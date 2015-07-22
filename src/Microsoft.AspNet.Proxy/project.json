@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0-*",
+  "description": "Proxy Library",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/aspnet/proxy"
+  },
+  "dependencies": {
+    "Microsoft.AspNet.Http.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.NotNullAttribute.Sources": {"version": "1.0.0-*", "type": "build"}
+  },
+
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": { "System.Net.Http": "" }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Collections": "4.0.10-*",
+        "System.Linq": "4.0.0-*",
+        "System.Threading": "4.0.10-*",
+        "Microsoft.CSharp": "4.0.0-*",
+        "Microsoft.Net.Http.Client": "1.0.0-*"
+      }
+    }
+  }
+}

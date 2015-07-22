@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0-*",
+  "description": "Microsoft.AspNet.Proxy.Test Class Library",
+  "dependencies": {
+    "Microsoft.Net.Http.Client": "1.0.0-*",
+    "Microsoft.AspNet.Proxy": "1.0.0-*",
+    "Microsoft.AspNet.TestHost": "1.0.0-*",
+    "xunit.runner.aspnet": "2.0.0-aspnet-*"
+  },
+  "commands": {
+    "test": "xunit.runner.aspnet"
+  },
+  "frameworks": {
+    "dnx451": { },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Collections": "4.0.10-*",
+        "System.Linq": "4.0.0-*",
+        "Microsoft.CSharp": "4.0.0-*"
+      }
+    }
+  }
+}
