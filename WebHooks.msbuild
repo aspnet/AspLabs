@@ -1,0 +1,119 @@
+<Project DefaultTargets="UnitTest" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="tools/WebStack.tasks.targets"/>
+  <UsingTask TaskName="SkipStrongNames.CheckSkipStrongNamesStatus" AssemblyFile="$(SkipStrongNamesExe)" />
+
+  <PropertyGroup>
+    <!-- build.cmd sets /p:Desktop=true. The CI server does not; instead, it does an additional step with /p:Configuration=CodeAnalysis. -->
+    <Configuration Condition=" '$(Configuration)' == '' and '$(Desktop)' == 'true' ">CodeAnalysis</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <CodeAnalysis Condition=" '$(CodeAnalysis)' == '' and '$(Configuration)' != 'Release' ">true</CodeAnalysis>
+    <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
+    <BuildPortable Condition=" '$(BuildPortable)' == '' ">true</BuildPortable>
+    <BuildInParallel Condition=" '$(BuildInParallel)' == '' And $(MSBuildNodeCount) &gt; 1 ">true</BuildInParallel>
+    <BuildInParallel Condition=" '$(BuildInParallel)' == '' ">false</BuildInParallel>
+    <TestResultsDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\test\TestResults\</TestResultsDirectory>
+    <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
+    <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
+    <NuGetExe>.nuget\NuGet.exe</NuGetExe>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SolutionsToBuild Include="WebHooks.sln">
+      <BuildInParallel>$(BuildInParallel)</BuildInParallel>
+    </SolutionsToBuild>
+  </ItemGroup>
+
+  <Target Name="EnableSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
+    <Exec Command='"$(SkipStrongNamesExe)" -e "$(SkipStrongNamesXml)"' />
+    <CheckSkipStrongNamesStatus AssembliesFile="$(SkipStrongNamesXml)">
+      <Output TaskParameter="Status" PropertyName="Status" />
+    </CheckSkipStrongNamesStatus>
+    <Message Text="SkipStrongNames: $(Status)" Importance="High" />
+  </Target>
+
+  <Target Name="DisableSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
+    <Exec Command='"$(SkipStrongNamesExe)" -d "$(SkipStrongNamesXml)"' />
+    <CheckSkipStrongNamesStatus AssembliesFile="$(SkipStrongNamesXml)">
+      <Output TaskParameter="Status" PropertyName="Status" />
+    </CheckSkipStrongNamesStatus>
+    <Message Text="SkipStrongNames: $(Status)" Importance="High" />
+  </Target>
+
+  <Target Name="Integration" DependsOnTargets="Clean;Build;UnitTest" />
+
+  <Target Name="Clean">
+    <MSBuild
+        Projects="@(SolutionsToBuild)"
+        Targets="Clean"
+        Condition=" '%(SolutionsToBuild.Portable)' != 'true' or '$(BuildPortable)' == 'true' "
+        Properties="Configuration=$(Configuration);VisualStudioVersion=$(VisualStudioVersion)" />
+    <RemoveDir Directories="bin\$(Configuration)" />
+  </Target>
+
+  <Target Name="DownloadNuGet">
+    <DownloadNuGet OutputFileName="$(NuGetExe)" MinimumVersion="2.7.0" />
+  </Target>
+
+  <Target Name="RestoreSkipStrongNames" DependsOnTargets="DownloadNuGet">
+    <Exec Command='"$(NuGetExe)" restore .nuget\packages.config -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile .nuget\NuGet.Config' />
+  </Target>
+
+  <Target Name="RestorePackages" DependsOnTargets="DownloadNuGet">
+    <Message Text="Restoring NuGet packages..." Importance="High" />
+    <Exec Command='"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
+    <!-- Pick the right Microsoft.Web.FxCop package to use and copy it to a standard location. -->
+  </Target>
+  
+  <Target Name="BuildTools">
+    <PropertyGroup>
+        <FxCopProjectLocation>$(MsBuildThisFileDirectory)tools\src\Microsoft.Web.FxCop\</FxCopProjectLocation>
+        <CustomFxCopRulesPath>$(MsBuildThisFileDirectory)packages\CustomFxCopRules</CustomFxCopRulesPath>
+    </PropertyGroup>
+    <MsBuild 
+          Condition=" '$(CodeAnalysis)' == 'true' "
+          Projects="$(FxCopProjectLocation)\Microsoft.Web.FxCop.csproj" 
+          Properties="Configuration=Release;OutputPath=$(CustomFxCopRulesPath)" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="RestorePackages;BuildTools">
+    <!-- we need to batch the solution files since they both build Microsoft.TestCommon -->
+    <Error Condition=" '$(CodeAnalysis)' == 'true' and '$(Configuration)' == 'Release' " Text="Unable to run code analysis in Release configuration. Release assemblies do not include SuppressMessage attributes (so code analysis would always fail with the errors that are normally suppressed)." />
+    <MakeDir Directories="bin\$(Configuration)" />
+    <MSBuild
+          Projects="@(SolutionsToBuild)"
+          BuildInParallel="%(SolutionsToBuild.BuildInParallel)"
+          Targets="Build"
+          Condition=" '%(SolutionsToBuild.Portable)' != 'true' or '$(BuildPortable)' == 'true' "
+          Properties="Configuration=$(Configuration);CodeAnalysis=$(CodeAnalysis);StyleCopEnabled=$(StyleCopEnabled);VisualStudioVersion=$(VisualStudioVersion)" />
+  </Target>
+
+  <Target Name="UnitTest" DependsOnTargets="CheckSkipStrongNames;Build">
+    <CallTarget Targets="RunTests;PrintTestRunSummary" RunEachTargetSeparately="True" />
+  </Target>
+
+  <Target Name="RunTests" DependsOnTargets="CheckSkipStrongNames">
+    <ItemGroup>
+      <TestDLLsXunit Include="bin\$(Configuration)\test\*.Test.dll;bin\$(Configuration)\test\*.Test.*.dll;bin\$(Configuration)\Test\NetCore\*.Test.dll" />
+      <XunitProject Include="tools\WebStack.xunit.targets">
+        <Properties>TestAssembly=%(TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(TestDLLsXunit.FileName)-XunitResults.xml</Properties>
+      </XunitProject>
+    </ItemGroup>
+
+    <!-- Re-create the test results directory so that print summary doesn't run on old test results -->
+    <RemoveDir Directories="$(TestResultsDirectory)" />
+    <MakeDir Directories="$(TestResultsDirectory)" />
+
+    <MSBuild Projects="@(XunitProject)" BuildInParallel="$(BuildInParallel)" Targets="Xunit" />
+  </Target>
+
+  <Target Name="CheckSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
+    <CheckSkipStrongNamesStatus AssembliesFile="$(SkipStrongNamesXml)">
+      <Output TaskParameter="Status" PropertyName="Status" />
+    </CheckSkipStrongNamesStatus>
+    <Error Text="Unit tests will not run correctly unless SkipStrongNames is Enabled. Current status: $(Status). Run build.cmd EnableSkipStrongNames to fix this problem." Condition="'$(Status)' != 'Enabled'" />
+  </Target>
+
+  <Target Name="PrintTestRunSummary">
+    <PrintTestRunSummary TestResultsDirectory="$(TestResultsDirectory)" />
+  </Target>
+</Project>

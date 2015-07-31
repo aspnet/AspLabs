@@ -1,0 +1,20 @@
+<Project ToolsVersion="4.0" DefaultTargets="Xunit" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="WebStack.tasks.targets"/>
+
+    <!-- This is a separate MSBuild file so that we can survive upgrades of the xunit NuGet package
+         and also still work with NuGet Package Restore. -->
+    <ItemGroup>
+        <XunitMsBuildRunner Include="..\packages\**\xunit.runner.msbuild.dll"/>
+    </ItemGroup>
+    <UsingTask TaskName="Xunit.Runner.MSBuild.xunit" AssemblyFile="@(XunitMsBuildRunner)"/>
+
+    <Target Name="Xunit">
+        <xunit Assemblies="$(TestAssembly)" Xml="$(XmlPath)"/>
+        <!-- Replace potentially illegal escaped characters -->
+        <RegexReplace
+            Files="$(XmlPath)"
+            Find="&amp;#x(?&lt;char&gt;[0-9A-Fa-f]+);"
+            Replace="\0x${char}"
+            WarnOnNoMatch="false"/>
+    </Target>
+</Project>

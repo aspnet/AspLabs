@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assemblies defaultPublicKeyToken="31bf3856ad364e35">
+  <!-- Production assemblies -->
+  <assembly name="Microsoft.AspNet.WebHooks.Common.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.Api.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.AzureStorage.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.Mvc.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Custom.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Slack.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress.dll"/>
+
+  <!-- Unit test assemblies and helpers -->
+  <assembly name="Microsoft.AspNet.WebHooks.Common.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.Api.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.AzureStorage.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Custom.Mvc.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Custom.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Slack.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello.Test.dll"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress.Test.dll"/>
+  <assembly name="Microsoft.TestUtilities"/>
+</assemblies>

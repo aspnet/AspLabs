@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.AspNet.WebHooks.Custom.Mvc</id>
+    <version>1.0.0-beta</version>
+    <title>Microsoft ASP.NET Custom WebHooks MVC Module</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      This package exposes helpers for managing and triggering your custom WebHooks from within ASP.NET MVC Controllers.
+    </description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <tags>microsoft aspnet webapi aspnetwebapi webhooks</tags>
+  </metadata>
+</package>

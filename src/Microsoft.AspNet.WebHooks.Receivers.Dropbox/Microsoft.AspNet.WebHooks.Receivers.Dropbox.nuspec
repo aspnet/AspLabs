@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.AspNet.WebHooks.Receivers.Dropbox</id>
+    <version>1.0.0-beta</version>
+    <title>Microsoft ASP.NET WebHooks Receiver for Dropbox</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      This package provides support for receiving WebHooks from Dropbox.
+      For information about Dropbox WebHooks, see "https://www.dropbox.com/developers/webhooks/docs".
+    </description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Dropbox</tags>
+  </metadata>
+</package>

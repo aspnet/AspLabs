@@ -1,0 +1,80 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <StyleCopMsBuildRunner Include="$(WebStackRootPath)packages\**\StyleCop.dll"/>
+    <StyleCopAdditionalAddins Include="$(WebStackRootPath)packages\**\Microsoft.Web.StyleCop.dll" />
+    <StyleCopAdditionalAddinPaths Include="@(StyleCopAdditionalAddins -> '%(RootDir)%(Directory)')" />
+  </ItemGroup>
+
+  <UsingTask AssemblyFile="@(StyleCopMsBuildRunner)" TaskName="StyleCopTask" Condition=" '@(StyleCopMsBuildRunner)' != '' " />
+
+  <PropertyGroup>
+    <PrepareForRunDependsOn>$(PrepareForRunDependsOn);StyleCop</PrepareForRunDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsStyleCopEnabled Condition="'$(IsStyleCopEnabled)' == ''">$(StyleCopEnabled)</IsStyleCopEnabled>
+    <StyleCopForceFullAnalysis Condition="'$(StyleCopForceFullAnalysis)' == ''">false</StyleCopForceFullAnalysis>
+    <StyleCopCacheResults Condition="'$(StyleCopCacheResults)' == ''">true</StyleCopCacheResults>
+    <StyleCopTreatErrorsAsWarnings Condition="'$(StyleCopTreatErrorsAsWarnings)' == ''">true</StyleCopTreatErrorsAsWarnings>
+    <StyleCopOverrideSettingsFile Condition="'$(StyleCopOverrideSettingsFile)' == ''"> </StyleCopOverrideSettingsFile>
+    <StyleCopOutputFile Condition="'$(StyleCopOutputFile)' == ''">$(IntermediateOutputPath)StyleCopViolations.xml</StyleCopOutputFile>
+    <StyleCopSuccessMarkerFile Condition="'$(StyleCopSuccessMarkerFile)' == ''">$(IntermediateOutputPath)StyleCop.success</StyleCopSuccessMarkerFile>
+    <!-- Specifying 0 will cause StyleCop to use the default violation count limit.
+         Specifying any positive number will cause StyleCop to use that number as the violation count limit.
+         Specifying any negative number will cause StyleCop to allow any number of violations without limit. -->
+    <StyleCopMaxViolationCount Condition="'$(StyleCopMaxViolationCount)' == ''">0</StyleCopMaxViolationCount>
+  </PropertyGroup>
+
+  <!-- Define target: StyleCop -->
+  <Target Name="StyleCop" Inputs="@(Compile)" Outputs="$(StyleCopSuccessMarkerFile)" Condition="'$(IsStyleCopEnabled)' == 'true'">
+    <PropertyGroup>
+      <StyleCopMsBuildRunner>@(StyleCopMsBuildRunner)</StyleCopMsBuildRunner>
+    </PropertyGroup>
+    <Error Text="Multiple StyleCop copies detected. Please clean out your packages folder and try again."
+           Condition=" $(StyleCopMsBuildRunner.Contains(';')) " />
+
+    <Delete Files="$(StyleCopSuccessMarkerFile)" Condition="Exists('$(StyleCopSuccessMarkerFile)')" />
+
+    <Message Text="Running Style Analysis..." Importance="high" />
+    <Message Text="Forcing full StyleCop reanalysis." Condition="'$(StyleCopForceFullAnalysis)' == 'true'" Importance="Low" />
+
+    <!-- Determine what files should be checked. Take all Compile items, but exclude those that have
+        set ExcludeFromStyleCop=true or ExcludeFromSourceAnalysis=true. -->
+    <ItemGroup>
+      <StyleCopFiles Include="@(Compile)" Condition=" '%(Compile.ExcludeFromStyleCop)' != 'true' and '%(Compile.ExcludeFromSourceAnalysis)' != 'true'" />
+      <StyleCopExcludedFiles Include="@(Compile)" Condition=" '%(Compile.ExcludeFromStyleCop)' == 'true' or '%(Compile.ExcludeFromSourceAnalysis)' == 'true'" />
+    </ItemGroup>
+
+    <Message Text="Analyzing @(StyleCopFiles)" Importance="Low" />
+
+    <!-- Show list of what files should be excluded. checked. Take all Compile items, but exclude those that have
+        set ExcludeFromStyleCop=true or ExcludeFromSourceAnalysis=true. -->
+    <Message Text="Excluding @(StyleCopExcludedFiles)" Importance="Normal" Condition=" '@(StyleCopExcludedFiles)' != '' "/>
+
+    <!-- Run the StyleCop MSBuild task. -->
+    <StyleCopTask
+      ProjectFullPath="$(MSBuildProjectDirectory)"
+      SourceFiles="@(StyleCopFiles)"
+      AdditionalAddinPaths="@(StyleCopAdditionalAddinPaths)"
+      ForceFullAnalysis="$(StyleCopForceFullAnalysis)"
+      DefineConstants="$(DefineConstants)"
+      TreatErrorsAsWarnings="$(StyleCopTreatErrorsAsWarnings)"
+      CacheResults="$(StyleCopCacheResults)"
+      OverrideSettingsFile="$(StyleCopOverrideSettingsFile)"
+      OutputFile="$(StyleCopOutputFile)"
+      MaxViolationCount="$(StyleCopMaxViolationCount)" />
+
+    <!-- Make output files cleanable -->
+    <ItemGroup>
+      <FileWrites Include="$(StyleCopOutputFile)" />
+      <FileWrites Include="$(StyleCopSuccessMarkerFile)" />
+    </ItemGroup>
+
+    <Touch Files="$(StyleCopSuccessMarkerFile)" AlwaysCreate="true" />
+
+    <!-- Add the StyleCop.cache file to the list of files we've written - so they can be cleaned up on a Build Clean. -->
+    <CreateItem Include="StyleCop.Cache" Condition="'$(StyleCopCacheResults)' == 'true'">
+      <Output TaskParameter="Include" ItemName="FileWrites"/>
+    </CreateItem>
+  </Target>
+</Project>

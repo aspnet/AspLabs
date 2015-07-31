@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.AspNet.WebHooks.Custom.Api</id>
+    <version>1.0.0-beta</version>
+    <title>Microsoft ASP.NET Custom WebHooks Web API Module</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      This package contains a set of ASP.NET Web API Controllers for managing your custom WebHooks filters and registrations
+      through a REST-style interface.
+    </description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
+  </metadata>
+</package>
