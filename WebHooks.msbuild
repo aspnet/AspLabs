@@ -70,7 +70,7 @@
 
   <Target Name="BuildPackages" DependsOnTargets="UnitTest">
     <Message Text='Building NuGet packages...' Importance="High" />
-    <Exec Command='"$(NuGetExe)" pack "%(NugetsToBuild.RecursiveDir)%(NugetsToBuild.FileName).csproj" -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory bin\$(Configuration) -Properties SymVersion=$(SymVersion)' />
+    <Exec Command='"$(NuGetExe)" pack "%(NugetsToBuild.RecursiveDir)%(NugetsToBuild.FileName).csproj" -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory bin\$(Configuration) -Properties SymVersion=$(SymVersion);Configuration=$(Configuration)' />
   </Target>
 
   <Target Name="BuildTools">
