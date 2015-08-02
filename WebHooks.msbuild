@@ -1,4 +1,4 @@
-<Project DefaultTargets="UnitTest" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="BuildPackages" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="tools/WebStack.tasks.targets"/>
   <UsingTask TaskName="SkipStrongNames.CheckSkipStrongNamesStatus" AssemblyFile="$(SkipStrongNamesExe)" />
 
@@ -15,12 +15,16 @@
     <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
     <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
     <NuGetExe>.nuget\NuGet.exe</NuGetExe>
+
+    <!-- Sym versioning for Nuget packages -->
+    <SymVersion Condition=" '$(SymVersion)' == ''">1.1.0-beta</SymVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <SolutionsToBuild Include="WebHooks.sln">
       <BuildInParallel>$(BuildInParallel)</BuildInParallel>
     </SolutionsToBuild>
+    <NugetsToBuild Include="**\*.nuspec"/>
   </ItemGroup>
 
   <Target Name="EnableSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
@@ -63,7 +67,12 @@
     <Exec Command='"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
     <!-- Pick the right Microsoft.Web.FxCop package to use and copy it to a standard location. -->
   </Target>
-  
+
+  <Target Name="BuildPackages" DependsOnTargets="UnitTest">
+    <Message Text='Building NuGet packages...' Importance="High" />
+    <Exec Command='"$(NuGetExe)" pack "%(NugetsToBuild.RecursiveDir)%(NugetsToBuild.FileName).csproj" -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory bin\$(Configuration) -Properties SymVersion=$(SymVersion)' />
+  </Target>
+
   <Target Name="BuildTools">
     <PropertyGroup>
         <FxCopProjectLocation>$(MsBuildThisFileDirectory)tools\src\Microsoft.Web.FxCop\</FxCopProjectLocation>

@@ -89,7 +89,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.WebHooks.Receivers.WordPress.nuspec" />
+    <None Include="Microsoft.AspNet.WebHooks.Receivers.WordPress.nuspec" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

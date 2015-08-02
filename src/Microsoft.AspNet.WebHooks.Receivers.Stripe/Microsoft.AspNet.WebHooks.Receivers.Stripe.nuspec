@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Microsoft.AspNet.WebHooks.Receivers.Stripe</id>
-    <version>1.0.0-beta</version>
+    <id>$id$</id>
+    <version>$symversion$</version>
     <title>Microsoft ASP.NET WebHooks Receiver for Stripe</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
