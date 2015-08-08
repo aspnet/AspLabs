@@ -11,6 +11,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Slack"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe"/>
@@ -28,6 +29,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Slack.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe.Test"/>
