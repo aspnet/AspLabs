@@ -35,7 +35,7 @@ namespace Microsoft.AspNet.WebHooks
         internal const string SignatureHeaderKey = "sha256";
         internal const string SignatureHeaderValueTemplate = SignatureHeaderKey + "={0}";
         internal const string SignatureHeaderName = "ms-signature";
-        internal const string BodyFiltersKey = "Filters";
+        internal const string BodyActionsKey = "Actions";
 
         private readonly IEnumerable<string> _names;
 
@@ -91,8 +91,8 @@ namespace Microsoft.AspNet.WebHooks
                 JObject data = await ReadAsJsonAsync(request);
 
                 // Pick out actions from data
-                var filters = data[BodyFiltersKey];
-                IEnumerable<string> actions = filters != null ? filters.Values<string>() : Enumerable.Empty<string>();
+                var rawActions = data[BodyActionsKey];
+                IEnumerable<string> actions = rawActions != null ? rawActions.Values<string>() : Enumerable.Empty<string>();
 
                 // Call registered handlers
                 return await ExecuteWebHookAsync(receiver, context, request, actions, data);

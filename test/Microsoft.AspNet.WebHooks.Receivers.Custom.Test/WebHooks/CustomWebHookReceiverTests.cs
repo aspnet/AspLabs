@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class CustomWebHookReceiverTests
     {
-        private const string TestContent = "{ \"key\": \"value\" }";
+        private const string TestContent = "{\r\n  \"Id\": \"1234567890\",\r\n  \"Attempt\": 1,\r\n  \"Actions\": [\r\n    \"a1\"\r\n  ],\r\n  \"Data\": {\r\n    \"d1\": \"dv1\"\r\n  },\r\n  \"Properties\": {\r\n    \"p1\": \"pv1\"\r\n  }\r\n}";
         private const string TestReceiver = "Test";
         private const string TestSecret = "12345678901234567890123456789012";
 
@@ -247,9 +247,11 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string header)
         {
             // Arrange
+            WebHooksConfig.Initialize(_config);
+            List<string> actions = new List<string> { "a1" };
             _postRequest.Headers.Add(CustomWebHookReceiver.SignatureHeaderName, header);
             _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>())
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 

@@ -209,10 +209,11 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string header)
         {
             // Arrange
+            List<string> actions = new List<string> { "action1" };
             _postRequest.Headers.Add(GitHubWebHookReceiver.SignatureHeaderName, header);
-            _postRequest.Headers.Add(GitHubWebHookReceiver.EventHeaderName, "action");
+            _postRequest.Headers.Add(GitHubWebHookReceiver.EventHeaderName, "action1");
             _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>())
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 

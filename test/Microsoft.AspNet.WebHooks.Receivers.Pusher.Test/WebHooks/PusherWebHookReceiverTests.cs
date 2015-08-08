@@ -299,9 +299,10 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest()
         {
             // Arrange
+            List<string> actions = new List<string> { "event_name" };
             _postRequest.Headers.Add(PusherWebHookReceiver.SignatureHeaderName, _testSignature);
             _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>())
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 

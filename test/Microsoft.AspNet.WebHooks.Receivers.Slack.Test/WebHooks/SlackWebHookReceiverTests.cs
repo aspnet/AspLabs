@@ -143,10 +143,12 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest()
         {
             // Arrange
+            WebHooksConfig.Initialize(_config);
+            List<string> actions = new List<string> { "trigger: hello!" };
             string content = "token=" + TestSecret + "&trigger_word=trigger:+hello!";
             _postRequest.Content = new StringContent(content, Encoding.UTF8, "application/x-www-form-urlencoded");
             _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>())
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 

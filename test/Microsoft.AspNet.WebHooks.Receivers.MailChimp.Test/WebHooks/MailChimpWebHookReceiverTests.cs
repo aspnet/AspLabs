@@ -152,9 +152,10 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             string content = "type=hello";
+            List<string> actions = new List<string> { "hello" };
             _postRequest.Content = new StringContent(content, Encoding.UTF8, "application/x-www-form-urlencoded");
             _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>())
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 
