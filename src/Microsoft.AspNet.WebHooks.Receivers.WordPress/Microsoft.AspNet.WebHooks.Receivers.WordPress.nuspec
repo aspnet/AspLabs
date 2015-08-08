@@ -11,8 +11,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides support for receiving WebHooks from WordPress.
-      For information about WordPress WebHooks, see "https://en.support.wordpress.com/webhooks/".
+      This package provides support for receiving WebHooks from WordPress. For information about WordPress WebHooks, see "https://en.support.wordpress.com/webhooks/".
     </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>

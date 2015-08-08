@@ -10,7 +10,9 @@
     <projectUrl>http://www.asp.net/</projectUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>This package provides common functionality for sending and receiving WebHooks using ASP.NET.</description>
+    <description>
+      This package provides common functionality for sending and receiving WebHooks using ASP.NET.
+    </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>

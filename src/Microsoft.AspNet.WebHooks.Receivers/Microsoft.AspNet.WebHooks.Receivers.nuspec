@@ -11,8 +11,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides a uniform model for receiving WebHooks from an open-ended set of WebHook generators such
-      as Dropbox, GitHub, Slack, and many more.
+      This package provides a uniform model for receiving WebHooks from an open-ended set of WebHook generators such as Dropbox, GitHub, Slack, and many more.
     </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>

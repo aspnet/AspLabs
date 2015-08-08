@@ -11,8 +11,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides support for receiving WebHooks from Dropbox.
-      For information about Dropbox WebHooks, see "https://www.dropbox.com/developers/webhooks/docs".
+      This package provides support for receiving WebHooks from Dropbox. For information about Dropbox WebHooks, see "https://www.dropbox.com/developers/webhooks/docs".
     </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
