@@ -3,18 +3,17 @@
 
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Extensions
 {
     public class HttpContentExtensionsTests
     {
-        public static TheoryDataCollection<string, bool> JsonMediaTypes
+        public static TheoryData<string, bool> JsonMediaTypes
         {
             get
             {
-                return new TheoryDataCollection<string, bool>
+                return new TheoryData<string, bool>
                 {
                     { "app/json", false },
                     { "other/json", false },

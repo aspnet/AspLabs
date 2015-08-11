@@ -25,11 +25,15 @@ namespace System.Web.Http
         public ApiControllerExtensionsTests()
         {
             HttpConfiguration config = new HttpConfiguration();
+            IWebHookUser user = new WebHookUser();
 
             _managerMock = new Mock<IWebHookManager>();
             _resolverMock = new Mock<IDependencyResolver>();
             _resolverMock.Setup(r => r.GetService(typeof(IWebHookManager)))
                 .Returns(_managerMock.Object)
+                .Verifiable();
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(user)
                 .Verifiable();
 
             config.DependencyResolver = _resolverMock.Object;

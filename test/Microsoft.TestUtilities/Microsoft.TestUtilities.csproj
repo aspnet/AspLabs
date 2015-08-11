@@ -65,7 +65,6 @@
     <Compile Include="PropertyAssert.cs" />
     <Compile Include="PropertySetter.cs" />
     <Compile Include="TestDataSets.cs" />
-    <Compile Include="TheoryDataCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\..\CustomDictionary.xml">

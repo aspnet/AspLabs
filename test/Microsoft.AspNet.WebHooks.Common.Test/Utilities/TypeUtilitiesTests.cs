@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Utilities
@@ -21,11 +20,11 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         {
         }
 
-        public static TheoryDataCollection<Type, Type, bool> IsTypeData
+        public static TheoryData<Type, Type, bool> IsTypeData
         {
             get
             {
-                return new TheoryDataCollection<Type, Type, bool>
+                return new TheoryData<Type, Type, bool>
                 {
                     { DateTime.Now.GetType(), typeof(DateTime), false },
                     { DayOfWeek.Saturday.GetType(), typeof(int), false },
@@ -101,6 +100,20 @@ namespace Microsoft.AspNet.WebHooks.Utilities
 
             // Assert
             Assert.Empty(actual);
+        }
+
+        [Fact]
+        public void GetInstances_CreatesExpectedInstances()
+        {
+            // Arrange
+            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+
+            // Act
+            ICollection<ITestType> actual = TypeUtilities.GetInstances<ITestType>(asms, t => TypeUtilities.IsType<ITestType>(t));
+
+            // Assert
+            Assert.Equal(1, actual.Count);
+            Assert.IsType<TestType>(actual.Single());
         }
 
         public class TestType : ITestType

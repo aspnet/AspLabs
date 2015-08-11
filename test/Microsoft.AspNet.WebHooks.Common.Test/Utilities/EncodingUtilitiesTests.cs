@@ -4,18 +4,17 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Utilities
 {
     public class EncodingUtilitiesTests
     {
-        public static TheoryDataCollection<string> HexData
+        public static TheoryData<string> HexData
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     string.Empty,
                     " ",
@@ -27,11 +26,11 @@ namespace Microsoft.AspNet.WebHooks.Utilities
             }
         }
 
-        public static TheoryDataCollection<string> InvalidHexData
+        public static TheoryData<string> InvalidHexData
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     "E4BDA0E5A5BDE4B896E7958",
                     "4BDA0E5A5BDE4B896E7958C",

@@ -2,18 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace System
 {
     public class StringExtensionsTests
     {
-        public static TheoryDataCollection<string, char[], string[]> SplitAndTrimData
+        public static TheoryData<string, char[], string[]> SplitAndTrimData
         {
             get
             {
-                return new TheoryDataCollection<string, char[], string[]>
+                return new TheoryData<string, char[], string[]>
                 {
                     { null, new[] { ',' }, new string[0] },
                     { string.Empty, new[] { ',' }, new string[0] },

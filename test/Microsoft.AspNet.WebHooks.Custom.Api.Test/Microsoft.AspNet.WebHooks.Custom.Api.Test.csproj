@@ -57,6 +57,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WebHookFiltersControllerTests.cs" />
+    <Compile Include="Controllers\WebHookRegistrationsControllerTests.cs" />
     <Compile Include="Filters\ValidateModelAttributeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -68,6 +70,10 @@
     <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Custom.Api\Microsoft.AspNet.WebHooks.Custom.Api.csproj">
       <Project>{f0ee25b8-d851-40da-ab2a-e0bace9c1e5d}</Project>
       <Name>Microsoft.AspNet.WebHooks.Custom.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Custom\Microsoft.AspNet.WebHooks.Custom.csproj">
+      <Project>{d4d210c6-3283-4d1d-806e-8717d8f51179}</Project>
+      <Name>Microsoft.AspNet.WebHooks.Custom</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.TestUtilities\Microsoft.TestUtilities.csproj">
       <Project>{608b1d09-e4de-4dba-8dbf-7758003988f0}</Project>

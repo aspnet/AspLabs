@@ -3,16 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Microsoft.TestUtilities
 {
     public static class TestDataSets
     {
-        public static TheoryDataCollection<object> MixedInstancesDataSet
+        public static TheoryData<object> MixedInstancesDataSet
         {
             get
             {
-                return new TheoryDataCollection<object>
+                return new TheoryData<object>
                 {
                     "test",
                     new string[] { "A", "B", "C" },
@@ -25,20 +26,20 @@ namespace Microsoft.TestUtilities
             }
         }
 
-        public static TheoryDataCollection<bool> BoolDataSet
+        public static TheoryData<bool> BoolDataSet
         {
             get
             {
-                return new TheoryDataCollection<bool> { true, false };
+                return new TheoryData<bool> { true, false };
             }
         }
 
-        public static TheoryDataCollection<string> EmptyOrWhiteSpaceStringDataSet
+        public static TheoryData<string> EmptyOrWhiteSpaceStringDataSet
         {
             get
             {
-                return new TheoryDataCollection<string> 
-                { 
+                return new TheoryData<string>
+                {
                     string.Empty,
                     "   ",
                     "\t",
@@ -50,12 +51,12 @@ namespace Microsoft.TestUtilities
             }
         }
 
-        public static TheoryDataCollection<string, string> CaseInsensitiveDataSet
+        public static TheoryData<string, string> CaseInsensitiveDataSet
         {
             get
             {
-                return new TheoryDataCollection<string, string> 
-                { 
+                return new TheoryData<string, string>
+                {
                     { string.Empty, string.Empty },
                     { "test", "TEST" },
                     { "TEST", "test" },

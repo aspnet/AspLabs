@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Microsoft.TestUtilities;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -21,11 +20,11 @@ namespace Microsoft.AspNet.WebHooks
             _context = new WebHookHandlerContext(_actions);
         }
 
-        public static TheoryDataCollection<object> Data
+        public static TheoryData<object> Data
         {
             get
             {
-                return new TheoryDataCollection<object>
+                return new TheoryData<object>
                 {
                     new NameValueCollection(),
                     new JObject(),

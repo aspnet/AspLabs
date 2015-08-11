@@ -13,7 +13,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Dependencies;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Mocks;
-using Microsoft.TestUtilities;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -42,11 +41,11 @@ namespace Microsoft.AspNet.WebHooks
             _request.SetRequestContext(_context);
         }
 
-        public static TheoryDataCollection<byte[], byte[], bool> ByteCompareData
+        public static TheoryData<byte[], byte[], bool> ByteCompareData
         {
             get
             {
-                return new TheoryDataCollection<byte[], byte[], bool>
+                return new TheoryData<byte[], byte[], bool>
                 {
                     { null, null, true },
                     { new byte[0], null, false },

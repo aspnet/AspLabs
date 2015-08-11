@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
@@ -43,11 +42,11 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.SetRequestContext(_context);
         }
 
-        public static TheoryDataCollection<string, string, string> Texts
+        public static TheoryData<string, string, string> Texts
         {
             get
             {
-                return new TheoryDataCollection<string, string, string>
+                return new TheoryData<string, string, string>
                 {
                     { string.Empty, null, string.Empty },
                     { string.Empty, string.Empty, string.Empty },

@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
@@ -47,11 +46,11 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
         }
 
-        public static TheoryDataCollection<string> InvalidPostHeaders
+        public static TheoryData<string> InvalidPostHeaders
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     string.Empty,
                     "=",
@@ -65,7 +64,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [SuppressMessage("Microsoft.Security.Cryptography", "CA5354:SHA1CannotBeUsed", Justification = "Required by GitHib")]
-        public static TheoryDataCollection<string> ValidPostRequest
+        public static TheoryData<string> ValidPostRequest
         {
             get
             {
@@ -78,7 +77,7 @@ namespace Microsoft.AspNet.WebHooks
                     testSignature = EncodingUtilities.ToHex(testHash);
                 }
 
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     "sha1=" + testSignature,
                     " sha1=" + testSignature,

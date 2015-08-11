@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.AspNet.WebHooks.Diagnostics;
-using Microsoft.TestUtilities;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Newtonsoft.Json.Linq;
@@ -48,12 +47,12 @@ namespace Microsoft.AspNet.WebHooks
             _response = new HttpResponseMessage();
         }
 
-        public static TheoryDataCollection<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int> LaunchWebHooksData
+        public static TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int> LaunchWebHooksData
         {
             get
             {
                 TimeSpan delay = TimeSpan.FromMilliseconds(25);
-                return new TheoryDataCollection<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int>
+                return new TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int>
                 {
                     { new TimeSpan[0], CreateNotifyResponseHandler(1), 0 },
                     { new[] { delay }, CreateNotifyResponseHandler(2), 1 },
@@ -77,7 +76,7 @@ namespace Microsoft.AspNet.WebHooks
                     { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true), -3 },
                     { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true), -4 },
                     { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true), -5 },
- 
+
                     { new TimeSpan[0], CreateNotifyResponseHandler(1, failuresOnly: true, throwExceptions: true), -1 },
                     { new[] { delay }, CreateNotifyResponseHandler(2, failuresOnly: true, throwExceptions: true), -2 },
                     { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true, throwExceptions: true), -3 },

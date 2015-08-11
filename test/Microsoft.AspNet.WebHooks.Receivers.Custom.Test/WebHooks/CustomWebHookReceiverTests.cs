@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
@@ -51,11 +50,11 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
         }
 
-        public static TheoryDataCollection<string[], string[]> ReceiverNames
+        public static TheoryData<string[], string[]> ReceiverNames
         {
             get
             {
-                return new TheoryDataCollection<string[], string[]>
+                return new TheoryData<string[], string[]>
                 {
                     { new string[0], new string[0] },
                     { new string[] { string.Empty }, new string[0] },
@@ -72,11 +71,11 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryDataCollection<string> InvalidPostHeaders
+        public static TheoryData<string> InvalidPostHeaders
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     string.Empty,
                     "=",
@@ -89,7 +88,7 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryDataCollection<string> ValidPostRequest
+        public static TheoryData<string> ValidPostRequest
         {
             get
             {
@@ -102,7 +101,7 @@ namespace Microsoft.AspNet.WebHooks
                     testSignature = EncodingUtilities.ToHex(testHash);
                 }
 
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     "sha256=" + testSignature,
                     " sha256=" + testSignature,

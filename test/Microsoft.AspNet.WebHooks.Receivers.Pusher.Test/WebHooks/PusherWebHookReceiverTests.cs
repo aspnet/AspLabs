@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
@@ -58,11 +57,11 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryDataCollection<string, long, string[]> PusherData
+        public static TheoryData<string, long, string[]> PusherData
         {
             get
             {
-                return new TheoryDataCollection<string, long, string[]>
+                return new TheoryData<string, long, string[]>
                 {
                     { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"}]}", 1437252687875, new[] { "channel_vacated" } },
                     { "{\"time_ms\":1437252692478,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"},{\"channel\":\"my_channel\",\"name\":\"你好世界\"},]}", 1437252692478, new[] { "channel_vacated", "你好世界" } },
@@ -72,11 +71,11 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryDataCollection<string, IDictionary<string, string>> ValidSecretData
+        public static TheoryData<string, IDictionary<string, string>> ValidSecretData
         {
             get
             {
-                return new TheoryDataCollection<string, IDictionary<string, string>>
+                return new TheoryData<string, IDictionary<string, string>>
                 {
                     { "key1_secret1", new Dictionary<string, string> { { "key1", "secret1" } } },
                     { "你好_secret1,世界_secret2", new Dictionary<string, string> { { "你好", "secret1" }, { "世界", "secret2" } } },
@@ -89,11 +88,11 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryDataCollection<string> InvalidSecretData
+        public static TheoryData<string> InvalidSecretData
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                    "        _",
                    "        key",

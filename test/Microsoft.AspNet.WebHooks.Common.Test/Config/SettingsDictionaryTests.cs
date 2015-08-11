@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Config
@@ -12,11 +11,11 @@ namespace Microsoft.AspNet.WebHooks.Config
     {
         private readonly SettingsDictionary _settings = new SettingsDictionary();
 
-        public static TheoryDataCollection<string, string> CustomSettings
+        public static TheoryData<string, string> CustomSettings
         {
             get
             {
-                return new TheoryDataCollection<string, string>
+                return new TheoryData<string, string>
                 {
                     { "key", null },
                     { "key", string.Empty },
@@ -31,11 +30,11 @@ namespace Microsoft.AspNet.WebHooks.Config
             }
         }
 
-        public static TheoryDataCollection<string> UnknownKeys
+        public static TheoryData<string> UnknownKeys
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     "key",
                     "你好世界",

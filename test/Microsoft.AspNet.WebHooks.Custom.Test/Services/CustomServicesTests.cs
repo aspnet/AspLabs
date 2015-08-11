@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Web.Http;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Services
@@ -26,6 +27,45 @@ namespace Microsoft.AspNet.WebHooks.Services
 
             // Assert
             Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
+        public void SetStore_GetStore_Roundtrips()
+        {
+            // Arrange
+            Mock<IWebHookStore> storeMock = new Mock<IWebHookStore>();
+
+            // Act
+            CustomServices.SetStore(storeMock.Object);
+            IWebHookStore actual = CustomServices.GetStore();
+
+            // Assert
+            Assert.Same(storeMock.Object, actual);
+        }
+
+        [Fact]
+        public void GetUser_ReturnsSingleInstance()
+        {
+            // Act
+            IWebHookUser actual1 = CustomServices.GetUser();
+            IWebHookUser actual2 = CustomServices.GetUser();
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
+        public void SetUser_GetUser_Roundtrips()
+        {
+            // Arrange
+            Mock<IWebHookUser> userMock = new Mock<IWebHookUser>();
+
+            // Act
+            CustomServices.SetUser(userMock.Object);
+            IWebHookUser actual = CustomServices.GetUser();
+
+            // Assert
+            Assert.Same(userMock.Object, actual);
         }
 
         [Fact]

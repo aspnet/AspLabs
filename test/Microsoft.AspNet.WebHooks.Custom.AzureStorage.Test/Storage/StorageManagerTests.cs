@@ -4,7 +4,6 @@
 using System;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Storage;
-using Microsoft.TestUtilities;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
@@ -23,11 +22,11 @@ namespace Microsoft.Azure.Applications.Storage
             _manager = new StorageManager(_loggerMock.Object);
         }
 
-        public static TheoryDataCollection<string> InvalidConnectionStringData
+        public static TheoryData<string> InvalidConnectionStringData
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     null,
                     string.Empty,
@@ -37,11 +36,11 @@ namespace Microsoft.Azure.Applications.Storage
             }
         }
 
-        public static TheoryDataCollection<string> ValidConnectionStringData
+        public static TheoryData<string> ValidConnectionStringData
         {
             get
             {
-                return new TheoryDataCollection<string>
+                return new TheoryData<string>
                 {
                     "DefaultEndpointsProtocol=https;AccountName=invalid;AccountKey=7gd3Ln88FpnYtpRxqMYNr/qBjlo1x8+0NU69Rd5XbB1tVQ1Ty+5QVoCw2fwoSxUq046mDDZiUf3CwdPTfNvaBw==",
                     "UseDevelopmentStorage=true;"
@@ -49,11 +48,11 @@ namespace Microsoft.Azure.Applications.Storage
             }
         }
 
-        public static TheoryDataCollection<string, string, string> PartitionKeyConstraintData
+        public static TheoryData<string, string, string> PartitionKeyConstraintData
         {
             get
             {
-                return new TheoryDataCollection<string, string, string>
+                return new TheoryData<string, string, string>
                 {
                     { string.Empty, string.Empty, "PartitionKey eq ''" },
                     { string.Empty, "12345", "PartitionKey eq '12345'" },
@@ -68,11 +67,11 @@ namespace Microsoft.Azure.Applications.Storage
             }
         }
 
-        public static TheoryDataCollection<Exception, string> StorageErrorMessageData
+        public static TheoryData<Exception, string> StorageErrorMessageData
         {
             get
             {
-                return new TheoryDataCollection<Exception, string>
+                return new TheoryData<Exception, string>
                 {
                     { null, string.Empty },
                     { new Exception("你好"), "你好" },

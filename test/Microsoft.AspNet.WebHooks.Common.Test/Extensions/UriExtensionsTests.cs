@@ -1,18 +1,17 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.TestUtilities;
 using Xunit;
 
 namespace System
 {
     public class UriExtensionsTests
     {
-        public static TheoryDataCollection<string, bool> HttpsData
+        public static TheoryData<string, bool> HttpsData
         {
             get
             {
-                return new TheoryDataCollection<string, bool>
+                return new TheoryData<string, bool>
                 {
                     { "http://localhost", false },
                     { "https://localhost", true },
