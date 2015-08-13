@@ -117,14 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Receiver_BadEvent" xml:space="preserve">
+    <value>Could not parse Pusher WebHook data: {0}</value>
+  </data>
   <data name="Receiver_BadHeaderEncoding" xml:space="preserve">
     <value>The '{0}' header value is invalid. It must be a valid hex-encoded string.</value>
   </data>
   <data name="Receiver_NoChallenge" xml:space="preserve">
     <value>The WebHook verification request must contain a '{0}' query parameter which will get echoed back in a successful response.</value>
-  </data>
-  <data name="Receiver_NoEventName" xml:space="preserve">
-    <value>The event does not have a '{0}' property and as a result is ignored. Event data: '{1}'.</value>
   </data>
   <data name="Receiver_NoSecrets" xml:space="preserve">
     <value>Did not find any applications settings of the form '{0}'. To receive WebHooks from the '{1}' receiver, please add corresponding applications settings.</value>

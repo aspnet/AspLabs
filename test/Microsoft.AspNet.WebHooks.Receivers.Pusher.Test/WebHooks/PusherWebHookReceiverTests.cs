@@ -71,6 +71,19 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        public static TheoryData<string> InvalidPusherData
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                   "{ \"time_ms\": \"i n v a l i d\" }",
+                   "{ \"time_ms\": 1437252687875, \"events\": \"i n v a l i d\" }",
+                   "{ \"time_ms\": 1437252687875, \"events\": [ { \"name\": { } } ] }",
+                };
+            }
+        }
+
         public static TheoryData<string, IDictionary<string, string>> ValidSecretData
         {
             get
@@ -102,6 +115,21 @@ namespace Microsoft.AspNet.WebHooks
                    "        key_key_secret_secret",
                 };
             }
+        }
+
+        [Theory]
+        [MemberData("InvalidPusherData")]
+        public async Task GetPusherNotification_Throws_IfInvalidData(string invalid)
+        {
+            ReceiverMock mock = new ReceiverMock();
+            _postRequest.Content = new StringContent(invalid, Encoding.UTF8, "application/json");
+
+            // Act
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => mock.GetPusherNotification(_postRequest));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.StartsWith("Could not parse Pusher WebHook data: ", error.Message);
         }
 
         [Theory]

@@ -32,7 +32,6 @@ namespace Microsoft.AspNet.WebHooks
 
         internal const string SignatureHeaderName = "X-Pusher-Signature";
         internal const string KeyHeaderName = "X-Pusher-Key";
-        internal const string EventNameKey = "name";
 
         private static readonly string[] ReceiverNames = new string[] { "pusher" };
 
@@ -188,30 +187,18 @@ namespace Microsoft.AspNet.WebHooks
 
             JObject data = await ReadAsJsonAsync(request);
 
-            PusherNotification notification = new PusherNotification
+            try
             {
-                CreatedAt = data.Value<long>("time_ms"),
-            };
-
-            JArray events = data.Value<JArray>("events");
-            if (events != null)
-            {
-                foreach (JObject e in events)
-                {
-                    string action = e.Value<string>(EventNameKey);
-                    if (action == null)
-                    {
-                        string msg = string.Format(PusherReceiverResources.Receiver_NoEventName, EventNameKey, e.ToString());
-                        request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-                    }
-                    else
-                    {
-                        notification.Events.Add(action, e);
-                    }
-                }
+                PusherNotification notification = new PusherNotification(data);
+                return notification;
             }
-
-            return notification;
+            catch (Exception ex)
+            {
+                string msg = string.Format(PusherReceiverResources.Receiver_BadEvent, ex.Message);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage invalidData = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(invalidData);
+            }
         }
     }
 }
