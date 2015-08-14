@@ -1,6 +1,6 @@
 @echo off
-pushd %~dp0
 setlocal
+pushd %~dp0
 
 if exist bin goto build
 mkdir bin
@@ -8,8 +8,7 @@ mkdir bin
 :Build
 
 REM Find the most recent 32bit MSBuild.exe on the system. Require v12.0 (installed with VS2013) or later since .NET 4.0
-REM is not supported. Also handle x86 operating systems, where %ProgramFiles(x86)% is not defined. Always quote the
-REM %MSBuild% value when setting the variable and never quote %MSBuild% references.
+REM is not supported. Always quote the %MSBuild% value when setting the variable and never quote %MSBuild% references.
 set MSBuild="%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
 if not exist %MSBuild% @set MSBuild="%ProgramFiles(x86)%\MSBuild\12.0\Bin\MSBuild.exe"
 if not exist %MSBuild% (
@@ -40,13 +39,9 @@ goto BuildSuccess
 :BuildFail
 echo.
 echo *** BUILD FAILED ***
-goto End
+exit /B 999
 
 :BuildSuccess
 echo.
 echo **** BUILD SUCCESSFUL ***
-goto end
-
-:End
-popd
-endlocal
+exit /B 0
