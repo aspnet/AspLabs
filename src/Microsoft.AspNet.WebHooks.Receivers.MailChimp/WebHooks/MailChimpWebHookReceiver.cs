@@ -20,6 +20,7 @@ namespace Microsoft.AspNet.WebHooks
     /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/mailchimp?code=5a4bd5fe-a970-42f2-a0e9-676681788eb0</c>'.
     /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
     /// same value as configured in the '<c>MS_WebHookReceiverSecret_MailChimp</c>' application setting.
+    /// The 'code' parameter must be between 16 and 64 characters long.
     /// For details about MailChimp WebHooks, see <c>https://apidocs.mailchimp.com/webhooks/</c>. 
     /// </summary>
     public class MailChimpWebHookReceiver : WebHookReceiver
@@ -106,7 +107,7 @@ namespace Microsoft.AspNet.WebHooks
                 throw new HttpResponseException(noCode);
             }
 
-            string secretKey = GetWebHookSecret(request, SecretKey, 8, 64);
+            string secretKey = GetWebHookSecret(request, SecretKey, 16, 64);
             if (!string.Equals(code, secretKey, StringComparison.Ordinal))
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, MailChimpReceiverResources.Receiver_BadCode, CodeQueryParameter);

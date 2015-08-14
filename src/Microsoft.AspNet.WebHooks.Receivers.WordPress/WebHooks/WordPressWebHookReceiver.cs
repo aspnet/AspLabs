@@ -20,6 +20,7 @@ namespace Microsoft.AspNet.WebHooks
     /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/wordpress?code=c2e25cd9-6f63-44f6-bf2a-729bcc9f236a</c>'.
     /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
     /// same value as configured in the '<c>MS_WebHookReceiverSecret_WordPress</c>' application setting.
+    /// The 'code' parameter must be between 16 and 64 characters long.
     /// For details about WordPress WebHooks, see <c>https://en.support.wordpress.com/webhooks/</c>. 
     /// </summary>
     public class WordPressWebHookReceiver : WebHookReceiver
@@ -101,7 +102,7 @@ namespace Microsoft.AspNet.WebHooks
                 throw new HttpResponseException(noCode);
             }
 
-            string secretKey = GetWebHookSecret(request, SecretKey, 8, 64);
+            string secretKey = GetWebHookSecret(request, SecretKey, 16, 64);
             if (!string.Equals(code, secretKey, StringComparison.Ordinal))
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, WordPressReceiverResources.Receiver_BadCode, CodeQueryParameter);
