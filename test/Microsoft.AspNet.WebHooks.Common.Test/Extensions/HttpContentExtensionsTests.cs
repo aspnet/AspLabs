@@ -26,9 +26,13 @@ namespace Microsoft.AspNet.WebHooks.Extensions
                     { "application/json", true },
                     { "application/xyzjson", false },
                     { "text/xyzjson", false },
-                    { "application/hal-json", true },
+                    { "application/hal-json", false },
+                    { "application/hal;json", false },
+                    { "application/hal+json", true },
                     { "text/json", true },
-                    { "text/hal-json", true },
+                    { "text/hal-json", false },
+                    { "text/hal;json", false },
+                    { "text/hal+json", true },
                 };
             }
         }

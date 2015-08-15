@@ -41,6 +41,23 @@ namespace Microsoft.AspNet.WebHooks
             _request.SetRequestContext(_context);
         }
 
+        public static TheoryData<string> InvalidCodeQueries
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                    string.Empty,
+                    "=",
+                    "==",
+                    "invalid",
+                    "code",
+                    "code=",
+                    "k1=v1;k2=v2",
+                };
+            }
+        }
+
         public static TheoryData<byte[], byte[], bool> ByteCompareData
         {
             get
@@ -57,6 +74,89 @@ namespace Microsoft.AspNet.WebHooks
                     { Encoding.UTF8.GetBytes(new string('a', 8 * 1024)), Encoding.UTF8.GetBytes(new string('a', 8 * 1024)), true },
                 };
             }
+        }
+
+        public static TheoryData<string, string, bool> StringCompareData
+        {
+            get
+            {
+                return new TheoryData<string, string, bool>
+                {
+                    { null, null, true },
+                    { string.Empty, null, false },
+                    { null, string.Empty, false },
+                    { string.Empty, string.Empty, true },
+                    { "123", "1 2 3", false },
+                    { "你好世界", "你好世界", true },
+                    { "你好", "世界", false },
+                    { new string('a', 8 * 1024), new string('a', 8 * 1024), true },
+                };
+            }
+        }
+
+        [Fact]
+        public async Task EnsureValidCode_Throws_IfNotUsingHttps()
+        {
+            // Arrange
+            string setting = "Secret";
+            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
+            settings[setting] = "12345678901234567890123456789012";
+            _request.RequestUri = new Uri("http://some.no.ssl.host");
+
+            // Act
+            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook receiver 'WebHookReceiverMock' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
+        }
+
+        [Theory]
+        [MemberData("InvalidCodeQueries")]
+        public async Task EnsureValidCode_Throws_IfNoCodeParameter(string query)
+        {
+            // Arrange
+            string setting = "Secret";
+            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
+            settings[setting] = "12345678901234567890123456789012";
+            _request.RequestUri = new Uri("https://some.no.ssl.host?" + query);
+
+            // Act
+            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
+        }
+
+        [Fact]
+        public async Task EnsureValidCode_Throws_IfWrongCodeParameter()
+        {
+            // Arrange
+            string setting = "Secret";
+            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
+            settings[setting] = "12345678901234567890123456789012";
+            _request.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
+
+            // Act
+            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
+        }
+
+        [Fact]
+        public void EnsureValidCode_Succeeds_IfRightCodeParameter()
+        {
+            // Arrange
+            string setting = "Secret";
+            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
+            settings[setting] = "12345678901234567890123456789012";
+            _request.RequestUri = new Uri("https://some.no.ssl.host?code=12345678901234567890123456789012");
+
+            // Act
+            _receiverMock.EnsureValidCode(_request, "Secret");
         }
 
         [Theory]
@@ -330,10 +430,21 @@ namespace Microsoft.AspNet.WebHooks
 
         [Theory]
         [MemberData("ByteCompareData")]
-        public void SignatureEqual_ComparesCorrectly(byte[] inputA, byte[] inputB, bool expected)
+        public void SecretEqual_ComparesByteArraysCorrectly(byte[] inputA, byte[] inputB, bool expected)
         {
             // Act
-            bool actual = WebHookReceiver.SignatureEqual(inputA, inputB);
+            bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [MemberData("StringCompareData")]
+        public void SecretEqual_ComparesStringsCorrectly(string inputA, string inputB, bool expected)
+        {
+            // Act
+            bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
 
             // Assert
             Assert.Equal(expected, actual);

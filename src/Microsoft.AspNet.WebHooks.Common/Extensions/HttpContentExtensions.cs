@@ -14,8 +14,8 @@ namespace System.Net.Http
     {
         /// <summary>
         /// Determines whether the specified content is JSON indicated by a 
-        /// content type of either <c>application/json</c>, <c>text/json</c>, <c>application/xyz-json</c>,
-        /// or <c>text/xyz-json</c>. The term <c>xyz</c> can for example be <c>hal</c> or some other 
+        /// content type of either <c>application/json</c>, <c>text/json</c>, <c>application/xyz+json</c>,
+        /// or <c>text/xyz+json</c>. The term <c>xyz</c> can for example be <c>hal</c> or some other 
         /// JSON derived media type.
         /// </summary>
         /// <returns>true if the specified content is JSON content; otherwise, false.</returns>
@@ -30,8 +30,30 @@ namespace System.Net.Http
             string mediaType = content.Headers.ContentType.MediaType;
             return string.Equals(mediaType, "application/json", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(mediaType, "text/json", StringComparison.OrdinalIgnoreCase)
-                || ((mediaType.StartsWith("application/", StringComparison.OrdinalIgnoreCase) || mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)) 
-                    && mediaType.EndsWith("-json", StringComparison.OrdinalIgnoreCase));
+                || ((mediaType.StartsWith("application/", StringComparison.OrdinalIgnoreCase) || mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
+                    && mediaType.EndsWith("+json", StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines whether the specified content is XML indicated by a 
+        /// content type of either <c>application/xml</c>, <c>text/xml</c>, <c>application/xyz+xml</c>,
+        /// or <c>text/xyz+xml</c>. The term <c>xyz</c> can for example be <c>rdf</c> or some other 
+        /// XML derived media type.
+        /// </summary>
+        /// <returns>true if the specified content is JSON content; otherwise, false.</returns>
+        /// <param name="content">The content to check.</param>
+        public static bool IsXml(this HttpContent content)
+        {
+            if (content == null || content.Headers == null || content.Headers.ContentType == null || content.Headers.ContentType.MediaType == null)
+            {
+                return false;
+            }
+
+            string mediaType = content.Headers.ContentType.MediaType;
+            return string.Equals(mediaType, "application/xml", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mediaType, "text/xml", StringComparison.OrdinalIgnoreCase)
+                || ((mediaType.StartsWith("application/", StringComparison.OrdinalIgnoreCase) || mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
+                    && mediaType.EndsWith("+xml", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

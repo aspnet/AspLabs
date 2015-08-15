@@ -132,6 +132,9 @@
   <data name="ReceiverController_Unknown" xml:space="preserve">
     <value>No WebHook receiver is registered with the name '{0}'.</value>
   </data>
+  <data name="Receiver_BadCode" xml:space="preserve">
+    <value>The '{0}' query parameter provided in the HTTP request did not match the expected value.</value>
+  </data>
   <data name="Receiver_BadFormData" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as HTML Form Data.</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="Receiver_NoBody" xml:space="preserve">
     <value>The WebHook request entity body cannot be empty.</value>
+  </data>
+  <data name="Receiver_NoCode" xml:space="preserve">
+    <value>The WebHook verification request must contain a '{0}' query parameter.</value>
   </data>
   <data name="Receiver_NoFormData" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as HTML Form Data.</value>

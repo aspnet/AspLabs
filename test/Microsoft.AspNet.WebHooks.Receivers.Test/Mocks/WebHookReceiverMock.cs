@@ -55,6 +55,11 @@ namespace Microsoft.AspNet.WebHooks.Mocks
             base.EnsureSecureConnection(request);
         }
 
+        public new void EnsureValidCode(HttpRequestMessage request, string setting)
+        {
+            base.EnsureValidCode(request, setting);
+        }
+
         public new string GetWebHookSecret(HttpRequestMessage request, string setting, int minLength, int maxLength)
         {
             return base.GetWebHookSecret(request, setting, minLength, maxLength);

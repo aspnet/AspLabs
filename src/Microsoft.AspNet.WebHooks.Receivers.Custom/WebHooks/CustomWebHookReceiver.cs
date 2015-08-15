@@ -171,7 +171,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             // Now verify that the actual hash matches the expected hash.
-            if (!WebHookReceiver.SignatureEqual(expectedHash, actualHash))
+            if (!WebHookReceiver.SecretEqual(expectedHash, actualHash))
             {
                 HttpResponseMessage badSignature = CreateBadSignatureResponse(request, SignatureHeaderName);
                 throw new HttpResponseException(badSignature);

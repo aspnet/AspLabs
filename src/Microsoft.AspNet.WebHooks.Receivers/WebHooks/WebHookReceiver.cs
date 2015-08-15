@@ -23,6 +23,8 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public abstract class WebHookReceiver : IWebHookReceiver
     {
+        internal const string CodeQueryParameter = "code";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WebHookReceiver"/> class.
         /// </summary>
@@ -37,13 +39,40 @@ namespace Microsoft.AspNet.WebHooks
         public abstract Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request);
 
         /// <summary>
-        /// Provides a time consistent comparison of signatures in the form of two byte arrays.
+        /// Provides a time consistent comparison of two secrets in the form of two byte arrays.
         /// </summary>
-        /// <param name="inputA">The first signature to compare.</param>
-        /// <param name="inputB">The second signature to compare.</param>
-        /// <returns>Returns <c>true</c> if the two bytes are equal, <c>false</c> otherwise.</returns>
+        /// <param name="inputA">The first secret to compare.</param>
+        /// <param name="inputB">The second secret to compare.</param>
+        /// <returns>Returns <c>true</c> if the two secrets are equal, <c>false</c> otherwise.</returns>
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        protected internal static bool SignatureEqual(byte[] inputA, byte[] inputB)
+        protected internal static bool SecretEqual(byte[] inputA, byte[] inputB)
+        {
+            if (ReferenceEquals(inputA, inputB))
+            {
+                return true;
+            }
+
+            if (inputA == null || inputB == null || inputA.Length != inputB.Length)
+            {
+                return false;
+            }
+
+            bool areSame = true;
+            for (int i = 0; i < inputA.Length; i++)
+            {
+                areSame &= inputA[i] == inputB[i];
+            }
+            return areSame;
+        }
+
+        /// <summary>
+        /// Provides a time consistent comparison of two secrets in the form of two strings.
+        /// </summary>
+        /// <param name="inputA">The first secret to compare.</param>
+        /// <param name="inputB">The second secret to compare.</param>
+        /// <returns>Returns <c>true</c> if the two secrets are equal, <c>false</c> otherwise.</returns>
+        [MethodImpl(MethodImplOptions.NoOptimization)]
+        protected internal static bool SecretEqual(string inputA, string inputB)
         {
             if (ReferenceEquals(inputA, inputB))
             {
@@ -84,6 +113,45 @@ namespace Microsoft.AspNet.WebHooks
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
                 HttpResponseMessage noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noHttps);
+            }
+        }
+
+        /// <summary>
+        /// For WebHooks providers with insufficient security considerations, the receiver can require that the WebHook URI must 
+        /// be an <c>https</c> URI and contain a 'code' query parameter with a value configured in the application setting with the name
+        /// <paramref name="setting"/>.
+        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=c2e25cd9-6f63-44f6-bf2a-729bcc9f236a</c>'.
+        /// The 'code' parameter must be between 32 and 64 characters long.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <param name="setting">The name of the application setting containing the expected 'code' query parameter value.</param>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed by Web API.")]
+        protected virtual void EnsureValidCode(HttpRequestMessage request, string setting)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
+            EnsureSecureConnection(request);
+
+            NameValueCollection queryParameters = request.RequestUri.ParseQueryString();
+            string code = queryParameters[CodeQueryParameter];
+            if (string.IsNullOrEmpty(code))
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoCode, CodeQueryParameter);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
+                HttpResponseMessage noCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(noCode);
+            }
+
+            string secretKey = GetWebHookSecret(request, setting, 32, 64);
+            if (!WebHookReceiver.SecretEqual(code, secretKey))
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
+                HttpResponseMessage invalidCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(invalidCode);
             }
         }
 
