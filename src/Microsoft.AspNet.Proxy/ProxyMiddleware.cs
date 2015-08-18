@@ -58,7 +58,10 @@ namespace Microsoft.AspNet.Proxy
         public async Task Invoke(HttpContext context)
         {
             var requestMessage = new HttpRequestMessage();
-            if (string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(context.Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(context.Request.Method, "HEAD", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(context.Request.Method, "DELETE", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(context.Request.Method, "TRACE", StringComparison.OrdinalIgnoreCase))
             {
                 var streamContent = new StreamContent(context.Request.Body);
                 requestMessage.Content = streamContent;
