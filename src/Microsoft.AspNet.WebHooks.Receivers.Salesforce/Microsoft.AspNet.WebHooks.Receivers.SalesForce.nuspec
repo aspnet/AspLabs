@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$symversion$</version>
+    <title>Microsoft ASP.NET WebHooks Receiver for Salesforce</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      This package provides support for receiving Salesforce SOAP-based Outbound Messages as a WebHook. For information about Salesforce WebHooks, see "https://help.salesforce.com/htviewhelpdoc?id=workflow_defining_outbound_messages.htm".
+    </description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Salesforce</tags>
+  </metadata>
+</package>

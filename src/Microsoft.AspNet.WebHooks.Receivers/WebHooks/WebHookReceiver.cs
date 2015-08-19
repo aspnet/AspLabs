@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
@@ -244,6 +245,46 @@ namespace Microsoft.AspNet.WebHooks
             catch (Exception ex)
             {
                 string msg = ReceiverResources.Receiver_BadJson;
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                throw new HttpResponseException(invalidBody);
+            }
+        }
+
+        /// <summary>
+        /// Reads the XML HTTP request entity body.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
+        protected virtual async Task<XElement> ReadAsXmlAsync(HttpRequestMessage request)
+        {
+            // Check that there is a request body
+            if (request.Content == null)
+            {
+                string msg = ReceiverResources.Receiver_NoBody;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(noBody);
+            }
+
+            // Check that the request body is XML
+            if (!request.Content.IsXml())
+            {
+                string msg = ReceiverResources.Receiver_NoXml;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                throw new HttpResponseException(noXml);
+            }
+
+            try
+            {
+                // Read request body
+                XElement result = await request.Content.ReadAsAsync<XElement>();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                string msg = ReceiverResources.Receiver_BadXml;
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);

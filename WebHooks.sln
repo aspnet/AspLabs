@@ -84,6 +84,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Paypal.Test", "test\Microsoft.AspNet.WebHooks.Receivers.PayPal.Test\Microsoft.AspNet.WebHooks.Receivers.Paypal.Test.csproj", "{45E5D92B-E075-492B-847F-E3E5D5796E95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Salesforce", "src\Microsoft.AspNet.WebHooks.Receivers.Salesforce\Microsoft.AspNet.WebHooks.Receivers.Salesforce.csproj", "{2331E6C8-2235-4FF6-8429-4B2B9CC21273}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Salesforce.Test", "test\Microsoft.AspNet.WebHooks.Receivers.Salesforce.Test\Microsoft.AspNet.WebHooks.Receivers.Salesforce.Test.csproj", "{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -289,6 +293,18 @@ Global
 		{45E5D92B-E075-492B-847F-E3E5D5796E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45E5D92B-E075-492B-847F-E3E5D5796E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45E5D92B-E075-492B-847F-E3E5D5796E95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -327,5 +343,7 @@ Global
 		{553B1951-A18E-4CFE-98A3-ED66652AD3FC} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{B15C721D-785C-4E5A-B33F-C55F5F159A00} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{45E5D92B-E075-492B-847F-E3E5D5796E95} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{2331E6C8-2235-4FF6-8429-4B2B9CC21273} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 	EndGlobalSection
 EndGlobal

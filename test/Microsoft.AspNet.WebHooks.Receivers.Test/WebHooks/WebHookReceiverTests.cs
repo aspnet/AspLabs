@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dependencies;
+using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Mocks;
 using Moq;
@@ -290,7 +291,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The WebHook request must contain an entity body formatted as JSON.", error.Message);
+            Assert.Equal("The WebHook request must contain an entity body formatted as valid JSON.", error.Message);
         }
 
         [Fact]
@@ -304,6 +305,58 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             Assert.Equal("v", actual["k"]);
+        }
+
+        [Fact]
+        public async Task ReadAsXmlAsync_Throws_IfNullBody()
+        {
+            // Act
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
+        }
+
+        [Fact]
+        public async Task ReadAsXmlAsync_Throws_IfNotXml()
+        {
+            // Arrange
+            _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
+
+            // Act
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook request must contain an entity body formatted as XML.", error.Message);
+        }
+
+        [Fact]
+        public async Task ReadAsXmlAsync_Throws_IfInvalidXml()
+        {
+            // Arrange
+            _request.Content = new StringContent("I n v a l i d  X M L", Encoding.UTF8, "application/xml");
+
+            // Act
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook request must contain an entity body formatted as valid XML.", error.Message);
+        }
+
+        [Fact]
+        public async Task ReadAsXmlAsync_Succeeds_OnValidXml()
+        {
+            // Arrange
+            _request.Content = new StringContent("<root><k>v</k></root>", Encoding.UTF8, "application/xml");
+
+            // Act
+            XElement actual = await _receiverMock.ReadAsXmlAsync(_request);
+
+            // Assert
+            Assert.Equal("v", actual.Element("k").Value);
         }
 
         [Fact]

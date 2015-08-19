@@ -115,7 +115,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as JSON..
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as valid JSON..
         /// </summary>
         internal static string Receiver_BadJson {
             get {
@@ -147,6 +147,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         internal static string Receiver_BadSignature {
             get {
                 return ResourceManager.GetString("Receiver_BadSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as valid XML..
+        /// </summary>
+        internal static string Receiver_BadXml {
+            get {
+                return ResourceManager.GetString("Receiver_BadXml", resourceCulture);
             }
         }
         
@@ -192,6 +201,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         internal static string Receiver_NoJson {
             get {
                 return ResourceManager.GetString("Receiver_NoJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as XML..
+        /// </summary>
+        internal static string Receiver_NoXml {
+            get {
+                return ResourceManager.GetString("Receiver_NoXml", resourceCulture);
             }
         }
         

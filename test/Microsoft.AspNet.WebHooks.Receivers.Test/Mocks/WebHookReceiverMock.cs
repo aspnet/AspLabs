@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.WebHooks.Mocks
@@ -68,6 +69,11 @@ namespace Microsoft.AspNet.WebHooks.Mocks
         public new Task<JObject> ReadAsJsonAsync(HttpRequestMessage request)
         {
             return base.ReadAsJsonAsync(request);
+        }
+
+        public new Task<XElement> ReadAsXmlAsync(HttpRequestMessage request)
+        {
+            return base.ReadAsXmlAsync(request);
         }
 
         public new Task<NameValueCollection> ReadAsFormDataAsync(HttpRequestMessage request)
