@@ -1,6 +1,7 @@
 [Bb]in
 [Oo]bj
 [Tt]est[Rr]esults
+.vs
 *.mdf
 *.ldf
 *.suo
