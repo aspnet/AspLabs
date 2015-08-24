@@ -79,6 +79,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not enqueue WebHook: {0}.
+        /// </summary>
+        internal static string QueueHandler_EnqueueError {
+            get {
+                return ResourceManager.GetString("QueueHandler_EnqueueError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; query parameter provided in the HTTP request did not match the expected value..
         /// </summary>
         internal static string Receiver_BadCode {

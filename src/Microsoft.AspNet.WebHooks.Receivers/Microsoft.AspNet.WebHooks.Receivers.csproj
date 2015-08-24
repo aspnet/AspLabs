@@ -73,7 +73,9 @@
     <Compile Include="WebHooks\IWebHookReceiver.cs" />
     <Compile Include="WebHooks\IWebHookReceiverManager.cs" />
     <Compile Include="WebHooks\WebHookHandler.cs" />
+    <Compile Include="WebHooks\WebHookQueueContext.cs" />
     <Compile Include="WebHooks\WebHookHandlerContext.cs" />
+    <Compile Include="WebHooks\WebHookQueueHandler.cs" />
     <Compile Include="WebHooks\WebHookReceiver.cs" />
     <Compile Include="WebHooks\WebHookHandlerSorter.cs" />
     <Compile Include="WebHooks\WebHookReceiverManager.cs" />

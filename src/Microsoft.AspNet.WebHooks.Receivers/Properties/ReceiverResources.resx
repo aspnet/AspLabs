@@ -123,6 +123,9 @@
   <data name="Manager_UnknownReceiver" xml:space="preserve">
     <value>No WebHook receiver has been registered with the name '{0}'. Please use one of the registered receivers.</value>
   </data>
+  <data name="QueueHandler_EnqueueError" xml:space="preserve">
+    <value>Could not enqueue WebHook: {0}</value>
+  </data>
   <data name="ReceiverController_Failure" xml:space="preserve">
     <value>WebHook receiver '{0}' could not process WebHook due to error: {1}</value>
   </data>

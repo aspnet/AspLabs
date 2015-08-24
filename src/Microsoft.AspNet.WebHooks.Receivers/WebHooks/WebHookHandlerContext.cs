@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 
@@ -14,7 +15,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class WebHookHandlerContext
     {
-        private List<string> _actions = new List<string>();
+        private List<string> _actions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebHookHandlerContext"/> with the given set of <paramref name="actions"/>.
@@ -25,13 +26,13 @@ namespace Microsoft.AspNet.WebHooks
             {
                 throw new ArgumentNullException("actions");
             }
-            _actions.AddRange(actions);
+            _actions = actions.ToList();
         }
 
         /// <summary>
         /// Provides the set of actions that caused the WebHook to be fired.
         /// </summary>
-        public IEnumerable<string> Actions
+        public ICollection<string> Actions
         {
             get
             {
