@@ -1,5 +1,5 @@
 <Project ToolsVersion="4.0" DefaultTargets="Xunit" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="WebStack.tasks.targets"/>
+    <Import Project="WebHooks.tasks.targets"/>
 
     <!-- This is a separate MSBuild file so that we can survive upgrades of the xunit NuGet package
          and also still work with NuGet Package Restore. -->

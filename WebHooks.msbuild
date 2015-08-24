@@ -1,5 +1,5 @@
 <Project DefaultTargets="BuildPackages" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="tools/WebStack.tasks.targets"/>
+  <Import Project="tools/WebHooks.tasks.targets"/>
   <UsingTask TaskName="SkipStrongNames.CheckSkipStrongNamesStatus" AssemblyFile="$(SkipStrongNamesExe)" />
 
   <PropertyGroup>
@@ -15,9 +15,6 @@
     <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
     <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
     <NuGetExe>.nuget\NuGet.exe</NuGetExe>
-
-    <!-- Sym versioning for Nuget packages -->
-    <SymVersion Condition=" '$(SymVersion)' == ''">1.1.0-beta</SymVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -70,7 +67,9 @@
 
   <Target Name="BuildPackages" DependsOnTargets="UnitTest">
     <Message Text='Building NuGet packages...' Importance="High" />
-    <Exec Command='"$(NuGetExe)" pack "%(NugetsToBuild.RecursiveDir)%(NugetsToBuild.FileName).csproj" -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory bin\$(Configuration) -Properties SymVersion=$(SymVersion);Configuration=$(Configuration)' />
+    <MSBuild Projects="src\Packages\Packages.proj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);VisualStudioVersion=$(VisualStudioVersion)" />
   </Target>
 
   <Target Name="BuildTools">
@@ -103,7 +102,7 @@
   <Target Name="RunTests" DependsOnTargets="CheckSkipStrongNames">
     <ItemGroup>
       <TestDLLsXunit Include="bin\$(Configuration)\test\*.Test.dll;bin\$(Configuration)\test\*.Test.*.dll;bin\$(Configuration)\Test\NetCore\*.Test.dll" />
-      <XunitProject Include="tools\WebStack.xunit.targets">
+      <XunitProject Include="tools\WebHooks.xunit.targets">
         <Properties>TestAssembly=%(TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(TestDLLsXunit.FileName)-XunitResults.xml</Properties>
       </XunitProject>
     </ItemGroup>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Rules FriendlyName="FxCop rules used by the ASP.NET Webstack team">
+<Rules FriendlyName="FxCop rules used by the ASP.NET WebHooks team">
 
     <!-- MW10xx: Resource rules -->
     <Rule TypeName="UnusedResourceUsageRule" Category="Microsoft.Web.FxCop" CheckId="MW1000">

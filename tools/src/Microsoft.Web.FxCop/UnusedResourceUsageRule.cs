@@ -106,7 +106,7 @@ namespace Microsoft.Web.FxCop
         }
 
         /// <summary>
-        /// Hack to determine if the file is "Common*Resources.resx" that is shared amongst multiple WebStack projects. 
+        /// Hack to determine if the file is "Common*Resources.resx" that is shared amongst multiple WebHooks projects. 
         /// Strings in this resx are ignored since they may have dependencies outside the current assembly.
         /// </summary>
         private static bool IsCommonResource(PropertyNode property)

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(CustomBeforeWebStackTargets)" Condition="Exists('$(CustomBeforeWebStackTargets)')" Label="Pre-targets Build Extensibility Point"/>
+  <Import Project="$(CustomBeforeWebHooksTargets)" Condition="Exists('$(CustomBeforeWebHooksTargets)')" Label="Pre-targets Build Extensibility Point"/>
 
   <PropertyGroup>
     <!-- Define some basic reference paths -->
-    <WebStackRootPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</WebStackRootPath>
-    <WebStackToolsPath>$(MSBuildThisFileDirectory)</WebStackToolsPath>
+    <WebHooksRootPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</WebHooksRootPath>
+    <WebHooksToolsPath>$(MSBuildThisFileDirectory)</WebHooksToolsPath>
 
     <!-- Use CustomAfterMicrosoftCommonTargets property (defined in Microsoft.Common.targets) to
              inject post-Common targets files without requiring the inclusion -->
-    <CustomAfterMicrosoftCommonTargets>$(WebStackToolsPath)WebStack.targets</CustomAfterMicrosoftCommonTargets>
+    <CustomAfterMicrosoftCommonTargets>$(WebHooksToolsPath)WebHooks.targets</CustomAfterMicrosoftCommonTargets>
     
     <!-- Force rebuild if this file changes -->
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -18,7 +18,7 @@
   <!-- Project Defaults -->
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <OutputPath Condition="'$(OutputPath)' == ''">$(WebStackRootPath)bin\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(WebHooksRootPath)bin\$(Configuration)\</OutputPath>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <FileAlignment>512</FileAlignment>
     <ErrorReport>prompt</ErrorReport>
@@ -39,7 +39,7 @@
     <!-- Everything is delay signed by default -->
     <SignAssembly>true</SignAssembly>
     <DelaySign>true</DelaySign>
-    <AssemblyOriginatorKeyFile>$(WebStackRootPath)\tools\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(WebHooksRootPath)\tools\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <!-- Per-configuration properties -->
