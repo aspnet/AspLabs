@@ -201,7 +201,10 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             else
             {
                 webHook.Filters.Clear();
-                webHook.Filters.AddRange(normalizedFilters);
+                foreach (string filter in normalizedFilters)
+                {
+                    webHook.Filters.Add(filter);
+                }
             }
         }
 

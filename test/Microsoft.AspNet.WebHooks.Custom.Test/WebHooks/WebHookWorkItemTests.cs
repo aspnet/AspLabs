@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.TestUtilities;
 using Xunit;
 
@@ -8,21 +9,29 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class WebHookWorkItemTests
     {
-        private readonly WebHookWorkItem _workItem = new WebHookWorkItem();
+        private readonly WebHookWorkItem _workItem;
+        private readonly WebHook _webHook;
+        private readonly NotificationDictionary _notification;
+        private readonly IEnumerable<NotificationDictionary> _notifications;
+
+        public WebHookWorkItemTests()
+        {
+            _notification = new NotificationDictionary("action", data: null);
+            _notifications = new List<NotificationDictionary> { _notification };
+            _webHook = new WebHook();
+            _workItem = new WebHookWorkItem(_webHook, _notifications);
+        }
 
         [Fact]
         public void Id_Roundtrips()
         {
-            _workItem.Id = "id";
-            PropertyAssert.Roundtrips(_workItem, s => s.Id, PropertySetter.NullRoundtrips, defaultValue: "id", roundtripValue: "value");
+            PropertyAssert.Roundtrips(_workItem, s => s.Id, PropertySetter.NullDoesNotRoundtrip, roundtripValue: "value");
         }
 
         [Fact]
         public void WebHook_Roundtrips()
         {
-            WebHook defaultValue = new WebHook();
-            _workItem.Hook = defaultValue;
-            PropertyAssert.Roundtrips(_workItem, s => s.Hook, PropertySetter.NullRoundtrips, defaultValue: defaultValue, roundtripValue: new WebHook());
+            PropertyAssert.Roundtrips(_workItem, s => s.WebHook, PropertySetter.NullRoundtrips, defaultValue: _webHook, roundtripValue: new WebHook());
         }
 
         [Fact]
@@ -33,17 +42,9 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public void Actions_Roundtrips()
+        public void Notifications_Initializes()
         {
-            _workItem.Actions.Add("some filter");
-            Assert.True(_workItem.Actions.Contains("some filter"));
-        }
-
-        [Fact]
-        public void Data_Roundtrips()
-        {
-            _workItem.Data.Add("name", "value");
-            Assert.True(_workItem.Data.ContainsKey("name"));
+            Assert.Equal(_notifications, _workItem.Notifications);
         }
     }
 }

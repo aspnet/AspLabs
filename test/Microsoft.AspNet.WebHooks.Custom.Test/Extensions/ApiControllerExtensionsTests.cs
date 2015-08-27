@@ -58,25 +58,64 @@ namespace System.Web.Http
         public async Task NotifyAsync_HandlesNullData()
         {
             // Act
-            await _controller.NotifyAsync("a1");
+            await _controller.NotifyAsync("a1", data: null);
 
             // Assert
-            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<string>>(i => i.Single() == "a1"), null));
+            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1")));
             _resolverMock.Verify();
         }
 
         [Fact]
-        public async Task NotifyAsync_HandlesNonNullData()
+        public async Task NotifyAsync_HandlesNoNotifications()
         {
-            // Arrange
-            IEnumerable<string> actions = new[] { "a1" };
-            IDictionary<string, object> data = new Dictionary<string, object>();
-
             // Act
-            await _controller.NotifyAsync(actions, data);
+            int actual = await _controller.NotifyAsync();
 
             // Assert
-            _managerMock.Verify(m => m.NotifyAsync("TestUser", actions, data));
+            Assert.Equal(0, actual);
+        }
+
+        [Fact]
+        public async Task NotifyAsync_HandlesEmptyDictionaryData()
+        {
+            // Act
+            await _controller.NotifyAsync("a1", new Dictionary<string, object>());
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1")));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAsync_HandlesEmptyObjectData()
+        {
+            // Act
+            await _controller.NotifyAsync("a1", new object());
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1")));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAsync_HandlesNonemptyDictionaryData()
+        {
+            // Act
+            await _controller.NotifyAsync("a1", new Dictionary<string, object>() { { "d1", "v1" } });
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1" && (string)n.Single()["d1"] == "v1")));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAsync_HandlesNonemptyObjectData()
+        {
+            // Act
+            await _controller.NotifyAsync("a1", new { d1 = "v1" });
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1" && (string)n.Single()["d1"] == "v1")));
             _resolverMock.Verify();
         }
 

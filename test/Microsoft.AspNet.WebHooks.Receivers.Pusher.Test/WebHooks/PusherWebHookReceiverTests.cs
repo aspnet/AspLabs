@@ -14,6 +14,7 @@ using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
@@ -57,16 +58,16 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
-        public static TheoryData<string, long, string[]> PusherData
+        public static TheoryData<string, string[]> PusherData
         {
             get
             {
-                return new TheoryData<string, long, string[]>
+                return new TheoryData<string, string[]>
                 {
-                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"}]}", 1437252687875, new[] { "channel_vacated" } },
-                    { "{\"time_ms\":1437252692478,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"},{\"channel\":\"my_channel\",\"name\":\"你好世界\"},]}", 1437252692478, new[] { "channel_vacated", "你好世界" } },
-                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"},{\"channel\":\"my_channel\"}]}", 1437252687875, new[] { "channel_vacated" } },
-                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\"},{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"}]}", 1437252687875, new[] { "channel_vacated" } },
+                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"}]}", new[] { "channel_vacated" } },
+                    { "{\"time_ms\":1437252692478,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"},{\"channel\":\"my_channel\",\"name\":\"你好世界\"},]}", new[] { "channel_vacated", "你好世界" } },
+                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"},{\"channel\":\"my_channel\"}]}", new[] { "channel_vacated" } },
+                    { "{\"time_ms\":1437252687875,\"events\":[{\"channel\":\"my_channel\"},{\"channel\":\"my_channel\",\"name\":\"channel_vacated\"}]}", new[] { "channel_vacated" } },
                 };
             }
         }
@@ -77,7 +78,6 @@ namespace Microsoft.AspNet.WebHooks
             {
                 return new TheoryData<string>
                 {
-                   "{ \"time_ms\": \"i n v a l i d\" }",
                    "{ \"time_ms\": 1437252687875, \"events\": \"i n v a l i d\" }",
                    "{ \"time_ms\": 1437252687875, \"events\": [ { \"name\": { } } ] }",
                 };
@@ -119,13 +119,13 @@ namespace Microsoft.AspNet.WebHooks
 
         [Theory]
         [MemberData("InvalidPusherData")]
-        public async Task GetPusherNotification_Throws_IfInvalidData(string invalid)
+        public async Task GetActions_Throws_IfInvalidData(string invalid)
         {
             ReceiverMock mock = new ReceiverMock();
-            _postRequest.Content = new StringContent(invalid, Encoding.UTF8, "application/json");
+            JObject data = JObject.Parse(invalid);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => mock.GetPusherNotification(_postRequest));
+            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => mock.GetActions(_postRequest, data));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
@@ -134,17 +134,16 @@ namespace Microsoft.AspNet.WebHooks
 
         [Theory]
         [MemberData("PusherData")]
-        public async Task GetPusherNotification_ExtractsData(string data, long createdAt, IEnumerable<string> actions)
+        public void GetActions_ExtractsActions(string valid, IEnumerable<string> actions)
         {
             ReceiverMock mock = new ReceiverMock();
-            _postRequest.Content = new StringContent(data, Encoding.UTF8, "application/json");
+            JObject data = JObject.Parse(valid);
 
             // Act
-            PusherNotification actual = await mock.GetPusherNotification(_postRequest);
+            IEnumerable<string> actual = mock.GetActions(_postRequest, data);
 
             // Assert
-            Assert.Equal(createdAt, actual.CreatedAt);
-            Assert.Equal(actions, actual.Events.Keys);
+            Assert.Equal(actions, actual);
         }
 
         [Theory]
@@ -363,9 +362,9 @@ namespace Microsoft.AspNet.WebHooks
 
         private class ReceiverMock : PusherWebHookReceiver
         {
-            public new Task<PusherNotification> GetPusherNotification(HttpRequestMessage request)
+            public new IEnumerable<string> GetActions(HttpRequestMessage request, JObject data)
             {
-                return base.GetPusherNotification(request);
+                return base.GetActions(request, data);
             }
 
             public new IDictionary<string, string> GetSecretLookupTable(HttpRequestMessage request)

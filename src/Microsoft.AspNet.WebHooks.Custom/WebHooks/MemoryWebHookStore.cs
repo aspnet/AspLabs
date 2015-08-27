@@ -53,18 +53,18 @@ namespace Microsoft.AspNet.WebHooks
             ConcurrentDictionary<string, WebHook> userHooks;
             if (_store.TryGetValue(user, out userHooks))
             {
-                foreach (WebHook hook in userHooks.Values)
+                foreach (WebHook webHook in userHooks.Values)
                 {
-                    if (hook.IsPaused)
+                    if (webHook.IsPaused)
                     {
                         continue;
                     }
 
                     foreach (string action in actions)
                     {
-                        if (hook.Filters.Contains(WildcardWebHookFilterProvider.Name) || hook.Filters.Contains(action))
+                        if (webHook.MatchesAction(action))
                         {
-                            matches.Add(hook);
+                            matches.Add(webHook);
                             break;
                         }
                     }

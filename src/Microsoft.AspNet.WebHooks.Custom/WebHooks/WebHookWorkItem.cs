@@ -1,8 +1,8 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -11,18 +11,50 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     internal class WebHookWorkItem
     {
-        private Collection<string> _actions = new Collection<string>();
-        private IDictionary<string, object> _data = new Dictionary<string, object>();
+        private string _id;
+        private IEnumerable<NotificationDictionary> _notifications;
 
         /// <summary>
-        /// Gets or sets a unique ID which is used to identify this firing of a <see cref="WebHook"/>.
+        /// Initializes a new instance of the <see cref="WebHookWorkItem"/> with the given <paramref name="notifications"/>.
         /// </summary>
-        public string Id { get; set; }
+        public WebHookWorkItem(WebHook webHook, IEnumerable<NotificationDictionary> notifications)
+        {
+            if (webHook == null)
+            {
+                throw new ArgumentNullException("webHook");
+            }
+            if (notifications == null)
+            {
+                throw new ArgumentNullException("notifications");
+            }
+
+            WebHook = webHook;
+            _notifications = notifications;
+        }
 
         /// <summary>
-        /// Gets or sets the <see cref="WebHook"/> to fire.
+        /// Gets or sets a unique ID which is used to identify this firing of a <see cref="WebHooks.WebHook"/>.
         /// </summary>
-        public WebHook Hook { get; set; }
+        public string Id
+        {
+            get
+            {
+                if (_id == null)
+                {
+                    _id = Guid.NewGuid().ToString("N");
+                }
+                return _id;
+            }
+            set
+            {
+                _id = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="WebHooks.WebHook"/> to fire.
+        /// </summary>
+        public WebHook WebHook { get; set; }
 
         /// <summary>
         /// Gets or sets the offset (starting with zero) identifying the launch line to be used when firing.
@@ -30,24 +62,13 @@ namespace Microsoft.AspNet.WebHooks
         public int Offset { get; set; }
 
         /// <summary>
-        /// Sets the set of actions that caused this <see cref="WebHook"/> to fire.
+        /// Gets the set of <see cref="NotificationDictionary"/> that caused the WebHook to be fired.
         /// </summary>
-        public Collection<string> Actions
+        public IEnumerable<NotificationDictionary> Notifications
         {
             get
             {
-                return _actions;
-            }
-        }
-
-        /// <summary>
-        /// Sets the extra data that should be submitted as part of this <see cref="WebHook"/> request.
-        /// </summary>
-        public IDictionary<string, object> Data
-        {
-            get
-            {
-                return _data;
+                return _notifications;
             }
         }
     }

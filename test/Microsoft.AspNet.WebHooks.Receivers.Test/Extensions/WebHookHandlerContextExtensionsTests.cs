@@ -52,6 +52,21 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void GetDataOrDefault_ReturnsTypeFromJObject()
+        {
+            // Arrange
+            TestClass test = new TestClass { Age = 1024, Name = "Henrik" };
+            _context.Data = JObject.FromObject(test);
+
+            // Act
+            TestClass actual = _context.GetDataOrDefault<TestClass>();
+
+            // Assert
+            Assert.Equal(1024, actual.Age);
+            Assert.Equal("Henrik", actual.Name);
+        }
+
+        [Fact]
         public void GetDataOrDefault_HandlesNullContext()
         {
             // Act
@@ -78,6 +93,23 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void TryGetData_ReturnsTypeFromJObject()
+        {
+            // Arrange
+            TestClass actual;
+            TestClass test = new TestClass { Age = 1024, Name = "Henrik" };
+            _context.Data = JObject.FromObject(test);
+
+            // Act
+            bool result = _context.TryGetData<TestClass>(out actual);
+
+            // Assert
+            Assert.True(result);
+            Assert.Equal(1024, actual.Age);
+            Assert.Equal("Henrik", actual.Name);
+        }
+
+        [Fact]
         public void TryGetData_HandlesNullContext()
         {
             // Arrange
@@ -88,6 +120,13 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             Assert.False(actual);
+        }
+
+        public class TestClass
+        {
+            public string Name { get; set; }
+
+            public int Age { get; set; }
         }
     }
 }

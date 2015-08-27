@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebHooks\CustomWebHookReceiverTests.cs" />
+    <Compile Include="WebHooks\CustomNotificationsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />

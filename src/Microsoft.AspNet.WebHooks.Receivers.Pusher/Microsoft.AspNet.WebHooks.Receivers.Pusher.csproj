@@ -65,7 +65,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PusherReceiverResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="WebHooks\PusherNotification.cs" />
+    <Compile Include="WebHooks\PusherNotifications.cs" />
     <Compile Include="WebHooks\PusherWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>

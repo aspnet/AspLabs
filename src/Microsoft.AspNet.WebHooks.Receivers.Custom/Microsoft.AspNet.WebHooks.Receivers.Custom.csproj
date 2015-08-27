@@ -66,6 +66,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CustomReceiverResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="WebHooks\CustomNotifications.cs" />
     <Compile Include="WebHooks\CustomWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>

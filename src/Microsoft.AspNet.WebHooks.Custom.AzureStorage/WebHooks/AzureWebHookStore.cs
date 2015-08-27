@@ -107,7 +107,7 @@ namespace Microsoft.AspNet.WebHooks
 
                 foreach (string action in actions)
                 {
-                    if (webHook.Filters.Contains(WildcardWebHookFilterProvider.Name) || webHook.Filters.Contains(action))
+                    if (webHook.MatchesAction(action))
                     {
                         matches.Add(webHook);
                         break;

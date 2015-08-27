@@ -14,6 +14,7 @@ namespace Microsoft.AspNet.WebHooks
 
         private string[] _actions = new string[] { "a1", "a2" };
         private object _data = new { Prop1 = "Hello", Prop2 = "World" };
+        private JsonSerializerSettings _settings = new JsonSerializerSettings();
         private WebHookQueueContext _queueContext;
 
         public WebHookQueueContextTests()
@@ -43,23 +44,18 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public void Serializes_AsExpected()
         {
-            // Arrange
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-
-            // Act
-            SerializationAssert.SerializesAs(_queueContext, settings, "{\"Receiver\":\"TestReceiver\",\"Actions\":[\"a1\",\"a2\"],\"Data\":{\"Prop1\":\"Hello\",\"Prop2\":\"World\"}}");
+            SerializationAssert.SerializesAs(_queueContext, _settings, "{\"Receiver\":\"TestReceiver\",\"Actions\":[\"a1\",\"a2\"],\"Data\":{\"Prop1\":\"Hello\",\"Prop2\":\"World\"}}");
         }
 
         [Fact]
         public void Serialization_Roundtrips()
         {
             // Arrange
-            JsonSerializerSettings settings = new JsonSerializerSettings();
             _queueContext.Data = "data";
 
             // Act
-            string ser = JsonConvert.SerializeObject(_queueContext, settings);
-            WebHookQueueContext actual = JsonConvert.DeserializeObject<WebHookQueueContext>(ser, settings);
+            string ser = JsonConvert.SerializeObject(_queueContext, _settings);
+            WebHookQueueContext actual = JsonConvert.DeserializeObject<WebHookQueueContext>(ser, _settings);
 
             // Assert
             Assert.Equal(_queueContext.Receiver, actual.Receiver);

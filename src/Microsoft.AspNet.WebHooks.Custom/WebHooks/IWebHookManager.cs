@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.WebHooks
@@ -28,11 +27,8 @@ namespace Microsoft.AspNet.WebHooks
         /// designated WebHook URI with information about the action.
         /// </summary>
         /// <param name="user">The user for which to lookup and dispatch matching WebHooks.</param>
-        /// <param name="actions">One or more actions describing the notification. In order for the actions to match
-        /// the WebHook filter, it must match one or more of the filter values registered with the 
-        /// <see cref="IWebHookFilterManager"/>.</param>
-        /// <param name="data">Optional additional data to include in the WebHook request.</param>
+        /// <param name="notifications">The set of notifications to include in the WebHook request.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        Task<int> NotifyAsync(string user, IEnumerable<string> actions, IDictionary<string, object> data);
+        Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications);
     }
 }

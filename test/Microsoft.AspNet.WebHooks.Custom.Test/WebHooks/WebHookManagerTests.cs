@@ -22,8 +22,8 @@ namespace Microsoft.AspNet.WebHooks
     public class WebHookManagerTests : IDisposable
     {
         private const string TestUser = "TestUser";
-        private const string SerializedWebHook = "{\r\n  \"Id\": \"1234567890\",\r\n  \"Attempt\": 1,\r\n  \"Actions\": [\r\n    \"a1\"\r\n  ],\r\n  \"Data\": {\r\n    \"d1\": \"dv1\"\r\n  },\r\n  \"Properties\": {\r\n    \"p1\": \"pv1\"\r\n  }\r\n}";
-        private const string WebHookSignature = "sha256=74D22CB352D87A82B8A1FB6268500DA1910F4D830D373499281AE957E242EEB1";
+        private const string SerializedWebHook = "{\r\n  \"Id\": \"1234567890\",\r\n  \"Attempt\": 1,\r\n  \"Properties\": {\r\n    \"p1\": \"pv1\"\r\n  },\r\n  \"Notifications\": [\r\n    {\r\n      \"Action\": \"a1\",\r\n      \"d1\": \"dv1\"\r\n    },\r\n    {\r\n      \"Action\": \"a1\",\r\n      \"d2\": \"http://localhost/\"\r\n    }\r\n  ]\r\n}";
+        private const string WebHookSignature = "sha256=69941A3C522CE0B52B5F08BD23309D4356422FEFF99A3398062A7C015B9FD48D";
 
         private readonly HttpClient _httpClient;
         private readonly Mock<IWebHookStore> _storeMock;
@@ -47,7 +47,7 @@ namespace Microsoft.AspNet.WebHooks
             _response = new HttpResponseMessage();
         }
 
-        public static TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int> LaunchWebHooksData
+        public static TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int> NotifyAsyncData
         {
             get
             {
@@ -82,6 +82,47 @@ namespace Microsoft.AspNet.WebHooks
                     { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true, throwExceptions: true), -3 },
                     { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true, throwExceptions: true), -4 },
                     { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true, throwExceptions: true), -5 },
+                };
+            }
+        }
+
+        public static TheoryData<IEnumerable<WebHook>, NotificationDictionary> FilterSingleNotificationData
+        {
+            get
+            {
+                return new TheoryData<IEnumerable<WebHook>, NotificationDictionary>
+                {
+                    { new[] { CreateWebHook("_") }, CreateNotification("a") },
+                    { new[] { CreateWebHook("a") }, CreateNotification("a") },
+                    { new[] { CreateWebHook("*") }, CreateNotification("a") },
+
+                    { new[] { CreateWebHook("_"), CreateWebHook("a") }, CreateNotification("a") },
+                    { new[] { CreateWebHook("a"), CreateWebHook("_") }, CreateNotification("a") },
+                    { new[] { CreateWebHook("*"), CreateWebHook("_") }, CreateNotification("a") },
+                    { new[] { CreateWebHook("*"), CreateWebHook("*") }, CreateNotification("a") },
+                };
+            }
+        }
+
+        public static TheoryData<IEnumerable<WebHook>, IEnumerable<NotificationDictionary>, int> FilterMultipleNotificationData
+        {
+            get
+            {
+                return new TheoryData<IEnumerable<WebHook>, IEnumerable<NotificationDictionary>, int>
+                {
+                    { new WebHook[0], new NotificationDictionary[0], 0 },
+
+                    { new[] { CreateWebHook("_") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 0 },
+                    { new[] { CreateWebHook("a") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 1 },
+                    { new[] { CreateWebHook("b") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 1 },
+                    { new[] { CreateWebHook("c") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 1 },
+                    { new[] { CreateWebHook("*") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 1 },
+
+                    { new[] { CreateWebHook("_"), CreateWebHook("_"), CreateWebHook("_") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 0 },
+                    { new[] { CreateWebHook("_"), CreateWebHook("a"), CreateWebHook("_") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 1 },
+                    { new[] { CreateWebHook("a"), CreateWebHook("_"), CreateWebHook("a") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 2 },
+                    { new[] { CreateWebHook("a"), CreateWebHook("a"), CreateWebHook("a") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 3 },
+                    { new[] { CreateWebHook("*"), CreateWebHook("a"), CreateWebHook("*") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 3 },
                 };
             }
         }
@@ -166,8 +207,8 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("LaunchWebHooksData")]
-        public async Task LaunchWebHooksAsync_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expected)
+        [MemberData("NotifyAsyncData")]
+        public async Task NotifyAsync_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expected)
         {
             // Arrange
             ManualResetEvent done = new ManualResetEvent(initialState: false);
@@ -182,9 +223,10 @@ namespace Microsoft.AspNet.WebHooks
                 done.Set();
             });
             _handlerMock.Handler = handler;
+            NotificationDictionary notification = new NotificationDictionary("a1", data: null);
 
             // Act
-            int actual = await _manager.NotifyAsync(TestUser, new[] { "a1" }, data: null);
+            int actual = await _manager.NotifyAsync(TestUser, new[] { notification });
             done.WaitOne();
 
             // Assert
@@ -199,19 +241,52 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        [Theory]
+        [MemberData("FilterSingleNotificationData")]
+        public void GetWorkItems_FilterSingleNotification(IEnumerable<WebHook> webHooks, NotificationDictionary notification)
+        {
+            // Act
+            IEnumerable<WebHookWorkItem> actual = WebHookManager.GetWorkItems(webHooks.ToArray(), new[] { notification });
+
+            // Assert
+            Assert.Equal(webHooks.Count(), actual.Count());
+            foreach (WebHookWorkItem workItem in actual)
+            {
+                Assert.Same(workItem.Notifications.Single(), notification);
+            }
+        }
+
+        [Theory]
+        [MemberData("FilterMultipleNotificationData")]
+        public void GetWorkItems_FilterMultipleNotifications(IEnumerable<WebHook> webHooks, IEnumerable<NotificationDictionary> notifications, int expected)
+        {
+            // Act
+            IEnumerable<WebHookWorkItem> actual = WebHookManager.GetWorkItems(webHooks.ToArray(), notifications.ToArray());
+
+            // Assert
+            Assert.Equal(expected, actual.Count());
+            foreach (WebHookWorkItem workItem in actual)
+            {
+                foreach (NotificationDictionary notification in workItem.Notifications)
+                {
+                    Assert.True(workItem.WebHook.MatchesAction(notification.Action));
+                }
+            }
+        }
+
         [Fact]
         public void CreateWebHookRequest_CreatesExpectedRequest()
         {
             // Arrange
             WebHookWorkItem workItem = CreateWorkItem();
-            workItem.Hook.Headers.Add("Content-Language", "da");
+            workItem.WebHook.Headers.Add("Content-Language", "da");
 
             // Act
             HttpRequestMessage actual = WebHookManager.CreateWebHookRequest(workItem, _loggerMock.Object);
 
             // Assert
             Assert.Equal(HttpMethod.Post, actual.Method);
-            Assert.Equal(workItem.Hook.WebHookUri, actual.RequestUri.AbsoluteUri);
+            Assert.Equal(workItem.WebHook.WebHookUri, actual.RequestUri.AbsoluteUri);
 
             IEnumerable<string> headers;
             actual.Headers.TryGetValues("h1", out headers);
@@ -246,7 +321,7 @@ namespace Microsoft.AspNet.WebHooks
             JObject body = WebHookManager.CreateWebHookRequestBody(workItem);
 
             // Act
-            WebHookManager.SignWebHookRequest(workItem.Hook, request, body);
+            WebHookManager.SignWebHookRequest(workItem.WebHook, request, body);
 
             // Assert
             IEnumerable<string> signature;
@@ -292,6 +367,11 @@ namespace Microsoft.AspNet.WebHooks
 
         private static WebHook CreateWebHook()
         {
+            return CreateWebHook("a1");
+        }
+
+        private static WebHook CreateWebHook(params string[] filters)
+        {
             WebHook hook = new WebHook
             {
                 Id = "1234",
@@ -301,20 +381,28 @@ namespace Microsoft.AspNet.WebHooks
             };
             hook.Headers.Add("h1", "hv1");
             hook.Properties.Add("p1", "pv1");
-            hook.Filters.Add("a1");
+            foreach (string filter in filters)
+            {
+                hook.Filters.Add(filter);
+            }
             return hook;
         }
 
         private static WebHookWorkItem CreateWorkItem()
         {
-            WebHookWorkItem workItem = new WebHookWorkItem
+            WebHook webHook = CreateWebHook();
+            NotificationDictionary notification1 = new NotificationDictionary("a1", new { d1 = "dv1" });
+            NotificationDictionary notification2 = new NotificationDictionary("a1", new Dictionary<string, object> { { "d2", new Uri("http://localhost") } });
+            WebHookWorkItem workItem = new WebHookWorkItem(webHook, new[] { notification1, notification2 })
             {
                 Id = "1234567890",
-                Hook = CreateWebHook()
             };
-            workItem.Actions.Add("a1");
-            workItem.Data.Add("d1", "dv1");
             return workItem;
+        }
+
+        private static NotificationDictionary CreateNotification(string action)
+        {
+            return new NotificationDictionary(action, data: null);
         }
 
         private static HttpResponseMessage[] CreateResponseArray(int length, bool failuresOnly = false, bool isGone = false)

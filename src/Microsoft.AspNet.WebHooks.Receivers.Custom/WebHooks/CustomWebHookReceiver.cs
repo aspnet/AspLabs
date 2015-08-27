@@ -35,7 +35,9 @@ namespace Microsoft.AspNet.WebHooks
         internal const string SignatureHeaderKey = "sha256";
         internal const string SignatureHeaderValueTemplate = SignatureHeaderKey + "={0}";
         internal const string SignatureHeaderName = "ms-signature";
-        internal const string BodyActionsKey = "Actions";
+
+        internal const string NotificationsKey = "Notifications";
+        internal const string ActionKey = "Action";
 
         private readonly IEnumerable<string> _names;
 
@@ -90,9 +92,8 @@ namespace Microsoft.AspNet.WebHooks
                 // Read the request entity body
                 JObject data = await ReadAsJsonAsync(request);
 
-                // Pick out actions from data
-                var rawActions = data[BodyActionsKey];
-                IEnumerable<string> actions = rawActions != null ? rawActions.Values<string>() : Enumerable.Empty<string>();
+                // Get the event actions
+                IEnumerable<string> actions = GetActions(request, data);
 
                 // Call registered handlers
                 return await ExecuteWebHookAsync(receiver, context, request, actions, data);
@@ -229,6 +230,50 @@ namespace Microsoft.AspNet.WebHooks
             string secretKey = SecretKeyPrefix + receiver;
             string secret = GetWebHookSecret(request, secretKey, 32, 64);
             return secret;
+        }
+
+        /// <summary>
+        /// Gets the notification actions form the given <paramref name="data"/>.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <param name="data">The request body.</param>
+        /// <returns>A collection of actions.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed by infrastructure.")]
+        protected virtual IEnumerable<string> GetActions(HttpRequestMessage request, JObject data)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
+            try
+            {
+                List<string> actions = new List<string>();
+                JArray notifications = data.Value<JArray>(NotificationsKey);
+                if (notifications != null)
+                {
+                    foreach (JObject e in notifications)
+                    {
+                        string action = e.Value<string>(ActionKey);
+                        if (action != null)
+                        {
+                            actions.Add(action);
+                        }
+                    }
+                }
+                return actions;
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomReceiverResources.Receiver_BadEvent, ex.Message);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage invalidData = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(invalidData);
+            }
         }
     }
 }

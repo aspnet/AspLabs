@@ -1,7 +1,6 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks;
@@ -19,11 +18,13 @@ namespace System.Web.Mvc
         /// current <see cref="Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
         /// </summary>
         /// <param name="controller">The MVC <see cref="Controller"/> instance.</param>
-        /// <param name="actions">One or more actions describing the notification.</param>
+        /// <param name="action">The action describing the notification.</param>
+        /// <param name="data">Optional additional data to include in the WebHook request.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static Task<int> NotifyAsync(this Controller controller, params string[] actions)
+        public static Task<int> NotifyAsync(this Controller controller, string action, object data)
         {
-            return NotifyAsync(controller, actions, data: null);
+            NotificationDictionary notification = new NotificationDictionary(action, data);
+            return NotifyAsync(controller, notification);
         }
 
         /// <summary>
@@ -31,14 +32,21 @@ namespace System.Web.Mvc
         /// current <see cref="Controller.User"/> and have a filter that matches one or more of the actions provided for the notification.
         /// </summary>
         /// <param name="controller">The MVC <see cref="Controller"/> instance.</param>
-        /// <param name="actions">One or more actions describing the notification.</param>
-        /// <param name="data">Optional additional data to include in the WebHook request.</param>
+        /// <param name="notifications">The set of notifications to include in the WebHook.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        public static async Task<int> NotifyAsync(this Controller controller, IEnumerable<string> actions, object data)
+        public static async Task<int> NotifyAsync(this Controller controller, params NotificationDictionary[] notifications)
         {
             if (controller == null)
             {
                 throw new ArgumentNullException("controller");
+            }
+            if (notifications == null)
+            {
+                throw new ArgumentNullException("notifications");
+            }
+            if (notifications.Length == 0)
+            {
+                return 0;
             }
 
             // Get the User ID from the User principal
@@ -47,7 +55,7 @@ namespace System.Web.Mvc
 
             // Send a notification to registered WebHooks with matching filters
             IWebHookManager manager = DependencyResolver.Current.GetManager();
-            return await manager.NotifyAsync(userId, actions, data);
+            return await manager.NotifyAsync(userId, notifications);
         }
     }
 }

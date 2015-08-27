@@ -15,13 +15,14 @@ using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
     public class CustomWebHookReceiverTests
     {
-        private const string TestContent = "{\r\n  \"Id\": \"1234567890\",\r\n  \"Attempt\": 1,\r\n  \"Actions\": [\r\n    \"a1\"\r\n  ],\r\n  \"Data\": {\r\n    \"d1\": \"dv1\"\r\n  },\r\n  \"Properties\": {\r\n    \"p1\": \"pv1\"\r\n  }\r\n}";
+        private const string TestContent = "{\r\n  \"Id\": \"1234567890\",\r\n  \"Attempt\": 1,\r\n  \"Properties\": {\r\n    \"p1\": \"pv1\"\r\n  },\r\n  \"Notifications\": [\r\n    {\r\n      \"Action\": \"a1\",\r\n      \"d1\": \"dv1\"\r\n    },\r\n    {\r\n      \"Action\": \"a1\",\r\n      \"d2\": \"http://localhost/\"\r\n    }\r\n  ]\r\n}";
         private const string TestReceiver = "Test";
         private const string TestSecret = "12345678901234567890123456789012";
 
@@ -88,6 +89,32 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        public static TheoryData<string, string[]> CustomData
+        {
+            get
+            {
+                return new TheoryData<string, string[]>
+                {
+                    { "{\"Attempt\":1,\"Notifications\":[{\"Action\":\"a1\"}]}", new[] { "a1" } },
+                    { "{\"Attempt\":1,\"Notifications\":[{\"Action\":\"a1\"},{\"Action\":\"你好世界\"},]}", new[] { "a1", "你好世界" } },
+                    { "{\"Attempt\":1,\"Notifications\":[{\"Action\":\"a1\"},{}]}", new[] { "a1" } },
+                    { "{\"Attempt\":1,\"Notifications\":[{},{\"Action\":\"a1\"}]}", new[] { "a1" } },
+                };
+            }
+        }
+
+        public static TheoryData<string> InvalidCustomData
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                   "{ \"Attempt\": 1, \"Notifications\": \"i n v a l i d\" }",
+                   "{ \"Attempt\": 1, \"Notifications\": [ { \"Action\": { } } ] }",
+                };
+            }
+        }
+
         public static TheoryData<string> ValidPostRequest
         {
             get
@@ -110,6 +137,36 @@ namespace Microsoft.AspNet.WebHooks
                     " sha256 = " + testSignature,
                 };
             }
+        }
+
+        [Theory]
+        [MemberData("InvalidCustomData")]
+        public async Task GetActions_Throws_IfInvalidData(string invalid)
+        {
+            ReceiverMock mock = new ReceiverMock(_config);
+            JObject data = JObject.Parse(invalid);
+
+            // Act
+            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => mock.GetActions(_postRequest, data));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.StartsWith("Could not parse WebHook data: ", error.Message);
+        }
+
+        [Theory]
+        [MemberData("CustomData")]
+        public void GetActions_ExtractsActions(string valid, IEnumerable<string> actions)
+        {
+            // Arrange
+            ReceiverMock mock = new ReceiverMock(_config);
+            JObject data = JObject.Parse(valid);
+
+            // Act
+            IEnumerable<string> actual = mock.GetActions(_postRequest, data);
+
+            // Assert
+            Assert.Equal(actions, actual);
         }
 
         [Fact]
@@ -247,7 +304,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             WebHooksConfig.Initialize(_config);
-            List<string> actions = new List<string> { "a1" };
+            List<string> actions = new List<string> { "a1", "a1" };
             _postRequest.Headers.Add(CustomWebHookReceiver.SignatureHeaderName, header);
             _receiverMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
@@ -311,6 +368,19 @@ namespace Microsoft.AspNet.WebHooks
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
             _receiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+        }
+
+        private class ReceiverMock : CustomWebHookReceiver
+        {
+            public ReceiverMock(HttpConfiguration config)
+                : base(config)
+            {
+            }
+
+            public new IEnumerable<string> GetActions(HttpRequestMessage request, JObject data)
+            {
+                return base.GetActions(request, data);
+            }
         }
     }
 }

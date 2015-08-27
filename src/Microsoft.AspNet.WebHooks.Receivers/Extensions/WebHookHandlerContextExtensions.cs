@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.ComponentModel;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -21,9 +22,22 @@ namespace Microsoft.AspNet.WebHooks
         public static T GetDataOrDefault<T>(this WebHookHandlerContext context)
             where T : class
         {
-            if (context == null)
+            if (context == null || context.Data == null)
             {
                 return default(T);
+            }
+
+            if (context.Data is JObject && typeof(T) != typeof(JObject))
+            {
+                try
+                {
+                    T data = ((JObject)context.Data).ToObject<T>();
+                    return data;
+                }
+                catch
+                {
+                    return default(T);
+                }
             }
 
             return context.Data as T;

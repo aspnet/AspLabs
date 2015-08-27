@@ -33,6 +33,9 @@ namespace Microsoft.AspNet.WebHooks
         internal const string SignatureHeaderName = "X-Pusher-Signature";
         internal const string KeyHeaderName = "X-Pusher-Key";
 
+        internal const string EventsKey = "events";
+        internal const string EventNameKey = "name";
+
         private static readonly string[] ReceiverNames = new string[] { "pusher" };
 
         private IDictionary<string, string> _secretLookupTable;
@@ -67,11 +70,14 @@ namespace Microsoft.AspNet.WebHooks
                     return CreateBadSignatureResponse(request, SignatureHeaderName);
                 }
 
-                // Get the pusher event notification data
-                PusherNotification notification = await GetPusherNotification(request);
+                // Read the request entity body
+                JObject data = await ReadAsJsonAsync(request);
+
+                // Get the pusher event actions
+                IEnumerable<string> actions = GetActions(request, data);
 
                 // Call registered handlers
-                return await ExecuteWebHookAsync(receiver, context, request, notification.Events.Keys, notification);
+                return await ExecuteWebHookAsync(receiver, context, request, actions, data);
             }
             else
             {
@@ -173,28 +179,43 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Creates a <see cref="PusherNotification"/> and determines the actions included in the data received from a
-        /// Pusher WebHook.
+        /// Gets the notification actions form the given <paramref name="data"/>.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
-        /// <returns>An initialized <see cref="PusherNotification"/> instance.</returns>
-        protected virtual async Task<PusherNotification> GetPusherNotification(HttpRequestMessage request)
+        /// <param name="data">The request body.</param>
+        /// <returns>A collection of actions.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed by infrastructure.")]
+        protected virtual IEnumerable<string> GetActions(HttpRequestMessage request, JObject data)
         {
             if (request == null)
             {
                 throw new ArgumentNullException("request");
             }
-
-            JObject data = await ReadAsJsonAsync(request);
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
 
             try
             {
-                PusherNotification notification = new PusherNotification(data);
-                return notification;
+                List<string> actions = new List<string>();
+                JArray events = data.Value<JArray>(EventsKey);
+                if (events != null)
+                {
+                    foreach (JObject e in events)
+                    {
+                        string action = e.Value<string>(EventNameKey);
+                        if (action != null)
+                        {
+                            actions.Add(action);
+                        }
+                    }
+                }
+                return actions;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(PusherReceiverResources.Receiver_BadEvent, ex.Message);
+                string msg = string.Format(CultureInfo.CurrentCulture, PusherReceiverResources.Receiver_BadEvent, ex.Message);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidData = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(invalidData);

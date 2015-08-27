@@ -62,8 +62,8 @@
     <Compile Include="Config\SettingsDictionaryTests.cs" />
     <Compile Include="Config\SettingsProviderTests.cs" />
     <Compile Include="Config\WebHooksConfigTests.cs" />
-    <Compile Include="Extensions\CollectionExtensionsTests.cs" />
     <Compile Include="Extensions\DependencyScopeExtensionsTests.cs" />
+    <Compile Include="Extensions\DictionaryExtensionsTests.cs" />
     <Compile Include="Extensions\HttpContentExtensionsTests.cs" />
     <Compile Include="Extensions\LogExtensionsTests.cs" />
     <Compile Include="Extensions\UriExtensionsTests.cs" />

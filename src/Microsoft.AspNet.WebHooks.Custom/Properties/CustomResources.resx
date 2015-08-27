@@ -153,6 +153,9 @@
   <data name="Manager_WebHookFailure" xml:space="preserve">
     <value>Failed to submit attempt {0} of WebHook {1} due to failure: {2}</value>
   </data>
+  <data name="Notification_KeyNotFound" xml:space="preserve">
+    <value>No Notification setting was found with key '{0}'.</value>
+  </data>
   <data name="WebHook_InvalidSecret" xml:space="preserve">
     <value>The WebHook secret key parameter must be between 32 and 64 characters long.</value>
   </data>

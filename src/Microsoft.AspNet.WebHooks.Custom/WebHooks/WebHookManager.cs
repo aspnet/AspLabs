@@ -35,8 +35,7 @@ namespace Microsoft.AspNet.WebHooks
         private const string BodyIdKey = "Id";
         private const string BodyAttemptKey = "Attempt";
         private const string BodyPropertiesKey = "Properties";
-        private const string BodyActionsKey = "Actions";
-        private const string BodyDataKey = "Data";
+        private const string BodyNotificationsKey = "Notifications";
 
         private static readonly Collection<TimeSpan> DefaultRetries = new Collection<TimeSpan> { TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4) };
 
@@ -167,40 +166,34 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<int> NotifyAsync(string user, IEnumerable<string> actions, IDictionary<string, object> data)
+        public async Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications)
         {
             if (user == null)
             {
                 throw new ArgumentNullException("user");
             }
-            if (actions == null)
+            if (notifications == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException("notifications");
             }
 
-            // Find matching, active WebHooks
-            ICollection<WebHook> hooks = await _webHookStore.QueryWebHooksAsync(user, actions);
-            foreach (WebHook hook in hooks)
+            // Get all actions in this batch
+            ICollection<NotificationDictionary> nots = notifications.ToArray();
+            string[] actions = nots.Select(n => n.Action).ToArray();
+
+            // Find all active WebHooks that matches at least one of the actions
+            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAsync(user, actions);
+
+            // For each WebHook set up a work item with the right set of notifications
+            IEnumerable<WebHookWorkItem> workItems = GetWorkItems(webHooks, nots);
+
+            // Start sending WebHooks
+            foreach (WebHookWorkItem workItem in workItems)
             {
-                WebHookWorkItem workItem = new WebHookWorkItem
-                {
-                    Hook = hook,
-                    Id = Guid.NewGuid().ToString("N")
-                };
-
-                // Add filters that caused this WebHook to fire
-                workItem.Actions.AddRange(actions);
-
-                // Add additional data provided by caller
-                if (data != null)
-                {
-                    workItem.Data.AddRange(data);
-                }
-
                 _launchers[0].Post(workItem);
             }
 
-            return hooks.Count;
+            return webHooks.Count;
         }
 
         /// <inheritdoc />
@@ -210,6 +203,34 @@ namespace Microsoft.AspNet.WebHooks
             GC.SuppressFinalize(this);
         }
 
+        internal static IEnumerable<WebHookWorkItem> GetWorkItems(ICollection<WebHook> webHooks, ICollection<NotificationDictionary> notifications)
+        {
+            List<WebHookWorkItem> workItems = new List<WebHookWorkItem>();
+            foreach (WebHook webHook in webHooks)
+            {
+                ICollection<NotificationDictionary> webHookNotifications;
+
+                // Pick the notifications that apply for this particular WebHook. If we only got one notification
+                // then we know that it applies to all WebHooks. Otherwise each notification may apply only to a subset.
+                if (notifications.Count == 1)
+                {
+                    webHookNotifications = notifications;
+                }
+                else
+                {
+                    webHookNotifications = notifications.Where(n => webHook.MatchesAction(n.Action)).ToArray();
+                    if (webHookNotifications.Count == 0)
+                    {
+                        continue;
+                    }
+                }
+
+                WebHookWorkItem workItem = new WebHookWorkItem(webHook, webHookNotifications);
+                workItems.Add(workItem);
+            }
+            return workItems;
+        }
+
         internal static JObject CreateWebHookRequestBody(WebHookWorkItem workItem)
         {
             Dictionary<string, object> body = new Dictionary<string, object>();
@@ -217,15 +238,16 @@ namespace Microsoft.AspNet.WebHooks
             // Set properties from work item
             body[BodyIdKey] = workItem.Id;
             body[BodyAttemptKey] = workItem.Offset + 1;
-            body[BodyActionsKey] = new Collection<string>(workItem.Actions);
-            body[BodyDataKey] = new Dictionary<string, object>(workItem.Data);
 
             // Set properties from WebHook
-            IDictionary<string, object> properties = workItem.Hook.Properties;
+            IDictionary<string, object> properties = workItem.WebHook.Properties;
             if (properties != null)
             {
                 body[BodyPropertiesKey] = new Dictionary<string, object>(properties);
             }
+
+            // Set notifications
+            body[BodyNotificationsKey] = workItem.Notifications;
 
             return JObject.FromObject(body);
         }
@@ -248,7 +270,7 @@ namespace Microsoft.AspNet.WebHooks
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Request is disposed by caller.")]
         internal static HttpRequestMessage CreateWebHookRequest(WebHookWorkItem workItem, ILogger logger)
         {
-            WebHook hook = workItem.Hook;
+            WebHook hook = workItem.WebHook;
 
             // Create WebHook request
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, hook.WebHookUri);
@@ -337,7 +359,7 @@ namespace Microsoft.AspNet.WebHooks
                 HttpRequestMessage request = CreateWebHookRequest(workItem, _logger);
                 HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Result, workItem.Hook.Id, response.StatusCode, workItem.Offset);
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Result, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
                 _logger.Info(msg);
 
                 if (response.IsSuccessStatusCode)
@@ -361,7 +383,7 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.Hook.Id, ex.Message);
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
                 _logger.Error(msg, ex);
             }
 
@@ -376,7 +398,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 else
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_GivingUp, workItem.Hook.Id, workItem.Offset);
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_GivingUp, workItem.WebHook.Id, workItem.Offset);
                     _logger.Error(msg);
                     if (_onWebHookFailure != null)
                     {
@@ -386,7 +408,7 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.Hook.Id, ex.Message);
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
                 _logger.Error(msg, ex);
             }
         }
