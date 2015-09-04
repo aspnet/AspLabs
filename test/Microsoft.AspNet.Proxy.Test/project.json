@@ -10,15 +10,9 @@
         "test": "xunit.runner.aspnet"
     },
     "frameworks": {
-        "dnx451": {
-            "frameworkAssemblies": { "System.Net.Http": "" }
-        },
+        "dnx451": { },
         "dnxcore50": {
             "dependencies": {
-                "System.Collections": "4.0.10-*",
-                "System.Linq": "4.0.0-*",
-                "System.Net.Http": "4.0.1-*",
-                "Microsoft.CSharp": "4.0.0-*"
             }
         }
     }
