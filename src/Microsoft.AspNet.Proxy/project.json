@@ -18,9 +18,9 @@
       "dependencies": {
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
+        "System.Net.Http": "4.0.1-*",
         "System.Threading": "4.0.10-*",
-        "Microsoft.CSharp": "4.0.0-*",
-        "Microsoft.Net.Http.Client": "1.0.0-*"
+        "Microsoft.CSharp": "4.0.0-*"
       }
     }
   }

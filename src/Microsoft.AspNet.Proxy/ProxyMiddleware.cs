@@ -47,12 +47,7 @@ namespace Microsoft.AspNet.Proxy
 
             _options = options;
 
-#if DNX451
-            _httpClient = new HttpClient(_options.BackChannelMessageHandler?? new HttpClientHandler());
-#else
-            _httpClient = new HttpClient(_options.BackChannelMessageHandler?? new Net.Http.Client.ManagedHandler());
-#endif
-
+            _httpClient = new HttpClient(_options.BackChannelMessageHandler ?? new HttpClientHandler());
         }
 
         public async Task Invoke(HttpContext context)
