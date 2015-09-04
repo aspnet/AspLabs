@@ -70,9 +70,9 @@ namespace Microsoft.AspNet.Proxy
             // Copy the request headers
             foreach (var header in context.Request.Headers)
             {
-                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value) && requestMessage.Content != null)
+                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) && requestMessage.Content != null)
                 {
-                    requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
                 }
             }
 
@@ -85,12 +85,12 @@ namespace Microsoft.AspNet.Proxy
                 context.Response.StatusCode = (int)responseMessage.StatusCode;
                 foreach (var header in responseMessage.Headers)
                 {
-                    context.Response.Headers.SetValues(header.Key, header.Value.ToArray());
+                    context.Response.Headers[header.Key] = header.Value.ToArray();
                 }
 
                 foreach (var header in responseMessage.Content.Headers)
                 {
-                    context.Response.Headers.SetValues(header.Key, header.Value.ToArray());
+                    context.Response.Headers[header.Key] = header.Value.ToArray();
                 }
 
                 // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
