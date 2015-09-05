@@ -129,7 +129,16 @@
   <data name="Receiver_BadValue" xml:space="preserve">
     <value>The '{0}' parameter provided in the HTTP request did not match the expected value.</value>
   </data>
+  <data name="Receiver_BadXml" xml:space="preserve">
+    <value>The WebHook request must contain an entity body formatted as valid XML.</value>
+  </data>
+  <data name="Receiver_NoBody" xml:space="preserve">
+    <value>The WebHook request entity body cannot be empty.</value>
+  </data>
   <data name="Receiver_NoCode" xml:space="preserve">
     <value>The WebHook verification request must contain a '{0}' query parameter.</value>
+  </data>
+  <data name="Receiver_NoXml" xml:space="preserve">
+    <value>The WebHook request must contain an entity body formatted as XML.</value>
   </data>
 </root>

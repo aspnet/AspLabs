@@ -97,11 +97,38 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as valid XML..
+        /// </summary>
+        internal static string Receiver_BadXml {
+            get {
+                return ResourceManager.GetString("Receiver_BadXml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The WebHook request entity body cannot be empty..
+        /// </summary>
+        internal static string Receiver_NoBody {
+            get {
+                return ResourceManager.GetString("Receiver_NoBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The WebHook verification request must contain a &apos;{0}&apos; query parameter..
         /// </summary>
         internal static string Receiver_NoCode {
             get {
                 return ResourceManager.GetString("Receiver_NoCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as XML..
+        /// </summary>
+        internal static string Receiver_NoXml {
+            get {
+                return ResourceManager.GetString("Receiver_NoXml", resourceCulture);
             }
         }
     }
