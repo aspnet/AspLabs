@@ -10,7 +10,7 @@ using System.Web.Http;
 using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Properties;
 
-namespace Microsoft.AspNet.WebHooks.Extensions
+namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Extension methods for <see cref="IWebHookReceiver"/>.
