@@ -25,7 +25,7 @@ namespace Microsoft.AspNet.WebHooks
         /// <param name="receiver">The <see cref="IWebHookReceiver"/> to get the XML for.</param>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
         /// <returns>An <see cref="XElement"/> containing the HTTP request entity body.</returns>
-        public static async Task<XElement> ReadAsXmlAsync(this IWebHookReceiver receiver, HttpRequestMessage request)
+        public static async Task<XElement> ReadBodyAsXmlAsync(this IWebHookReceiver receiver, HttpRequestMessage request)
         {
             if (receiver == null)
             {
