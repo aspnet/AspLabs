@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Filters;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Routes;
@@ -46,6 +45,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         /// </summary>
         /// <returns>The registered <see cref="WebHook"/> instance for a given user.</returns>
         [Route("{id}", Name = WebHookRouteNames.RegistrationLookupAction)]
+        [HttpGet]
         [ResponseType(typeof(WebHook))]
         public async Task<IHttpActionResult> Lookup(string id)
         {
