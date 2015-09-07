@@ -14,7 +14,7 @@ namespace System.Web.Http
     {
         /// <summary>
         /// Initializes support for receiving WordPress WebHooks. 
-        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/wordpress?code=c2e25cd9-6f63-44f6-bf2a-729bcc9f236a</c>'.
+        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/wordpress?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
         /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
         /// same value as configured in the '<c>MS_WebHookReceiverSecret_WordPress</c>' application setting.
         /// The 'code' parameter must be between 16 and 64 characters long.

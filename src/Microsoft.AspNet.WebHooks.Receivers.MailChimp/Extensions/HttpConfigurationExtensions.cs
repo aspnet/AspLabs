@@ -14,7 +14,7 @@ namespace System.Web.Http
     {
         /// <summary>
         /// Initializes support for receiving MailChimp WebHooks. 
-        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/mailchimp?code=5a4bd5fe-a970-42f2-a0e9-676681788eb0</c>'.
+        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/mailchimp?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
         /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
         /// same value as configured in the '<c>MS_WebHookReceiverSecret_MailChimp</c>' application setting.
         /// The 'code' parameter must be between 16 and 64 characters long.

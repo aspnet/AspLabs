@@ -121,7 +121,7 @@ namespace Microsoft.AspNet.WebHooks
         /// For WebHooks providers with insufficient security considerations, the receiver can require that the WebHook URI must 
         /// be an <c>https</c> URI and contain a 'code' query parameter with a value configured in the application setting with the name
         /// <paramref name="setting"/>.
-        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=c2e25cd9-6f63-44f6-bf2a-729bcc9f236a</c>'.
+        /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
         /// The 'code' parameter must be between 32 and 64 characters long.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
