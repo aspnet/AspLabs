@@ -9,7 +9,7 @@
   },
 
   "commands": {
-    "web": "Microsoft.AspNet.Hosting --config hosting.ini"
+    "web": "Microsoft.AspNet.Server.WebListener --server.urls=http://localhost:5000"
   },
 
   "frameworks": {
