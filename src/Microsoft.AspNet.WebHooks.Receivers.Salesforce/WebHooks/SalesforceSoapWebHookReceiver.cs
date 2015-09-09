@@ -57,7 +57,7 @@ namespace Microsoft.AspNet.WebHooks
                 EnsureSecureConnection(request);
 
                 // Read the request entity body
-                XElement data = await this.ReadBodyAsXmlAsync(request);
+                XElement data = await ReadAsXmlAsync(request);
                 SalesforceNotifications notifications = new SalesforceNotifications(data);
 
                 // Ensure that the organization ID matches the expected value.
