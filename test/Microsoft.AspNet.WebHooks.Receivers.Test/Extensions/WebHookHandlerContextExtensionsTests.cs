@@ -67,6 +67,25 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void GetDataOrDefault_ReturnsTypeFromJArray()
+        {
+            // Arrange
+            IEnumerable<TestClass> actual;
+            IEnumerable<TestClass> test = new List<TestClass>
+            {
+                new TestClass { Age = 1, Name = "Henrik1" },
+                new TestClass { Age = 2, Name = "Henrik2" },
+            };
+            _context.Data = JArray.FromObject(test);
+
+            // Act
+            actual = _context.GetDataOrDefault<IEnumerable<TestClass>>();
+
+            // Assert
+            Assert.Equal(test, actual);
+        }
+
+        [Fact]
         public void GetDataOrDefault_HandlesNullContext()
         {
             // Act
@@ -110,6 +129,26 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void TryGetData_ReturnsTypeFromJArray()
+        {
+            // Arrange
+            IEnumerable<TestClass> actual;
+            IEnumerable<TestClass> test = new List<TestClass>
+            {
+                new TestClass { Age = 1, Name = "Henrik1" },
+                new TestClass { Age = 2, Name = "Henrik2" },
+            };
+            _context.Data = JArray.FromObject(test);
+
+            // Act
+            bool result = _context.TryGetData<IEnumerable<TestClass>>(out actual);
+
+            // Assert
+            Assert.True(result);
+            Assert.Equal(test, actual);
+        }
+
+        [Fact]
         public void TryGetData_HandlesNullContext()
         {
             // Arrange
@@ -127,6 +166,22 @@ namespace Microsoft.AspNet.WebHooks
             public string Name { get; set; }
 
             public int Age { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                TestClass x = obj as TestClass;
+                if (x == null)
+                {
+                    return false;
+                }
+
+                return Name == x.Name && Age == x.Age;
+            }
+
+            public override int GetHashCode()
+            {
+                return Name.GetHashCode() ^ Age;
+            }
         }
     }
 }

@@ -7,18 +7,18 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8CED31FB-32F2-4FFB-9997-452FB9728577}</ProjectGuid>
+    <ProjectGuid>{3E842532-D709-48B6-AC39-1367E9F0DAB9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.AspNet.WebHooks</RootNamespace>
-    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers</AssemblyName>
+    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers.Instagram</AssemblyName>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <RunCodeAnalysis>$(CodeAnalysis)</RunCodeAnalysis>
     <CodeAnalysisAdditionalOptions>/assemblyCompareMode:StrongNameIgnoringVersion</CodeAnalysisAdditionalOptions>
     <CodeAnalysisRuleSet>..\..\FxCop.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>$(DefineConstants);ASPNETWEBHOOKS</DefineConstants>
     <SignAssembly>true</SignAssembly>
-    <NuGetPackageImportStamp>161e2853</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>b718ef60</NuGetPackageImportStamp>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -27,6 +27,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -56,31 +57,22 @@
     <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Controllers\WebHookReceiversController.cs" />
-    <Compile Include="Extensions\DependencyScopeExtensions.cs" />
-    <Compile Include="Extensions\WebHookHandlerContextExtensions.cs" />
-    <Compile Include="Extensions\WebHookReceiverConfigExtensions.cs" />
+    <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
+    <Compile Include="Extensions\InstagramWebHookClientExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\ReceiverResources.Designer.cs">
+    <Compile Include="Properties\InstagramReceiverResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ReceiverResources.resx</DependentUpon>
+      <DependentUpon>InstagramReceiverResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Routes\WebHookReceiverRouteNames.cs" />
-    <Compile Include="Services\ReceiverServices.cs" />
-    <Compile Include="WebHooks\IWebHookReceiverConfig.cs" />
-    <Compile Include="WebHooks\IWebHookHandlerSorter.cs" />
-    <Compile Include="WebHooks\IWebHookHandler.cs" />
-    <Compile Include="WebHooks\IWebHookReceiver.cs" />
-    <Compile Include="WebHooks\IWebHookReceiverManager.cs" />
-    <Compile Include="WebHooks\WebHookHandler.cs" />
-    <Compile Include="WebHooks\WebHookQueueContext.cs" />
-    <Compile Include="WebHooks\WebHookHandlerContext.cs" />
-    <Compile Include="WebHooks\WebHookQueueHandler.cs" />
-    <Compile Include="WebHooks\WebHookReceiver.cs" />
-    <Compile Include="WebHooks\WebHookHandlerSorter.cs" />
-    <Compile Include="WebHooks\WebHookReceiverConfig.cs" />
-    <Compile Include="WebHooks\WebHookReceiverManager.cs" />
+    <Compile Include="WebHooks\InstagramCaption.cs" />
+    <Compile Include="WebHooks\InstagramLocation.cs" />
+    <Compile Include="WebHooks\InstagramMedia.cs" />
+    <Compile Include="WebHooks\InstagramNotification.cs" />
+    <Compile Include="WebHooks\InstagramSubscription.cs" />
+    <Compile Include="WebHooks\InstagramUser.cs" />
+    <Compile Include="WebHooks\InstagramWebHookClient.cs" />
+    <Compile Include="WebHooks\InstagramWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -90,16 +82,19 @@
       <Project>{f7dd0935-6320-4efc-9464-d5a2d2b8c2f7}</Project>
       <Name>Microsoft.AspNet.WebHooks.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.AspNet.WebHooks.Receivers\Microsoft.AspNet.WebHooks.Receivers.csproj">
+      <Project>{8ced31fb-32f2-4ffb-9997-452fb9728577}</Project>
+      <Name>Microsoft.AspNet.WebHooks.Receivers</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\ReceiverResources.resx">
+    <None Include="Microsoft.AspNet.WebHooks.Receivers.Instagram.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\InstagramReceiverResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ReceiverResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
+      <LastGenOutput>InstagramReceiverResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Microsoft.AspNet.WebHooks.Receivers.nuspec" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

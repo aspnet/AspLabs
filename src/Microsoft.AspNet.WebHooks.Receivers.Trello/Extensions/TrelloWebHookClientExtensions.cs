@@ -36,8 +36,8 @@ namespace System.Web.Http
 
             Dictionary<string, object> parameters = new Dictionary<string, object> { { "webHookReceiver", TrelloWebHookReceiver.ReceiverName } };
             string receiver = urlHelper.Link(WebHookReceiverRouteNames.ReceiversAction, parameters);
-            Uri receiverAddress = new Uri(receiver);
-            return client.CreateAsync(receiverAddress, modelId, description);
+            Uri callback = new Uri(receiver);
+            return client.CreateAsync(callback, modelId, description);
         }
     }
 }

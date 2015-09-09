@@ -66,16 +66,16 @@ namespace Microsoft.AspNet.WebHooks
         /// Creates a WebHook subscription for Trello to send WebHooks when changes happen to a given <paramref name="modelId"/>.
         /// If the operation fails an exception is thrown.
         /// </summary>
-        /// <param name="receiver">The URI where WebHooks for the given <paramref name="modelId"/> will be received. Typically this will be of the form <c>https://&lt;host&gt;/api/webhooks/incoming/trello</c></param>
+        /// <param name="callback">The URI where WebHooks for the given <paramref name="modelId"/> will be received. Typically this will be of the form <c>https://&lt;host&gt;/api/webhooks/incoming/trello</c></param>
         /// <param name="modelId">The ID of a model to watch. This can be the ID of a member, card, board, or anything that actions apply to. Any event involving this model will trigger the WebHook. An example model ID is <c>4d5ea62fd76aa1136000000c</c>.</param>
         /// <param name="description">A description of the WebHook, for example <c>My Trello WebHook!</c>.</param>
-        public virtual async Task<string> CreateAsync(Uri receiver, string modelId, string description)
+        public virtual async Task<string> CreateAsync(Uri callback, string modelId, string description)
         {
-            if (receiver == null)
+            if (callback == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("callback");
             }
-            if (!receiver.IsAbsoluteUri)
+            if (!callback.IsAbsoluteUri)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_NotAbsoluteCallback, "https://<host>/api/webhooks/incoming/trello");
                 throw new ArgumentException(msg, "receiver");
@@ -91,7 +91,7 @@ namespace Microsoft.AspNet.WebHooks
 
             JObject parameters = new JObject();
             parameters[DescriptionKey] = description;
-            parameters[CallbackKey] = receiver;
+            parameters[CallbackKey] = callback;
             parameters[ModelIdKey] = modelId;
 
             using (HttpResponseMessage response = await _httpClient.PostAsJsonAsync(_createWebHookUri, parameters))

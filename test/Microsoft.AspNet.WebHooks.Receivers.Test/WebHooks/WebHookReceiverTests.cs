@@ -577,8 +577,6 @@ namespace Microsoft.AspNet.WebHooks
 
         public void Initialize(string name, string id, string config, params KeyValuePair<Type, object>[] dependencies)
         {
-            _httpConfig = new HttpConfiguration();
-
             _logger = new Mock<ILogger>().Object;
             _settings = new SettingsDictionary();
             _settings[SecretPrefix + name] = GetConfigValue(id, config);

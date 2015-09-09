@@ -42,6 +42,47 @@ namespace Microsoft.AspNet.WebHooks
         public abstract Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request);
 
         /// <summary>
+        /// Reads the JSON HTTP request entity body.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
+        internal static async Task<T> ReadAsJsonAsync<T>(HttpRequestMessage request)
+            where T : JToken
+        {
+            // Check that there is a request body
+            if (request.Content == null)
+            {
+                string msg = ReceiverResources.Receiver_NoBody;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                throw new HttpResponseException(noBody);
+            }
+
+            // Check that the request body is JSON
+            if (!request.Content.IsJson())
+            {
+                string msg = ReceiverResources.Receiver_NoJson;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                throw new HttpResponseException(noJson);
+            }
+
+            try
+            {
+                // Read request body
+                T result = await request.Content.ReadAsAsync<T>();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                string msg = ReceiverResources.Receiver_BadJson;
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                throw new HttpResponseException(invalidBody);
+            }
+        }
+
+        /// <summary>
         /// Provides a time consistent comparison of two secrets in the form of two byte arrays.
         /// </summary>
         /// <param name="inputA">The first secret to compare.</param>
@@ -182,10 +223,8 @@ namespace Microsoft.AspNet.WebHooks
             // Look up configuration for this receiver and instance
             HttpConfiguration httpConfig = request.GetConfiguration();
             IWebHookReceiverConfig receiverConfig = httpConfig.DependencyResolver.GetReceiverConfig();
-            string secret = await receiverConfig.GetReceiverConfigAsync(name, id);
-
-            // Verify that configuration matches length requirements
-            if (secret == null || secret.Length < minLength || secret.Length > maxLength)
+            string secret = await receiverConfig.GetReceiverConfigAsync(name, id, minLength, maxLength);
+            if (secret == null)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
                 httpConfig.DependencyResolver.GetLogger().Error(msg);
@@ -224,43 +263,23 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Reads the JSON HTTP request entity body.
+        /// Reads the JSON HTTP request entity body as a JSON object.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
         /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
-        protected virtual async Task<JObject> ReadAsJsonAsync(HttpRequestMessage request)
+        protected virtual Task<JObject> ReadAsJsonAsync(HttpRequestMessage request)
         {
-            // Check that there is a request body
-            if (request.Content == null)
-            {
-                string msg = ReceiverResources.Receiver_NoBody;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
-                throw new HttpResponseException(noBody);
-            }
+            return ReadAsJsonAsync<JObject>(request);
+        }
 
-            // Check that the request body is JSON
-            if (!request.Content.IsJson())
-            {
-                string msg = ReceiverResources.Receiver_NoJson;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
-                throw new HttpResponseException(noJson);
-            }
-
-            try
-            {
-                // Read request body
-                JObject result = await request.Content.ReadAsAsync<JObject>();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                string msg = ReceiverResources.Receiver_BadJson;
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
-                throw new HttpResponseException(invalidBody);
-            }
+        /// <summary>
+        /// Reads the JSON HTTP request entity body as a JSON array.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
+        protected virtual Task<JArray> ReadAsJsonArrayAsync(HttpRequestMessage request)
+        {
+            return ReadAsJsonAsync<JArray>(request);
         }
 
         /// <summary>

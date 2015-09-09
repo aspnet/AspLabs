@@ -12,13 +12,13 @@ namespace Microsoft.AspNet.WebHooks
     public interface IWebHookReceiverConfig
     {
         /// <summary>
-        /// Gets the receiver configuration for a given <paramref name="receiver"/> and a particular <paramref name="id"/>
+        /// Gets the receiver configuration for a given <paramref name="name"/> and a particular <paramref name="id"/>
         /// or <c>null</c> if not found.
         /// </summary>
-        /// <param name="receiver">The case-insensitive name of the receiver used by the incoming WebHook. The receiver 
+        /// <param name="name">The case-insensitive name of the receiver configuration used by the incoming WebHook. The receiver 
         /// name can for example be <c>dropbox</c> or <c>github</c>.</param>
-        /// <param name="id">A (possibly empty) ID of a particular configuration for the given <paramref name="receiver"/>.
+        /// <param name="id">A (possibly empty) ID of a particular configuration for the given <paramref name="name"/>.
         /// This can be used for one receiver to differentiate between multiple configurations.</param>
-        Task<string> GetReceiverConfigAsync(string receiver, string id);
+        Task<string> GetReceiverConfigAsync(string name, string id);
     }
 }

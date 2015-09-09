@@ -61,7 +61,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Registered ID &apos;{0}&apos; for receiver: &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Registered configuration setting &apos;{0}&apos; for ID &apos;{1}&apos;&apos;..
         /// </summary>
         internal static string Config_AddedName {
             get {
@@ -93,6 +93,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         internal static string Config_NoConfig {
             get {
                 return ResourceManager.GetString("Config_NoConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not deserialize instance of type &apos;{0}&apos; as &apos;{1}&apos;: {2}.
+        /// </summary>
+        internal static string GetDataOrDefault_Failure {
+            get {
+                return ResourceManager.GetString("GetDataOrDefault_Failure", resourceCulture);
             }
         }
         

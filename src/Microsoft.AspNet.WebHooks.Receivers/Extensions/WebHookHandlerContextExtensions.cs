@@ -1,13 +1,16 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.ComponentModel;
+using System.Globalization;
+using Microsoft.AspNet.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Various extension methods for the <see cref="WebHookHandlerContextExtensions"/> class.
+    /// Various extension methods for the <see cref="WebHookHandlerContext"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class WebHookHandlerContextExtensions
@@ -27,15 +30,17 @@ namespace Microsoft.AspNet.WebHooks
                 return default(T);
             }
 
-            if (context.Data is JObject && typeof(T) != typeof(JObject))
+            if (context.Data is JToken && !typeof(JToken).IsAssignableFrom(typeof(T)))
             {
                 try
                 {
-                    T data = ((JObject)context.Data).ToObject<T>();
+                    T data = ((JToken)context.Data).ToObject<T>();
                     return data;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.GetDataOrDefault_Failure, context.Data.GetType(), typeof(T), ex.Message);
+                    context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(msg, ex);
                     return default(T);
                 }
             }

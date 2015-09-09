@@ -45,18 +45,18 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task<string> GetReceiverConfigAsync(string receiver, string id)
+        public Task<string> GetReceiverConfigAsync(string name, string id)
         {
-            if (receiver == null)
+            if (name == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("name");
             }
             if (id == null)
             {
                 id = string.Empty;
             }
 
-            string key = GetConfigKey(receiver, id);
+            string key = GetConfigKey(name, id);
             string value;
             string result = _config.TryGetValue(key, out value) ? value : null;
             return Task.FromResult(result);
@@ -113,7 +113,7 @@ namespace Microsoft.AspNet.WebHooks
             try
             {
                 config.Add(lookupKey, value);
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddedName, id, receiver);
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddedName, receiver, id);
                 logger.Info(msg);
             }
             catch (Exception ex)
