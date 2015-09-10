@@ -79,6 +79,10 @@
       <Project>{8ced31fb-32f2-4ffb-9997-452fb9728577}</Project>
       <Name>Microsoft.AspNet.WebHooks.Receivers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.AspNet.WebHooks.Receivers.Test\Microsoft.AspNet.WebHooks.Receivers.Test.csproj">
+      <Project>{cb965ed1-1e07-4374-a829-c636db09f567}</Project>
+      <Name>Microsoft.AspNet.WebHooks.Receivers.Test</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.TestUtilities\Microsoft.TestUtilities.csproj">
       <Project>{608b1d09-e4de-4dba-8dbf-7758003988f0}</Project>
       <Name>Microsoft.TestUtilities</Name>

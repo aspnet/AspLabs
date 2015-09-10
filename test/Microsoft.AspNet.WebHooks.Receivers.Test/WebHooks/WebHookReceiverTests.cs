@@ -10,10 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Dependencies;
 using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Config;
+using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Mocks;
+using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -22,25 +23,18 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class WebHookReceiverTests
     {
-        private HttpConfiguration _config;
+        private const string TestId = "";
+        private const string TestSecret = "12345678901234567890123456789012";
+        private const string SecretPrefix = "MS_WebHookReceiverSecret_";
+
+        private ILogger _logger;
+        private SettingsDictionary _settings;
+        private IWebHookReceiverConfig _config;
+        private HttpConfiguration _httpConfig;
+
         private HttpRequestMessage _request;
         private HttpRequestContext _context;
         private WebHookReceiverMock _receiverMock;
-        private Mock<IDependencyResolver> _resolverMock;
-
-        public WebHookReceiverTests()
-        {
-            _config = new HttpConfiguration();
-            _resolverMock = new Mock<IDependencyResolver>();
-            _config.DependencyResolver = _resolverMock.Object;
-            WebHooksConfig.Initialize(_config);
-            _request = new HttpRequestMessage();
-            _receiverMock = new WebHookReceiverMock();
-
-            _context = new HttpRequestContext();
-            _context.Configuration = _config;
-            _request.SetRequestContext(_context);
-        }
 
         public static TheoryData<string> InvalidCodeQueries
         {
@@ -95,17 +89,48 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        public static TheoryData<string> ValidIdData
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                    { string.Empty },
+                    { "id" },
+                    { "你好" },
+                    { "1" },
+                    { "1234567890" },
+                };
+            }
+        }
+        public static TheoryData<string, string, string, int, int> ValidConfigData
+        {
+            get
+            {
+                return new TheoryData<string, string, string, int, int>
+                {
+                    { "Receiver", null, "12345678", 2, 8 },
+                    { "RECEIVER", null, "12345678", 2, 8 },
+                    { "receiver", null, "12345678", 2, 8 },
+                    { "Receiver", string.Empty, "12345678", 8, 16 },
+                    { "RECEIVER", string.Empty, "12345678", 8, 16 },
+                    { "receiver", string.Empty, "12345678", 8, 16 },
+                    { "Receiver", "1", "12345678", 2, 16 },
+                    { "RECEIVER", "1234567890", "12345678", 2, 16 },
+                    { WebHookReceiverMock.ReceiverName, "你好", "12345678", 2, 16 },
+                };
+            }
+        }
+
         [Fact]
         public async Task EnsureValidCode_Throws_IfNotUsingHttps()
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = "12345678901234567890123456789012";
+            Initialize(TestSecret);
             _request.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
@@ -117,43 +142,39 @@ namespace Microsoft.AspNet.WebHooks
         public async Task EnsureValidCode_Throws_IfNoCodeParameter(string query)
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = "12345678901234567890123456789012";
+            Initialize(TestSecret);
             _request.RequestUri = new Uri("https://some.no.ssl.host?" + query);
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
         }
 
-        [Fact]
-        public async Task EnsureValidCode_Throws_IfWrongCodeParameter()
+        [Theory]
+        [MemberData("ValidIdData")]
+        public async Task EnsureValidCode_Throws_IfWrongCodeParameter(string id)
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = "12345678901234567890123456789012";
+            Initialize(GetConfigValue(id, TestSecret));
             _request.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, "Secret"));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, id));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
         }
 
-        [Fact]
-        public void EnsureValidCode_Succeeds_IfRightCodeParameter()
+        [Theory]
+        [MemberData("ValidIdData")]
+        public void EnsureValidCode_Succeeds_IfRightCodeParameter(string id)
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = "12345678901234567890123456789012";
+            Initialize(GetConfigValue(id, TestSecret));
             _request.RequestUri = new Uri("https://some.no.ssl.host?code=12345678901234567890123456789012");
 
             // Act
@@ -167,6 +188,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task EnsureSecureConnection_ThrowsIfNotLocalAndNotHttps(string address)
         {
             // Arrange
+            Initialize(TestSecret);
             _request.RequestUri = new Uri(address);
 
             // Act
@@ -181,38 +203,29 @@ namespace Microsoft.AspNet.WebHooks
         [Theory]
         [InlineData("12345678", 16, 32)]
         [InlineData("12345678", 2, 4)]
-        [InlineData(null, 6, 8)]
-        [InlineData("", 6, 8)]
-        public async Task GetWebHookSecret_Throws_IfInvalidSecret(string secret, int minLength, int maxLength)
+        public async Task GetReceiverConfig_Throws_IfInvalidSecret(string secret, int minLength, int maxLength)
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = secret;
+            Initialize(secret);
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.GetWebHookSecret(_request, setting, minLength, maxLength));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.GetReceiverConfig(_request, _receiverMock.Name, TestId, minLength, maxLength));
 
             // Assert
-            string expected = string.Format("In order for the incoming WebHook request to be verified, the '{0}' setting must be set to a value between {1} and {2} characters long.", setting, minLength, maxLength);
+            string expected = string.Format("Could not find a valid configuration for WebHook receiver 'MockReceiver' and instance '{0}'. The setting must be set to a value between {1} and {2} characters long.", TestId, minLength, maxLength);
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal(expected, error.Message);
         }
 
         [Theory]
-        [InlineData("12345678", 2, 8)]
-        [InlineData("12345678", 8, 16)]
-        [InlineData("12345678", 2, 16)]
-        [InlineData("", 0, 16)]
-        public void GetWebHookSecret_Succeeds_IfValidSecret(string secret, int minLength, int maxLength)
+        [MemberData("ValidConfigData")]
+        public async Task GetReceiverConfig_Succeeds_IfValidSecret(string name, string id, string secret, int minLength, int maxLength)
         {
             // Arrange
-            string setting = "Secret";
-            SettingsDictionary settings = _config.DependencyResolver.GetSettings();
-            settings[setting] = secret;
+            Initialize(name, id, secret);
 
             // Act
-            string actual = _receiverMock.GetWebHookSecret(_request, setting, minLength, maxLength);
+            string actual = await _receiverMock.GetReceiverConfig(_request, name, id, minLength, maxLength);
 
             // Assert
             Assert.Equal(secret, actual);
@@ -225,6 +238,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task GetRequestHeader_Throws_IfHeaderCount_IsNotOne(int headers)
         {
             // Arrange
+            Initialize(TestSecret);
             string name = "signature";
             for (int cnt = 0; cnt < headers; cnt++)
             {
@@ -244,6 +258,7 @@ namespace Microsoft.AspNet.WebHooks
         public void GetRequestHeader_Succeeds_WithOneHeader()
         {
             // Arrange
+            Initialize(TestSecret);
             string expected = "value";
             string name = "signature";
             _request.Headers.Add(name, expected);
@@ -258,6 +273,9 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public async Task ReadAsJsonAsync_Throws_IfNullBody()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
 
@@ -270,6 +288,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsJsonAsync_Throws_IfNotJson()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
@@ -284,6 +303,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsJsonAsync_Throws_IfInvalidJson()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("I n v a l i d  J S O N", Encoding.UTF8, "application/json");
 
             // Act
@@ -298,6 +318,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsJsonAsync_Succeeds_OnValidJson()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("{ \"k\": \"v\" }", Encoding.UTF8, "application/json");
 
             // Act
@@ -310,6 +331,9 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public async Task ReadAsXmlAsync_Throws_IfNullBody()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
 
@@ -322,6 +346,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsXmlAsync_Throws_IfNotXml()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
@@ -336,6 +361,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsXmlAsync_Throws_IfInvalidXml()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("I n v a l i d  X M L", Encoding.UTF8, "application/xml");
 
             // Act
@@ -350,6 +376,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsXmlAsync_Succeeds_OnValidXml()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("<root><k>v</k></root>", Encoding.UTF8, "application/xml");
 
             // Act
@@ -362,6 +389,9 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public async Task ReadAsFormDataAsync_Throws_IfNullBody()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsFormDataAsync(_request));
 
@@ -374,6 +404,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsFormDataAsync_Throws_IfNotFormData()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
@@ -388,6 +419,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsFormDataAsync_Succeeds_OnValidFormData()
         {
             // Arrange
+            Initialize(TestSecret);
             _request.Content = new StringContent("k=v", Encoding.UTF8, "application/x-www-form-urlencoded");
 
             // Act
@@ -400,6 +432,9 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public async Task CreateBadMethodResponse_CreatesExpectedResponse()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             HttpResponseMessage actual = _receiverMock.CreateBadMethodResponse(_request);
 
@@ -412,6 +447,9 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public async Task CreateBadSignatureResponse_CreatesExpectedResponse()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             HttpResponseMessage actual = _receiverMock.CreateBadSignatureResponse(_request, "Header");
 
@@ -425,66 +463,92 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ExecuteWebHookAsync_StopsOnFirstResponse()
         {
             // Arrange
-            List<TestHandler> handlers = new List<TestHandler>()
+            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
             {
-                new TestHandler { Order = 10, },
-                new TestHandler { Order = 20, },
-                new TestHandler { Order = 30, SetResponse = true },
-                new TestHandler { Order = 40, },
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 10, }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 20, }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 30, SetResponse = true }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 40, }),
             };
-            _resolverMock.Setup(r => r.GetServices(typeof(IWebHookHandler)))
-                .Returns(handlers)
-                .Verifiable();
-            WebHookReceiverMock receiver = new WebHookReceiverMock();
+            Initialize(TestSecret, handlers);
             object data = new object();
 
             // Act
-            HttpResponseMessage actual = await receiver.ExecuteWebHookAsync(WebHookReceiverMock.ReceiverName, _context, _request, new[] { "action" }, data);
+            HttpResponseMessage actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
 
             // Assert
-            _resolverMock.Verify();
             Assert.Equal("Order: 30", actual.ReasonPhrase);
-            Assert.True(handlers[0].IsCalled);
-            Assert.True(handlers[1].IsCalled);
-            Assert.True(handlers[2].IsCalled);
-            Assert.False(handlers[3].IsCalled);
+            Assert.True(((TestHandler)handlers[0].Value).IsCalled);
+            Assert.True(((TestHandler)handlers[1].Value).IsCalled);
+            Assert.True(((TestHandler)handlers[2].Value).IsCalled);
+            Assert.False(((TestHandler)handlers[3].Value).IsCalled);
         }
 
         [Fact]
         public async Task ExecuteWebHookAsync_FindsMatchingHandlers()
         {
             // Arrange
-            List<TestHandler> handlers = new List<TestHandler>()
+            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
             {
-                new TestHandler { Order = 10, Receiver = "other" },
-                new TestHandler { Order = 20, Receiver = "MockReceiver" },
-                new TestHandler { Order = 30, Receiver = "MOCKRECEIVER" },
-                new TestHandler { Order = 40, Receiver = null },
-                new TestHandler { Order = 50, Receiver = "something" },
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 10, Receiver = "other" }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 20, Receiver = "MockReceiver" }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 30, Receiver = "MOCKRECEIVER" }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 40, Receiver = null }),
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 50, Receiver = "something" }),
             };
-            _resolverMock.Setup(r => r.GetServices(typeof(IWebHookHandler)))
-                .Returns(handlers)
-                .Verifiable();
-            WebHookReceiverMock receiver = new WebHookReceiverMock();
+            Initialize(TestSecret, handlers);
             object data = new object();
 
             // Act
-            HttpResponseMessage actual = await receiver.ExecuteWebHookAsync(WebHookReceiverMock.ReceiverName, _context, _request, new[] { "action" }, data);
+            HttpResponseMessage actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
 
             // Assert
-            _resolverMock.Verify();
             Assert.Equal("OK", actual.ReasonPhrase);
-            Assert.False(handlers[0].IsCalled);
-            Assert.True(handlers[1].IsCalled);
-            Assert.True(handlers[2].IsCalled);
-            Assert.True(handlers[3].IsCalled);
-            Assert.False(handlers[4].IsCalled);
+            Assert.False(((TestHandler)handlers[0].Value).IsCalled);
+            Assert.True(((TestHandler)handlers[1].Value).IsCalled);
+            Assert.True(((TestHandler)handlers[2].Value).IsCalled);
+            Assert.True(((TestHandler)handlers[3].Value).IsCalled);
+            Assert.False(((TestHandler)handlers[4].Value).IsCalled);
+        }
+
+        [Fact]
+        public async Task ExecuteWebHookAsync_InitializesContext()
+        {
+            // Arrange
+            WebHookHandlerContext actual = null;
+            Mock<IWebHookHandler> handlerMock = new Mock<IWebHookHandler>();
+            handlerMock.Setup<Task>(h => h.ExecuteAsync(WebHookReceiverMock.ReceiverName, It.IsAny<WebHookHandlerContext>()))
+                .Callback<string, WebHookHandlerContext>((rec, con) => actual = con)
+                .Returns(Task.FromResult(true))
+                .Verifiable();
+
+            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
+            {
+                new KeyValuePair<Type, object>(typeof(IWebHookHandler), handlerMock.Object),
+            };
+            Initialize(TestSecret, handlers);
+            object data = new object();
+            IEnumerable<string> actions = new[] { "action" };
+
+            // Act
+            await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, actions, data);
+
+            // Assert
+            handlerMock.Verify();
+            Assert.Equal(TestId, actual.Id);
+            Assert.Equal(_request, actual.Request);
+            Assert.Equal(_context, actual.RequestContext);
+            Assert.Equal(data, actual.Data);
+            Assert.Equal(actions, actual.Actions);
         }
 
         [Theory]
         [MemberData("ByteCompareData")]
         public void SecretEqual_ComparesByteArraysCorrectly(byte[] inputA, byte[] inputB, bool expected)
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
 
@@ -496,11 +560,50 @@ namespace Microsoft.AspNet.WebHooks
         [MemberData("StringCompareData")]
         public void SecretEqual_ComparesStringsCorrectly(string inputA, string inputB, bool expected)
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        public void Initialize(string config, params KeyValuePair<Type, object>[] dependencies)
+        {
+            Initialize(WebHookReceiverMock.ReceiverName, TestId, config, dependencies);
+        }
+
+        public void Initialize(string name, string id, string config, params KeyValuePair<Type, object>[] dependencies)
+        {
+            _httpConfig = new HttpConfiguration();
+
+            _logger = new Mock<ILogger>().Object;
+            _settings = new SettingsDictionary();
+            _settings[SecretPrefix + name] = GetConfigValue(id, config);
+
+            _config = new WebHookReceiverConfig(_settings, _logger);
+
+            List<KeyValuePair<Type, object>> deps = new List<KeyValuePair<Type, object>>()
+            {
+                new KeyValuePair<Type, object>(typeof(IWebHookReceiverConfig), _config),
+                new KeyValuePair<Type, object>(typeof(SettingsDictionary), _settings)
+            };
+            deps.AddRange(dependencies);
+
+            _httpConfig = HttpConfigurationMock.Create(deps);
+
+            _request = new HttpRequestMessage();
+            _receiverMock = new WebHookReceiverMock();
+
+            _context = new HttpRequestContext { Configuration = _httpConfig };
+            _request.SetRequestContext(_context);
+        }
+
+        private static string GetConfigValue(string id, string config)
+        {
+            return string.IsNullOrEmpty(id) ? config : id + " = " + config;
         }
 
         private class TestHandler : IWebHookHandler

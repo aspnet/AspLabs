@@ -9,43 +9,26 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
-    public class PaypalWebHookReceiverTests
+    public class PaypalWebHookReceiverTests : WebHookReceiverTestsBase<PaypalWebHookReceiver>
     {
         private const string TestContent = "{ \"key\": \"value\", \"event_type\": \"action1\" }";
-        private const string TestReceiver = "Test";
+        private const string TestId = "";
+        private const string TestSecret = "NotUsed";
 
-        private HttpConfiguration _config;
-        private SettingsDictionary _settings;
-        private HttpRequestContext _context;
-        private Mock<PaypalWebHookReceiver> _receiverMock;
         private HttpRequestMessage _postRequest;
-
-        public PaypalWebHookReceiverTests()
-        {
-            _settings = new SettingsDictionary();
-
-            _config = HttpConfigurationMock.Create(new Dictionary<Type, object> { { typeof(SettingsDictionary), _settings } });
-            _context = new HttpRequestContext { Configuration = _config };
-
-            _receiverMock = new Mock<PaypalWebHookReceiver>(false) { CallBase = true };
-
-            _postRequest = new HttpRequestMessage() { Method = HttpMethod.Post };
-            _postRequest.SetRequestContext(_context);
-            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
-        }
 
         [Fact]
         public void Constructor_Throws_IfNoConfig()
         {
+            // Arrange
+            Initialize(TestSecret);
+
             // Act
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => new PaypalWebHookReceiver());
 
@@ -57,104 +40,109 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Throws_IfNoRequestBody()
         {
             // Arrange
-            _receiverMock.Protected()
-                .Setup<bool>("ValidateReceivedEvent", _context, ItExpr.IsAny<NameValueCollection>(), string.Empty)
+            Initialize(TestSecret);
+            ReceiverMock.Protected()
+                .Setup<bool>("ValidateReceivedEvent", RequestContext, ItExpr.IsAny<NameValueCollection>(), string.Empty)
                 .Returns(true)
                 .Verifiable();
             _postRequest.Content = null;
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(string.Empty, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(string.Empty, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
-            _receiverMock.Verify();
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Verify();
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotJson()
         {
             // Arrange
-            _receiverMock.Protected()
-                .Setup<bool>("ValidateReceivedEvent", _context, ItExpr.IsAny<NameValueCollection>(), TestContent)
+            Initialize(TestSecret);
+            ReceiverMock.Protected()
+                .Setup<bool>("ValidateReceivedEvent", RequestContext, ItExpr.IsAny<NameValueCollection>(), TestContent)
                 .Returns(true)
                 .Verifiable();
             _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as JSON.", error.Message);
-            _receiverMock.Verify();
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Verify();
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_ReturnsError_IfPostHasNoEventParameter()
         {
             // Arrange
-            _receiverMock.Protected()
-                .Setup<bool>("ValidateReceivedEvent", _context, ItExpr.IsAny<NameValueCollection>(), "{ }")
+            Initialize(TestSecret);
+            ReceiverMock.Protected()
+                .Setup<bool>("ValidateReceivedEvent", RequestContext, ItExpr.IsAny<NameValueCollection>(), "{ }")
                 .Returns(true)
                 .Verifiable();
             _postRequest.Content = new StringContent("{ }", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The HTTP request body did not contain a required 'event_type' property.", error.Message);
-            _receiverMock.Verify();
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Verify();
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_ReturnsError_IfValidationFails()
         {
             // Arrange
-            _receiverMock.Protected()
-                .Setup<bool>("ValidateReceivedEvent", _context, ItExpr.IsAny<NameValueCollection>(), TestContent)
+            Initialize(TestSecret);
+            ReceiverMock.Protected()
+                .Setup<bool>("ValidateReceivedEvent", RequestContext, ItExpr.IsAny<NameValueCollection>(), TestContent)
                 .Returns(false)
                 .Verifiable();
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The received WebHook is not valid.", error.Message);
-            _receiverMock.Verify();
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Verify();
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest()
         {
             // Arrange
+            Initialize(TestSecret);
             List<string> actions = new List<string> { "action1" };
-            _receiverMock.Protected()
-                .Setup<bool>("ValidateReceivedEvent", _context, ItExpr.IsAny<NameValueCollection>(), TestContent)
+            ReceiverMock.Protected()
+                .Setup<bool>("ValidateReceivedEvent", RequestContext, ItExpr.IsAny<NameValueCollection>(), TestContent)
                 .Returns(true)
                 .Verifiable();
-            _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestId, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 
             // Act
-            await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            _receiverMock.Verify();
+            ReceiverMock.Verify();
         }
 
         [Theory]
@@ -166,16 +154,27 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_ReturnsError_IfInvalidMethod(string method)
         {
             // Arrange
+            Initialize(TestSecret);
             HttpRequestMessage req = new HttpRequestMessage { Method = new HttpMethod(method) };
-            req.SetRequestContext(_context);
+            req.SetRequestContext(RequestContext);
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, req);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+        }
+
+        public override void Initialize(string config)
+        {
+            ReceiverMock = new Mock<PaypalWebHookReceiver>(false) { CallBase = true };
+            base.Initialize(config);
+
+            _postRequest = new HttpRequestMessage() { Method = HttpMethod.Post };
+            _postRequest.SetRequestContext(RequestContext);
+            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
         }
     }
 }

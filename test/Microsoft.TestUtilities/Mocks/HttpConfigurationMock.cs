@@ -47,14 +47,14 @@ namespace Microsoft.TestUtilities.Mocks
         /// </summary>
         /// <param name="serviceInstances">Set of service instances to return from dependency resolver.</param>
         /// <returns>A newly configured <see cref="HttpConfiguration"/> instance.</returns>
-        public static HttpConfiguration Create(IDictionary<Type, object> serviceInstances)
+        public static HttpConfiguration Create(IEnumerable<KeyValuePair<Type, object>> serviceInstances)
         {
             HttpConfiguration config = new HttpConfiguration();
 
             // Set dependency resolver
             Mock<IDependencyResolver> dependencyResolverMock = new Mock<IDependencyResolver>();
             dependencyResolverMock.Setup(d => d.GetService(It.IsAny<Type>()))
-                .Returns<Type>(t => serviceInstances.ContainsKey(t) ? serviceInstances[t] : null);
+                .Returns<Type>(t => serviceInstances.FirstOrDefault(kvp => kvp.Key == t).Value);
             dependencyResolverMock.Setup(d => d.GetServices(It.IsAny<Type>()))
                 .Returns<Type>(t => serviceInstances.Where(kvp => kvp.Key == t).Select(kvp => kvp.Value));
             config.DependencyResolver = dependencyResolverMock.Object;

@@ -22,6 +22,12 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void Id_Roundtrips()
+        {
+            PropertyAssert.Roundtrips(_context, c => c.Id, PropertySetter.NullRoundtrips, roundtripValue: "你好世界");
+        }
+
+        [Fact]
         public void Data_Roundtrips()
         {
             PropertyAssert.Roundtrips(_context, c => c.Data, PropertySetter.NullRoundtrips, roundtripValue: "你好世界");

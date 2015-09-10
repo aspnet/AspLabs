@@ -14,7 +14,7 @@ namespace System.Web.Http
     {
         /// <summary>
         /// Initializes support for receiving Slack WebHooks.
-        /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/slack</c>'.
+        /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/slack/{id}</c>'.
         /// For security reasons, the WebHook URI must be an <c>https</c> URI and the WebHook 'token' parameter 
         /// must have the same value as configured in the '<c>MS_WebHookReceiverSecret_Slack</c>' application setting.
         /// For details about Slack WebHooks, see <c>https://api.slack.com/outgoing-webhooks</c>.

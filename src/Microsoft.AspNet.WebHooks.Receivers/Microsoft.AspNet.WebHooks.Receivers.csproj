@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="Routes\WebHookReceiverRouteNames.cs" />
     <Compile Include="Services\ReceiverServices.cs" />
+    <Compile Include="WebHooks\IWebHookReceiverConfig.cs" />
     <Compile Include="WebHooks\IWebHookHandlerSorter.cs" />
     <Compile Include="WebHooks\IWebHookHandler.cs" />
     <Compile Include="WebHooks\IWebHookReceiver.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="WebHooks\WebHookQueueHandler.cs" />
     <Compile Include="WebHooks\WebHookReceiver.cs" />
     <Compile Include="WebHooks\WebHookHandlerSorter.cs" />
+    <Compile Include="WebHooks\WebHookReceiverConfig.cs" />
     <Compile Include="WebHooks\WebHookReceiverManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,12 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
+        /// Gets or sets a (potentially empty) ID of a particular configuration for this WebHook. This ID can be 
+        /// used to differentiate between WebHooks from multiple senders registered with the same receiver.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Provides the set of actions that caused the WebHook to be fired.
         /// </summary>
         public ICollection<string> Actions

@@ -24,6 +24,8 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public abstract class WebHookReceiver : IWebHookReceiver
     {
+        internal const int CodeMinLength = 32;
+        internal const int CodeMaxLength = 128;
         internal const string CodeQueryParameter = "code";
 
         /// <summary>
@@ -34,10 +36,10 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public abstract IEnumerable<string> Names { get; }
+        public abstract string Name { get; }
 
         /// <inheritdoc />
-        public abstract Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request);
+        public abstract Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request);
 
         /// <summary>
         /// Provides a time consistent comparison of two secrets in the form of two byte arrays.
@@ -119,15 +121,15 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// For WebHooks providers with insufficient security considerations, the receiver can require that the WebHook URI must 
-        /// be an <c>https</c> URI and contain a 'code' query parameter with a value configured in the application setting with the name
-        /// <paramref name="setting"/>.
+        /// be an <c>https</c> URI and contain a 'code' query parameter with a value configured for that particular <paramref name="id"/>.
         /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
-        /// The 'code' parameter must be between 32 and 64 characters long.
+        /// The 'code' parameter must be between 32 and 128 characters long.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
-        /// <param name="setting">The name of the application setting containing the expected 'code' query parameter value.</param>
+        /// <param name="id">A (potentially empty) ID of a particular configuration for this <see cref="IWebHookReceiver"/>. This
+        /// allows an <see cref="IWebHookReceiver"/> to support multiple WebHooks with individual configurations.</param>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed by Web API.")]
-        protected virtual void EnsureValidCode(HttpRequestMessage request, string setting)
+        protected virtual async Task EnsureValidCode(HttpRequestMessage request, string id)
         {
             if (request == null)
             {
@@ -146,7 +148,7 @@ namespace Microsoft.AspNet.WebHooks
                 throw new HttpResponseException(noCode);
             }
 
-            string secretKey = GetWebHookSecret(request, setting, 32, 64);
+            string secretKey = await this.GetReceiverConfig(request, Name, id, CodeMinLength, CodeMaxLength);
             if (!WebHookReceiver.SecretEqual(code, secretKey))
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
@@ -160,23 +162,33 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets the locally configured WebHook secret key used to validate any signature header provided in a WebHook request.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
-        /// <param name="setting">The name of the application setting to look for.</param>
+        /// <param name="name">The name of the config to obtain. Typically this the name of the receiver, e.g. <c>github</c>.</param>
+        /// <param name="id">A (potentially empty) ID of a particular configuration for this <see cref="IWebHookReceiver"/>. This
+        /// allows an <see cref="IWebHookReceiver"/> to support multiple WebHooks with individual configurations.</param>
         /// <param name="minLength">The minimum length of the key value.</param>
         /// <param name="maxLength">The maximum length of the key value.</param>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
-        protected virtual string GetWebHookSecret(HttpRequestMessage request, string setting, int minLength, int maxLength)
+        protected virtual async Task<string> GetReceiverConfig(HttpRequestMessage request, string name, string id, int minLength, int maxLength)
         {
             if (request == null)
             {
                 throw new ArgumentNullException("request");
             }
+            if (name == null)
+            {
+                throw new ArgumentNullException("name");
+            }
 
-            HttpConfiguration config = request.GetConfiguration();
-            string secret = config.DependencyResolver.GetSettings().GetValueOrDefault(setting);
+            // Look up configuration for this receiver and instance
+            HttpConfiguration httpConfig = request.GetConfiguration();
+            IWebHookReceiverConfig receiverConfig = httpConfig.DependencyResolver.GetReceiverConfig();
+            string secret = await receiverConfig.GetReceiverConfigAsync(name, id);
+
+            // Verify that configuration matches length requirements
             if (secret == null || secret.Length < minLength || secret.Length > maxLength)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, setting, minLength, maxLength);
-                config.DependencyResolver.GetLogger().Error(msg);
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
+                httpConfig.DependencyResolver.GetLogger().Error(msg);
                 HttpResponseMessage noSecret = request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg);
                 throw new HttpResponseException(noSecret);
             }
@@ -375,17 +387,17 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Processes the WebHook request by calling all registered <see cref="IWebHookHandler"/> instances. 
         /// </summary>
-        /// <param name="receiver">The case-insensitive name of the receiver used by the incoming WebHook. The receiver 
-        /// name can for example be <c>dropbox</c> or <c>github</c>.</param>
+        /// <param name="id">A (potentially empty) ID of a particular configuration for this <see cref="IWebHookReceiver"/>. This
+        /// allows an <see cref="IWebHookReceiver"/> to support multiple WebHooks with individual configurations.</param>
         /// <param name="context">The <see cref="HttpRequestContext"/> for this WebHook invocation.</param>
         /// <param name="request">The <see cref="HttpRequestMessage"/> for this WebHook invocation.</param>
         /// <param name="actions">The collection of actions associated with this WebHook invocation.</param>
         /// <param name="data">Optional data associated with this WebHook invocation.</param>
-        protected virtual async Task<HttpResponseMessage> ExecuteWebHookAsync(string receiver, HttpRequestContext context, HttpRequestMessage request, IEnumerable<string> actions, object data)
+        protected virtual async Task<HttpResponseMessage> ExecuteWebHookAsync(string id, HttpRequestContext context, HttpRequestMessage request, IEnumerable<string> actions, object data)
         {
-            if (receiver == null)
+            if (id == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("id");
             }
             if (context == null)
             {
@@ -409,22 +421,22 @@ namespace Microsoft.AspNet.WebHooks
             // the execution of handlers is also stopped.
             WebHookHandlerContext handlerContext = new WebHookHandlerContext(actions)
             {
+                Id = id,
                 Data = data,
                 Request = request,
                 RequestContext = context,
             };
 
-            receiver = receiver.ToLowerInvariant();
             IEnumerable<IWebHookHandler> handlers = context.Configuration.DependencyResolver.GetHandlers();
             foreach (IWebHookHandler handler in handlers)
             {
                 // Only call handlers with matching receiver name (or no receiver name in which case they support all receivers)
-                if (handler.Receiver != null && !string.Equals(receiver, handler.Receiver, StringComparison.OrdinalIgnoreCase))
+                if (handler.Receiver != null && !string.Equals(Name, handler.Receiver, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                await handler.ExecuteAsync(receiver, handlerContext);
+                await handler.ExecuteAsync(Name, handlerContext);
 
                 // Check if response has been set and if so stop the processing.
                 if (handlerContext.Response != null)

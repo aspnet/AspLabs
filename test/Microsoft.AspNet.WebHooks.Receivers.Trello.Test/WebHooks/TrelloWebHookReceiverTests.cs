@@ -19,41 +19,20 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
-    public class TrelloWebHookReceiverTests
+    public class TrelloWebHookReceiverTests : WebHookReceiverTestsBase<TrelloWebHookReceiver>
     {
         private const string TestContent = "{ \"key\": \"value\" }";
-        private const string TestReceiver = "Test";
+        private const string TestId = "";
         private const string TestSecret = "12345678901234567890123456789012";
         private const string TestAddress = "http://localhost/";
 
-        private HttpConfiguration _config;
-        private SettingsDictionary _settings;
-        private HttpRequestContext _context;
-        private Mock<TrelloWebHookReceiver> _receiverMock;
-
         private HttpRequestMessage _headRequest;
         private HttpRequestMessage _postRequest;
-
         private string _signature;
 
         [SuppressMessage("Microsoft.Security.Cryptography", "CA5354:SHA1CannotBeUsed", Justification = "This is how Trello supports WebHooks.")]
         public TrelloWebHookReceiverTests()
         {
-            _settings = new SettingsDictionary();
-            _settings["MS_WebHookReceiverSecret_Trello"] = TestSecret;
-
-            _config = HttpConfigurationMock.Create(new Dictionary<Type, object> { { typeof(SettingsDictionary), _settings } });
-            _context = new HttpRequestContext { Configuration = _config };
-
-            _receiverMock = new Mock<TrelloWebHookReceiver> { CallBase = true };
-
-            _headRequest = new HttpRequestMessage() { Method = HttpMethod.Head };
-            _headRequest.SetRequestContext(_context);
-
-            _postRequest = new HttpRequestMessage(HttpMethod.Post, TestAddress);
-            _postRequest.SetRequestContext(_context);
-            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
-
             byte[] secret = Encoding.UTF8.GetBytes(TestSecret);
             using (var hasher = new HMACSHA1(secret))
             {
@@ -71,109 +50,118 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Throws_IfPostHasNoSignatureHeader()
         {
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            Initialize(TestSecret);
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("Expecting exactly one 'x-trello-webhook' header field in the WebHook request but found 0. Please ensure that the request contains exactly one 'x-trello-webhook' header field.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostHasTwoSignatureHeaders()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, "value1");
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, "value2");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("Expecting exactly one 'x-trello-webhook' header field in the WebHook request but found 2. Please ensure that the request contains exactly one 'x-trello-webhook' header field.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_ReturnsError_IfPostHasInvalidSignatureHeaderEncoding()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, "你好世界");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'x-trello-webhook' header value is invalid. It must be a valid base64-encoded string.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostHasInvalidSignature()
         {
             // Arrange
+            Initialize(TestSecret);
             string invalid = EncodingUtilities.ToBase64(Encoding.UTF8.GetBytes("你好世界"), uriSafe: false);
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, invalid);
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook signature provided by the 'x-trello-webhook' header field does not match the value expected by the 'TrelloWebHookReceiverProxy' receiver. WebHook request is invalid.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotJson()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, _signature);
             _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as JSON.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
-        [Fact]
-        public async Task ReceiveAsync_Succeeds_IfValidPostRequest()
+        [Theory]
+        [MemberData("ValidIdData")]
+        public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange
+            Initialize(GetConfigValue(id, TestSecret));
             List<string> actions = new List<string> { "change" };
             _postRequest.Headers.Add(TrelloWebHookReceiver.SignatureHeaderName, _signature);
-            _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 
             // Act
-            await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _postRequest);
 
             // Assert
-            _receiverMock.Verify();
+            ReceiverMock.Verify();
         }
 
-        [Fact]
-        public async Task ReceiveAsync_Succeeds_IfValidHeadRequest()
+        [Theory]
+        [MemberData("ValidIdData")]
+        public async Task ReceiveAsync_Succeeds_IfValidHeadRequest(string id)
         {
             // Act
-            await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _headRequest);
+            Initialize(GetConfigValue(id, TestSecret));
+            await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _headRequest);
 
             // Assert
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _headRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), id, RequestContext, _headRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Theory]
@@ -184,16 +172,29 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_ReturnsError_IfInvalidMethod(string method)
         {
             // Arrange
+            Initialize(TestSecret);
             HttpRequestMessage req = new HttpRequestMessage { Method = new HttpMethod(method) };
-            req.SetRequestContext(_context);
+            req.SetRequestContext(RequestContext);
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, req);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+        }
+
+        public override void Initialize(string config)
+        {
+            base.Initialize(config);
+
+            _headRequest = new HttpRequestMessage() { Method = HttpMethod.Head };
+            _headRequest.SetRequestContext(RequestContext);
+
+            _postRequest = new HttpRequestMessage(HttpMethod.Post, TestAddress);
+            _postRequest.SetRequestContext(RequestContext);
+            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/json");
         }
     }
 }

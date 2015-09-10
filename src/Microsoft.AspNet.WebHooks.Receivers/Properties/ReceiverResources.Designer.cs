@@ -61,6 +61,42 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Registered ID &apos;{0}&apos; for receiver: &apos;{1}&apos;..
+        /// </summary>
+        internal static string Config_AddedName {
+            get {
+                return ResourceManager.GetString("Config_AddedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not add configuration for receiver &apos;{0}&apos; and id &apos;{1}&apos;: {2}.
+        /// </summary>
+        internal static string Config_AddFailure {
+            get {
+                return ResourceManager.GetString("Config_AddFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; application setting must have a comma-separated value of one or more secrets of the form &lt;secret&gt; or &lt;id&gt;=&lt;secret&gt;..
+        /// </summary>
+        internal static string Config_BadValue {
+            get {
+                return ResourceManager.GetString("Config_BadValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Did not find any applications settings of the form &apos;{0}&apos;. To receive WebHooks, please add corresponding applications settings..
+        /// </summary>
+        internal static string Config_NoConfig {
+            get {
+                return ResourceManager.GetString("Config_NoConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple types were found that match the WebHook receiver named &apos;{0}&apos;. This can happen if multiple receivers are defined with the same name but different casing which is not supported. The request for &apos;{0}&apos; has found the following matching receivers: {1}{2}..
         /// </summary>
         internal static string Manager_MultipleAmbiguousReceiversFound {
@@ -133,7 +169,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to In order for the incoming WebHook request to be verified, the &apos;{0}&apos; setting must be set to a value between {1} and {2} characters long..
+        ///   Looks up a localized string similar to Could not find a valid configuration for WebHook receiver &apos;{0}&apos; and instance &apos;{1}&apos;. The setting must be set to a value between {2} and {3} characters long..
         /// </summary>
         internal static string Receiver_BadSecret {
             get {

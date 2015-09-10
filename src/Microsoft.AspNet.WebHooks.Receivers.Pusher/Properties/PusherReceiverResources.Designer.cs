@@ -88,7 +88,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Did not find any applications settings of the form &apos;{0}&apos;. To receive WebHooks from the &apos;{1}&apos; receiver, please add corresponding applications settings..
+        ///   Looks up a localized string similar to Did not find any applications settings for Pusher. To receive WebHooks from the &apos;{1}&apos; receiver, please add corresponding applications settings..
         /// </summary>
         internal static string Receiver_NoSecrets {
             get {
@@ -106,7 +106,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The application setting &apos;{0}&apos; must have a comma separated list of one or more values of the form &apos;&lt;appKey&gt;_&lt;appSecret&gt;&apos;..
+        ///   Looks up a localized string similar to The application setting for Pusher must be a comma-separated list of segments of the form &apos;&lt;appKey1&gt;_&lt;appSecret1&gt;; &lt;appKey2&gt;_&lt;appSecret2&gt;&apos;..
         /// </summary>
         internal static string Recevier_BadSecret {
             get {

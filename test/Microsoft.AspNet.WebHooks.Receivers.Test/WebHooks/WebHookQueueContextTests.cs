@@ -11,6 +11,7 @@ namespace Microsoft.AspNet.WebHooks
     public class WebHookQueueContextTests
     {
         private const string TestReceiver = "TestReceiver";
+        private const string TestId = "12345";
 
         private string[] _actions = new string[] { "a1", "a2" };
         private object _data = new { Prop1 = "Hello", Prop2 = "World" };
@@ -19,7 +20,7 @@ namespace Microsoft.AspNet.WebHooks
 
         public WebHookQueueContextTests()
         {
-            WebHookHandlerContext context = new WebHookHandlerContext(_actions) { Data = _data };
+            WebHookHandlerContext context = new WebHookHandlerContext(_actions) { Id = TestId, Data = _data };
             _queueContext = new WebHookQueueContext(TestReceiver, context);
         }
 
@@ -27,6 +28,12 @@ namespace Microsoft.AspNet.WebHooks
         public void Receiver_Roundtrips()
         {
             PropertyAssert.Roundtrips(_queueContext, c => c.Receiver, PropertySetter.NullRoundtrips, defaultValue: TestReceiver, roundtripValue: "你好世界");
+        }
+
+        [Fact]
+        public void Id_Roundtrips()
+        {
+            PropertyAssert.Roundtrips(_queueContext, c => c.Id, PropertySetter.NullRoundtrips, defaultValue: TestId, roundtripValue: "你好世界");
         }
 
         [Fact]
@@ -44,7 +51,7 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public void Serializes_AsExpected()
         {
-            SerializationAssert.SerializesAs(_queueContext, _settings, "{\"Receiver\":\"TestReceiver\",\"Actions\":[\"a1\",\"a2\"],\"Data\":{\"Prop1\":\"Hello\",\"Prop2\":\"World\"}}");
+            SerializationAssert.SerializesAs(_queueContext, _settings, "{\"Receiver\":\"TestReceiver\",\"Id\":\"12345\",\"Actions\":[\"a1\",\"a2\"],\"Data\":{\"Prop1\":\"Hello\",\"Prop2\":\"World\"}}");
         }
 
         [Fact]

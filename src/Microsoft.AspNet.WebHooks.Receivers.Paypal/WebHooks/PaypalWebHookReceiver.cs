@@ -24,9 +24,8 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class PaypalWebHookReceiver : WebHookReceiver
     {
+        internal const string ReceiverName = "mailchimp";
         internal const string EventTypeParameter = "event_type";
-
-        private static readonly string[] ReceiverNames = new string[] { "paypal" };
 
         private readonly object _thisLock = new object();
         private readonly OAuthTokenCredential _credentials;
@@ -62,17 +61,17 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> Names
+        public override string Name
         {
-            get { return ReceiverNames; }
+            get { return ReceiverName; }
         }
 
         /// <inheritdoc />
-        public override async Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request)
+        public override async Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request)
         {
-            if (receiver == null)
+            if (id == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("id");
             }
             if (context == null)
             {
@@ -109,7 +108,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
 
                 // Call registered handlers
-                return await ExecuteWebHookAsync(receiver, context, request, new string[] { action }, data);
+                return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
             }
             else
             {

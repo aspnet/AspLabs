@@ -127,12 +127,12 @@
     <value>The WebHook verification request must contain a '{0}' query parameter which will get echoed back in a successful response.</value>
   </data>
   <data name="Receiver_NoSecrets" xml:space="preserve">
-    <value>Did not find any applications settings of the form '{0}'. To receive WebHooks from the '{1}' receiver, please add corresponding applications settings.</value>
+    <value>Did not find any applications settings for Pusher. To receive WebHooks from the '{1}' receiver, please add corresponding applications settings.</value>
   </data>
   <data name="Receiver_SecretNotFound" xml:space="preserve">
     <value>The HTTP header '{0}' value of '{1}' is not recognized as a valid application key. Please ensure that the right application keys and secrets have been configured.</value>
   </data>
   <data name="Recevier_BadSecret" xml:space="preserve">
-    <value>The application setting '{0}' must have a comma separated list of one or more values of the form '&lt;appKey&gt;_&lt;appSecret&gt;'.</value>
+    <value>The application setting for Pusher must be a comma-separated list of segments of the form '&lt;appKey1&gt;_&lt;appSecret1&gt;; &lt;appKey2&gt;_&lt;appSecret2&gt;'.</value>
   </data>
 </root>

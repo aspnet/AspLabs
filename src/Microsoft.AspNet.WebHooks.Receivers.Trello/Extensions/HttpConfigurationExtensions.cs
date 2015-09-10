@@ -14,8 +14,8 @@ namespace System.Web.Http
     {
         /// <summary>
         /// Initializes support for receiving Trello WebHooks.
-        /// Set the '<c>MS_WebHookReceiverSecret_Trello</c>' application setting to the secret defined in Trello.
-        /// The corresponding WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/trello</c>'.
+        /// Set the '<c>MS_WebHookReceiverSecret_Trello</c>' application setting to the secrets defined in Trello.
+        /// The corresponding WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/trello/{id}</c>'.
         /// For details about Trello WebHooks, see <c>https://trello.com/docs/gettingstarted/webhooks.html</c>.
         /// </summary>
         /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>

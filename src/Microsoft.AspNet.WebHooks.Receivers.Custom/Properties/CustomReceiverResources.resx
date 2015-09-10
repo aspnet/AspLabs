@@ -126,13 +126,7 @@
   <data name="Receiver_BadHeaderValue" xml:space="preserve">
     <value>Invalid '{0}' header value. Expecting a value of '{1}={2}'.</value>
   </data>
-  <data name="Receiver_Names" xml:space="preserve">
-    <value>Registered the following names for the '{0}' receiver: '{1}'.</value>
-  </data>
   <data name="Receiver_NoEcho" xml:space="preserve">
     <value>The WebHook verification request must contain a '{0}' query parameter which will get echoed back in a successful response.</value>
-  </data>
-  <data name="Receiver_NoNames" xml:space="preserve">
-    <value>Did not find any applications settings of the form '{0}'. To receive WebHooks from the '{1}' receiver, please add corresponding applications settings.</value>
   </data>
 </root>

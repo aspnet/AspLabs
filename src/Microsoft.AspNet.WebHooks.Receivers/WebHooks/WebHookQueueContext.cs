@@ -41,6 +41,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             Receiver = receiver;
+            Id = context.Id;
             Data = context.Data;
             _actions = context.Actions.ToList();
         }
@@ -50,6 +51,12 @@ namespace Microsoft.AspNet.WebHooks
         /// receiver can for example be <c>dropbox</c> or <c>github</c>.
         /// </summary>
         public string Receiver { get; set; }
+
+        /// <summary>
+        /// Gets or sets a (potentially empty) ID of a particular configuration for this WebHook. This ID can be 
+        /// used to differentiate between WebHooks from multiple senders registered with the same receiver.
+        /// </summary>
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets the set of actions that caused the WebHook to be fired.

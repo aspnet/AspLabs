@@ -15,6 +15,7 @@ namespace Microsoft.AspNet.WebHooks.Services
         {
             HttpConfiguration config = new HttpConfiguration();
             WebHooksConfig.Initialize(config);
+            ReceiverServices.Reset();
         }
 
         [Fact]

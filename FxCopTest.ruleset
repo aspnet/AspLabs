@@ -2,6 +2,7 @@
 <RuleSet Name="FxCop Test Rules" Description="FxCop rule set for tests" ToolsVersion="14.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1000" Action="None" />
     <Rule Id="CA1001" Action="None" />
     <Rule Id="CA1004" Action="None" />
     <Rule Id="CA1005" Action="None" />
@@ -33,6 +34,7 @@
     <Rule Id="CA2201" Action="None" />
     <Rule Id="CA2202" Action="None" />
     <Rule Id="CA2210" Action="None" />
+    <Rule Id="CA2227" Action="None" />
     <Rule Id="CA2234" Action="None" />
     <Rule Id="CA3113" Action="None" />
     <Rule Id="CA905" Action="None" />

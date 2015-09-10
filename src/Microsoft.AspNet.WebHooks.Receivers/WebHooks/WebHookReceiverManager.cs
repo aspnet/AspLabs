@@ -34,9 +34,8 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             _receiverLookup = receivers
-                .SelectMany(receiver => receiver.Names, (r, n) => new { Name = n, Receiver = r })
-                .GroupBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.Select(t => t.Receiver).ToList(), StringComparer.OrdinalIgnoreCase);
+               .GroupBy(provider => provider.Name, StringComparer.OrdinalIgnoreCase)
+               .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
             _logger = logger;
         }
 

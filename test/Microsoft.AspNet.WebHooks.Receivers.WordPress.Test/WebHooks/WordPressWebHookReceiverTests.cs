@@ -8,41 +8,20 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
-    public class WordPressWebHookReceiverTests
+    public class WordPressWebHookReceiverTests : WebHookReceiverTestsBase<WordPressWebHookReceiver>
     {
-        private const string TestReceiver = "Test";
+        private const string TestContent = "hook=hello";
+        private const string TestId = "";
         private const string TestSecret = "12345678901234567890123456789012";
-        private const string TestHost = "https://some.ssl.host?code=" + TestSecret;
-
-        private HttpConfiguration _config;
-        private SettingsDictionary _settings;
-        private HttpRequestContext _context;
-        private Mock<WordPressWebHookReceiver> _receiverMock;
+        private const string TestAddress = "https://some.ssl.host?code=" + TestSecret;
 
         private HttpRequestMessage _postRequest;
-
-        public WordPressWebHookReceiverTests()
-        {
-            _settings = new SettingsDictionary();
-            _settings["MS_WebHookReceiverSecret_WordPress"] = TestSecret;
-
-            _config = HttpConfigurationMock.Create(new Dictionary<Type, object> { { typeof(SettingsDictionary), _settings } });
-            _context = new HttpRequestContext { Configuration = _config };
-
-            _receiverMock = new Mock<WordPressWebHookReceiver> { CallBase = true };
-
-            _postRequest = new HttpRequestMessage(HttpMethod.Post, TestHost);
-            _postRequest.SetRequestContext(_context);
-        }
 
         public static TheoryData<string> InvalidCodeQueries
         {
@@ -65,16 +44,17 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Throws_IfPostIsNotUsingHttps()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook receiver 'WordPressWebHookReceiverProxy' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Theory]
@@ -82,83 +62,87 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_Throws_IfPostHasNoCodeParameter(string query)
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.RequestUri = new Uri("https://some.no.ssl.host?" + query);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostHasWrongCodeParameter()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotFormData()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.Content = new StringContent("{ }", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest));
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as HTML Form Data.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
         public async Task ReceiveAsync_ReturnsError_IfPostHasNoAction()
         {
             // Arrange
+            Initialize(TestSecret);
             _postRequest.Content = new StringContent("k=v", Encoding.UTF8, "application/x-www-form-urlencoded");
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The HTTP request body did not contain a required 'hook' property.", error.Message);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
-        [Fact]
-        public async Task ReceiveAsync_Succeeds_IfValidPostRequest()
+        [Theory]
+        [MemberData("ValidIdData")]
+        public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange
+            Initialize(GetConfigValue(id, TestSecret));
             List<string> actions = new List<string> { "hello" };
-            string content = "hook=hello";
-            _postRequest.Content = new StringContent(content, Encoding.UTF8, "application/x-www-form-urlencoded");
-            _receiverMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestReceiver, _context, _postRequest, actions, ItExpr.IsAny<object>())
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
                 .Verifiable();
 
             // Act
-            await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, _postRequest);
+            await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _postRequest);
 
             // Assert
-            _receiverMock.Verify();
+            ReceiverMock.Verify();
         }
 
         [Theory]
@@ -170,16 +154,25 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReceiveAsync_ReturnsError_IfInvalidMethod(string method)
         {
             // Arrange
+            Initialize(TestSecret);
             HttpRequestMessage req = new HttpRequestMessage { Method = new HttpMethod(method) };
-            req.SetRequestContext(_context);
+            req.SetRequestContext(RequestContext);
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.Object.ReceiveAsync(TestReceiver, _context, req);
+            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
-            _receiverMock.Protected()
-                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestReceiver, _context, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+        }
+        public override void Initialize(string config)
+        {
+            base.Initialize(config);
+
+            _postRequest = new HttpRequestMessage(HttpMethod.Post, TestAddress);
+            _postRequest.SetRequestContext(RequestContext);
+            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
         }
     }
 }

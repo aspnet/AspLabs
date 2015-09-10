@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web.Http.Dependencies;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 
 namespace Microsoft.AspNet.WebHooks
@@ -31,6 +32,24 @@ namespace Microsoft.AspNet.WebHooks
                 receiverManager = ReceiverServices.GetReceiverManager(receivers, logger);
             }
             return receiverManager;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IWebHookReceiverConfig"/> implementation registered with the Dependency Injection engine
+        /// or a default implementation if none is registered.
+        /// </summary>
+        /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
+        /// <returns>The registered <see cref="IWebHookReceiverManager"/> instance or a default implementation if none are registered.</returns>
+        public static IWebHookReceiverConfig GetReceiverConfig(this IDependencyScope services)
+        {
+            IWebHookReceiverConfig receiverConfig = services.GetService<IWebHookReceiverConfig>();
+            if (receiverConfig == null)
+            {
+                SettingsDictionary settings = services.GetSettings();
+                ILogger logger = services.GetLogger();
+                receiverConfig = ReceiverServices.GetReceiverConfig(settings, logger);
+            }
+            return receiverConfig;
         }
 
         /// <summary>

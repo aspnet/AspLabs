@@ -33,12 +33,12 @@ namespace Microsoft.AspNet.WebHooks.Mocks
             _exception = exception;
         }
 
-        public override IEnumerable<string> Names
+        public override string Name
         {
-            get { return new string[] { ReceiverName }; }
+            get { return ReceiverName; }
         }
 
-        public override Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request)
+        public override Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request)
         {
             if (_response != null)
             {
@@ -56,14 +56,14 @@ namespace Microsoft.AspNet.WebHooks.Mocks
             base.EnsureSecureConnection(request);
         }
 
-        public new void EnsureValidCode(HttpRequestMessage request, string setting)
+        public new Task EnsureValidCode(HttpRequestMessage request, string id)
         {
-            base.EnsureValidCode(request, setting);
+            return base.EnsureValidCode(request, id);
         }
 
-        public new string GetWebHookSecret(HttpRequestMessage request, string setting, int minLength, int maxLength)
+        public new Task<string> GetReceiverConfig(HttpRequestMessage request, string name, string id, int minLength, int maxLength)
         {
-            return base.GetWebHookSecret(request, setting, minLength, maxLength);
+            return base.GetReceiverConfig(request, name, id, minLength, maxLength);
         }
 
         public new Task<JObject> ReadAsJsonAsync(HttpRequestMessage request)
@@ -96,9 +96,9 @@ namespace Microsoft.AspNet.WebHooks.Mocks
             return base.CreateBadSignatureResponse(request, signatureHeaderName);
         }
 
-        public new Task<HttpResponseMessage> ExecuteWebHookAsync(string receiver, HttpRequestContext context, HttpRequestMessage request, IEnumerable<string> actions, object data)
+        public new Task<HttpResponseMessage> ExecuteWebHookAsync(string id, HttpRequestContext context, HttpRequestMessage request, IEnumerable<string> actions, object data)
         {
-            return base.ExecuteWebHookAsync(receiver, context, request, actions, data);
+            return base.ExecuteWebHookAsync(id, context, request, actions, data);
         }
     }
 }

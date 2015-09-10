@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Net;
@@ -23,22 +22,20 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class WordPressWebHookReceiver : WebHookReceiver
     {
-        internal const string SecretKey = "MS_WebHookReceiverSecret_WordPress";
-
-        private static readonly string[] ReceiverNames = new string[] { "wordpress" };
+        internal const string ReceiverName = "wordpress";
 
         /// <inheritdoc />
-        public override IEnumerable<string> Names
+        public override string Name
         {
-            get { return ReceiverNames; }
+            get { return ReceiverName; }
         }
 
         /// <inheritdoc />
-        public override async Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request)
+        public override async Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request)
         {
-            if (receiver == null)
+            if (id == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("id");
             }
             if (context == null)
             {
@@ -52,7 +49,7 @@ namespace Microsoft.AspNet.WebHooks
             if (request.Method == HttpMethod.Post)
             {
                 // Ensure that we use https and have a valid code parameter
-                EnsureValidCode(request, SecretKey);
+                await EnsureValidCode(request, id);
 
                 // Read the request entity body
                 NameValueCollection data = await ReadAsFormDataAsync(request);
@@ -67,7 +64,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
 
                 // Call registered handlers
-                return await ExecuteWebHookAsync(receiver, context, request, new string[] { action }, data);
+                return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
             }
             else
             {

@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -18,30 +17,29 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Provides an <see cref="IWebHookReceiver"/> implementation which supports Salesforce SOAP-based Outbound Messages as a WebHook.
-    /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/sfsoap</c>'.
+    /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/sfsoap/{id}</c>'.
     /// For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>' 
-    /// application setting must be configured to the Salesforce Organization ID. This ID can be found at 
+    /// application setting must be configured to the Salesforce Organization IDs. The Organizational IDs can be found at 
     /// <c>http://www.salesforce.com</c> under <c>Setup | Company Profile | Company Information</c>.
     /// For details about Salesforce Outbound Messages, see <c>https://help.salesforce.com/htviewhelpdoc?id=workflow_defining_outbound_messages.htm</c>. 
     /// </summary>
     public class SalesforceSoapWebHookReceiver : WebHookReceiver
     {
-        internal const string SecretKey = "MS_WebHookReceiverSecret_SalesforceSoap";
-
-        private static readonly string[] ReceiverNames = new string[] { "sfsoap" };
+        internal const string ReceiverName = "sfsoap";
+        internal const string ReceiverConfigName = "SalesforceSoap";
 
         /// <inheritdoc />
-        public override IEnumerable<string> Names
+        public override string Name
         {
-            get { return ReceiverNames; }
+            get { return ReceiverName; }
         }
 
         /// <inheritdoc />
-        public override async Task<HttpResponseMessage> ReceiveAsync(string receiver, HttpRequestContext context, HttpRequestMessage request)
+        public override async Task<HttpResponseMessage> ReceiveAsync(string id, HttpRequestContext context, HttpRequestMessage request)
         {
-            if (receiver == null)
+            if (id == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException("id");
             }
             if (context == null)
             {
@@ -62,7 +60,8 @@ namespace Microsoft.AspNet.WebHooks
 
                 // Ensure that the organization ID matches the expected value.
                 string orgId = GetShortOrgId(notifications.OrganizationId);
-                string secretKey = GetShortOrgId(GetWebHookSecret(request, SecretKey, 15, 18));
+                string secret = await GetReceiverConfig(request, ReceiverConfigName, id, 15, 18);
+                string secretKey = GetShortOrgId(secret);
                 if (!WebHookReceiver.SecretEqual(orgId, secretKey))
                 {
                     string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadValue, "OrganizationId");
@@ -82,7 +81,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
 
                 // Call registered handlers
-                HttpResponseMessage response = await ExecuteWebHookAsync(receiver, context, request, new string[] { action }, notifications);
+                HttpResponseMessage response = await ExecuteWebHookAsync(id, context, request, new string[] { action }, notifications);
 
                 // Add SOAP response if not already present
                 if (response == null || response.Content == null || !response.Content.IsXml())

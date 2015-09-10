@@ -2,14 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Dependencies;
 using System.Web.Http.Results;
-using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Mocks;
+using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Xunit;
 
@@ -22,19 +22,11 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         private HttpConfiguration _config;
         private WebHookReceiversController _controller;
         private Mock<IWebHookReceiverManager> _managerMock;
-        private Mock<IDependencyResolver> _resolverMock;
 
         public WebHookReceiversControllerTests()
         {
-            _resolverMock = new Mock<IDependencyResolver>();
             _managerMock = new Mock<IWebHookReceiverManager>();
-            _resolverMock.Setup(r => r.GetService(typeof(IWebHookReceiverManager)))
-                .Returns(_managerMock.Object)
-                .Verifiable();
-
-            _config = new HttpConfiguration();
-            _config.DependencyResolver = _resolverMock.Object;
-            WebHooksConfig.Initialize(_config);
+            _config = HttpConfigurationMock.Create(new[] { new KeyValuePair<Type, object>(typeof(IWebHookReceiverManager), _managerMock.Object) });
 
             HttpControllerContext controllerContext = new HttpControllerContext()
             {
@@ -58,7 +50,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.IsType<NotFoundResult>(result);
         }
 
@@ -78,7 +69,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.Equal("From Receiver!", actual.ReasonPhrase);
         }
 
@@ -99,7 +89,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.Equal("WebHook receiver 'TestReceiver' could not process WebHook due to error: Catch this!", error.Message);
         }
 
@@ -116,7 +105,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.IsType<NotFoundResult>(result);
         }
 
@@ -136,7 +124,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.Equal("From Receiver!", actual.ReasonPhrase);
         }
 
@@ -157,7 +144,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.Equal("WebHook receiver 'TestReceiver' could not process WebHook due to error: Catch this!", error.Message);
         }
 
@@ -178,7 +164,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             // Assert
             _managerMock.Verify();
-            _resolverMock.Verify();
             Assert.Same(response, actual);
         }
     }

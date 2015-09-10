@@ -88,29 +88,11 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Registered the following names for the &apos;{0}&apos; receiver: &apos;{1}&apos;..
-        /// </summary>
-        internal static string Receiver_Names {
-            get {
-                return ResourceManager.GetString("Receiver_Names", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The WebHook verification request must contain a &apos;{0}&apos; query parameter which will get echoed back in a successful response..
         /// </summary>
         internal static string Receiver_NoEcho {
             get {
                 return ResourceManager.GetString("Receiver_NoEcho", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Did not find any applications settings of the form &apos;{0}&apos;. To receive WebHooks from the &apos;{1}&apos; receiver, please add corresponding applications settings..
-        /// </summary>
-        internal static string Receiver_NoNames {
-            get {
-                return ResourceManager.GetString("Receiver_NoNames", resourceCulture);
             }
         }
     }

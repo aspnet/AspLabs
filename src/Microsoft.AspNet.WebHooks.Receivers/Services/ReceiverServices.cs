@@ -21,6 +21,7 @@ namespace Microsoft.AspNet.WebHooks
     public static class ReceiverServices
     {
         private static IWebHookReceiverManager _receiverManager;
+        private static IWebHookReceiverConfig _receiverConfig;
         private static IWebHookHandlerSorter _handlerSorter;
         private static IEnumerable<IWebHookReceiver> _receivers;
         private static IEnumerable<IWebHookHandler> _handlers;
@@ -49,6 +50,32 @@ namespace Microsoft.AspNet.WebHooks
             IWebHookReceiverManager instance = new WebHookReceiverManager(receivers, logger);
             Interlocked.CompareExchange(ref _receiverManager, instance, null);
             return _receiverManager;
+        }
+
+        /// <summary>
+        /// Gets a default <see cref="IWebHookReceiverConfig"/> implementation which is used if none are registered with the
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <returns>A default <see cref="IWebHookReceiverConfig"/> instance.</returns>
+        public static IWebHookReceiverConfig GetReceiverConfig(SettingsDictionary settings, ILogger logger)
+        {
+            if (_receiverConfig != null)
+            {
+                return _receiverConfig;
+            }
+
+            if (settings == null)
+            {
+                throw new ArgumentNullException("settings");
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            IWebHookReceiverConfig instance = new WebHookReceiverConfig(settings, logger);
+            Interlocked.CompareExchange(ref _receiverConfig, instance, null);
+            return _receiverConfig;
         }
 
         /// <summary>
@@ -107,11 +134,12 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// For testing purposes
+        /// Resets all values for testing purposes.
         /// </summary>
         internal static void Reset()
         {
             _receiverManager = null;
+            _receiverConfig = null;
             _handlerSorter = null;
             _receivers = null;
             _handlers = null;

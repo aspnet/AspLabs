@@ -66,13 +66,13 @@
     <Compile Include="Services\ReceiverServicesTests.cs" />
     <Compile Include="WebHooks\WebHookQueueContextTests.cs" />
     <Compile Include="WebHooks\WebHookQueueHandlerTests.cs" />
+    <Compile Include="WebHooks\WebHookReceiverConfigTests.cs" />
     <Compile Include="WebHooks\WebHookReceiverManagerTests.cs" />
     <Compile Include="WebHooks\WebHookHandlerSorterTests.cs" />
     <Compile Include="WebHooks\WebHookHandlerTests.cs" />
-    <Compile Include="WebHooks\WebHookReceiverTests.cs">
-      <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
-    </Compile>
     <Compile Include="WebHooks\WebHookHandlerContextTests.cs" />
+    <Compile Include="WebHooks\WebHookReceiverTests.cs" />
+    <Compile Include="WebHooks\WebHookReceiverTestsBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
