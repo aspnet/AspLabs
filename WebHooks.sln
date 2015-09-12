@@ -92,6 +92,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Instagram.Test", "test\Microsoft.AspNet.WebHooks.Receivers.Instagram.Test\Microsoft.AspNet.WebHooks.Receivers.Instagram.Test.csproj", "{3F1EB00E-8C9E-441D-8D42-3DDB3B0751A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.BitBucket", "src\Microsoft.AspNet.WebHooks.Receivers.Bitbucket\Microsoft.AspNet.WebHooks.Receivers.BitBucket.csproj", "{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Bitbucket.Test", "test\Microsoft.AspNet.WebHooks.Receivers.Bitbucket.Test\Microsoft.AspNet.WebHooks.Receivers.Bitbucket.Test.csproj", "{71FF4046-71FE-458C-9A5C-48BC5F169326}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -321,6 +325,18 @@ Global
 		{3F1EB00E-8C9E-441D-8D42-3DDB3B0751A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F1EB00E-8C9E-441D-8D42-3DDB3B0751A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F1EB00E-8C9E-441D-8D42-3DDB3B0751A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71FF4046-71FE-458C-9A5C-48BC5F169326}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,5 +379,7 @@ Global
 		{D4749AE7-C126-4B2C-A04C-C3A3D1FA5290} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{3E842532-D709-48B6-AC39-1367E9F0DAB9} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{3F1EB00E-8C9E-441D-8D42-3DDB3B0751A7} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{08FECDD6-7158-436A-A95C-96BDC8ABF1A4} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{71FF4046-71FE-458C-9A5C-48BC5F169326} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 	EndGlobalSection
 EndGlobal
