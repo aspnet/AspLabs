@@ -37,6 +37,10 @@ namespace Microsoft.AspNet.WebHooks
                .GroupBy(provider => provider.Name, StringComparer.OrdinalIgnoreCase)
                .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
             _logger = logger;
+
+            string providerList = string.Join(", ", _receiverLookup.Keys);
+            string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_RegisteredNames, typeof(IWebHookReceiver).Name, providerList);
+            _logger.Info(msg);
         }
 
         /// <inheritdoc />

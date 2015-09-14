@@ -142,7 +142,7 @@
     <value>WebHook receiver '{0}' could not process WebHook due to error: {1}</value>
   </data>
   <data name="ReceiverController_Processing" xml:space="preserve">
-    <value>Processing incoming WebHook request with receiver '{0}'.</value>
+    <value>Processing incoming WebHook request with receiver '{0}' and id '{1}'.</value>
   </data>
   <data name="ReceiverController_Unknown" xml:space="preserve">
     <value>No WebHook receiver is registered with the name '{0}'.</value>
@@ -188,5 +188,8 @@
   </data>
   <data name="Receiver_NoXml" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as XML.</value>
+  </data>
+  <data name="Manager_RegisteredNames" xml:space="preserve">
+    <value>Registered '{0}' instances with the following names: {1}.</value>
   </data>
 </root>

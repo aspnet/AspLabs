@@ -67,7 +67,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             try
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Processing, webHookReceiver);
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Processing, webHookReceiver, id);
                 Configuration.DependencyResolver.GetLogger().Info(msg);
                 HttpResponseMessage response = await receiver.ReceiveAsync(id, RequestContext, Request);
                 return ResponseMessage(response);

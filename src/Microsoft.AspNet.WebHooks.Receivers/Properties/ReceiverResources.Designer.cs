@@ -106,6 +106,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Registered &apos;{0}&apos; instances with the following names: {1}..
+        /// </summary>
+        internal static string Manager_RegisteredNames {
+            get {
+                return ResourceManager.GetString("Manager_RegisteredNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No WebHook receiver has been registered with the name &apos;{0}&apos;. Please use one of the registered receivers..
         /// </summary>
         internal static string Manager_UnknownReceiver {
@@ -259,7 +268,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Processing incoming WebHook request with receiver &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Processing incoming WebHook request with receiver &apos;{0}&apos; and id &apos;{1}&apos;..
         /// </summary>
         internal static string ReceiverController_Processing {
             get {
