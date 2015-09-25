@@ -24,7 +24,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class PaypalWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "mailchimp";
+        internal const string ReceiverName = "paypal";
         internal const string EventTypeParameter = "event_type";
 
         private readonly object _thisLock = new object();
