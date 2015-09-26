@@ -54,7 +54,7 @@ namespace Microsoft.AspNet.WebHooks
         public string ItemType { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of repository, e.g. '<c>git</c>'.
+        /// Gets or sets the type of repository, e.g. '<c>hg</c>'.
         /// </summary>
         [JsonProperty("scm")]
         public string RepositoryType { get; set; }
