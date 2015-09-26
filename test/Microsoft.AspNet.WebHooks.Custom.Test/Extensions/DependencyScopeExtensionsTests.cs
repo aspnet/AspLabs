@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
+    [Collection("ConfigCollection")]
     public class DependencyScopeExtensionsTests
     {
         private readonly Mock<IDependencyScope> _resolverMock;

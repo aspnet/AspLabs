@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Services
 {
+    [Collection("ConfigCollection")]
     public class CustomServicesTests
     {
         public CustomServicesTests()

@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
+    [Collection("ConfigCollection")]
     public class DependencyScopeExtensionsTests
     {
         private Mock<IDependencyScope> _resolverMock;
