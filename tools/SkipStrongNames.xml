@@ -12,7 +12,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram"/>
-  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Kudu"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Azure"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher"/>
@@ -33,7 +33,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram.Test"/>
-  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Kudu.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Azure.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher.Test"/>

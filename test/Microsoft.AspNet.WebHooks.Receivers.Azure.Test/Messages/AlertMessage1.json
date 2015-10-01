@@ -1,0 +1,26 @@
+﻿{
+  "status": "Activated",
+  "context": {
+    "id": "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/microsoft.insights/alertrules/HenriknTest02",
+    "name": "HenriknTest02",
+    "description": "Test",
+    "conditionType": "Metric",
+    "condition": {
+      "metricName": "CPU percentage",
+      "metricUnit": "Count",
+      "metricValue": "2.716631",
+      "threshold": "10",
+      "windowSize": "5",
+      "timeAggregation": "Average",
+      "operator": "LessThan"
+    },
+    "subscriptionId": "aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee",
+    "resourceGroupName": "tests123",
+    "timestamp": "2015-09-30T03:55:30.7037012Z",
+    "resourceName": "testmachine",
+    "resourceType": "microsoft.classiccompute/virtualmachines",
+    "resourceId": "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine",
+    "portalLink": "https://portal.azure.com/#resource/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine"
+  },
+  "properties": { }
+}

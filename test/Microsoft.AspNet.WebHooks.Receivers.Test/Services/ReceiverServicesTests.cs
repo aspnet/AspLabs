@@ -35,6 +35,21 @@ namespace Microsoft.AspNet.WebHooks.Services
         }
 
         [Fact]
+        public void GetReceiverConfig_ReturnsSingleInstance()
+        {
+            // Arrange
+            SettingsDictionary settings = CommonServices.GetSettings();
+            ILogger logger = CommonServices.GetLogger();
+
+            // Act
+            IWebHookReceiverConfig actual1 = ReceiverServices.GetReceiverConfig(settings, logger);
+            IWebHookReceiverConfig actual2 = ReceiverServices.GetReceiverConfig(settings, logger);
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
         public void GetHandlerSorter_ReturnsSingletonInstance()
         {
             // Act

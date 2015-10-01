@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -312,6 +313,22 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as valid JSON.", error.Message);
+        }
+
+        [Fact]
+        public async Task ReadAsJsonAsync_Handles_UtcDateTime()
+        {
+            // Arrange
+            DateTime expectedDateTime = DateTime.Parse("2015-09-26T04:26:55.6393049Z").ToUniversalTime();
+            Initialize(TestSecret);
+            _request.Content = new StringContent("{ \"datetime\": \"2015-09-26T04:26:55.6393049Z\" }", Encoding.UTF8, "application/json");
+
+            // Act
+            JObject actual = await _receiverMock.ReadAsJsonAsync(_request);
+            DateTime actualDateTime = actual["datetime"].ToObject<DateTime>();
+
+            // Assert
+            Assert.Equal(expectedDateTime, actualDateTime);
         }
 
         [Fact]

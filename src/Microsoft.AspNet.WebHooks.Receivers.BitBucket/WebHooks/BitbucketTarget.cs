@@ -63,6 +63,6 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets or set the UTC time of this target.
         /// </summary>
         [JsonProperty("date")]
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

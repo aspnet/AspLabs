@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.AspNet.WebHooks</RootNamespace>
-    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers.Kudu</AssemblyName>
+    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers.Azure</AssemblyName>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <RunCodeAnalysis>$(CodeAnalysis)</RunCodeAnalysis>
     <CodeAnalysisAdditionalOptions>/assemblyCompareMode:StrongNameIgnoringVersion</CodeAnalysisAdditionalOptions>
@@ -59,16 +59,21 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
-    <Compile Include="Properties\KuduReceiverResources.Designer.cs">
+    <Compile Include="Properties\AzureReceiverResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>KuduReceiverResources.resx</DependentUpon>
+      <DependentUpon>AzureReceiverResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebHooks\AzureAlertContext.cs" />
+    <Compile Include="WebHooks\AzureAlertCondition.cs" />
+    <Compile Include="WebHooks\AzureAlertNotification.cs" />
+    <Compile Include="WebHooks\AzureAlertWebHookReceiver.cs" />
+    <Compile Include="WebHooks\KuduNotification.cs" />
     <Compile Include="WebHooks\KuduWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.AspNet.WebHooks.Receivers.Kudu.nuspec" />
+    <None Include="Microsoft.AspNet.WebHooks.Receivers.Azure.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -82,9 +87,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\KuduReceiverResources.resx">
+    <EmbeddedResource Include="Properties\AzureReceiverResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>KuduReceiverResources.Designer.cs</LastGenOutput>
+      <LastGenOutput>AzureReceiverResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -9,6 +10,16 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class BitbucketTargetTests
     {
+        private readonly JsonSerializerSettings _serializerSettings;
+
+        public BitbucketTargetTests()
+        {
+            _serializerSettings = new JsonSerializerSettings
+            {
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+            };
+        }
+
         [Fact]
         public void BitbucketTarget_Roundtrips()
         {
@@ -37,7 +48,7 @@ namespace Microsoft.AspNet.WebHooks
                 Operation = "commit",
                 Hash = "8339b7affbd7c70bbacd0276f581d1ca44df0853",
                 Author = expectedAuthor,
-                Date = "somedate",
+                Date = DateTime.Parse("2015-09-30T18:48:38+00:00").ToUniversalTime(),
             };
 
             BitbucketParent expectedParent = new BitbucketParent
@@ -56,8 +67,8 @@ namespace Microsoft.AspNet.WebHooks
             BitbucketTarget actualTarget = data["push"]["changes"][0]["new"]["target"].ToObject<BitbucketTarget>();
 
             // Assert
-            string expectedJson = JsonConvert.SerializeObject(expectedTarget);
-            string actualJson = JsonConvert.SerializeObject(actualTarget);
+            string expectedJson = JsonConvert.SerializeObject(expectedTarget, _serializerSettings);
+            string actualJson = JsonConvert.SerializeObject(actualTarget, _serializerSettings);
             Assert.Equal(expectedJson, actualJson);
         }
     }

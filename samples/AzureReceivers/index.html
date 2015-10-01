@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WewbHooks Bitbucket Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WewbHooks Bitbucket Receiver</h1>
+
+    <p>This sample illustrates how to wire up a Azure Alerts and Azure Kudu WebHooks receiver. For Azure Alerts, a sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/azurealert/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</pre>
+
+    <p>
+        For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
+        same value as configured in the <b>MS_WebHookReceiverSecret_AzureAlert</b> application setting.
+        The 'code' parameter must be between 32 and 128 characters long.
+    </p>
+
+    <p>
+        Please see <a href="https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/">Azure Alerts WebHooks</a>
+        for more information.
+    </p>
+
+    <p>For Kudu, a sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/kudu/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</pre>
+
+    <p>
+        As above, for security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
+        same value as configured in the <b>MS_WebHookReceiverSecret_Kudu</b> application setting.
+        The 'code' parameter must be between 32 and 128 characters long.
+    </p>
+
+    <p>
+        Please see <a href="https://github.com/projectkudu/kudu/wiki/Web-hooks">Kudu WebHooks</a>
+        for more information.
+    </p>
+
+</body>
+</html>
