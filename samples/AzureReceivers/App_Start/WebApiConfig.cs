@@ -19,7 +19,7 @@ namespace AzureReceivers
 
             // Initialize Azure Alert and Kudu WebHooks
             config.InitializeReceiveAzureAlertWebHooks();
-            config.InitializeReceiveAzureKuduWebHooks();
+            config.InitializeReceiveKuduWebHooks();
         }
     }
 }

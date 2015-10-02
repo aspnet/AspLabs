@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides information in a WebHook notification sent from Azure Alert Service.
+    /// Contains information sent in a WebHook notification from Azure Alert Service.
     /// </summary>
     public class AzureAlertNotification
     {

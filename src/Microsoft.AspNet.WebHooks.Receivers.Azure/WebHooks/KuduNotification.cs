@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides information in a WebHook notification sent from Azure Kudu Service (Azure Web App Deployment).
+    /// Contains information sent in a WebHook notification from Kudu (Azure Web App Deployment Service).
     /// </summary>
     public class KuduNotification
     {
