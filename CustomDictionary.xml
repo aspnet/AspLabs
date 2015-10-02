@@ -1,4 +1,4 @@
-<!-- See http://msdn.microsoft.com/en-us/library/bb514188.aspx for details -->
+﻿<!-- See http://msdn.microsoft.com/en-us/library/bb514188.aspx for details -->
 <Dictionary>
   <Words>
     <Unrecognized>
@@ -33,6 +33,7 @@
     <DiscreteExceptions>
       <Term>RunTime</Term>
       <Term>GitHub</Term>
+      <Term>MyGet</Term>
     </DiscreteExceptions>
   </Words>
   <Acronyms>

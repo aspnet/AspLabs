@@ -1,0 +1,34 @@
+﻿{
+  "Identifier": "7a48ce8c-728d-4350-8da8-e283d6fce277",
+  "Username": "maartenba",
+  "When": "2014-09-08T12:59:53.1148196Z",
+  "PayloadType": "PackageAddedWebHookEventPayloadV1",
+  "Payload": {
+    "PackageType": "NuGet",
+    "PackageIdentifier": "GoogleAnalyticsTracker.WP8",
+    "PackageVersion": "1.0.0-CI00002",
+    "PackageDetailsUrl": "https://www.myget.org/feed/sample-feed/package/GoogleAnalyticsTracker.WP8/1.0.0-CI00002",
+    "PackageDownloadUrl": "https://www.myget.org/F/sample-feed/api/v2/package/GoogleAnalyticsTracker.WP8/1.0.0-CI00002",
+    "PackageMetadata": {
+      "IconUrl": "/Content/images/packageDefaultIcon.png",
+      "Size": 6158,
+      "Authors": "Maarten Balliauw",
+      "Description": "GoogleAnalyticsTracker was created to have a means of tracking specific URL's directly from C#. For example, it enables you to log API calls to Google Analytics.",
+      "LicenseUrl": "http://github.com/maartenba/GoogleAnalyticsTracker/blob/master/LICENSE.md",
+      "LicenseNames": "MS-PL",
+      "ProjectUrl": "http://github.com/maartenba/GoogleAnalyticsTracker",
+      "Tags": "google analytics ga wp8 wp7 windows phone windowsphone api rest client tracker stats statistics mango",
+      "MinClientVersion": null,
+      "ReleaseNotes": null,
+      "Dependencies": [
+        {
+          "PackageIdentifier": "GoogleAnalyticsTracker.Core",
+          "PackageVersion": "(>= 2.0.5364.25176)",
+          "TargetFramework": ".NETFramework,Version=v4.0.0.0"
+        }
+      ]
+    },
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/"
+  }
+}

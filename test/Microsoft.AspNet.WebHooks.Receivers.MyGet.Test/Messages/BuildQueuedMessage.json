@@ -1,0 +1,12 @@
+﻿{
+  "Identifier": "82f9a300-2439-4ac6-a2bd-8da96bb26f75",
+  "Username": "maartenba",
+  "When": "2014-09-08T13:00:10.9006808Z",
+  "PayloadType": "BuildQueuedWebHookEventPayloadV1",
+  "Payload": {
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/",
+    "Name": "SampleBuild",
+    "Branch": "master"
+  }
+}

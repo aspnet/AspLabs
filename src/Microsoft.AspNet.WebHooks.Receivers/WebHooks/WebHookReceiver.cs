@@ -55,11 +55,13 @@ namespace Microsoft.AspNet.WebHooks
         internal static async Task<T> ReadAsJsonAsync<T>(HttpRequestMessage request)
             where T : JToken
         {
+            HttpConfiguration config = request.GetConfiguration();
+
             // Check that there is a request body
             if (request.Content == null)
             {
                 string msg = ReceiverResources.Receiver_NoBody;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                config.DependencyResolver.GetLogger().Info(msg);
                 HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noBody);
             }
@@ -68,7 +70,7 @@ namespace Microsoft.AspNet.WebHooks
             if (!request.Content.IsJson())
             {
                 string msg = ReceiverResources.Receiver_NoJson;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                config.DependencyResolver.GetLogger().Info(msg);
                 HttpResponseMessage noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
                 throw new HttpResponseException(noJson);
             }
@@ -76,13 +78,13 @@ namespace Microsoft.AspNet.WebHooks
             try
             {
                 // Read request body
-                T result = await request.Content.ReadAsAsync<T>();
+                T result = await request.Content.ReadAsAsync<T>(config.Formatters);
                 return result;
             }
             catch (Exception ex)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                config.DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
             }
@@ -317,11 +319,13 @@ namespace Microsoft.AspNet.WebHooks
         /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
         protected virtual async Task<XElement> ReadAsXmlAsync(HttpRequestMessage request)
         {
+            HttpConfiguration config = request.GetConfiguration();
+
             // Check that there is a request body
             if (request.Content == null)
             {
                 string msg = ReceiverResources.Receiver_NoBody;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                config.DependencyResolver.GetLogger().Info(msg);
                 HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noBody);
             }
@@ -330,7 +334,7 @@ namespace Microsoft.AspNet.WebHooks
             if (!request.Content.IsXml())
             {
                 string msg = ReceiverResources.Receiver_NoXml;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
+                config.DependencyResolver.GetLogger().Info(msg);
                 HttpResponseMessage noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
                 throw new HttpResponseException(noXml);
             }
@@ -338,13 +342,13 @@ namespace Microsoft.AspNet.WebHooks
             try
             {
                 // Read request body
-                XElement result = await request.Content.ReadAsAsync<XElement>();
+                XElement result = await request.Content.ReadAsAsync<XElement>(config.Formatters);
                 return result;
             }
             catch (Exception ex)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
+                config.DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
             }

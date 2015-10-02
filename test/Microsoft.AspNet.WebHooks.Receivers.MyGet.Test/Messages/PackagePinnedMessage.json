@@ -1,0 +1,14 @@
+﻿{
+  "Identifier": "3374190e-33ed-4546-a1c1-d47e19b1980f",
+  "Username": "maartenba",
+  "When": "2014-09-08T13:07:43.1294196Z",
+  "PayloadType": "PackagePinnedWebHookEventPayloadV1",
+  "Payload": {
+    "Action": "pinned",
+    "PackageType": "NuGet",
+    "PackageIdentifier": "GoogleAnalyticsTracker.Simple",
+    "PackageVersion": "1.0.0-CI00002",
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/"
+  }
+}

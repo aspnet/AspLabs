@@ -17,6 +17,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.MyGet"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Salesforce"/>
@@ -41,6 +42,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.MyGet.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Paypal.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Pusher.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Salesforce.Test"/>

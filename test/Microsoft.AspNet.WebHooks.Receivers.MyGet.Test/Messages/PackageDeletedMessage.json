@@ -1,0 +1,13 @@
+﻿{
+  "Identifier": "de5358b5-2fea-4000-b59e-7345e14af0ca",
+  "Username": "maartenba",
+  "When": "2014-09-08T13:00:52.0300822Z",
+  "PayloadType": "PackageDeletedWebHookEventPayloadV1",
+  "Payload": {
+    "PackageType": "NuGet",
+    "PackageIdentifier": "GoogleAnalyticsTracker.Core",
+    "PackageVersion": "1.0.0-CI00002",
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/"
+  }
+}

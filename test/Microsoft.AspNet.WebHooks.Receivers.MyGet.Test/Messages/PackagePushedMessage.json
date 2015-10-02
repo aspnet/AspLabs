@@ -1,0 +1,36 @@
+﻿{
+  "Identifier": "0ebf1e5d-2dc4-4576-8246-aacda950142d",
+  "Username": "maartenba",
+  "When": "2014-09-08T13:02:46.6949583Z",
+  "PayloadType": "PackagePushedWebHookEventPayloadV1",
+  "Payload": {
+    "PackageType": "NuGet",
+    "PackageIdentifier": "GoogleAnalyticsTracker.Simple",
+    "PackageVersion": "1.0.0-CI00002",
+    "PackageDetailsUrl": "https://www.myget.org/feed/sample-feed/package/GoogleAnalyticsTracker.Simple/1.0.0-CI00002",
+    "PackageDownloadUrl": "https://www.myget.org/F/sample-feed/api/v2/package/GoogleAnalyticsTracker.Simple/1.0.0-CI00002",
+    "PackageMetadata": {
+      "IconUrl": "/Content/images/packageDefaultIcon.png",
+      "Size": 5542,
+      "Authors": "Maarten Balliauw",
+      "Description": "GoogleAnalyticsTracker was created to have a means of tracking specific URL's directly from C#. For example, it enables you to log API calls to Google Analytics.",
+      "LicenseUrl": "http://github.com/maartenba/GoogleAnalyticsTracker/blob/master/LICENSE.md",
+      "LicenseNames": "MS-PL",
+      "ProjectUrl": "http://github.com/maartenba/GoogleAnalyticsTracker",
+      "Tags": "google analytics ga mvc api rest client tracker stats statistics",
+      "MinClientVersion": null,
+      "ReleaseNotes": null,
+      "Dependencies": [
+        {
+          "PackageIdentifier": "GoogleAnalyticsTracker.Core",
+          "PackageVersion": "(? 2.0.5364.25176)",
+          "TargetFramework": ".NETFramework,Version=v4.0.0.0"
+        }
+      ]
+    },
+    "TargetPackageSourceName": "Other Feed",
+    "TargetPackageSourceUrl": "https://www.myget.org/F/other-feed/",
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/"
+  }
+}

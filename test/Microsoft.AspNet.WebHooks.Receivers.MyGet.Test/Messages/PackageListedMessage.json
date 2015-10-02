@@ -1,0 +1,14 @@
+﻿{
+  "Identifier": "76919dd9-ba4f-4f11-ab4d-d983146d2aae",
+  "Username": "maartenba",
+  "When": "2014-09-08T13:07:33.6121841Z",
+  "PayloadType": "PackageListedWebHookEventPayloadV1",
+  "Payload": {
+    "Action": "unlisted",
+    "PackageType": "NuGet",
+    "PackageIdentifier": "GoogleAnalyticsTracker.Simple",
+    "PackageVersion": "1.0.0-CI00002",
+    "FeedIdentifier": "sample-feed",
+    "FeedUrl": "https://www.myget.org/F/sample-feed/"
+  }
+}
