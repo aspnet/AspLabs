@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Internal;
 
 namespace Microsoft.AspNet.Proxy
 {
@@ -17,8 +16,18 @@ namespace Microsoft.AspNet.Proxy
         private readonly HttpClient _httpClient;
         private readonly ProxyOptions _options;
 
-        public ProxyMiddleware([NotNull] RequestDelegate next, [NotNull] ProxyOptions options)
+        public ProxyMiddleware(RequestDelegate next, ProxyOptions options)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
+
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _next = next;
             if (string.IsNullOrEmpty(options.Host))
             {
