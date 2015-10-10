@@ -7,7 +7,7 @@
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
-    <projectUrl>http://www.asp.net/</projectUrl>
+    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>This package provides support for receiving WebHooks from Bitbucket. For information about Bitbucket WebHooks, see "https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html".</description>
