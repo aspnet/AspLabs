@@ -116,7 +116,7 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             Assert.Equal("1", actual.Id);
             Assert.Equal("user", actual.Object);
-            Assert.Equal(TestCallback, actual.Callback);
+            Assert.Equal(TestCallback, actual.Callback.AbsoluteUri);
         }
 
         [Fact]
@@ -141,7 +141,7 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             Assert.Equal("1", actual.Id);
             Assert.Equal("tag", actual.Object);
-            Assert.Equal(TestCallback, actual.Callback);
+            Assert.Equal(TestCallback, actual.Callback.AbsoluteUri);
         }
 
         [Fact]
@@ -168,7 +168,7 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             Assert.Equal("1", actual.Id);
             Assert.Equal("geography", actual.Object);
-            Assert.Equal(TestCallback, actual.Callback);
+            Assert.Equal(TestCallback, actual.Callback.AbsoluteUri);
         }
 
         [Fact]

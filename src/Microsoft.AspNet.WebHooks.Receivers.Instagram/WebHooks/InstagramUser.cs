@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks
@@ -32,6 +33,6 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets or sets the profile picture for this user.
         /// </summary>
         [JsonProperty("profile_picture")]
-        public string ProfilePicture { get; set; }
+        public Uri ProfilePicture { get; set; }
     }
 }

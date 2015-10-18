@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks
@@ -14,7 +15,7 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets or sets the URI of the media.
         /// </summary>
         [JsonProperty("url")]
-        public string Address { get; set; }
+        public Uri Address { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the media in pixels.

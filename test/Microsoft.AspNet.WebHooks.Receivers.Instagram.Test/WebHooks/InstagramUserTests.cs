@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.TestUtilities;
 using Xunit;
 
@@ -31,7 +32,8 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public void ProfilePicture_Roundtrips()
         {
-            PropertyAssert.Roundtrips(_user, u => u.ProfilePicture, PropertySetter.NullRoundtrips, roundtripValue: "Value");
+            Uri roundtrip = new Uri("http://localhost");
+            PropertyAssert.Roundtrips(_user, u => u.ProfilePicture, PropertySetter.NullRoundtrips, roundtripValue: roundtrip);
         }
     }
 }

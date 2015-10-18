@@ -65,9 +65,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InstagramReceiverResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Serialization\InstagramUnixTimeConverter.cs" />
     <Compile Include="WebHooks\InstagramCaption.cs" />
     <Compile Include="WebHooks\InstagramLocation.cs" />
+    <Compile Include="WebHooks\InstagramImages.cs" />
+    <Compile Include="WebHooks\InstagramVideos.cs" />
+    <Compile Include="WebHooks\InstagramPost.cs" />
     <Compile Include="WebHooks\InstagramMedia.cs" />
+    <Compile Include="WebHooks\InstagramNotifications.cs" />
     <Compile Include="WebHooks\InstagramNotification.cs" />
     <Compile Include="WebHooks\InstagramSubscription.cs" />
     <Compile Include="WebHooks\InstagramUser.cs" />

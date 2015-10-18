@@ -135,6 +135,12 @@
   <data name="Client_UnsubscribeFailure" xml:space="preserve">
     <value>Could not delete Instagram subscriptions. Received status code '{0}' and error message "{1}".</value>
   </data>
+  <data name="DateTime_BadFormat" xml:space="preserve">
+    <value>Cannot read value '{0}' as type '{1}'.</value>
+  </data>
+  <data name="DateTime_NullError" xml:space="preserve">
+    <value>Cannot convert null value to type '{0}'.</value>
+  </data>
   <data name="Receiver_BadEvent" xml:space="preserve">
     <value>Could not parse WebHook data: {0}</value>
   </data>

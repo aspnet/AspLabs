@@ -115,6 +115,24 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot read value &apos;{0}&apos; as type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DateTime_BadFormat {
+            get {
+                return ResourceManager.GetString("DateTime_BadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot convert null value to type &apos;{0}&apos;..
+        /// </summary>
+        internal static string DateTime_NullError {
+            get {
+                return ResourceManager.GetString("DateTime_NullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not parse WebHook data: {0}.
         /// </summary>
         internal static string Receiver_BadEvent {

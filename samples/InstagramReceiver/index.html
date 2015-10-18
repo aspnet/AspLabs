@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WewbHooks Instagram Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WewbHooks Instagram Receiver</h1>
+
+    <p>This sample illustrates how to wire up a Instagram WebHooks receiver. A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/instagram/{id}</pre>
+
+    <p>
+        Note that for security reasons the URI <b>MUST</b> be <b>https</b>.
+    </p>
+    <p>
+        Set the <b>MS_WebHookReceiverSecret_Instagram</b> application setting to the Instagram application secret, optionally using IDs
+        to differentiate between multiple WebHooks, for example '<c>secret0, id1=secret1, id2=secret2</c>'. 
+    </p>
+    <p>    
+        Also, set the <b>MS_WebHookReceiverSecret_InstagramId</b> application setting to the application id, again optionally using IDs
+        to differentiate between multiple WebHooks, for example '<c>secret0, id1=secret1, id2=secret2</c>'.
+    </p>
+    <p>
+        To subscribe to a geo-location, send an empty POST request to
+        <pre>http://&lt;host&gt;/api/instagram/subscribe</pre>
+
+        To unsubscribe from the geo-location, send an empty POST request to
+        <pre>http://&lt;host&gt;/api/instagram/unsubscribe?id=&lt;id&gt;</pre>
+    </p>
+    <p>
+        Please see <a href="https://instagram.com/developer/realtime/">Instagram WebHooks</a>
+        for more information.
+    </p>
+</body>
+</html>

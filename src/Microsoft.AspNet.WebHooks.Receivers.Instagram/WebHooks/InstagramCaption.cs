@@ -1,6 +1,8 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+using Microsoft.AspNet.WebHooks.Serialization;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks
@@ -20,7 +22,8 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets or sets the creation time for this caption.
         /// </summary>
         [JsonProperty("created_time")]
-        public string CreatedTime { get; set; }
+        [JsonConverter(typeof(InstagramUnixTimeConverter))]
+        public DateTime CreatedTime { get; set; }
 
         /// <summary>
         /// Gets or sets the text of this caption.

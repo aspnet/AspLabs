@@ -13,7 +13,7 @@ namespace Microsoft.AspNet.WebHooks
         [Fact]
         public void Id_Roundtrips()
         {
-            PropertyAssert.Roundtrips(_location, l => l.Id, PropertySetter.NullRoundtrips, roundtripValue: "Value");
+            PropertyAssert.Roundtrips(_location, l => l.Id, defaultValue: 0, roundtripValue: 1024);
         }
 
         [Fact]
