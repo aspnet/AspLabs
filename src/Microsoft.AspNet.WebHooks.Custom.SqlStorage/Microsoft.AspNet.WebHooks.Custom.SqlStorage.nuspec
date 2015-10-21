@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$symversion$</version>
+    <title>Microsoft ASP.NET Custom WebHooks SQL Module</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      This package provides support for persisting your custom WebHooks registrations in a SQL database.
+    </description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
+  </metadata>
+</package>

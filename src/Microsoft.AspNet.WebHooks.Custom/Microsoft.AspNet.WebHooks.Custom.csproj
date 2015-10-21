@@ -69,6 +69,7 @@
     <Compile Include="WebHooks\WebHook.cs" />
     <Compile Include="WebHooks\WebHookFilter.cs" />
     <Compile Include="WebHooks\WebHookFilterManager.cs" />
+    <Compile Include="WebHooks\WebHookStore.cs" />
     <Compile Include="WebHooks\WebHookUser.cs" />
     <Compile Include="WebHooks\WebHookManager.cs" />
     <Compile Include="WebHooks\WebHookWorkItem.cs" />

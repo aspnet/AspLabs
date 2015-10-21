@@ -108,6 +108,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureReceivers", "samples\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstagramReceiver", "samples\InstagramReceiver\InstagramReceiver.csproj", "{3F9F62DD-C365-4FEC-A10E-5314D111EBF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Custom.SqlStorage", "src\Microsoft.AspNet.WebHooks.Custom.SqlStorage\Microsoft.AspNet.WebHooks.Custom.SqlStorage.csproj", "{EAC99E25-F698-41B2-8671-740D642781AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Custom.SqlStorage.Test", "test\Microsoft.AspNet.WebHooks.Custom.SqlStorage.Test\Microsoft.AspNet.WebHooks.Custom.SqlStorage.Test.csproj", "{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -379,6 +383,18 @@ Global
 		{3F9F62DD-C365-4FEC-A10E-5314D111EBF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F9F62DD-C365-4FEC-A10E-5314D111EBF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F9F62DD-C365-4FEC-A10E-5314D111EBF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC99E25-F698-41B2-8671-740D642781AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -428,6 +444,8 @@ Global
 		{D6287838-8329-4349-90F1-D9CBF49EDCEA} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{5DFA6EF9-2417-47AF-B8BB-424E420D9464} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{3F9F62DD-C365-4FEC-A10E-5314D111EBF5} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{EAC99E25-F698-41B2-8671-740D642781AB} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45

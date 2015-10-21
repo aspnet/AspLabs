@@ -15,6 +15,7 @@
           <Value>\.generated\.cs$</Value>
           <Value>\.g\.i\.cs$</Value>
           <Value>TemporaryGeneratedFile_.*\.cs$</Value>
+          <Value>\.Designer\.cs$</Value>
         </CollectionProperty>
       </ParserSettings>
     </Parser>
