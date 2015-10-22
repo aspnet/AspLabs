@@ -9,12 +9,12 @@
     "Microsoft.AspNet.Http.Abstractions": "1.0.0-*"
   },
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
         "System.Net.Http": ""
       }
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Net.Http": "4.0.1-*"
       }
