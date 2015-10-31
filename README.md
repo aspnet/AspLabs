@@ -11,6 +11,8 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 - [All Samples](/samples/)
 - [Azure](/samples/AzureReceivers)
 - [Bitbucket](/samples/BitbucketReceiver)
+- [Instagram](/samples/InstagramReceiver)
+- [Slack](/samples/SlackReceiver)
 
 ###Resources
 - [Announcement of Microsoft ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/04/introducing-microsoft-asp-net-webhooks-preview.aspx)

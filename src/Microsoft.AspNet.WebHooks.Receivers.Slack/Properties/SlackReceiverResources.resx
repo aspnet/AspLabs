@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Receiver_BadBody" xml:space="preserve">
-    <value>The HTTP request body did not contain a required '{0}' property.</value>
+    <value>The HTTP request body did not contain a required '{0}' property indicating a slash command or a '{1}' property indicating an outgoing WebHook.</value>
   </data>
   <data name="Receiver_BadToken" xml:space="preserve">
     <value>The '{0}' parameter provided in the HTTP request did not match the expected value.</value>

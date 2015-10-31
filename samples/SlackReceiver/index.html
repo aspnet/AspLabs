@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WebHooks Slack Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WebHooks Slack Receiver</h1>
+
+    <p>This sample illustrates how to wire up a Slack WebHooks receiver which can be used for both
+    Slack Outgoing WebHooks as well as Slash Commands. A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/slack/{id}</pre>
+
+    <p>
+        Note that for security reasons the URI <b>MUST</b> be <b>https</b>.
+    </p>
+    <p>
+        Set the <b>MS_WebHookReceiverSecret_Slack</b> application setting to the Slack 'token' parameter, optionally using IDs
+        to differentiate between multiple WebHooks, for example '<c>secret0, id1=secret1, id2=secret2</c>'. 
+    </p>
+    <p>
+        In this example we use id 'trigger' for an outgoing WebHook and id 'slash' for a slash command. This means that you
+        should register the following URIs with Slack:
+    </p>
+    <pre>
+        https://&lt;host&gt;/api/webhooks/incoming/slack/trigger
+        https://&lt;host&gt;/api/webhooks/incoming/slack/slash</pre>
+    <p>
+        and then configure the application setting as follows
+    </p>
+    <pre>
+        &lt;add key="MS_WebHookReceiverSecret_Slack" value="trigger=&lt;token&gt;, slash=&lt;token&gt;" /&gt;
+    </pre>
+    <p>
+        Please see <a href="https://api.slack.com/outgoing-webhooks">Slack WebHooks</a>
+        for more information.
+    </p>
+</body>
+</html>

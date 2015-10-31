@@ -16,7 +16,8 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class SlackWebHookReceiverTests : WebHookReceiverTestsBase<SlackWebHookReceiver>
     {
-        private const string TestContent = "token=" + TestSecret + "&trigger_word=trigger:+hello!";
+        private const string TestTriggerContent = "token=" + TestSecret + "&trigger_word=trigger:+hello!";
+        private const string TestSlashContent = "token=" + TestSecret + "&command=hello!";
         private const string TestId = "";
         private const string TestSecret = "12345678901234567890123456789012";
 
@@ -117,18 +118,39 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The HTTP request body did not contain a required 'trigger_word' property.", error.Message);
+            Assert.Equal("The HTTP request body did not contain a required 'command' property indicating a slash command or a 'trigger_word' property indicating an outgoing WebHook.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Theory]
         [MemberData("ValidIdData")]
-        public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
+        public async Task ReceiveAsync_Succeeds_IfValidTriggerPostRequest(string id)
         {
             // Arrange
             Initialize(GetConfigValue(id, TestSecret));
             List<string> actions = new List<string> { "trigger: hello!" };
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
+                .ReturnsAsync(new HttpResponseMessage())
+                .Verifiable();
+
+            // Act
+            await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _postRequest);
+
+            // Assert
+            ReceiverMock.Verify();
+        }
+
+        [Theory]
+        [MemberData("ValidIdData")]
+        public async Task ReceiveAsync_Succeeds_IfValidSlashPostRequest(string id)
+        {
+            // Arrange
+            Initialize(GetConfigValue(id, TestSecret));
+            _postRequest.Content = new StringContent(TestSlashContent, Encoding.UTF8, "application/x-www-form-urlencoded");
+
+            List<string> actions = new List<string> { "hello!" };
             ReceiverMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
@@ -169,7 +191,7 @@ namespace Microsoft.AspNet.WebHooks
 
             _postRequest = new HttpRequestMessage(HttpMethod.Post, "https://some.ssl.host");
             _postRequest.SetRequestContext(RequestContext);
-            _postRequest.Content = new StringContent(TestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
+            _postRequest.Content = new StringContent(TestTriggerContent, Encoding.UTF8, "application/x-www-form-urlencoded");
         }
     }
 }

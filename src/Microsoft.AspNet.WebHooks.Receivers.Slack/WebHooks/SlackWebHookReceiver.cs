@@ -26,7 +26,8 @@ namespace Microsoft.AspNet.WebHooks
         internal const int SecretMaxLength = 128;
 
         internal const string TokenParameter = "token";
-        internal const string ActionParameter = "trigger_word";
+        internal const string TriggerParameter = "trigger_word";
+        internal const string CommandParameter = "command";
         internal const string TextParameter = "text";
         internal const string SubtextParameter = "subtext";
 
@@ -70,19 +71,26 @@ namespace Microsoft.AspNet.WebHooks
                     return invalidCode;
                 }
 
-                // Get the action
-                string action = data[ActionParameter];
+                // Get the action by looking for either trigger_word or command parameter
+                string action = data[TriggerParameter];
+                if (!string.IsNullOrEmpty(action))
+                {
+                    // Get the subtext by removing the trigger word
+                    string text = data[TextParameter];
+                    data[SubtextParameter] = GetSubtext(action, text);
+                }
+                else
+                {
+                    action = data[CommandParameter];
+                }
+
                 if (string.IsNullOrEmpty(action))
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_BadBody, ActionParameter);
+                    string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_BadBody, CommandParameter, TriggerParameter);
                     context.Configuration.DependencyResolver.GetLogger().Error(msg);
                     HttpResponseMessage badType = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                     return badType;
                 }
-
-                // Get the subtext by removing the trigger word
-                string text = data[TextParameter];
-                data[SubtextParameter] = GetSubtext(action, text);
 
                 // Call registered handlers
                 return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
