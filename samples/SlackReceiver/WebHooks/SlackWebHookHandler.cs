@@ -15,7 +15,7 @@ namespace SlackReceiver.WebHooks
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)
         {
-            // For more information about BitBucket WebHook payloads, please see 
+            // For more information about Slack WebHook payloads, please see 
             // 'https://api.slack.com/outgoing-webhooks'
             NameValueCollection entry = context.GetDataOrDefault<NameValueCollection>();
 
