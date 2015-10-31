@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -199,6 +198,37 @@ namespace Microsoft.AspNet.WebHooks
             string expected = string.Format("The WebHook receiver 'WebHookReceiverMock' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.");
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal(expected, error.Message);
+        }
+
+        [Theory]
+        [InlineData("http://example.org", "true")]
+        [InlineData("HTTP://example.org", "TRUE")]
+        [InlineData("http://local", "True")]
+        [InlineData("https://example.org", "TrUe")]
+        [InlineData("HTTPS://example.org", "tRUE")]
+        [InlineData("http://localhost", "tRuE")]
+        public void EnsureSecureConnection_SucceedsIfCheckDisabled(string address, string check)
+        {
+            // Arrange
+            Initialize(TestSecret);
+            _settings["MS_WebHookDisableHttpsCheck"] = check;
+            _request.RequestUri = new Uri(address);
+
+            // Act
+            _receiverMock.EnsureSecureConnection(_request);
+        }
+
+        [Theory]
+        [InlineData("https://example.org")]
+        [InlineData("HTTPS://example.org")]
+        public void EnsureSecureConnection_SucceedsIfHttps(string address)
+        {
+            // Arrange
+            Initialize(TestSecret);
+            _request.RequestUri = new Uri(address);
+
+            // Act
+            _receiverMock.EnsureSecureConnection(_request);
         }
 
         [Theory]

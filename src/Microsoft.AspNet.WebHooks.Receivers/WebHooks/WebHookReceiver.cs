@@ -13,7 +13,9 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Dependencies;
 using System.Xml.Linq;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
@@ -24,6 +26,10 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public abstract class WebHookReceiver : IWebHookReceiver
     {
+        // Application setting for disabling HTTPS check
+        internal const string DisableHttpsCheckKey = "MS_WebHookDisableHttpsCheck";
+
+        // Information about the 'code' URI parameter
         internal const int CodeMinLength = 32;
         internal const int CodeMaxLength = 128;
         internal const string CodeQueryParameter = "code";
@@ -151,10 +157,22 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("request");
             }
 
+            IDependencyResolver resolver = request.GetConfiguration().DependencyResolver;
+
+            // Check to see if we have been configured to ignore this check
+            SettingsDictionary settings = resolver.GetSettings();
+            string disableHttpsCheckValue = settings.GetValueOrDefault(DisableHttpsCheckKey);
+            bool disableHttpsCheck;
+            if (bool.TryParse(disableHttpsCheckValue, out disableHttpsCheck) && disableHttpsCheck == true)
+            {
+                return;
+            }
+
+            // Require HTTP unless request is local
             if (!request.IsLocal() && !request.RequestUri.IsHttps())
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoHttps, GetType().Name, Uri.UriSchemeHttps);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
+                resolver.GetLogger().Error(msg);
                 HttpResponseMessage noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noHttps);
             }
