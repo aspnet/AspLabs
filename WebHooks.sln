@@ -114,6 +114,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackReceiver", "samples\SlackReceiver\SlackReceiver.csproj", "{EBF58015-2787-4741-AD9C-A7FDFE2C10F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Generic", "src\Microsoft.AspNet.WebHooks.Receivers.Generic\Microsoft.AspNet.WebHooks.Receivers.Generic.csproj", "{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericReceivers", "samples\GenericReceivers\GenericReceivers.csproj", "{E15E396E-A33F-4286-910B-254ED6F52365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.Generic.Test", "test\Microsoft.AspNet.WebHooks.Receivers.Generic.Test\Microsoft.AspNet.WebHooks.Receivers.Generic.Test.csproj", "{062CDC55-0F74-4649-9563-98983AAE323C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -403,6 +409,24 @@ Global
 		{EBF58015-2787-4741-AD9C-A7FDFE2C10F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBF58015-2787-4741-AD9C-A7FDFE2C10F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBF58015-2787-4741-AD9C-A7FDFE2C10F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E15E396E-A33F-4286-910B-254ED6F52365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062CDC55-0F74-4649-9563-98983AAE323C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -455,6 +479,9 @@ Global
 		{EAC99E25-F698-41B2-8671-740D642781AB} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{CCE7ADB5-7335-4F7D-A34D-0B7CA1D3141F} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{EBF58015-2787-4741-AD9C-A7FDFE2C10F9} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{2D26EAB4-0FDB-45E7-8B2E-C42CB19669B3} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{E15E396E-A33F-4286-910B-254ED6F52365} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{062CDC55-0F74-4649-9563-98983AAE323C} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45

@@ -12,6 +12,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Bitbucket"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Custom"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Generic"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp"/>
@@ -34,6 +35,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Bitbucket.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Custom.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Dropbox.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Generic.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.GitHub.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Instagram.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.MailChimp.Test"/>
