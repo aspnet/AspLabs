@@ -50,8 +50,30 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Initialize a new instance of the <see cref="WebHookManager"/> with a default retry policy.
         /// </summary>
+        /// <param name="webHookStore">The current <see cref="IWebHookStore"/>.</param>
+        /// <param name="logger">The current <see cref="ILogger"/>.</param>
         public WebHookManager(IWebHookStore webHookStore, ILogger logger)
             : this(webHookStore, logger, retryDelays: null, options: null, httpClient: null, onWebHookSuccess: null, onWebHookFailure: null)
+        {
+        }
+
+        /// <summary>
+        /// Initialize a new instance of the <see cref="WebHookManager"/> with a given collection of <paramref name="retryDelays"/> and
+        /// <paramref name="options"/> for how to manage the queuing policy for each transmission. The transmission model is as follows: each try
+        /// and subsequent retries is managed by a separate <see cref="ActionBlock{T}"/> which controls the level of concurrency used to 
+        /// send out WebHooks. The <paramref name="options"/> parameter can be used to control all <see cref="ActionBlock{T}"/> instances 
+        /// by setting the maximum level of concurrency, length of queue, and more.
+        /// </summary>
+        /// <param name="webHookStore">The current <see cref="IWebHookStore"/>.</param>
+        /// <param name="logger">The current <see cref="ILogger"/>.</param>
+        /// <param name="retryDelays">A collection of <see cref="TimeSpan"/> instances indicating the delay between each retry. If <c>null</c>,
+        /// then a default retry policy is used of one retry after one 1 minute and then again after 4 minutes. A retry is attempted if the 
+        /// delivery fails or does not result in a 2xx HTTP status code. If the status code is 410 then no retry is attempted. If the collection
+        /// is empty then no retries are attempted.</param>
+        /// <param name="options">An <see cref="ExecutionDataflowBlockOptions"/> used to control the <see cref="ActionBlock{T}"/> instances.
+        /// The default setting uses a maximum of 8 concurrent transmitters for each try or retry.</param>
+        public WebHookManager(IWebHookStore webHookStore, ILogger logger, IEnumerable<TimeSpan> retryDelays, ExecutionDataflowBlockOptions options)
+            : this(webHookStore, logger, retryDelays, options, httpClient: null, onWebHookSuccess: null, onWebHookFailure: null)
         {
         }
 
