@@ -17,4 +17,7 @@
     <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
+  <files>
+    <file src="Readme.txt" target="" />
+  </files>
 </package>
