@@ -7,13 +7,13 @@ namespace Microsoft.AspNet.WebHooks.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class WebHookStoreInitialDb : IMigrationMetadata
+    public sealed partial class WebHookStoreInitialDB : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(WebHookStoreInitialDb));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(WebHookStoreInitialDB));
         
         string IMigrationMetadata.Id
         {
-            get { return "201511060113521_WebHookStoreInitialDb"; }
+            get { return "201511060517479_WebHookStoreInitialDB"; }
         }
         
         string IMigrationMetadata.Source

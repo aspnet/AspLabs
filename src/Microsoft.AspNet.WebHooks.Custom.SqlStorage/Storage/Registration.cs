@@ -25,7 +25,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         /// Gets or sets the ID of this WebHook registration.
         /// </summary>
         [Key]
-        [StringLength(256)]
+        [StringLength(64)]
         [Column(Order = 1)]
         public string Id { get; set; }
 

@@ -73,9 +73,9 @@
   <ItemGroup>
     <Compile Include="Extensions\HttpConfigurationExtensionsTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Migrations\201511060113521_WebHookStoreInitialDb.cs" />
-    <Compile Include="Migrations\201511060113521_WebHookStoreInitialDb.Designer.cs">
-      <DependentUpon>201511060113521_WebHookStoreInitialDb.cs</DependentUpon>
+    <Compile Include="Migrations\201511060517479_WebHookStoreInitialDB.cs" />
+    <Compile Include="Migrations\201511060517479_WebHookStoreInitialDB.Designer.cs">
+      <DependentUpon>201511060517479_WebHookStoreInitialDB.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,8 +119,8 @@
     <Folder Include="Storage\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201511060113521_WebHookStoreInitialDb.resx">
-      <DependentUpon>201511060113521_WebHookStoreInitialDb.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201511060517479_WebHookStoreInitialDB.resx">
+      <DependentUpon>201511060517479_WebHookStoreInitialDB.cs</DependentUpon>
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </EmbeddedResource>
   </ItemGroup>

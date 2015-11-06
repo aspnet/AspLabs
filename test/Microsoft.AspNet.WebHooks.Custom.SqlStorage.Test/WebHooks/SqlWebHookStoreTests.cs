@@ -6,7 +6,6 @@ using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Web.Http;
 using Microsoft.AspNet.WebHooks.Services;
-using Microsoft.AspNet.WebHooks.Storage;
 using Xunit;
 using EF = Microsoft.AspNet.WebHooks.Migrations;
 
