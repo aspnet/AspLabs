@@ -95,12 +95,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Migrations\201510210452218_WebHooksInitialDb.cs" />
-    <Compile Include="Migrations\201510210452218_WebHooksInitialDb.Designer.cs">
-      <DependentUpon>201510210452218_WebHooksInitialDb.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\SqlStorageResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -108,14 +102,10 @@
       <DependentUpon>SqlStorageResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Storage\Registration.cs" />
-    <Compile Include="Storage\WebHookContext.cs" />
+    <Compile Include="WebHooks\WebHookStoreContext.cs" />
     <Compile Include="WebHooks\SqlWebHookStore.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201510210452218_WebHooksInitialDb.resx">
-      <DependentUpon>201510210452218_WebHooksInitialDb.cs</DependentUpon>
-      <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\SqlStorageResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlStorageResources.Designer.cs</LastGenOutput>

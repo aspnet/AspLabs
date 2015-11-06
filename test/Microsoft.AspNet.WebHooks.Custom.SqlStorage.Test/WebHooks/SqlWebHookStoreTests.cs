@@ -8,7 +8,7 @@ using System.Web.Http;
 using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
 using Xunit;
-using EF = Microsoft.AspNet.WebHooks.Custom.SqlStorage.Migrations;
+using EF = Microsoft.AspNet.WebHooks.Migrations;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.WebHooks
         private static IWebHookStore CreateStore()
         {
             // Delete any existing DB
-            string connectionString = ConfigurationManager.ConnectionStrings[WebHookContext.ConnectionStringName].ConnectionString;
+            string connectionString = ConfigurationManager.ConnectionStrings[WebHookStoreContext.ConnectionStringName].ConnectionString;
             Database.Delete(connectionString);
 
             // Initialize DB using code first migration

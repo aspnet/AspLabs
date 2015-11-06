@@ -66,7 +66,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var registrations = await context.Registrations.Where(r => r.User == user).ToArrayAsync();
                     var collection = new List<WebHook>();
@@ -102,7 +102,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var registration = await context.Registrations.Where(r => r.User == user && r.Id == id).FirstOrDefaultAsync();
                     if (registration != null)
@@ -136,7 +136,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var registration = ConvertToRegistration(user, webHook);
                     context.Registrations.Attach(registration);
@@ -186,7 +186,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var registration = await context.Registrations.Where(r => r.User == user && r.Id == webHook.Id).FirstOrDefaultAsync();
                     if (registration == null)
@@ -235,7 +235,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var match = await context.Registrations.Where(r => r.User == user && r.Id == id).FirstOrDefaultAsync();
                     if (match == null)
@@ -279,7 +279,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new WebHookContext())
+                using (var context = new WebHookStoreContext())
                 {
                     var matches = await context.Registrations.Where(r => r.User == user).ToArrayAsync();
                     foreach (var m in matches)
@@ -305,9 +305,9 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             ConnectionSettings connection;
-            if (!settings.Connections.TryGetValue(WebHookContext.ConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
+            if (!settings.Connections.TryGetValue(WebHookStoreContext.ConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_NoConnectionString, WebHookContext.ConnectionStringName);
+                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_NoConnectionString, WebHookStoreContext.ConnectionStringName);
                 throw new InvalidOperationException(msg);
             }
             return connection.ConnectionString;

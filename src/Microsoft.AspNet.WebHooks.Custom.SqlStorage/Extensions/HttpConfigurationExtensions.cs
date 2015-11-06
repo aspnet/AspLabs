@@ -42,7 +42,7 @@ namespace System.Web.Http
             SettingsDictionary settings = config.DependencyResolver.GetSettings();
 
             // We explicitly set the DB initializer to null to avoid that an existing DB is initialized wrongly.
-            Database.SetInitializer<WebHookContext>(null);
+            Database.SetInitializer<WebHookStoreContext>(null);
 
             IDataProtectionProvider provider = GetDataProtectionProvider();
             IDataProtector protector = provider.CreateProtector(Purpose);
