@@ -1,7 +1,7 @@
 ﻿Microsoft ASP.NET Custom WebHooks SQL Module
 --------------------------------------------
 
-This package provides support for persisting your custom WebHooks registrations in a SQL database. 
+This package provides support for persisting your custom WebHook registrations in a SQL database. 
 To set up the SQL DB you must first configure a connection string with the name 'MS_SqlStoreConnectionString',
 for example:
 
