@@ -1,0 +1,17 @@
+﻿{
+  "devices": [
+    {
+      "identifier": "oiuytrdsdfghjk",
+      "type": "ios"
+    },
+    {
+      "identifier": "iuytfrdcvbnmkl",
+      "type": "android"
+    }
+  ],
+  "notification": {
+    "body": "Agent replied something something",
+    "title": "Agent replied",
+    "ticket_id": "5"
+  }
+}

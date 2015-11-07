@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$symversion$</version>
+    <title>Microsoft ASP.NET WebHooks Receiver for Zendesk</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft, aspnet</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This package provides support for receiving WebHooks from Zendesk. For information about Zendesk WebHooks, see "https://developer.zendesk.com/embeddables/docs/ios/push_notifications_webhook".</description>
+    <releaseNotes></releaseNotes>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Zendesk</tags>
+  </metadata>
+</package>

@@ -14,8 +14,10 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 - [Dropbox](/samples/DropboxReceiver)
 - [GitHub](/samples/GitHubReceiver)
 - [Instagram](/samples/InstagramReceiver)
+- [MyGet](/samples/MyGetReceiver)
 - [Slack](/samples/SlackReceiver)
 - [Stripe](/samples/StripeReceiver)
+- [Zendesk](/samples/ZendeskReceiver)
 
 ###Resources
 * Overview

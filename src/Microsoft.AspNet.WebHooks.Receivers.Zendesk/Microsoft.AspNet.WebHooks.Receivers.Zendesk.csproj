@@ -7,11 +7,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B3F5421B-B28C-444C-AF60-E950048D206F}</ProjectGuid>
+    <ProjectGuid>{DCD550FB-FE5E-4684-AA52-C09FE5F8FDDA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.AspNet.WebHooks</RootNamespace>
-    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers.MyGet</AssemblyName>
+    <AssemblyName>Microsoft.AspNet.WebHooks.Receivers.Zendesk</AssemblyName>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <RunCodeAnalysis>$(CodeAnalysis)</RunCodeAnalysis>
     <CodeAnalysisAdditionalOptions>/assemblyCompareMode:StrongNameIgnoringVersion</CodeAnalysisAdditionalOptions>
@@ -59,33 +59,18 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
-    <Compile Include="Handlers\MyGetWebHookHandlerBase.cs" />
-    <Compile Include="Payloads\BuildFinishedPayload.cs" />
-    <Compile Include="Payloads\BuildQueuedPayload.cs" />
-    <Compile Include="Payloads\BuildStartedPayload.cs" />
-    <Compile Include="Payloads\Package.cs" />
-    <Compile Include="Payloads\PackageAddedPayload.cs" />
-    <Compile Include="Payloads\PackageDeletedPayload.cs" />
-    <Compile Include="Payloads\PackageListedPayload.cs" />
-    <Compile Include="Payloads\PackageMetadata.cs" />
-    <Compile Include="Payloads\PackagePinnedPayload.cs" />
-    <Compile Include="Payloads\PackagePushedPayload.cs" />
-    <Compile Include="Properties\MyGetReceiverResources.Designer.cs">
+    <Compile Include="WebHooks\ZendeskDevice.cs" />
+    <Compile Include="WebHooks\ZendeskPost.cs" />
+    <Compile Include="WebHooks\ZendeskNotification.cs" />
+    <Compile Include="WebHooks\ZendeskWebHookReceiver.cs" />
+    <Compile Include="Properties\ZendeskReceiverResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>MyGetReceiverResources.resx</DependentUpon>
+      <DependentUpon>ZendeskReceiverResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="WebHooks\MyGetWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\MyGetReceiverResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>MyGetReceiverResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.AspNet.WebHooks.Common\Microsoft.AspNet.WebHooks.Common.csproj">
@@ -98,9 +83,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Microsoft.AspNet.WebHooks.Receivers.MyGet.nuspec">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Microsoft.AspNet.WebHooks.Receivers.Zendesk.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\ZendeskReceiverResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ZendeskReceiverResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

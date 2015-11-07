@@ -25,6 +25,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Zendesk"/>
 
   <!-- Unit test assemblies and helpers -->
   <assembly name="Microsoft.AspNet.WebHooks.Common.Test"/>
@@ -51,5 +52,6 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.Zendesk.Test"/>
   <assembly name="Microsoft.TestUtilities"/>
 </assemblies>

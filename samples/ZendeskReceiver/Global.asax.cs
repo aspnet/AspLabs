@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace BitbucketReceiver
+namespace ZendeskReceiver
 {
     public class WebApiApplication : System.Web.HttpApplication
     {
