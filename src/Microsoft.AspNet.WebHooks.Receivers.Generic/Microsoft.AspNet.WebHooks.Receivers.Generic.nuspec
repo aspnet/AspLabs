@@ -3,7 +3,7 @@
   <metadata>
     <id>$id$</id>
     <version>$symversion$</version>
-    <title>Microsoft ASP.NET WebHooks Receiver for genetic WebHooks with no special validation logic or security requirements.</title>
+    <title>Microsoft ASP.NET WebHooks Receiver for Generic WebHooks</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
