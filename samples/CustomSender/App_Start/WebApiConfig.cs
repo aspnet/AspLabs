@@ -22,7 +22,7 @@ namespace CustomSender
 
             // Load Azure Storage or SQL for persisting subscriptions
             config.InitializeCustomWebHooksAzureStorage();
-            //config.InitializeCustomWebHooksSqlStorage();
+            // config.InitializeCustomWebHooksSqlStorage();
 
             // Load Web API controllers for managing subscriptions
             config.InitializeCustomWebHooksApis();

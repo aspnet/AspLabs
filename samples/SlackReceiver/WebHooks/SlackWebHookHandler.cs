@@ -36,7 +36,6 @@ namespace SlackReceiver.WebHooks
                     context.Response = context.Request.CreateResponse();
                     context.Response.Content = new StringContent("Hello slash command!");
                     break;
-
             }
 
             return Task.FromResult(true);
