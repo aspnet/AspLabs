@@ -65,6 +65,7 @@
     <Compile Include="Mocks\WebHookReceiverMock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ReceiverServicesTests.cs" />
+    <Compile Include="WebHooks\WebHookAssemblyResolverTests.cs" />
     <Compile Include="WebHooks\WebHookQueueContextTests.cs" />
     <Compile Include="WebHooks\WebHookQueueHandlerTests.cs" />
     <Compile Include="WebHooks\WebHookReceiverConfigTests.cs" />

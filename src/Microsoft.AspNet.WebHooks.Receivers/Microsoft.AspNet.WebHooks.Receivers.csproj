@@ -73,6 +73,7 @@
     <Compile Include="WebHooks\IWebHookHandler.cs" />
     <Compile Include="WebHooks\IWebHookReceiver.cs" />
     <Compile Include="WebHooks\IWebHookReceiverManager.cs" />
+    <Compile Include="WebHooks\WebHookAssemblyResolver.cs" />
     <Compile Include="WebHooks\WebHookHandler.cs" />
     <Compile Include="WebHooks\WebHookQueueContext.cs" />
     <Compile Include="WebHooks\WebHookHandlerContext.cs" />

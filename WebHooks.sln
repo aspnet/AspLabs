@@ -124,6 +124,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomSender", "samples\Cus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomReceiver", "samples\CustomReceiver\CustomReceiver.csproj", "{D19D59DD-7F60-4D75-B1B7-BB380044925B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailChimpReceiver.Selfhost", "samples\MailChimpReceiver.Selfhost\MailChimpReceiver.Selfhost.csproj", "{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -443,6 +445,12 @@ Global
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -500,6 +508,7 @@ Global
 		{062CDC55-0F74-4649-9563-98983AAE323C} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{750EBD27-2091-46DF-B5F7-063053ED4C49} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
