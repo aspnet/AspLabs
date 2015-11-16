@@ -18,9 +18,6 @@ namespace MailChimpReceiver.Selfhost
             WebHookAssemblyResolver assemblyResolver = new WebHookAssemblyResolver();
             config.Services.Replace(typeof(IAssembliesResolver), assemblyResolver);
 
-            DefaultHttpControllerTypeResolver typeResolver = new DefaultHttpControllerTypeResolver();
-            config.Services.Replace(typeof(IHttpControllerTypeResolver), typeResolver);
-
             // Web API routes
             config.MapHttpAttributeRoutes();
 
