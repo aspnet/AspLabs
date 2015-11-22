@@ -342,7 +342,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The WebHook request must contain an entity body formatted as valid JSON.", error.Message);
+            Assert.Equal("The WebHook request contained invalid JSON: 'Error parsing positive infinity value. Path '', line 0, position 0.'.", error.Message);
         }
 
         [Fact]
@@ -416,7 +416,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The WebHook request must contain an entity body formatted as valid XML.", error.Message);
+            Assert.Equal("The WebHook request contained invalid XML: 'There was an error deserializing the object of type System.Xml.Linq.XElement. The data at the root level is invalid. Line 1, position 1.'.", error.Message);
         }
 
         [Fact]

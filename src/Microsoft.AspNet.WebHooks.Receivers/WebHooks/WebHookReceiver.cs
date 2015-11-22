@@ -81,7 +81,7 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = ReceiverResources.Receiver_BadJson;
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
@@ -333,7 +333,7 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = ReceiverResources.Receiver_BadXml;
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
@@ -373,7 +373,7 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = ReceiverResources.Receiver_BadFormData;
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadFormData, ex.Message);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);

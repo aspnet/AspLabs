@@ -151,7 +151,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as HTML Form Data..
+        ///   Looks up a localized string similar to The WebHook request contained invalid HTML Form Data: &apos;{0}&apos;..
         /// </summary>
         internal static string Receiver_BadFormData {
             get {
@@ -169,7 +169,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as valid JSON..
+        ///   Looks up a localized string similar to The WebHook request contained invalid JSON: &apos;{0}&apos;..
         /// </summary>
         internal static string Receiver_BadJson {
             get {
@@ -205,7 +205,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as valid XML..
+        ///   Looks up a localized string similar to The WebHook request contained invalid XML: &apos;{0}&apos;..
         /// </summary>
         internal static string Receiver_BadXml {
             get {

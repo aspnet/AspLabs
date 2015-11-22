@@ -151,13 +151,13 @@
     <value>The '{0}' query parameter provided in the HTTP request did not match the expected value.</value>
   </data>
   <data name="Receiver_BadFormData" xml:space="preserve">
-    <value>The WebHook request must contain an entity body formatted as HTML Form Data.</value>
+    <value>The WebHook request contained invalid HTML Form Data: '{0}'.</value>
   </data>
   <data name="Receiver_BadHeader" xml:space="preserve">
     <value>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Please ensure that the request contains exactly one '{0}' header field.</value>
   </data>
   <data name="Receiver_BadJson" xml:space="preserve">
-    <value>The WebHook request must contain an entity body formatted as valid JSON.</value>
+    <value>The WebHook request contained invalid JSON: '{0}'.</value>
   </data>
   <data name="Receiver_BadMethod" xml:space="preserve">
     <value>The HTTP '{0}' method is not supported by the '{1}' WebHook receiver.</value>
@@ -169,7 +169,7 @@
     <value>The WebHook signature provided by the '{0}' header field does not match the value expected by the '{1}' receiver. WebHook request is invalid.</value>
   </data>
   <data name="Receiver_BadXml" xml:space="preserve">
-    <value>The WebHook request must contain an entity body formatted as valid XML.</value>
+    <value>The WebHook request contained invalid XML: '{0}'.</value>
   </data>
   <data name="Receiver_NoBody" xml:space="preserve">
     <value>The WebHook request entity body cannot be empty.</value>
