@@ -117,11 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AzureStore_BadWebHook" xml:space="preserve">
-    <value>The '{0}' could not be retrieved from Azure Table store: {1}</value>
-  </data>
-  <data name="AzureStore_NotFound" xml:space="preserve">
-    <value>No entry was found with partition key '{0}' and row key '{1}'.</value>
+  <data name="SqlStore_BadWebHook" xml:space="preserve">
+    <value>The '{0}' could not be retrieved from the SQL store: {1}</value>
   </data>
   <data name="SqlStore_ConcurrencyError" xml:space="preserve">
     <value>Concurrency failure during '{0}' operation: '{1}'.</value>

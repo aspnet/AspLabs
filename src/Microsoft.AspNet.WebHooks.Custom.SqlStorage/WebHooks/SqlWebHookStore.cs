@@ -69,12 +69,39 @@ namespace Microsoft.AspNet.WebHooks
                 using (var context = new WebHookStoreContext())
                 {
                     var registrations = await context.Registrations.Where(r => r.User == user).ToArrayAsync();
-                    var collection = new List<WebHook>();
-                    foreach (var registration in registrations)
-                    {
-                        collection.Add(ConvertFromRegistration(registration));
-                    }
-                    return collection;
+                    ICollection<WebHook> result = registrations.Select(r => ConvertToWebHook(r))
+                        .Where(w => w != null)
+                        .ToArray();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
+                _logger.Error(msg, ex);
+                throw new InvalidOperationException(msg, ex);
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+
+            user = NormalizeKey(user);
+
+            try
+            {
+                using (var context = new WebHookStoreContext())
+                {
+                    var registrations = await context.Registrations.Where(r => r.User == user).ToArrayAsync();
+                    ICollection<WebHook> matches = registrations.Select(r => ConvertToWebHook(r))
+                        .Where(w => MatchesAnyAction(w, actions))
+                        .ToArray();
+                    return matches;
                 }
             }
             catch (Exception ex)
@@ -107,7 +134,7 @@ namespace Microsoft.AspNet.WebHooks
                     var registration = await context.Registrations.Where(r => r.User == user && r.Id == id).FirstOrDefaultAsync();
                     if (registration != null)
                     {
-                        return ConvertFromRegistration(registration);
+                        return ConvertToWebHook(registration);
                     }
                     return null;
                 }
@@ -138,7 +165,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 using (var context = new WebHookStoreContext())
                 {
-                    var registration = ConvertToRegistration(user, webHook);
+                    var registration = ConvertFromWebHook(user, webHook);
                     context.Registrations.Attach(registration);
                     context.Entry(registration).State = EntityState.Added;
                     await context.SaveChangesAsync();
@@ -297,6 +324,41 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        /// <inheritdoc />
+        public override async Task<ICollection<WebHook>> QueryWebHooksAcrossAllUsersAsync(IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
+        {
+            if (actions == null)
+            {
+                throw new ArgumentNullException("actions");
+            }
+
+            predicate = predicate ?? DefaultPredicate;
+
+            try
+            {
+                using (var context = new WebHookStoreContext())
+                {
+                    var registrations = await context.Registrations.ToArrayAsync();
+                    var matches = new List<WebHook>();
+                    foreach (var registration in registrations)
+                    {
+                        WebHook webHook = ConvertToWebHook(registration);
+                        if (MatchesAnyAction(webHook, actions) && predicate(webHook, registration.User))
+                        {
+                            matches.Add(webHook);
+                        }
+                    }
+                    return matches;
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
+                _logger.Error(msg, ex);
+                throw new InvalidOperationException(msg, ex);
+            }
+        }
+
         internal static string CheckSqlStorageConnectionString(SettingsDictionary settings)
         {
             if (settings == null)
@@ -313,14 +375,33 @@ namespace Microsoft.AspNet.WebHooks
             return connection.ConnectionString;
         }
 
-        private WebHook ConvertFromRegistration(Registration registration)
+        private static bool DefaultPredicate(WebHook webHook, string user)
         {
-            string content = _protector.Unprotect(registration.ProtectedData);
-            WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
-            return webHook;
+            return true;
         }
 
-        private Registration ConvertToRegistration(string user, WebHook webHook)
+        private WebHook ConvertToWebHook(Registration registration)
+        {
+            if (registration == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                string content = _protector.Unprotect(registration.ProtectedData);
+                WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
+                return webHook;
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_BadWebHook, typeof(WebHook).Name, ex.Message);
+                _logger.Error(msg, ex);
+            }
+            return null;
+        }
+
+        private Registration ConvertFromWebHook(string user, WebHook webHook)
         {
             string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
             string protectedData = _protector.Protect(content);

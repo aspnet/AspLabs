@@ -61,20 +61,11 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; could not be retrieved from Azure Table store: {1}.
+        ///   Looks up a localized string similar to The &apos;{0}&apos; could not be retrieved from the SQL store: {1}.
         /// </summary>
-        internal static string AzureStore_BadWebHook {
+        internal static string SqlStore_BadWebHook {
             get {
-                return ResourceManager.GetString("AzureStore_BadWebHook", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No entry was found with partition key &apos;{0}&apos; and row key &apos;{1}&apos;..
-        /// </summary>
-        internal static string AzureStore_NotFound {
-            get {
-                return ResourceManager.GetString("AzureStore_NotFound", resourceCulture);
+                return ResourceManager.GetString("SqlStore_BadWebHook", resourceCulture);
             }
         }
         

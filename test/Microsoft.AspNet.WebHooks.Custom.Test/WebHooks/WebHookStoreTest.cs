@@ -13,6 +13,7 @@ namespace Microsoft.AspNet.WebHooks
     {
         private const string OtherUser = "OtherUser";
         private const int WebHookCount = 8;
+        private const int TestId = 32;
 
         private readonly IWebHookStore _store;
 
@@ -64,7 +65,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook w1 = CreateWebHook(TestUser, 32, filter: "h1");
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch");
             await _store.InsertWebHookAsync(TestUser, w1);
 
             // Act
@@ -81,9 +82,10 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook w1 = CreateWebHook(TestUser, 32);
-            w1.IsPaused = true;
+            WebHook w1 = CreateWebHook(TestUser, TestId, isPaused: true);
             await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(TestUser, TestId + 1, isPaused: true, hasWildcard: true);
+            await _store.InsertWebHookAsync(TestUser, w2);
 
             // Act
             ICollection<WebHook> actual = await _store.QueryWebHooksAsync(TestUser, new[] { "a1" });
@@ -98,11 +100,141 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook w1 = CreateWebHook(TestUser, 32, filter: WildcardWebHookFilterProvider.Name);
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch", hasWildcard: true);
             await _store.InsertWebHookAsync(TestUser, w1);
 
             // Act
             ICollection<WebHook> actual = await _store.QueryWebHooksAsync(TestUser, new[] { "a1" });
+
+            // Assert
+            Assert.Equal(WebHookCount + 1, actual.Count);
+            Assert.Equal(WebHookCount, actual.Where(h => h.Filters.Contains("a1")).Count());
+            Assert.Equal(1, actual.Where(h => h.Filters.Contains("*")).Count());
+        }
+
+        [Theory]
+        [InlineData("a1", true)]
+        [InlineData("A1", true)]
+        [InlineData("b1", false)]
+        [InlineData("", false)]
+        public async Task QueryWebHooksAcrossAllUsers_ReturnsExpectedItems(string action, bool present)
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch");
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, filter: "nomatch");
+            await _store.InsertWebHookAsync(TestUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { action }, null);
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
+
+            // Assert
+            int expectedCount = present ? WebHookCount : 0;
+            Assert.Equal(2 * expectedCount, actual.Count);
+            Assert.Equal(expectedCount, actual.Where(h => h.Description == TestUser).Count());
+            Assert.Equal(expectedCount, actual.Where(h => h.Description == OtherUser).Count());
+        }
+
+        [Fact]
+        public async Task QueryWebHooksAcrossAllUsers_SkipsPausedWebHooks()
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, isPaused: true);
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, isPaused: true);
+            await _store.InsertWebHookAsync(TestUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { "a1" }, null);
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
+
+            // Assert
+            Assert.Equal(2 * WebHookCount, actual.Count);
+            Assert.Equal(WebHookCount, actual.Where(h => h.Description == TestUser).Count());
+            Assert.Equal(WebHookCount, actual.Where(h => h.Description == OtherUser).Count());
+        }
+
+        [Fact]
+        public async Task QueryWebHooksAcrossAllUsers_FindsWildcards()
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch", hasWildcard: true);
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, filter: "nomatch", hasWildcard: true);
+            await _store.InsertWebHookAsync(TestUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { "a1" }, null);
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
+
+            // Assert
+            Assert.Equal((2 * WebHookCount) + 2, actual.Count);
+            Assert.Equal(2 * WebHookCount, actual.Where(h => h.Filters.Contains("a1")).Count());
+            Assert.Equal(2, actual.Where(h => h.Filters.Contains("*")).Count());
+        }
+
+        [Theory]
+        [InlineData("a1", true)]
+        [InlineData("A1", true)]
+        [InlineData("b1", false)]
+        [InlineData("", false)]
+        public async Task QueryWebHooksAcrossAllUsers_ReturnsExpectedItemsWithPredicate(string action, bool present)
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch");
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, filter: "nomatch");
+            await _store.InsertWebHookAsync(TestUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { action }, (w, u) => u == TestUser.ToLowerInvariant());
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
+
+            // Assert
+            int expectedCount = present ? WebHookCount : 0;
+            Assert.Equal(expectedCount, actual.Count);
+            Assert.Equal(expectedCount, actual.Where(h => h.Description == TestUser).Count());
+            Assert.Equal(0, actual.Where(h => h.Description == OtherUser).Count());
+        }
+
+        [Fact]
+        public async Task QueryWebHooksAcrossAllUsers_SkipsPausedWebHooksWithPredicate()
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, isPaused: true);
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, isPaused: true);
+            await _store.InsertWebHookAsync(TestUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { "a1" }, (w, u) => u == TestUser.ToLowerInvariant());
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
+
+            // Assert
+            Assert.Equal(WebHookCount, actual.Count);
+            Assert.Equal(WebHookCount, actual.Where(h => h.Description == TestUser).Count());
+            Assert.Equal(0, actual.Where(h => h.Description == OtherUser).Count());
+        }
+
+        [Fact]
+        public async Task QueryWebHooksAcrossAllUsers_FindsWildcardsWithPredicate()
+        {
+            // Arrange
+            await Initialize();
+            WebHook w1 = CreateWebHook(TestUser, TestId, filter: "nomatch", hasWildcard: true);
+            await _store.InsertWebHookAsync(TestUser, w1);
+            WebHook w2 = CreateWebHook(OtherUser, TestId + 1, filter: "nomatch", hasWildcard: true);
+            await _store.InsertWebHookAsync(OtherUser, w2);
+
+            // Act
+            ICollection<WebHook> all = await _store.QueryWebHooksAcrossAllUsersAsync(new[] { "a1" }, (w, u) => u == TestUser.ToLowerInvariant());
+            ICollection<WebHook> actual = all.Where(w => w.Description == TestUser || w.Description == OtherUser).ToArray();
 
             // Assert
             Assert.Equal(WebHookCount + 1, actual.Count);
@@ -139,7 +271,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook webHook = CreateWebHook(TestUser, 32);
+            WebHook webHook = CreateWebHook(TestUser, TestId);
 
             // Act
             StoreResult actual = await _store.InsertWebHookAsync(TestUser, webHook);
@@ -153,7 +285,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook webHook = CreateWebHook(TestUser, 32);
+            WebHook webHook = CreateWebHook(TestUser, TestId);
 
             // Act
             StoreResult actual1 = await _store.InsertWebHookAsync(TestUser, webHook);
@@ -186,7 +318,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             await Initialize();
-            WebHook webHook = CreateWebHook(TestUser, 32);
+            WebHook webHook = CreateWebHook(TestUser, TestId);
 
             // Act
             StoreResult actual = await _store.UpdateWebHookAsync(TestUser, webHook);
@@ -255,11 +387,12 @@ namespace Microsoft.AspNet.WebHooks
             Assert.Empty(actual2);
         }
 
-        protected static WebHook CreateWebHook(string user, int offset, string filter = "a1")
+        protected static WebHook CreateWebHook(string user, int offset, string filter = "a1", bool isPaused = false, bool hasWildcard = false)
         {
             WebHook hook = new WebHook
             {
                 Id = offset.ToString(),
+                IsPaused = isPaused,
                 Description = user,
                 Secret = "123456789012345678901234567890123456789012345678",
                 WebHookUri = "http://localhost/hook/" + offset
@@ -267,6 +400,10 @@ namespace Microsoft.AspNet.WebHooks
             hook.Headers.Add("h1", "hv1");
             hook.Properties.Add("p1", "pv1");
             hook.Filters.Add(filter);
+            if (hasWildcard)
+            {
+                hook.Filters.Add(WildcardWebHookFilterProvider.Name);
+            }
             return hook;
         }
 
@@ -280,7 +417,7 @@ namespace Microsoft.AspNet.WebHooks
                 await _store.InsertWebHookAsync(TestUser, webHook);
             }
 
-            // Insert items for other user which should not show up
+            // Insert items for other user
             await _store.DeleteAllWebHooksAsync(OtherUser);
             for (int cnt = 0; cnt < WebHookCount; cnt++)
             {

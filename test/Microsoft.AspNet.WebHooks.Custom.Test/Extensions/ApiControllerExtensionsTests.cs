@@ -18,6 +18,7 @@ namespace System.Web.Http
     {
         private Mock<IWebHookManager> _managerMock;
         private Mock<IDependencyResolver> _resolverMock;
+        private IWebHookUser _user;
         private HttpRequestContext _context;
         private ApiController _controller;
         private IPrincipal _principal;
@@ -25,15 +26,12 @@ namespace System.Web.Http
         public ApiControllerExtensionsTests()
         {
             HttpConfiguration config = new HttpConfiguration();
-            IWebHookUser user = new WebHookUser();
+            _user = new WebHookUser();
 
             _managerMock = new Mock<IWebHookManager>();
             _resolverMock = new Mock<IDependencyResolver>();
             _resolverMock.Setup(r => r.GetService(typeof(IWebHookManager)))
                 .Returns(_managerMock.Object)
-                .Verifiable();
-            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
-                .Returns(user)
                 .Verifiable();
 
             config.DependencyResolver = _resolverMock.Object;
@@ -57,6 +55,11 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesNullData()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             await _controller.NotifyAsync("a1", data: null);
 
@@ -68,6 +71,11 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesNoNotifications()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             int actual = await _controller.NotifyAsync();
 
@@ -78,6 +86,11 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesEmptyDictionaryData()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             await _controller.NotifyAsync("a1", new Dictionary<string, object>());
 
@@ -89,6 +102,11 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesEmptyObjectData()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             await _controller.NotifyAsync("a1", new object());
 
@@ -100,6 +118,11 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesNonemptyDictionaryData()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             await _controller.NotifyAsync("a1", new Dictionary<string, object>() { { "d1", "v1" } });
 
@@ -111,11 +134,130 @@ namespace System.Web.Http
         [Fact]
         public async Task NotifyAsync_HandlesNonemptyObjectData()
         {
+            // Arrange
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookUser)))
+                .Returns(_user)
+                .Verifiable();
+
             // Act
             await _controller.NotifyAsync("a1", new { d1 = "v1" });
 
             // Assert
             _managerMock.Verify(m => m.NotifyAsync("TestUser", It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1" && (string)n.Single()["d1"] == "v1")));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNullData()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", data: null);
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNullDataAndNullPredicate()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", data: null, predicate: null);
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNoNotifications()
+        {
+            // Act
+            int actual = await _controller.NotifyAllAsync(notifications: new NotificationDictionary[0]);
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNoNotificationsAndNoPredicate()
+        {
+            // Act
+            int actual = await _controller.NotifyAllAsync(notifications: new NotificationDictionary[0], predicate: null);
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesEmptyDictionaryData()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", new Dictionary<string, object>());
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesEmptyDictionaryDataAndNoPredicate()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", new Dictionary<string, object>());
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesEmptyObjectData()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", new object());
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesEmptyObjectDataAndNoPredicate()
+        {
+            // Act
+            await _controller.NotifyAllAsync("a1", new object(), predicate: null);
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1"), null));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNonemptyDictionaryDataAndPredicate()
+        {
+            // Arrange
+            Func<WebHook, string, bool> predicate = (w, s) => true;
+
+            // Act
+            await _controller.NotifyAllAsync("a1", new Dictionary<string, object>() { { "d1", "v1" } }, predicate);
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1" && (string)n.Single()["d1"] == "v1"), predicate));
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public async Task NotifyAllAsync_HandlesNonemptyObjectDataAndPredicate()
+        {
+            // Arrange
+            Func<WebHook, string, bool> predicate = (w, s) => true;
+
+            // Act
+            await _controller.NotifyAllAsync("a1", new { d1 = "v1" }, predicate);
+
+            // Assert
+            _managerMock.Verify(m => m.NotifyAllAsync(It.Is<IEnumerable<NotificationDictionary>>(n => n.Single().Action == "a1" && (string)n.Single()["d1"] == "v1"), predicate));
             _resolverMock.Verify();
         }
 

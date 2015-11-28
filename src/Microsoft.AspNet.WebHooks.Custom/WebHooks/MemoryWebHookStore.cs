@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.WebHooks
@@ -15,20 +16,20 @@ namespace Microsoft.AspNet.WebHooks
     /// <remarks>Actual deployments should replace this with a persistent store, for example provided by
     /// <c>Microsoft.AspNet.WebHooks.Custom.AzureStorage</c>.
     /// </remarks>
-    public class MemoryWebHookStore : IWebHookStore
+    public class MemoryWebHookStore : WebHookStore
     {
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, WebHook>> _store =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, WebHook>>();
 
         /// <inheritdoc />
-        public Task<ICollection<WebHook>> GetAllWebHooksAsync(string user)
+        public override Task<ICollection<WebHook>> GetAllWebHooksAsync(string user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException("user");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             ConcurrentDictionary<string, WebHook> userHooks;
             ICollection<WebHook> result = _store.TryGetValue(user, out userHooks) ? userHooks.Values : new Collection<WebHook>();
@@ -36,7 +37,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        public override Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
         {
             if (user == null)
             {
@@ -47,35 +48,21 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("actions");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
-            ICollection<WebHook> matches = new List<WebHook>();
             ConcurrentDictionary<string, WebHook> userHooks;
             if (_store.TryGetValue(user, out userHooks))
             {
-                foreach (WebHook webHook in userHooks.Values)
-                {
-                    if (webHook.IsPaused)
-                    {
-                        continue;
-                    }
-
-                    foreach (string action in actions)
-                    {
-                        if (webHook.MatchesAction(action))
-                        {
-                            matches.Add(webHook);
-                            break;
-                        }
-                    }
-                }
+                ICollection<WebHook> matches = userHooks.Values.Where(w => MatchesAnyAction(w, actions))
+                    .ToArray();
+                return Task.FromResult(matches);
             }
 
-            return Task.FromResult(matches);
+            return Task.FromResult<ICollection<WebHook>>(new WebHook[0]);
         }
 
         /// <inheritdoc />
-        public Task<WebHook> LookupWebHookAsync(string user, string id)
+        public override Task<WebHook> LookupWebHookAsync(string user, string id)
         {
             if (user == null)
             {
@@ -86,13 +73,13 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("id");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             WebHook result = null;
             ConcurrentDictionary<string, WebHook> userHooks;
             if (_store.TryGetValue(user, out userHooks))
             {
-                id = Normalize(id);
+                id = NormalizeKey(id);
                 userHooks.TryGetValue(id, out result);
             }
 
@@ -100,7 +87,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task<StoreResult> InsertWebHookAsync(string user, WebHook webHook)
+        public override Task<StoreResult> InsertWebHookAsync(string user, WebHook webHook)
         {
             if (user == null)
             {
@@ -111,18 +98,18 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("webHook");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             ConcurrentDictionary<string, WebHook> userHooks = _store.GetOrAdd(user, key => new ConcurrentDictionary<string, WebHook>());
 
-            string id = Normalize(webHook.Id);
+            string id = NormalizeKey(webHook.Id);
             bool inserted = userHooks.TryAdd(id, webHook);
             StoreResult result = inserted ? StoreResult.Success : StoreResult.Conflict;
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task<StoreResult> UpdateWebHookAsync(string user, WebHook webHook)
+        public override Task<StoreResult> UpdateWebHookAsync(string user, WebHook webHook)
         {
             if (user == null)
             {
@@ -133,13 +120,13 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("webHook");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             ConcurrentDictionary<string, WebHook> userHooks;
             StoreResult result = StoreResult.NotFound;
             if (_store.TryGetValue(user, out userHooks))
             {
-                string id = Normalize(webHook.Id);
+                string id = NormalizeKey(webHook.Id);
 
                 WebHook current;
                 if (userHooks.TryGetValue(id, out current))
@@ -152,7 +139,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task<StoreResult> DeleteWebHookAsync(string user, string id)
+        public override Task<StoreResult> DeleteWebHookAsync(string user, string id)
         {
             if (user == null)
             {
@@ -163,14 +150,14 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("id");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             bool deleted = false;
             ConcurrentDictionary<string, WebHook> userHooks;
             StoreResult result = StoreResult.NotFound;
             if (_store.TryGetValue(user, out userHooks))
             {
-                id = Normalize(id);
+                id = NormalizeKey(id);
 
                 WebHook current;
                 deleted = userHooks.TryRemove(id, out current);
@@ -180,14 +167,14 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task DeleteAllWebHooksAsync(string user)
+        public override Task DeleteAllWebHooksAsync(string user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException("user");
             }
 
-            user = Normalize(user);
+            user = NormalizeKey(user);
 
             ConcurrentDictionary<string, WebHook> userHooks;
             if (_store.TryGetValue(user, out userHooks))
@@ -198,9 +185,27 @@ namespace Microsoft.AspNet.WebHooks
             return Task.FromResult(true);
         }
 
-        private static string Normalize(string value)
+        /// <inheritdoc />
+        public override Task<ICollection<WebHook>> QueryWebHooksAcrossAllUsersAsync(IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
         {
-            return value.ToLowerInvariant();
+            if (actions == null)
+            {
+                throw new ArgumentNullException("actions");
+            }
+
+            predicate = predicate ?? DefaultPredicate;
+
+            var matches = new List<WebHook>();
+            foreach (var user in _store)
+            {
+                matches.AddRange(user.Value.Where(w => MatchesAnyAction(w.Value, actions) && predicate(w.Value, user.Key)).Select(w => w.Value));
+            }
+            return Task.FromResult<ICollection<WebHook>>(matches);
+        }
+
+        private static bool DefaultPredicate(WebHook webHook, string user)
+        {
+            return true;
         }
     }
 }

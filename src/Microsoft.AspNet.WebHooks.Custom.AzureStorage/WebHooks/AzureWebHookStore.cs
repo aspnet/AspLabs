@@ -20,7 +20,7 @@ namespace Microsoft.AspNet.WebHooks
     /// Provides an implementation of <see cref="IWebHookStore"/> storing registered WebHooks in Microsoft Azure Table Storage.
     /// </summary>
     [CLSCompliant(false)]
-    public class AzureWebHookStore : IWebHookStore
+    public class AzureWebHookStore : WebHookStore
     {
         internal const string AzureStoreConnectionStringName = "MS_AzureStoreConnectionString";
         internal const string WebHookTable = "WebHooks";
@@ -64,7 +64,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<ICollection<WebHook>> GetAllWebHooksAsync(string user)
+        public override async Task<ICollection<WebHook>> GetAllWebHooksAsync(string user)
         {
             if (user == null)
             {
@@ -77,15 +77,15 @@ namespace Microsoft.AspNet.WebHooks
             TableQuery query = new TableQuery();
             _manager.AddPartitionKeyConstraint(query, user);
 
-            IEnumerable<DynamicTableEntity> entries = await _manager.ExecuteQueryAsync(table, query);
-            ICollection<WebHook> result = entries.Select(e => ConvertToWebHook(e))
+            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            ICollection<WebHook> result = entities.Select(e => ConvertToWebHook(e))
                 .Where(w => w != null)
                 .ToArray();
             return result;
         }
 
         /// <inheritdoc />
-        public async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
         {
             if (user == null)
             {
@@ -96,30 +96,21 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("actions");
             }
 
-            ICollection<WebHook> webHooks = await GetAllWebHooksAsync(user);
-            ICollection<WebHook> matches = new List<WebHook>();
-            foreach (WebHook webHook in webHooks)
-            {
-                if (webHook.IsPaused)
-                {
-                    continue;
-                }
+            user = NormalizeKey(user);
 
-                foreach (string action in actions)
-                {
-                    if (webHook.MatchesAction(action))
-                    {
-                        matches.Add(webHook);
-                        break;
-                    }
-                }
-            }
+            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            TableQuery query = new TableQuery();
+            _manager.AddPartitionKeyConstraint(query, user);
 
+            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            ICollection<WebHook> matches = entities.Select(e => ConvertToWebHook(e))
+                .Where(w => MatchesAnyAction(w, actions))
+                .ToArray();
             return matches;
         }
 
         /// <inheritdoc />
-        public async Task<WebHook> LookupWebHookAsync(string user, string id)
+        public override async Task<WebHook> LookupWebHookAsync(string user, string id)
         {
             if (user == null)
             {
@@ -147,7 +138,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<StoreResult> InsertWebHookAsync(string user, WebHook webHook)
+        public override async Task<StoreResult> InsertWebHookAsync(string user, WebHook webHook)
         {
             if (user == null)
             {
@@ -176,7 +167,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<StoreResult> UpdateWebHookAsync(string user, WebHook webHook)
+        public override async Task<StoreResult> UpdateWebHookAsync(string user, WebHook webHook)
         {
             if (user == null)
             {
@@ -205,7 +196,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<StoreResult> DeleteWebHookAsync(string user, string id)
+        public override async Task<StoreResult> DeleteWebHookAsync(string user, string id)
         {
             if (user == null)
             {
@@ -236,7 +227,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task DeleteAllWebHooksAsync(string user)
+        public override async Task DeleteAllWebHooksAsync(string user)
         {
             if (user == null)
             {
@@ -247,6 +238,32 @@ namespace Microsoft.AspNet.WebHooks
 
             CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
             await _manager.ExecuteDeleteAllAsync(table, user, filter: null);
+        }
+
+        /// <inheritdoc />
+        public override async Task<ICollection<WebHook>> QueryWebHooksAcrossAllUsersAsync(IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
+        {
+            if (actions == null)
+            {
+                throw new ArgumentNullException("actions");
+            }
+
+            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            TableQuery query = new TableQuery();
+
+            predicate = predicate ?? DefaultPredicate;
+
+            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            var matches = new List<WebHook>();
+            foreach (var entity in entities)
+            {
+                WebHook webHook = ConvertToWebHook(entity);
+                if (MatchesAnyAction(webHook, actions) && predicate(webHook, entity.PartitionKey))
+                {
+                    matches.Add(webHook);
+                }
+            }
+            return matches;
         }
 
         private static string GetAzureStorageConnectionString(SettingsDictionary settings)
@@ -265,9 +282,9 @@ namespace Microsoft.AspNet.WebHooks
             return connection.ConnectionString;
         }
 
-        private static string NormalizeKey(string value)
+        private static bool DefaultPredicate(WebHook webHook, string user)
         {
-            return value.ToLowerInvariant();
+            return true;
         }
 
         private static StoreResult GetStoreResult(TableResult result)

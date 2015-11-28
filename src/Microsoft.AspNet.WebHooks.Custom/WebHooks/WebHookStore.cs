@@ -23,38 +23,7 @@ namespace Microsoft.AspNet.WebHooks
         public abstract Task<ICollection<WebHook>> GetAllWebHooksAsync(string user);
 
         /// <inheritdoc />
-        public virtual async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException("user");
-            }
-            if (actions == null)
-            {
-                throw new ArgumentNullException("actions");
-            }
-
-            ICollection<WebHook> webHooks = await GetAllWebHooksAsync(user);
-            ICollection<WebHook> matches = new List<WebHook>();
-            foreach (WebHook webHook in webHooks)
-            {
-                if (webHook.IsPaused)
-                {
-                    continue;
-                }
-
-                foreach (string action in actions)
-                {
-                    if (webHook.MatchesAction(action))
-                    {
-                        matches.Add(webHook);
-                        break;
-                    }
-                }
-            }
-
-            return matches;
-        }
+        public abstract Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions);
 
         /// <inheritdoc />
         public abstract Task<WebHook> LookupWebHookAsync(string user, string id);
@@ -71,6 +40,9 @@ namespace Microsoft.AspNet.WebHooks
         /// <inheritdoc />
         public abstract Task DeleteAllWebHooksAsync(string user);
 
+        /// <inheritdoc />
+        public abstract Task<ICollection<WebHook>> QueryWebHooksAcrossAllUsersAsync(IEnumerable<string> actions, Func<WebHook, string, bool> predicate);
+
         /// <summary>
         /// Normalizes a given key to ensure consistent lookups.
         /// </summary>
@@ -83,6 +55,18 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("key");
             }
             return key.ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Checks that the given <paramref name="webHook"/> is not paused and matches at least
+        /// one of the given <paramref name="actions"/>.
+        /// </summary>
+        /// <param name="webHook">The <see cref="WebHook"/> instance to operate on.</param>
+        /// <param name="actions">The set of actions to match against the <paramref name="webHook"/> filters.</param>
+        /// <returns><c>true</c> if the given <paramref name="webHook"/> matches one of the pro</returns>
+        protected virtual bool MatchesAnyAction(WebHook webHook, IEnumerable<string> actions)
+        {
+            return webHook != null && !webHook.IsPaused && webHook.MatchesAnyAction(actions);
         }
     }
 }

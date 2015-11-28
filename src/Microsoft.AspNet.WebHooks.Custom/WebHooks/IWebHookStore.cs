@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -67,5 +68,15 @@ namespace Microsoft.AspNet.WebHooks
         /// Deletes all existing <see cref="WebHook"/> instances for a given <paramref name="user"/>.
         /// </summary>
         Task DeleteAllWebHooksAsync(string user);
+
+        /// <summary>
+        /// Gets all active <see cref="WebHook"/> instances across all users with subscriptions that match the given <paramref name="predicate"/>.
+        /// </summary>
+        /// <param name="actions">The set of actions that determines matching <see cref="WebHook"/> instances.</param>
+        /// <param name="predicate">An optional function to test each <see cref="WebHook"/> to see whether it fulfills the condition. The
+        /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+        /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
+        /// <returns>A collection of matching (and active) <see cref="WebHook"/> instances.</returns>
+        Task<ICollection<WebHook>> QueryWebHooksAcrossAllUsersAsync(IEnumerable<string> actions, Func<WebHook, string, bool> predicate);
     }
 }

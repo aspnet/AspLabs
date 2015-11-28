@@ -219,6 +219,33 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
+        public async Task<int> NotifyAllAsync(IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
+        {
+            if (notifications == null)
+            {
+                throw new ArgumentNullException("notifications");
+            }
+
+            // Get all actions in this batch
+            ICollection<NotificationDictionary> nots = notifications.ToArray();
+            string[] actions = nots.Select(n => n.Action).ToArray();
+
+            // Find all active WebHooks that matches at least one of the actions
+            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAcrossAllUsersAsync(actions, predicate);
+
+            // For each WebHook set up a work item with the right set of notifications
+            IEnumerable<WebHookWorkItem> workItems = GetWorkItems(webHooks, nots);
+
+            // Start sending WebHooks
+            foreach (WebHookWorkItem workItem in workItems)
+            {
+                _launchers[0].Post(workItem);
+            }
+
+            return webHooks.Count;
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
