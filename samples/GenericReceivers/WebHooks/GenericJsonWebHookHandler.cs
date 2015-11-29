@@ -12,7 +12,7 @@ namespace GenericReceivers.WebHooks
             this.Receiver = "genericjson";
         }
 
-        public override Task ExecuteAsync(string generator, WebHookHandlerContext context)
+        public override Task ExecuteAsync(string receiver, WebHookHandlerContext context)
         {
             // Get JSON from WebHook
             JObject data = context.GetDataOrDefault<JObject>();
