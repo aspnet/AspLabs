@@ -11,6 +11,7 @@ using EF = Microsoft.AspNet.WebHooks.Migrations;
 
 namespace Microsoft.AspNet.WebHooks
 {
+    [Collection("StoreCollection")]
     public class SqlWebHookStoreTests : WebHookStoreTest
     {
         public SqlWebHookStoreTests()

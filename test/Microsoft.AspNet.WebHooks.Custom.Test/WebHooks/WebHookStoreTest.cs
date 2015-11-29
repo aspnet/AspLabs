@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
+    [Collection("StoreCollection")]
     public abstract class WebHookStoreTest
     {
         private const string OtherUser = "OtherUser";

@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
+    [Collection("StoreCollection")]
     public class AzureWebHookStoreTests : WebHookStoreTest
     {
         public AzureWebHookStoreTests()
