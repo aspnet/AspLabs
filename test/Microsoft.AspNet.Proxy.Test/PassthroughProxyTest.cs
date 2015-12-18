@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.TestHost;
 using Xunit;
 
@@ -46,10 +47,12 @@ namespace Microsoft.AspNet.Proxy.Test
                 }
             };
 
-            var server = TestServer.Create(app =>
-            {
-                app.RunProxy(options);
-            });
+            var builder = new WebApplicationBuilder()
+                .Configure(app =>
+                {
+                    app.RunProxy(options);
+                });
+            var server = new TestServer(builder);
 
             var requestMessage = new HttpRequestMessage(new HttpMethod(MethodType), "");
             var responseMessage = await server.CreateClient().SendAsync(requestMessage);
@@ -95,10 +98,12 @@ namespace Microsoft.AspNet.Proxy.Test
                 }
             };
 
-            var server = TestServer.Create(app =>
-            {
-                app.RunProxy(options);
-            });
+            var builder = new WebApplicationBuilder()
+                .Configure(app =>
+                {
+                    app.RunProxy(options);
+                });
+            var server = new TestServer(builder);
 
             var requestMessage = new HttpRequestMessage(new HttpMethod(MethodType), "");
             requestMessage.Content = new StringContent("Request Body");
