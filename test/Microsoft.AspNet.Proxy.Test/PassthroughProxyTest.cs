@@ -24,33 +24,30 @@ namespace Microsoft.AspNet.Proxy.Test
         [InlineData("DELETE", "3004")]
         public async Task PassthroughRequestsWithoutBodyWithResponseHeaders(string MethodType, string Port)
         {
-            var options = new ProxyOptions()
-            {
-                Scheme = "http",
-                Host = "localhost",
-                Port = Port
-            };
-
-            options.BackChannelMessageHandler = new TestMessageHandler
-            {
-                Sender = req =>
-                {
-                    IEnumerable<string> hostValue;
-                    req.Headers.TryGetValues("Host", out hostValue);
-                    Assert.Equal("localhost:" + Port, hostValue.Single());
-                    Assert.Equal("http://localhost:"+Port+"/", req.RequestUri.ToString());
-                    Assert.Equal(new HttpMethod(MethodType), req.Method);
-                    var response = new HttpResponseMessage(HttpStatusCode.Created);
-                    response.Headers.Add("testHeader", "testHeaderValue");
-                    response.Content = new StringContent("Response Body");
-                    return response;
-                }
-            };
-
             var builder = new WebApplicationBuilder()
                 .Configure(app =>
                 {
-                    app.RunProxy(options);
+                    app.RunProxy(options =>
+                    {
+                        options.Scheme = "http";
+                        options.Host = "localhost";
+                        options.Port = Port;
+                        options.BackChannelMessageHandler = new TestMessageHandler
+                        {
+                            Sender = req =>
+                            {
+                                IEnumerable<string> hostValue;
+                                req.Headers.TryGetValues("Host", out hostValue);
+                                Assert.Equal("localhost:" + Port, hostValue.Single());
+                                Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
+                                Assert.Equal(new HttpMethod(MethodType), req.Method);
+                                var response = new HttpResponseMessage(HttpStatusCode.Created);
+                                response.Headers.Add("testHeader", "testHeaderValue");
+                                response.Content = new StringContent("Response Body");
+                                return response;
+                            }
+                        };
+                    });
                 });
             var server = new TestServer(builder);
 
@@ -72,36 +69,33 @@ namespace Microsoft.AspNet.Proxy.Test
         [InlineData("NewHttpMethod", "3008")]
         public async Task PassthroughReuestWithBody(string MethodType, string Port)
         {
-            var options = new ProxyOptions()
-            {
-                Scheme = "http",
-                Host = "localhost",
-                Port = Port
-            };
-
-            options.BackChannelMessageHandler = new TestMessageHandler
-            {
-                Sender = req =>
-                {
-                    IEnumerable<string> hostValue;
-                    req.Headers.TryGetValues("Host", out hostValue);
-                    Assert.Equal("localhost:" + Port, hostValue.Single());
-                    Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
-                    Assert.Equal(new HttpMethod(MethodType), req.Method);
-                    var content = req.Content.ReadAsStringAsync();
-                    Assert.True(content.Wait(3000) && !content.IsFaulted);
-                    Assert.Equal("Request Body", content.Result);
-                    var response = new HttpResponseMessage(HttpStatusCode.Created);
-                    response.Headers.Add("testHeader", "testHeaderValue");
-                    response.Content = new StringContent("Response Body");
-                    return response;
-                }
-            };
-
             var builder = new WebApplicationBuilder()
                 .Configure(app =>
                 {
-                    app.RunProxy(options);
+                    app.RunProxy(options =>
+                    {
+                        options.Scheme = "http";
+                        options.Host = "localhost";
+                        options.Port = Port;
+                        options.BackChannelMessageHandler = new TestMessageHandler
+                        {
+                            Sender = req =>
+                            {
+                                IEnumerable<string> hostValue;
+                                req.Headers.TryGetValues("Host", out hostValue);
+                                Assert.Equal("localhost:" + Port, hostValue.Single());
+                                Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
+                                Assert.Equal(new HttpMethod(MethodType), req.Method);
+                                var content = req.Content.ReadAsStringAsync();
+                                Assert.True(content.Wait(3000) && !content.IsFaulted);
+                                Assert.Equal("Request Body", content.Result);
+                                var response = new HttpResponseMessage(HttpStatusCode.Created);
+                                response.Headers.Add("testHeader", "testHeaderValue");
+                                response.Content = new StringContent("Response Body");
+                                return response;
+                            }
+                        };
+                    });
                 });
             var server = new TestServer(builder);
 
