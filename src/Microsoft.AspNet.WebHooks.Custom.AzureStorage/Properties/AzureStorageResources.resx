@@ -117,14 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AzureSender_AddFailure" xml:space="preserve">
+    <value>Could not add messages to Azure Queue: {0}.</value>
+  </data>
   <data name="AzureStore_BadWebHook" xml:space="preserve">
     <value>The '{0}' could not be retrieved from Azure Table store: {1}</value>
   </data>
   <data name="AzureStore_NoConnectionString" xml:space="preserve">
-    <value>Please provide an Azure Table Storage connection string with name '{0}' in the configuration string section of the 'Web.Config' file.</value>
+    <value>Please provide a Microsoft Azure Storage connection string with name '{0}' in the configuration string section of the 'Web.Config' file.</value>
   </data>
   <data name="AzureStore_NotFound" xml:space="preserve">
     <value>No entry was found with partition key '{0}' and row key '{1}'.</value>
+  </data>
+  <data name="DequeueManager_Started" xml:space="preserve">
+    <value>This '{0}' instance has already been started. It can only be started once.</value>
   </data>
   <data name="StorageManager_BadContinuationToken" xml:space="preserve">
     <value>Invalid continuation token: '{0}'.</value>

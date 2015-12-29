@@ -60,6 +60,24 @@ namespace System.Web.Mvc
         }
 
         /// <summary>
+        /// Gets an <see cref="IWebHookSender"/> implementation registered with the Dependency Injection engine
+        /// or a default implementation if none are registered.
+        /// </summary>
+        /// <param name="services">The <see cref="IDependencyResolver"/> implementation.</param>
+        /// <returns>The registered <see cref="IWebHookSender"/> instance or a default implementation if none are registered.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
+        public static IWebHookSender GetSender(this IDependencyResolver services)
+        {
+            IWebHookSender sender = services.GetService<IWebHookSender>();
+            if (sender == null)
+            {
+                ILogger logger = services.GetLogger();
+                sender = CustomServices.GetSender(logger);
+            }
+            return sender;
+        }
+
+        /// <summary>
         /// Gets an <see cref="IWebHookManager"/> implementation registered with the Dependency Injection engine
         /// or a default implementation if none are registered.
         /// </summary>
@@ -72,8 +90,9 @@ namespace System.Web.Mvc
             if (manager == null)
             {
                 IWebHookStore store = services.GetStore();
+                IWebHookSender sender = services.GetSender();
                 ILogger logger = services.GetLogger();
-                manager = CustomServices.GetManager(store, logger);
+                manager = CustomServices.GetManager(store, sender, logger);
             }
             return manager;
         }

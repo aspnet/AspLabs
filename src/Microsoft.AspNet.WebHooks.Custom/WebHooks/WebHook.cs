@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNet.WebHooks.Properties;
 
 namespace Microsoft.AspNet.WebHooks
@@ -54,9 +53,8 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets or sets the URI of the WebHook.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "This is part of a wire contract.")]
         [Required]
-        public string WebHookUri { get; set; }
+        public Uri WebHookUri { get; set; }
 
         /// <summary>
         /// Gets or sets the secret used to sign the body of the WebHook request.

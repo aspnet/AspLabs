@@ -7,7 +7,7 @@ using System.Reflection;
 using Microsoft.AspNet.WebHooks.Controllers;
 using Xunit;
 
-namespace Microsoft.AspNet.WebHooks.WebHooks
+namespace Microsoft.AspNet.WebHooks
 {
     public class WebHookAssemblyResolverTests
     {

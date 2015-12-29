@@ -396,7 +396,7 @@ namespace Microsoft.AspNet.WebHooks
                 IsPaused = isPaused,
                 Description = user,
                 Secret = "123456789012345678901234567890123456789012345678",
-                WebHookUri = "http://localhost/hook/" + offset
+                WebHookUri = new Uri("http://localhost/hook/" + offset)
             };
             hook.Headers.Add("h1", "hv1");
             hook.Properties.Add("p1", "pv1");

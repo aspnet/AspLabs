@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.ComponentModel;
+using System.Threading;
 using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks;
 using Microsoft.AspNet.WebHooks.Config;
@@ -21,6 +22,30 @@ namespace System.Web.Http
         private const string ApplicationName = "Microsoft.AspNet.WebHooks";
         private const string Purpose = "WebHookPersistence";
         private const string DataProtectionKeysFolderName = "DataProtection-Keys";
+
+        private static IStorageManager _storageManager;
+
+        /// <summary>
+        /// Configures a Microsoft Azure Table Storage implementation of <see cref="IWebHookStore"/>
+        /// which provides a persistent store for registered WebHooks used by the custom WebHooks module.
+        /// </summary>
+        /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>
+        public static void InitializeCustomWebHooksAzureQueueSender(this HttpConfiguration config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
+
+            WebHooksConfig.Initialize(config);
+
+            ILogger logger = config.DependencyResolver.GetLogger();
+            SettingsDictionary settings = config.DependencyResolver.GetSettings();
+
+            IStorageManager storageManager = GetStorageManager(logger);
+            IWebHookSender sender = new AzureWebHookSender(storageManager, settings, logger);
+            CustomServices.SetSender(sender);
+        }
 
         /// <summary>
         /// Configures a Microsoft Azure Table Storage implementation of <see cref="IWebHookStore"/>
@@ -42,7 +67,7 @@ namespace System.Web.Http
             IDataProtectionProvider provider = GetDataProtectionProvider();
             IDataProtector protector = provider.CreateProtector(Purpose);
 
-            IStorageManager storageManager = new StorageManager(logger);
+            IStorageManager storageManager = GetStorageManager(logger);
             IWebHookStore store = new AzureWebHookStore(storageManager, settings, protector, logger);
             CustomServices.SetStore(store);
         }
@@ -58,6 +83,18 @@ namespace System.Web.Http
             serviceCollection.AddDataProtection();
             IServiceProvider services = serviceCollection.BuildServiceProvider();
             return services.GetDataProtectionProvider();
+        }
+
+        internal static IStorageManager GetStorageManager(ILogger logger)
+        {
+            if (_storageManager != null)
+            {
+                return _storageManager;
+            }
+
+            IStorageManager instance = new StorageManager(logger);
+            Interlocked.CompareExchange(ref _storageManager, instance, null);
+            return _storageManager;
         }
     }
 }

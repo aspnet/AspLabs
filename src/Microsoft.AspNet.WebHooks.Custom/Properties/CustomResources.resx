@@ -132,6 +132,9 @@
   <data name="Manager_InvalidHeader" xml:space="preserve">
     <value>Could not add header field '{0}' to the WebHook request for WebHook ID '{1}'.</value>
   </data>
+  <data name="Manager_NoHttpUri" xml:space="preserve">
+    <value>The WebHook URI must be absolute with a scheme of either 'http' or 'https' but received '{0}'.</value>
+  </data>
   <data name="Manager_NoUser" xml:space="preserve">
     <value>Could not determine the user ID from the given principal.</value>
   </data>

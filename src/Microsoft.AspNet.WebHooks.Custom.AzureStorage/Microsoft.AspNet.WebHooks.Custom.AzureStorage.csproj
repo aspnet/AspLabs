@@ -120,6 +120,8 @@
     </Compile>
     <Compile Include="Storage\IStorageManager.cs" />
     <Compile Include="Storage\StorageManager.cs" />
+    <Compile Include="WebHooks\AzureWebHookDequeueManager.cs" />
+    <Compile Include="WebHooks\AzureWebHookSender.cs" />
     <Compile Include="WebHooks\AzureWebHookStore.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -148,6 +149,26 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             Assert.IsType<BadRequestResult>(actual);
         }
 
+        [Theory]
+        [InlineData("/some/path")]
+        [InlineData("invalid://localhost")]
+        [InlineData("ftp://localhost")]
+        public async Task Post_ReturnsBadRequest_IfInvalidWebHookUri(string webHookUri)
+        {
+            // Arrange
+            await Initialize();
+            WebHook webHook = new WebHook()
+            {
+                WebHookUri = new Uri(webHookUri, UriKind.RelativeOrAbsolute)
+            };
+
+            // Act
+            IHttpActionResult actual = await _controller.Post(webHook: null);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(actual);
+        }
+
         [Fact]
         public async Task VerifyFilter_SetsWildcard_IfNoFiltersProvided()
         {
@@ -189,7 +210,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 Id = offset.ToString(),
                 Description = user,
                 Secret = "123456789012345678901234567890123456789012345678",
-                WebHookUri = "http://localhost/hook/" + offset
+                WebHookUri = new Uri("http://localhost/hook/" + offset),
             };
             hook.Headers.Add("h1", "hv1");
             hook.Properties.Add("p1", "pv1");

@@ -95,15 +95,45 @@ namespace Microsoft.AspNet.WebHooks.Services
         }
 
         [Fact]
+        public void GetSender_ReturnsSingleInstance()
+        {
+            // Arrange
+            ILogger logger = CommonServices.GetLogger();
+
+            // Act
+            IWebHookSender actual1 = CustomServices.GetSender(logger);
+            IWebHookSender actual2 = CustomServices.GetSender(logger);
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
+        public void SetSender_GetSender_Roundtrips()
+        {
+            // Arrange
+            ILogger logger = CommonServices.GetLogger();
+            Mock<IWebHookSender> senderMock = new Mock<IWebHookSender>();
+
+            // Act
+            CustomServices.SetSender(senderMock.Object);
+            IWebHookSender actual = CustomServices.GetSender(logger);
+
+            // Assert
+            Assert.Same(senderMock.Object, actual);
+        }
+
+        [Fact]
         public void GetManager_ReturnsSingleInstance()
         {
             // Arrange
             ILogger logger = CommonServices.GetLogger();
             IWebHookStore store = CustomServices.GetStore();
+            IWebHookSender sender = CustomServices.GetSender(logger);
 
             // Act
-            IWebHookManager actual1 = CustomServices.GetManager(store, logger);
-            IWebHookManager actual2 = CustomServices.GetManager(store, logger);
+            IWebHookManager actual1 = CustomServices.GetManager(store, sender, logger);
+            IWebHookManager actual2 = CustomServices.GetManager(store, sender, logger);
 
             // Assert
             Assert.Same(actual1, actual2);

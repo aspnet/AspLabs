@@ -106,6 +106,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The WebHook URI must be absolute with a scheme of either &apos;http&apos; or &apos;https&apos; but received &apos;{0}&apos;..
+        /// </summary>
+        internal static string Manager_NoHttpUri {
+            get {
+                return ResourceManager.GetString("Manager_NoHttpUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not determine the user ID from the given principal..
         /// </summary>
         internal static string Manager_NoUser {

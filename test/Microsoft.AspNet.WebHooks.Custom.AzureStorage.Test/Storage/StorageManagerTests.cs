@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.WindowsAzure.Storage;
@@ -80,6 +81,34 @@ namespace Microsoft.Azure.Applications.Storage
                     { new StorageException(new RequestResult { }, "你好", inner: null), string.Empty },
                 };
             }
+        }
+
+        [Fact]
+        public void GetAzureStorageConnectionString_ThrowsIfNotFound()
+        {
+            // Arrange
+            SettingsDictionary settings = new SettingsDictionary();
+
+            // Act
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => _manager.GetAzureStorageConnectionString(settings));
+
+            // Assert
+            Assert.Equal("Please provide a Microsoft Azure Storage connection string with name 'MS_AzureStoreConnectionString' in the configuration string section of the 'Web.Config' file.", ex.Message);
+        }
+
+        [Fact]
+        public void GetAzureStorageConnectionString_FindsConnectionString()
+        {
+            // Arrange
+            SettingsDictionary settings = new SettingsDictionary();
+            ConnectionSettings connection = new ConnectionSettings("MS_AzureStoreConnectionString", "connectionString");
+            settings.Connections.Add("MS_AzureStoreConnectionString", connection);
+
+            // Act
+            string actual = _manager.GetAzureStorageConnectionString(settings);
+
+            // Assert
+            Assert.Equal("connectionString", actual);
         }
 
         [Theory]

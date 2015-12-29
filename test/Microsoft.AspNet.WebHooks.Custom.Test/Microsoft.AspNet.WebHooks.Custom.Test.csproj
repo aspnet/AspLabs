@@ -71,6 +71,8 @@
     <Compile Include="WebHooks\NotificationDictionaryTests.cs" />
     <Compile Include="WebHooks\WebHookFilterManagerTests.cs" />
     <Compile Include="WebHooks\WebHookFilterTests.cs" />
+    <Compile Include="WebHooks\DataflowWebHookSenderTests.cs" />
+    <Compile Include="WebHooks\WebHookSenderTests.cs" />
     <Compile Include="WebHooks\WebHookUserTests.cs" />
     <Compile Include="WebHooks\WebHookManagerTests.cs" />
     <Compile Include="WebHooks\WebHookStoreTest.cs" />

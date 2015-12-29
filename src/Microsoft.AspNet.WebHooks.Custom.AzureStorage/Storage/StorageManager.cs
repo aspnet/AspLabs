@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Utilities;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Microsoft.AspNet.WebHooks.Storage
@@ -21,6 +23,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
     [CLSCompliant(false)]
     public class StorageManager : IStorageManager
     {
+        private const string AzureStoreConnectionStringName = "MS_AzureStoreConnectionString";
         private const string PartitionKey = "PartitionKey";
         private const string RowKey = "RowKey";
 
@@ -28,6 +31,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         private const int MaxBatchSize = 100;
 
         private static readonly ConcurrentDictionary<string, CloudStorageAccount> TableAccounts = new ConcurrentDictionary<string, CloudStorageAccount>();
+        private static readonly ConcurrentDictionary<string, CloudStorageAccount> QueueAccounts = new ConcurrentDictionary<string, CloudStorageAccount>();
 
         private readonly ILogger _logger;
 
@@ -41,6 +45,23 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 throw new ArgumentNullException("logger");
             }
             _logger = logger;
+        }
+
+        /// <inheritdoc />
+        public string GetAzureStorageConnectionString(SettingsDictionary settings)
+        {
+            if (settings == null)
+            {
+                throw new ArgumentNullException("settings");
+            }
+
+            ConnectionSettings connection;
+            if (!settings.Connections.TryGetValue(AzureStoreConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NoConnectionString, AzureStoreConnectionStringName);
+                throw new InvalidOperationException(msg);
+            }
+            return connection.ConnectionString;
         }
 
         /// <inheritdoc />
@@ -103,6 +124,46 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             CloudTableClient cloudClient = account.CreateCloudTableClient();
             return cloudClient.GetTableReference(tableName);
+        }
+
+        /// <inheritdoc />
+        public CloudQueue GetCloudQueue(string connectionString, string queueName)
+        {
+            if (connectionString == null)
+            {
+                throw new ArgumentNullException("connectionString");
+            }
+            if (queueName == null)
+            {
+                throw new ArgumentNullException("queueName");
+            }
+
+            string queueKey = GetLookupKey(connectionString, queueName);
+            CloudStorageAccount account = QueueAccounts.GetOrAdd(
+                queueKey,
+                key =>
+                {
+                    CloudStorageAccount storageAccount = GetCloudStorageAccount(connectionString);
+                    try
+                    {
+                        // Ensure that queue exists
+                        CloudQueueClient client = storageAccount.CreateCloudQueueClient();
+                        CloudQueue cloudQueue = client.GetQueueReference(queueName);
+                        cloudQueue.CreateIfNotExists();
+                    }
+                    catch (Exception ex)
+                    {
+                        string error = GetStorageErrorMessage(ex);
+                        string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_InitializationFailure, error);
+                        _logger.Error(msg, ex);
+                        throw new InvalidOperationException(msg, ex);
+                    }
+
+                    return storageAccount;
+                });
+
+            CloudQueueClient cloudClient = account.CreateCloudQueueClient();
+            return cloudClient.GetQueueReference(queueName);
         }
 
         /// <inheritdoc />

@@ -58,6 +58,8 @@
       <DependentUpon>CustomResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\CustomServices.cs" />
+    <Compile Include="WebHooks\WebHookSender.cs" />
+    <Compile Include="WebHooks\IWebHookSender.cs" />
     <Compile Include="WebHooks\IWebHookUser.cs" />
     <Compile Include="WebHooks\NotificationDictionary.cs" />
     <Compile Include="WebHooks\StoreResult.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="WebHooks\WebHook.cs" />
     <Compile Include="WebHooks\WebHookFilter.cs" />
     <Compile Include="WebHooks\WebHookFilterManager.cs" />
+    <Compile Include="WebHooks\DataflowWebHookSender.cs" />
     <Compile Include="WebHooks\WebHookStore.cs" />
     <Compile Include="WebHooks\WebHookUser.cs" />
     <Compile Include="WebHooks\WebHookManager.cs" />

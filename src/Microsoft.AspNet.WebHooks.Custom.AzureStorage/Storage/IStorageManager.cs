@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Microsoft.AspNet.WebHooks.Storage
@@ -16,6 +18,14 @@ namespace Microsoft.AspNet.WebHooks.Storage
     public interface IStorageManager
     {
         /// <summary>
+        /// Gets the connection string from the provided <paramref name="settings"/> or throws
+        /// an exception if not present
+        /// </summary>
+        /// <param name="settings">The current <see cref="SettingsDictionary"/>.</param>
+        /// <returns>The connection string.</returns>
+        string GetAzureStorageConnectionString(SettingsDictionary settings);
+
+        /// <summary>
         /// Gets a <see cref="CloudStorageAccount"/> given a <paramref name="connectionString"/>.
         /// </summary>
         CloudStorageAccount GetCloudStorageAccount(string connectionString);
@@ -25,6 +35,12 @@ namespace Microsoft.AspNet.WebHooks.Storage
         /// </summary>
         /// <returns>A new <see cref="CloudTable"/> instance.</returns>
         CloudTable GetCloudTable(string connectionString, string tableName);
+
+        /// <summary>
+        /// Gets a <see cref="CloudQueue"/> given a <paramref name="connectionString"/> and <paramref name="queueName"/>.
+        /// </summary>
+        /// <returns>A new <see cref="CloudTable"/> instance.</returns>
+        CloudQueue GetCloudQueue(string connectionString, string queueName);
 
         /// <summary>
         /// Adds an explicit partition key constraint to an existing query.

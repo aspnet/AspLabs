@@ -69,6 +69,50 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void GetSender_ReturnsDependencyInstance_IfRegistered()
+        {
+            // Arrange
+            Mock<IWebHookSender> instanceMock = new Mock<IWebHookSender>();
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookSender)))
+                .Returns(instanceMock.Object)
+                .Verifiable();
+
+            // Act
+            IWebHookSender actual = _resolverMock.Object.GetSender();
+
+            // Assert
+            Assert.Same(instanceMock.Object, actual);
+            instanceMock.Verify();
+        }
+
+        [Fact]
+        public void GetSender_ReturnsDefaultInstance_IfNoneRegistered()
+        {
+            // Arrange
+            _config.InitializeCustomWebHooks();
+
+            // Act
+            IWebHookSender actual = _resolverMock.Object.GetSender();
+
+            // Assert
+            Assert.IsType<DataflowWebHookSender>(actual);
+        }
+
+        [Fact]
+        public void GetSender_ReturnsSameInstance_IfNoneRegistered()
+        {
+            // Arrange
+            _config.InitializeCustomWebHooks();
+
+            // Act
+            IWebHookSender actual1 = _resolverMock.Object.GetSender();
+            IWebHookSender actual2 = _resolverMock.Object.GetSender();
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
         public void GetManager_ReturnsDependencyInstance_IfRegistered()
         {
             // Arrange

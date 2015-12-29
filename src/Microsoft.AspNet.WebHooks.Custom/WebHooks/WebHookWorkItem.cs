@@ -7,12 +7,13 @@ using System.Collections.Generic;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// A work item represents the act of firing a WebHook.
+    /// A work item represents the act of firing a single WebHook with one or more notifications.
     /// </summary>
-    internal class WebHookWorkItem
+    public class WebHookWorkItem
     {
         private string _id;
         private IEnumerable<NotificationDictionary> _notifications;
+        private IDictionary<string, object> _properties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebHookWorkItem"/> with the given <paramref name="notifications"/>.
@@ -69,6 +70,21 @@ namespace Microsoft.AspNet.WebHooks
             get
             {
                 return _notifications;
+            }
+        }
+
+        /// <summary>
+        /// Gets the set of additional properties associated with this <see cref="WebHookWorkItem"/> instance.
+        /// </summary>
+        public IDictionary<string, object> Properties
+        {
+            get
+            {
+                if (_properties == null)
+                {
+                    _properties = new Dictionary<string, object>();
+                }
+                return _properties;
             }
         }
     }

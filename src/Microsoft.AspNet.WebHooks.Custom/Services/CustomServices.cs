@@ -22,11 +22,12 @@ namespace Microsoft.AspNet.WebHooks.Services
     /// </summary>
     public static class CustomServices
     {
-        private static IWebHookStore _store;
-        private static IWebHookUser _user;
         private static IEnumerable<IWebHookFilterProvider> _filterProviders;
         private static IWebHookFilterManager _filterManager;
+        private static IWebHookStore _store;
+        private static IWebHookSender _sender;
         private static IWebHookManager _manager;
+        private static IWebHookUser _user;
 
         /// <summary>
         /// Gets a default <see cref="IWebHookStore"/> implementation which is used if none are registered with the 
@@ -125,12 +126,44 @@ namespace Microsoft.AspNet.WebHooks.Services
         }
 
         /// <summary>
+        /// Gets a default <see cref="IWebHookSender"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <returns>A default <see cref="IWebHookSender"/> instance.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by AppDomain")]
+        public static IWebHookSender GetSender(ILogger logger)
+        {
+            if (_sender != null)
+            {
+                return _sender;
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            IWebHookSender instance = new DataflowWebHookSender(logger);
+            Interlocked.CompareExchange(ref _sender, instance, null);
+            return _sender;
+        }
+
+        /// <summary>
+        /// Sets a default <see cref="IWebHookSender"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <param name="instance">The <see cref="IWebHookSender"/> to use. If <c>null</c> then a default implementation is used.</param>
+        public static void SetSender(IWebHookSender instance)
+        {
+            _sender = instance;
+        }
+
+        /// <summary>
         /// Gets a default <see cref="IWebHookManager"/> implementation which is used if none are registered with the 
         /// Dependency Injection engine.
         /// </summary>
         /// <returns>A default <see cref="IWebHookManager"/> instance.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by AppDomain")]
-        public static IWebHookManager GetManager(IWebHookStore store, ILogger logger)
+        public static IWebHookManager GetManager(IWebHookStore store, IWebHookSender sender, ILogger logger)
         {
             if (_manager != null)
             {
@@ -140,12 +173,16 @@ namespace Microsoft.AspNet.WebHooks.Services
             {
                 throw new ArgumentNullException("store");
             }
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            IWebHookManager instance = new WebHookManager(store, logger);
+            IWebHookManager instance = new WebHookManager(store, sender, logger);
             Interlocked.CompareExchange(ref _manager, instance, null);
             return _manager;
         }
@@ -156,9 +193,11 @@ namespace Microsoft.AspNet.WebHooks.Services
         internal static void Reset()
         {
             _filterManager = null;
-            _manager = null;
             _filterProviders = null;
             _store = null;
+            _sender = null;
+            _manager = null;
+            _user = null;
         }
     }
 }

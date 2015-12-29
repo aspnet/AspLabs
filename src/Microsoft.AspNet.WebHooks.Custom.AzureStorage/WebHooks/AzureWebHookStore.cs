@@ -22,7 +22,6 @@ namespace Microsoft.AspNet.WebHooks
     [CLSCompliant(false)]
     public class AzureWebHookStore : WebHookStore
     {
-        internal const string AzureStoreConnectionStringName = "MS_AzureStoreConnectionString";
         internal const string WebHookTable = "WebHooks";
         internal const string WebHookDataColumn = "Data";
         internal const int AzureStoreSecretKeyMinLength = 8;
@@ -36,7 +35,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureWebHookStore"/> class with the given <paramref name="manager"/>,
-        /// <paramref name="protector"/>, and <paramref name="logger"/>.
+        /// <paramref name="settings"/>, <paramref name="protector"/>, and <paramref name="logger"/>.
         /// </summary>
         public AzureWebHookStore(IStorageManager manager, SettingsDictionary settings, IDataProtector protector, ILogger logger)
         {
@@ -58,7 +57,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             _manager = manager;
-            _connectionString = GetAzureStorageConnectionString(settings);
+            _connectionString = manager.GetAzureStorageConnectionString(settings);
             _protector = protector;
             _logger = logger;
         }
@@ -264,22 +263,6 @@ namespace Microsoft.AspNet.WebHooks
                 }
             }
             return matches;
-        }
-
-        private static string GetAzureStorageConnectionString(SettingsDictionary settings)
-        {
-            if (settings == null)
-            {
-                throw new ArgumentNullException("settings");
-            }
-
-            ConnectionSettings connection;
-            if (!settings.Connections.TryGetValue(AzureStoreConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
-            {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NoConnectionString, AzureStoreConnectionStringName);
-                throw new InvalidOperationException(msg);
-            }
-            return connection.ConnectionString;
         }
 
         private static bool DefaultPredicate(WebHook webHook, string user)

@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.Web.Mvc;
 using Microsoft.AspNet.WebHooks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
@@ -108,6 +107,33 @@ namespace System.Web.Mvc
             Assert.IsType<WebHookFilterManager>(actual);
         }
 
+        [Fact]
+        public void GetSender_ReturnsDependencyInstance_IfRegistered()
+        {
+            // Arrange
+            Mock<IWebHookSender> instanceMock = new Mock<IWebHookSender>();
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookSender)))
+                .Returns(instanceMock.Object)
+                .Verifiable();
+
+            // Act
+            IWebHookSender actual = _resolverMock.Object.GetSender();
+
+            // Assert
+            Assert.Same(instanceMock.Object, actual);
+            instanceMock.Verify();
+        }
+
+        [Fact]
+        public void GetSender_ReturnsDefaultInstance_IfNoneRegistered()
+        {
+            // Act
+            IWebHookSender actual = _resolverMock.Object.GetSender();
+
+            // Assert
+            Assert.IsType<DataflowWebHookSender>(actual);
+        }
+        
         [Fact]
         public void GetManager_ReturnsDependencyInstance_IfRegistered()
         {

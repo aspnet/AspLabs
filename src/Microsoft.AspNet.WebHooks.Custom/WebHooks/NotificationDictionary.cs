@@ -14,11 +14,18 @@ namespace Microsoft.AspNet.WebHooks
     /// <summary>
     /// Contains WebHook settings that are provided by the outside, for example through application settings.
     /// </summary>
-    [SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "This class is not intended for serialization")]
+    [SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "This class is not intended for XML serialization")]
     [Serializable]
     public class NotificationDictionary : Dictionary<string, object>
     {
         internal const string ActionKey = "Action";
+
+        /// <summary>
+        /// Initializes a new empty <see cref="NotificationDictionary"/>.
+        /// </summary>
+        public NotificationDictionary()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationDictionary"/> class.

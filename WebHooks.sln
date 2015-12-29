@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{929F44D0-A040-4DC3-A22F-4C5829C05D44}"
 EndProject
@@ -125,6 +125,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomReceiver", "samples\CustomReceiver\CustomReceiver.csproj", "{D19D59DD-7F60-4D75-B1B7-BB380044925B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailChimpReceiver.Selfhost", "samples\MailChimpReceiver.Selfhost\MailChimpReceiver.Selfhost.csproj", "{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomSender.QueuedSender", "samples\CustomSender.QueuedSender\CustomSender.QueuedSender.csproj", "{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -451,6 +453,12 @@ Global
 		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -509,6 +517,7 @@ Global
 		{750EBD27-2091-46DF-B5F7-063053ED4C49} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
