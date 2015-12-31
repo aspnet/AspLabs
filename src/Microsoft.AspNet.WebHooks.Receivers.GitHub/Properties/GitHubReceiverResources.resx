@@ -126,4 +126,7 @@
   <data name="Receiver_NoEvent" xml:space="preserve">
     <value>The WebHook request must contain a '{0}' HTTP header indicating the type of event.</value>
   </data>
+  <data name="Receiver_PingEvent" xml:space="preserve">
+    <value>Received a GitHub Ping Event -- ignoring.</value>
+  </data>
 </root>

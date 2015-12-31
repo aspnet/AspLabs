@@ -129,8 +129,17 @@
   <data name="AzureStore_NotFound" xml:space="preserve">
     <value>No entry was found with partition key '{0}' and row key '{1}'.</value>
   </data>
+  <data name="DequeueManager_ErrorDequeueing" xml:space="preserve">
+    <value>Encountered an error when dequeueing messages from the Azure Queue '{0}': '{1}'</value>
+  </data>
+  <data name="DequeueManager_GivingUp" xml:space="preserve">
+    <value>Giving up sending WebHook '{0}' after '{1}' attempts.</value>
+  </data>
   <data name="DequeueManager_Started" xml:space="preserve">
     <value>This '{0}' instance has already been started. It can only be started once.</value>
+  </data>
+  <data name="DequeueManager_WebHookStatus" xml:space="preserve">
+    <value>WebHook '{0}' resulted in status code '{1}' on attempt '{2}'.</value>
   </data>
   <data name="StorageManager_BadContinuationToken" xml:space="preserve">
     <value>Invalid continuation token: '{0}'.</value>

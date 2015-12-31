@@ -123,4 +123,7 @@
   <data name="Receiver_BadId" xml:space="preserve">
     <value>The ID '{0}' could not be resolved for an actual event.</value>
   </data>
+  <data name="Receiver_TestEvent" xml:space="preserve">
+    <value>Received a Stripe Test Event -- ignoring.</value>
+  </data>
 </root>

@@ -174,7 +174,7 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 catch (Exception ex)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, "Encountered an error when dequeueing messages from the Azure Queue '{0}': '{1}' ", _queue.Name, ex.Message);
+                    string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_ErrorDequeueing, _queue.Name, ex.Message);
                     _logger.Error(msg, ex);
                 }
 
@@ -244,7 +244,7 @@ namespace Microsoft.AspNet.WebHooks
                 foreach (HttpResponseMessage response in responses)
                 {
                     WebHookWorkItem workItem = response.RequestMessage.Properties.GetValueOrDefault<WebHookWorkItem>(WorkItemKey);
-                    string msg = string.Format(CultureInfo.CurrentCulture, "WebHook '{0}' resulted in status code '{1}' on attempt '{2}'.", workItem.WebHook.Id, response.StatusCode, workItem.Offset);
+                    string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_WebHookStatus, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
                     Logger.Info(msg);
 
                     // If success or 'gone' HTTP status code then we remove the message from the Azure queue.
@@ -258,7 +258,7 @@ namespace Microsoft.AspNet.WebHooks
                         }
                         else if (message.DequeueCount > _parent._maxAttempts)
                         {
-                            string error = string.Format(CultureInfo.CurrentCulture, "Giving up sending WebHook '{0}' after '{1}' attempts.", workItem.WebHook.Id, message.DequeueCount);
+                            string error = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_GivingUp, workItem.WebHook.Id, message.DequeueCount);
                             Logger.Error(error);
                             deleteTasks.Add(_parent._queue.DeleteMessageAsync(message));
                         }

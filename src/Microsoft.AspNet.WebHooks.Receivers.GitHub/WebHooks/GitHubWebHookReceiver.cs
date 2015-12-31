@@ -78,6 +78,7 @@ namespace Microsoft.AspNet.WebHooks
                 // If this is a ping request then just return. Otherwise call handlers.
                 if (string.Equals(actions.FirstOrDefault(), PingEvent, StringComparison.OrdinalIgnoreCase))
                 {
+                    context.Configuration.DependencyResolver.GetLogger().Info(GitHubReceiverResources.Receiver_PingEvent);
                     return request.CreateResponse();
                 }
                 return await ExecuteWebHookAsync(id, context, request, actions, data);

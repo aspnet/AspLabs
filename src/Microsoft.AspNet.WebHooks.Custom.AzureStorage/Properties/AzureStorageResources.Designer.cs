@@ -97,11 +97,38 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Encountered an error when dequeueing messages from the Azure Queue &apos;{0}&apos;: &apos;{1}&apos;.
+        /// </summary>
+        internal static string DequeueManager_ErrorDequeueing {
+            get {
+                return ResourceManager.GetString("DequeueManager_ErrorDequeueing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Giving up sending WebHook &apos;{0}&apos; after &apos;{1}&apos; attempts..
+        /// </summary>
+        internal static string DequeueManager_GivingUp {
+            get {
+                return ResourceManager.GetString("DequeueManager_GivingUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This &apos;{0}&apos; instance has already been started. It can only be started once..
         /// </summary>
         internal static string DequeueManager_Started {
             get {
                 return ResourceManager.GetString("DequeueManager_Started", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WebHook &apos;{0}&apos; resulted in status code &apos;{1}&apos; on attempt &apos;{2}&apos;..
+        /// </summary>
+        internal static string DequeueManager_WebHookStatus {
+            get {
+                return ResourceManager.GetString("DequeueManager_WebHookStatus", resourceCulture);
             }
         }
         

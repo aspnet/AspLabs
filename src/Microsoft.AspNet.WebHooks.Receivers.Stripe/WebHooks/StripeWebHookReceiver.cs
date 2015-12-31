@@ -90,6 +90,7 @@ namespace Microsoft.AspNet.WebHooks
                 // If test ID then just return here.
                 if (string.Equals(TestId, notificationId, StringComparison.OrdinalIgnoreCase))
                 {
+                    context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent);
                     return request.CreateResponse();
                 }
 
