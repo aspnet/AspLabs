@@ -37,7 +37,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public override Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        public override Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
         {
             if (user == null)
             {
@@ -50,10 +50,12 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
+            predicate = predicate ?? DefaultPredicate;
+
             ConcurrentDictionary<string, WebHook> userHooks;
             if (_store.TryGetValue(user, out userHooks))
             {
-                ICollection<WebHook> matches = userHooks.Values.Where(w => MatchesAnyAction(w, actions))
+                ICollection<WebHook> matches = userHooks.Values.Where(w => MatchesAnyAction(w, actions) && predicate(w, user))
                     .ToArray();
                 return Task.FromResult(matches);
             }

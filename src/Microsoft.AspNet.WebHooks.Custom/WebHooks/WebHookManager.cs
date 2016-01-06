@@ -131,7 +131,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public async Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications)
+        public async Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate)
         {
             if (user == null)
             {
@@ -147,7 +147,7 @@ namespace Microsoft.AspNet.WebHooks
             string[] actions = nots.Select(n => n.Action).ToArray();
 
             // Find all active WebHooks that matches at least one of the actions
-            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAsync(user, actions);
+            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAsync(user, actions, predicate);
 
             // For each WebHook set up a work item with the right set of notifications
             IEnumerable<WebHookWorkItem> workItems = GetWorkItems(webHooks, nots);

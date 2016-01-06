@@ -27,8 +27,11 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="user">The user for which to query the registered <see cref="WebHook"/> instances.</param>
         /// <param name="actions">The set of actions that determines matching <see cref="WebHook"/> instances.</param>
+        /// <param name="predicate">An optional function to test each <see cref="WebHook"/> to see whether it fulfills the condition. The
+        /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+        /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>A collection of matching (and active) <see cref="WebHook"/> instances.</returns>
-        Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions);
+        Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions, Func<WebHook, string, bool> predicate);
 
         /// <summary>
         /// Looks up an existing <see cref="WebHook"/> for a given <paramref name="user"/>. If a <see cref="WebHook"/>

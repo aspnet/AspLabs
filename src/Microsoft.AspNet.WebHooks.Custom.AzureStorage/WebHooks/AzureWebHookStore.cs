@@ -84,7 +84,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
         {
             if (user == null)
             {
@@ -97,13 +97,15 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
+            predicate = predicate ?? DefaultPredicate;
+
             CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
             TableQuery query = new TableQuery();
             _manager.AddPartitionKeyConstraint(query, user);
 
             IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
             ICollection<WebHook> matches = entities.Select(e => ConvertToWebHook(e))
-                .Where(w => MatchesAnyAction(w, actions))
+                .Where(w => MatchesAnyAction(w, actions) && predicate(w, user))
                 .ToArray();
             return matches;
         }

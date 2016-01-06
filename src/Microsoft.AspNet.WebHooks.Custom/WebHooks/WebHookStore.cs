@@ -23,7 +23,7 @@ namespace Microsoft.AspNet.WebHooks
         public abstract Task<ICollection<WebHook>> GetAllWebHooksAsync(string user);
 
         /// <inheritdoc />
-        public abstract Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions);
+        public abstract Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions, Func<WebHook, string, bool> predicate);
 
         /// <inheritdoc />
         public abstract Task<WebHook> LookupWebHookAsync(string user, string id);

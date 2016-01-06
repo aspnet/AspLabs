@@ -35,7 +35,7 @@ namespace Microsoft.AspNet.WebHooks
             _handlerMock = new HttpMessageHandlerMock();
             _httpClient = new HttpClient(_handlerMock);
             _storeMock = new Mock<IWebHookStore>();
-            _storeMock.Setup<Task<ICollection<WebHook>>>(s => s.QueryWebHooksAsync(TestUser, new[] { "a1" }))
+            _storeMock.Setup<Task<ICollection<WebHook>>>(s => s.QueryWebHooksAsync(TestUser, new[] { "a1" }, null))
                 .ReturnsAsync(new Collection<WebHook> { CreateWebHook() })
                 .Verifiable();
             _senderMock = new Mock<IWebHookSender>();

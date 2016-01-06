@@ -84,7 +84,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions)
+        public override async Task<ICollection<WebHook>> QueryWebHooksAsync(string user, IEnumerable<string> actions, Func<WebHook, string, bool> predicate)
         {
             if (user == null)
             {
@@ -93,13 +93,15 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
+            predicate = predicate ?? DefaultPredicate;
+
             try
             {
                 using (var context = new WebHookStoreContext())
                 {
                     var registrations = await context.Registrations.Where(r => r.User == user).ToArrayAsync();
                     ICollection<WebHook> matches = registrations.Select(r => ConvertToWebHook(r))
-                        .Where(w => MatchesAnyAction(w, actions))
+                        .Where(w => MatchesAnyAction(w, actions) && predicate(w, user))
                         .ToArray();
                     return matches;
                 }

@@ -29,8 +29,11 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="user">The user for which to lookup and dispatch matching WebHooks.</param>
         /// <param name="notifications">The set of notifications to include in the WebHook request.</param>
+        /// <param name="predicate">An optional function to test each <see cref="WebHook"/> to see whether it fulfills the condition. The
+        /// predicate is passed the <see cref="WebHook"/> and the user who registered it. If the predicate returns <c>true</c> then
+        /// the <see cref="WebHook"/> is included; otherwise it is not.</param>
         /// <returns>The number of <see cref="WebHook"/> instances that were selected and subsequently notified about the actions.</returns>
-        Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications);
+        Task<int> NotifyAsync(string user, IEnumerable<NotificationDictionary> notifications, Func<WebHook, string, bool> predicate);
 
         /// <summary>
         /// Submits a notification to all users with subscriptions that match the given <paramref name="predicate"/>. For active 
