@@ -37,6 +37,7 @@
   </Words>
   <Acronyms>
     <CasingExceptions>
+      <Acronym>CRM</Acronym>
       <Acronym>SSO</Acronym>
     </CasingExceptions>
   </Acronyms>

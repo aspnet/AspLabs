@@ -128,6 +128,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailChimpReceiver.Selfhost"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomSender.QueuedSender", "samples\CustomSender.QueuedSender\CustomSender.QueuedSender.csproj", "{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM", "src\Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM\Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM.csproj", "{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM.Test", "test\Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM.Test\Microsoft.AspNet.WebHooks.Receivers.DynamicsCRM.Test.csproj", "{5F47AA81-8404-405B-BF7F-E5418CB89C5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -459,6 +463,18 @@ Global
 		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -518,6 +534,8 @@ Global
 		{D19D59DD-7F60-4D75-B1B7-BB380044925B} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{7A7E5F2A-D53D-4F8B-AF37-8CD921E9B694} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{B6729BF9-AB07-489D-BA2A-72DBB2FE90D9} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
+		{B8F0B5C7-90BE-4F58-89C7-9F95BB6933C5} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{5F47AA81-8404-405B-BF7F-E5418CB89C5F} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
