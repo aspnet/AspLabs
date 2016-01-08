@@ -373,6 +373,85 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         /// <inheritdoc />
+        public async Task AddMessagesAsync(CloudQueue queue, IEnumerable<CloudQueueMessage> messages)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException("queue");
+            }
+
+            try
+            {
+                List<Task> addTasks = new List<Task>();
+                foreach (var message in messages)
+                {
+                    Task addTask = queue.AddMessageAsync(message);
+                    addTasks.Add(addTask);
+                }
+
+                await Task.WhenAll(addTasks);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = GetStorageErrorMessage(ex);
+                int statusCode = GetStorageStatusCode(ex);
+                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(msg, ex);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<CloudQueueMessage>> GetMessagesAsync(CloudQueue queue, int messageCount, TimeSpan timeout)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException("queue");
+            }
+
+            try
+            {
+                IEnumerable<CloudQueueMessage> messages = await queue.GetMessagesAsync(messageCount, timeout, options: null, operationContext: null);
+                return messages;
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = GetStorageErrorMessage(ex);
+                int statusCode = GetStorageStatusCode(ex);
+                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(msg, ex);
+                return Enumerable.Empty<CloudQueueMessage>();
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteMessagesAsync(CloudQueue queue, IEnumerable<CloudQueueMessage> messages)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException("queue");
+            }
+
+            try
+            {
+                List<Task> deleteTasks = new List<Task>();
+                foreach (var message in messages)
+                {
+                    Task deleteTask = queue.DeleteMessageAsync(message);
+                    deleteTasks.Add(deleteTask);
+                }
+
+                await Task.WhenAll(deleteTasks);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = GetStorageErrorMessage(ex);
+                int statusCode = GetStorageStatusCode(ex);
+                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(msg, ex);
+            }
+        }
+
+        /// <inheritdoc />
         public string GetStorageErrorMessage(Exception ex)
         {
             StorageException se = ex as StorageException;

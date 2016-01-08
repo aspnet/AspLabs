@@ -83,6 +83,29 @@ namespace Microsoft.AspNet.WebHooks.Storage
         Task<long> ExecuteDeleteAllAsync(CloudTable table, string partitionKey, string filter);
 
         /// <summary>
+        /// Inserts the given <paramref name="messages"/> to the given <paramref name="queue"/>.
+        /// </summary>
+        /// <param name="queue">The <see cref="CloudQueue"/> to insert into the queue.</param>
+        /// <param name="messages">The messages to add.</param>
+        Task AddMessagesAsync(CloudQueue queue, IEnumerable<CloudQueueMessage> messages);
+
+        /// <summary>
+        /// Gets messages from the given <paramref name="queue"/>. 
+        /// </summary>
+        /// <param name="queue">The <see cref="CloudQueue"/> to retrieve the messages from.</param>
+        /// <param name="messageCount">The number of messages to retrieve.</param>
+        /// <param name="timeout">A <see cref="TimeSpan"/> specifying the visibility timeout.</param>
+        /// <returns>A collection of retrieved messages.</returns>
+        Task<IEnumerable<CloudQueueMessage>> GetMessagesAsync(CloudQueue queue, int messageCount, TimeSpan timeout);
+
+        /// <summary>
+        /// Deletes the given <paramref name="messages"/> from the given <paramref name="queue"/>.
+        /// </summary>
+        /// <param name="queue">The <see cref="CloudQueue"/> to delete the messages from.</param>
+        /// <param name="messages">The messages to delete.</param>
+        Task DeleteMessagesAsync(CloudQueue queue, IEnumerable<CloudQueueMessage> messages);
+
+        /// <summary>
         /// Gets the extended error message from a <see cref="StorageException"/> or the Message information from any other <see cref="Exception"/> type.
         /// </summary>
         /// <param name="ex">The exception to extract message from.</param>

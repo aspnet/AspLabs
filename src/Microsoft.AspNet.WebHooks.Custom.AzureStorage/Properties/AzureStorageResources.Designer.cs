@@ -61,11 +61,11 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not add messages to Azure Queue: {0}..
+        ///   Looks up a localized string similar to Could not serialize message: {0}.
         /// </summary>
-        internal static string AzureSender_AddFailure {
+        internal static string AzureSender_SerializeFailure {
             get {
-                return ResourceManager.GetString("AzureSender_AddFailure", resourceCulture);
+                return ResourceManager.GetString("AzureSender_SerializeFailure", resourceCulture);
             }
         }
         
@@ -111,6 +111,24 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         internal static string DequeueManager_GivingUp {
             get {
                 return ResourceManager.GetString("DequeueManager_GivingUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not get the property with key &apos;{0}&apos; from the work item with Id &apos;{1}&apos;..
+        /// </summary>
+        internal static string DequeueManager_NoProperty {
+            get {
+                return ResourceManager.GetString("DequeueManager_NoProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not send HTTP request to &apos;{0}&apos;: &apos;{1}&apos;..
+        /// </summary>
+        internal static string DequeueManager_SendFailure {
+            get {
+                return ResourceManager.GetString("DequeueManager_SendFailure", resourceCulture);
             }
         }
         

@@ -25,7 +25,7 @@ namespace CustomSender
             // config.InitializeCustomWebHooksSqlStorage();
 
             // Load Azure Queued Sender for enqueueing outgoing WebHooks to an Azure Storage Queue
-            //config.InitializeCustomWebHooksAzureQueueSender();
+            // config.InitializeCustomWebHooksAzureQueueSender();
 
             // Load Web API controllers for managing subscriptions
             config.InitializeCustomWebHooksApis();

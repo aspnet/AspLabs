@@ -24,24 +24,26 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class AzureWebHookDequeueManager : IDisposable
     {
-        private const string QueueMessageKey = "MS_QueueMessage";
+        internal const string QueueMessageKey = "MS_QueueMessage";
+        internal const int MaxDequeuedMessages = 32;
+
+        internal static readonly TimeSpan _DefaultFrequency = TimeSpan.FromMinutes(5);
+        internal static readonly TimeSpan _DefaultMessageTimeout = TimeSpan.FromMinutes(2);
+
         private const string WorkItemKey = "MS_WebHookWorkItem";
-
         private const int DefaultMaxDequeueCount = 3;
-
-        private static readonly TimeSpan _DefaultFrequency = TimeSpan.FromMinutes(5);
-        private static readonly TimeSpan _DefaultMessageTimeout = TimeSpan.FromMinutes(2);
 
         private readonly ILogger _logger;
         private readonly TimeSpan _messageTimeout;
         private readonly TimeSpan _pollingFrequency;
         private readonly int _maxAttempts;
+
         private readonly IStorageManager _storageManager;
         private readonly HttpClient _httpClient;
+        private readonly WebHookSender _sender;
 
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings();
         private readonly CloudQueue _queue;
-        private readonly QueuedSender _sender;
 
         private CancellationTokenSource _tokenSource;
         private bool _disposed;
@@ -69,14 +71,14 @@ namespace Microsoft.AspNet.WebHooks
         /// it will be attempted again.</param>
         /// <param name="maxAttempts">The maximum number of attempts to deliver the WebHook.</param>
         public AzureWebHookDequeueManager(string connectionString, ILogger logger, TimeSpan pollingFrequency, TimeSpan messageTimeout, int maxAttempts)
-            : this(connectionString, logger, pollingFrequency, messageTimeout, maxAttempts, httpClient: null, storageManager: null)
+            : this(connectionString, logger, pollingFrequency, messageTimeout, maxAttempts, httpClient: null, storageManager: null, sender: null)
         {
         }
 
         /// <summary>
         /// Intended for unit test purposes
         /// </summary>
-        internal AzureWebHookDequeueManager(string connectionString, ILogger logger, TimeSpan pollingFrequency, TimeSpan messageTimeout, int maxAttempts, HttpClient httpClient, IStorageManager storageManager)
+        internal AzureWebHookDequeueManager(string connectionString, ILogger logger, TimeSpan pollingFrequency, TimeSpan messageTimeout, int maxAttempts, HttpClient httpClient, IStorageManager storageManager, WebHookSender sender)
         {
             if (connectionString == null)
             {
@@ -102,9 +104,17 @@ namespace Microsoft.AspNet.WebHooks
 
             _httpClient = httpClient ?? new HttpClient();
             _storageManager = storageManager ?? new StorageManager(logger);
+            _sender = sender ?? new QueuedSender(this, logger);
 
             _queue = _storageManager.GetCloudQueue(connectionString, AzureWebHookSender.WebHookQueue);
-            _sender = new QueuedSender(this, logger);
+        }
+
+        internal WebHookSender WebHookSender
+        {
+            get
+            {
+                return _sender;
+            }
         }
 
         /// <summary>
@@ -150,7 +160,7 @@ namespace Microsoft.AspNet.WebHooks
                         }
 
                         // Dequeue messages from Azure queue
-                        IEnumerable<CloudQueueMessage> messages = await _queue.GetMessagesAsync(32, _messageTimeout, options: null, operationContext: null);
+                        IEnumerable<CloudQueueMessage> messages = await _storageManager.GetMessagesAsync(_queue, MaxDequeuedMessages, _messageTimeout);
 
                         // Extract the work items
                         ICollection<WebHookWorkItem> workItems = messages.Select(m =>
@@ -166,8 +176,10 @@ namespace Microsoft.AspNet.WebHooks
                         }
 
                         // Submit work items to be sent to WebHook receivers
-                        await _sender.SendWebHookWorkItemsAsync(workItems);
-
+                        if (workItems.Count > 0)
+                        {
+                            await _sender.SendWebHookWorkItemsAsync(workItems);
+                        }
                         isEmpty = workItems.Count == 0;
                     }
                     while (!isEmpty);
@@ -178,7 +190,15 @@ namespace Microsoft.AspNet.WebHooks
                     _logger.Error(msg, ex);
                 }
 
-                await Task.Delay(_pollingFrequency, cancellationToken);
+                try
+                {
+                    await Task.Delay(_pollingFrequency, cancellationToken);
+                }
+                catch (OperationCanceledException oex)
+                {
+                    _logger.Error(oex.Message, oex);
+                    return;
+                }
             }
         }
 
@@ -229,17 +249,35 @@ namespace Microsoft.AspNet.WebHooks
                     throw new ArgumentNullException("workItems");
                 }
 
+                // Keep track of which queued messages should be deleted because processing has completed.
+                List<CloudQueueMessage> deleteMessages = new List<CloudQueueMessage>();
+
                 // Submit WebHook requests in parallel
                 List<Task<HttpResponseMessage>> requestTasks = new List<Task<HttpResponseMessage>>();
                 foreach (var workItem in workItems)
                 {
                     HttpRequestMessage request = CreateWebHookRequest(workItem);
                     request.Properties[WorkItemKey] = workItem;
-                    requestTasks.Add(_parent._httpClient.SendAsync(request));
+
+                    try
+                    {
+                        Task<HttpResponseMessage> requestTask = _parent._httpClient.SendAsync(request);
+                        requestTasks.Add(requestTask);
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_SendFailure, request.RequestUri, ex.Message);
+                        Logger.Info(msg);
+
+                        CloudQueueMessage message = GetMessage(workItem);
+                        if (DiscardMessage(workItem, message))
+                        {
+                            deleteMessages.Add(message);
+                        }
+                    }
                 }
 
-                // Wait for all responses and see which messages should be deleted from the queue.
-                List<Task> deleteTasks = new List<Task>();
+                // Wait for all responses and see which messages should be deleted from the queue based on the response statuses.
                 HttpResponseMessage[] responses = await Task.WhenAll(requestTasks);
                 foreach (HttpResponseMessage response in responses)
                 {
@@ -249,24 +287,38 @@ namespace Microsoft.AspNet.WebHooks
 
                     // If success or 'gone' HTTP status code then we remove the message from the Azure queue.
                     // If error then we leave it in the queue to be consumed once it becomes visible again or we give up
-                    CloudQueueMessage message = workItem.Properties.GetValueOrDefault<CloudQueueMessage>(QueueMessageKey);
-                    if (message != null)
+                    CloudQueueMessage message = GetMessage(workItem);
+                    if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Gone || DiscardMessage(workItem, message))
                     {
-                        if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Gone)
-                        {
-                            deleteTasks.Add(_parent._queue.DeleteMessageAsync(message));
-                        }
-                        else if (message.DequeueCount > _parent._maxAttempts)
-                        {
-                            string error = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_GivingUp, workItem.WebHook.Id, message.DequeueCount);
-                            Logger.Error(error);
-                            deleteTasks.Add(_parent._queue.DeleteMessageAsync(message));
-                        }
+                        deleteMessages.Add(message);
                     }
                 }
 
                 // Delete successfully delivered messages and messages that have been attempted delivered too many times.
-                await Task.WhenAll(deleteTasks);
+                await _parent._storageManager.DeleteMessagesAsync(_parent._queue, deleteMessages);
+            }
+
+            private CloudQueueMessage GetMessage(WebHookWorkItem workItem)
+            {
+                CloudQueueMessage message = workItem != null ? workItem.Properties.GetValueOrDefault<CloudQueueMessage>(QueueMessageKey) : null;
+                if (message == null)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_NoProperty, QueueMessageKey, workItem.Id);
+                    Logger.Error(msg);
+                    throw new InvalidOperationException(msg);
+                }
+                return message;
+            }
+
+            private bool DiscardMessage(WebHookWorkItem workItem, CloudQueueMessage message)
+            {
+                if (message.DequeueCount >= _parent._maxAttempts)
+                {
+                    string error = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.DequeueManager_GivingUp, workItem.WebHook.Id, message.DequeueCount);
+                    Logger.Error(error);
+                    return true;
+                }
+                return false;
             }
         }
     }

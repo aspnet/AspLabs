@@ -87,8 +87,11 @@
   <ItemGroup>
     <Compile Include="Extensions\HttpConfigurationExtensionsTests.cs" />
     <Compile Include="Extensions\TableResultExtensionsTests.cs" />
+    <Compile Include="Mocks\StorageManagerMock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\StorageManagerTests.cs" />
+    <Compile Include="WebHooks\AzureWebHookDequeueManagerTests.cs" />
+    <Compile Include="WebHooks\AzureWebHookSenderTests.cs" />
     <Compile Include="WebHooks\AzureWebHookStoreTests.cs" />
   </ItemGroup>
   <ItemGroup>

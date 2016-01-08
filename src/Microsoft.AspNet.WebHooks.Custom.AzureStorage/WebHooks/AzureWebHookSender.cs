@@ -60,24 +60,27 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException("workItems");
             }
 
-            CloudQueue queue = _manager.GetCloudQueue(_connectionString, WebHookQueue);
-
+            // Serialize WebHook requests and convert to queue messages
+            IEnumerable<CloudQueueMessage> messages = null;
             try
             {
-                IEnumerable<Task> addTasks = workItems.Select(item =>
+                messages = workItems.Select(item =>
                     {
                         string content = JsonConvert.SerializeObject(item, _serializerSettings);
                         CloudQueueMessage message = new CloudQueueMessage(content);
-                        return queue.AddMessageAsync(message);
-                    });
-                await Task.WhenAll(addTasks);
+                        return message;
+                    }).ToArray();
             }
             catch (Exception ex)
             {
-                string error = _manager.GetStorageErrorMessage(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureSender_AddFailure, error);
+                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureSender_SerializeFailure, ex.Message);
                 _logger.Error(msg, ex);
+                throw new InvalidOperationException(msg);
             }
+
+            // Insert queue messages into queue.
+            CloudQueue queue = _manager.GetCloudQueue(_connectionString, WebHookQueue);
+            await _manager.AddMessagesAsync(queue, messages);
         }
     }
 }

@@ -2,10 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using Xunit;
@@ -14,6 +18,8 @@ namespace Microsoft.Azure.Applications.Storage
 {
     public class StorageManagerTests
     {
+        private const int MaxCloudQueueMessages = 16;
+
         private readonly Mock<ILogger> _loggerMock;
         private readonly IStorageManager _manager;
 
@@ -140,6 +146,16 @@ namespace Microsoft.Azure.Applications.Storage
             Assert.StartsWith("Could not initialize connection to Microsoft Azure Storage: Bad Request", ex.Message);
         }
 
+        [Fact]
+        public void GetCloudQueue_HandlesInvalidQueueName()
+        {
+            // Act
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => _manager.GetCloudQueue("UseDevelopmentStorage=true;", "I n v a l i d / N a m e"));
+
+            // Assert
+            Assert.StartsWith("Could not initialize connection to Microsoft Azure Storage: The requested URI does not represent any resource on the server. ", ex.Message);
+        }
+
         [Theory]
         [MemberData("PartitionKeyConstraintData")]
         public void AddPartitionKeyConstraint_CreatesExpectedQuery(string filter, string partitionKey, string expected)
@@ -154,6 +170,82 @@ namespace Microsoft.Azure.Applications.Storage
             Assert.Equal(expected, actual.FilterString);
         }
 
+        [Fact]
+        public async Task GetMessages_HandlesEmptyQueue()
+        {
+            // Arrange
+            CloudQueue queue = InitializeQueue();
+
+            // Act
+            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, TimeSpan.FromMinutes(1));
+
+            // Assert
+            Assert.Empty(actual);
+        }
+
+        [Fact]
+        public async Task AddMessagesGetMessages_Roundtrips()
+        {
+            // Arrange
+            CloudQueue queue = InitializeQueue();
+            IEnumerable<CloudQueueMessage> expected = CreateQueueMessages();
+
+            // Act
+            await _manager.AddMessagesAsync(queue, expected);
+            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, TimeSpan.FromMinutes(1));
+
+            // Assert
+            Assert.Equal(expected.Count(), actual.Count());
+        }
+
+        [Fact]
+        public async Task DeleteMessages_EmptiesQueue()
+        {
+            // Arrange
+            CloudQueue queue = InitializeQueue();
+            IEnumerable<CloudQueueMessage> messages = CreateQueueMessages();
+            await _manager.AddMessagesAsync(queue, messages);
+
+            // Act
+            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxCloudQueueMessages, TimeSpan.FromMinutes(1));
+            await _manager.DeleteMessagesAsync(queue, initial);
+            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxCloudQueueMessages, TimeSpan.FromMinutes(1));
+
+            // Assert
+            Assert.Equal(MaxCloudQueueMessages, initial.Count());
+            Assert.Equal(0, final.Count());
+        }
+
+        [Fact]
+        public async Task DeleteMessages_HandlesDoubleDeletion()
+        {
+            // Arrange
+            CloudQueue queue = InitializeQueue();
+            IEnumerable<CloudQueueMessage> messages = CreateQueueMessages();
+            await _manager.AddMessagesAsync(queue, messages);
+
+            // Act
+            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxCloudQueueMessages, TimeSpan.FromMinutes(1));
+            await _manager.DeleteMessagesAsync(queue, initial);
+            await _manager.DeleteMessagesAsync(queue, initial);
+            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxCloudQueueMessages, TimeSpan.FromMinutes(1));
+
+            // Assert
+            Assert.Equal(MaxCloudQueueMessages, initial.Count());
+            Assert.Equal(0, final.Count());
+        }
+
+        [Fact]
+        public async Task DeleteMessages_HandlesInvalidMessage()
+        {
+            // Arrange
+            CloudQueue queue = InitializeQueue();
+            CloudQueueMessage message = new CloudQueueMessage("invalid");
+
+            // Act
+            await _manager.DeleteMessagesAsync(queue, new[] { message });
+        }
+
         [Theory]
         [MemberData("StorageErrorMessageData")]
         public void GetStorageErrorMessage_ExtractsMessage(Exception exception, string expected)
@@ -163,6 +255,24 @@ namespace Microsoft.Azure.Applications.Storage
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        private CloudQueue InitializeQueue()
+        {
+            CloudQueue queue = _manager.GetCloudQueue("UseDevelopmentStorage=true;", "test");
+            queue.DeleteIfExists();
+            queue.Create();
+            return queue;
+        }
+
+        private IEnumerable<CloudQueueMessage> CreateQueueMessages()
+        {
+            CloudQueueMessage[] messages = new CloudQueueMessage[MaxCloudQueueMessages];
+            for (int cnt = 0; cnt < MaxCloudQueueMessages; cnt++)
+            {
+                messages[cnt] = new CloudQueueMessage("data " + cnt);
+            }
+            return messages;
         }
     }
 }
