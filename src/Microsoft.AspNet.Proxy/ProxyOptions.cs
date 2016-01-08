@@ -3,7 +3,7 @@
 
 using System.Net.Http;
 
-namespace Microsoft.AspNet.Proxy
+namespace Microsoft.AspNet.Builder
 {
     /// <summary>
     /// Options to configure host, scheme, and port settings

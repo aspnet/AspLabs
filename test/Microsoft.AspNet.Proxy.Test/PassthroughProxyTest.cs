@@ -27,12 +27,12 @@ namespace Microsoft.AspNet.Proxy.Test
             var builder = new WebApplicationBuilder()
                 .Configure(app =>
                 {
-                    app.RunProxy(options =>
+                    app.RunProxy(new ProxyOptions
                     {
-                        options.Scheme = "http";
-                        options.Host = "localhost";
-                        options.Port = Port;
-                        options.BackChannelMessageHandler = new TestMessageHandler
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = Port,
+                        BackChannelMessageHandler = new TestMessageHandler
                         {
                             Sender = req =>
                             {
@@ -46,7 +46,7 @@ namespace Microsoft.AspNet.Proxy.Test
                                 response.Content = new StringContent("Response Body");
                                 return response;
                             }
-                        };
+                        }
                     });
                 });
             var server = new TestServer(builder);
@@ -72,12 +72,12 @@ namespace Microsoft.AspNet.Proxy.Test
             var builder = new WebApplicationBuilder()
                 .Configure(app =>
                 {
-                    app.RunProxy(options =>
+                    app.RunProxy(new ProxyOptions
                     {
-                        options.Scheme = "http";
-                        options.Host = "localhost";
-                        options.Port = Port;
-                        options.BackChannelMessageHandler = new TestMessageHandler
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = Port,
+                        BackChannelMessageHandler = new TestMessageHandler
                         {
                             Sender = req =>
                             {
@@ -94,7 +94,7 @@ namespace Microsoft.AspNet.Proxy.Test
                                 response.Content = new StringContent("Response Body");
                                 return response;
                             }
-                        };
+                        }
                     });
                 });
             var server = new TestServer(builder);

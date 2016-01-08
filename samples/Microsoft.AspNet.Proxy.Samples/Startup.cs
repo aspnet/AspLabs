@@ -13,11 +13,11 @@ namespace Microsoft.AspNet.Proxy
             const string scheme = "https";
             const string host = "example.com";
             const string port = "443";
-            app.RunProxy(options =>
+            app.RunProxy(new ProxyOptions
             {
-                options.Scheme = scheme;
-                options.Host = host;
-                options.Port = port;
+                Scheme = scheme,
+                Host = host,
+                Port = port
             });
         }
 

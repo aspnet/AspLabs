@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNet.Proxy
 {
@@ -16,7 +17,7 @@ namespace Microsoft.AspNet.Proxy
         private readonly HttpClient _httpClient;
         private readonly ProxyOptions _options;
 
-        public ProxyMiddleware(RequestDelegate next, ProxyOptions options)
+        public ProxyMiddleware(RequestDelegate next, IOptions<ProxyOptions> options)
         {
             if (next == null)
             {
@@ -29,31 +30,31 @@ namespace Microsoft.AspNet.Proxy
             }
 
             _next = next;
-            if (string.IsNullOrEmpty(options.Host))
+            _options = options.Value;
+
+            if (string.IsNullOrEmpty(_options.Host))
             {
-                throw new ArgumentException("Options parameter must specify host.", "options");
+                throw new ArgumentException("Options parameter must specify host.", nameof(options));
             }
 
             // Setting default Port and Scheme if not specified
-            if (string.IsNullOrEmpty(options.Port))
+            if (string.IsNullOrEmpty(_options.Port))
             {
-                if (string.Equals(options.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(_options.Scheme, "https", StringComparison.OrdinalIgnoreCase))
                 {
-                    options.Port = "443";
+                    _options.Port = "443";
                 }
                 else
                 {
-                    options.Port = "80";
+                    _options.Port = "80";
                 }
 
             }
 
-            if (string.IsNullOrEmpty(options.Scheme))
+            if (string.IsNullOrEmpty(_options.Scheme))
             {
-                options.Scheme = "http";
+                _options.Scheme = "http";
             }
-
-            _options = options;
 
             _httpClient = new HttpClient(_options.BackChannelMessageHandler ?? new HttpClientHandler());
         }
