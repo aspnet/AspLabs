@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>This package provides support for receiving WebHooks from Bitbucket. For information about Bitbucket WebHooks, see "https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html".</description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Bitbucket</tags>
   </metadata>
 </package>

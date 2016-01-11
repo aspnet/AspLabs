@@ -14,7 +14,7 @@
       This package provides common functionality for sending and receiving WebHooks using ASP.NET.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
 </package>

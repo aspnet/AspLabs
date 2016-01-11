@@ -14,7 +14,7 @@
       This package provides functionality for adding your own custom WebHook support to your ASP.NET project. The functionality enables users to register WebHooks using a simple pub/sub model, and for your code to send WebHooks to registered receivers with matching WebHook registrations.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
 </package>

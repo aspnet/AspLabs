@@ -14,7 +14,7 @@
       This package provides support for receiving Salesforce SOAP-based Outbound Messages as a WebHook. For information about Salesforce WebHooks, see "https://help.salesforce.com/htviewhelpdoc?id=workflow_defining_outbound_messages.htm".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Salesforce</tags>
   </metadata>
 </package>

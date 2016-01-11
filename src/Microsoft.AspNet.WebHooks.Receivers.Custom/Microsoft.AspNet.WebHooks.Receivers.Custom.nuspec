@@ -14,7 +14,7 @@
       This package provides support for receiving custom WebHooks from ASP.NET WebHooks implementations.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
 </package>

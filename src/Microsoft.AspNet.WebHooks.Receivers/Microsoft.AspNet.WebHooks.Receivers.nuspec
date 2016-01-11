@@ -14,7 +14,7 @@
       This package provides a uniform model for receiving WebHooks from an open-ended set of WebHook generators such as Dropbox, GitHub, Slack, and many more.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
 </package>

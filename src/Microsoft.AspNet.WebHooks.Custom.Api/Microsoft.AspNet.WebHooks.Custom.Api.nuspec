@@ -14,7 +14,7 @@
       This package contains a set of ASP.NET Web API Controllers for managing your custom WebHooks filters and registrations through a REST-style interface.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks</tags>
   </metadata>
 </package>

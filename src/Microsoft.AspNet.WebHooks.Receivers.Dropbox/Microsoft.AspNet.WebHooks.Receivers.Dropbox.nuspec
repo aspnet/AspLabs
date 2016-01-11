@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Dropbox. For information about Dropbox WebHooks, see "https://www.dropbox.com/developers/webhooks/docs".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Dropbox</tags>
   </metadata>
 </package>

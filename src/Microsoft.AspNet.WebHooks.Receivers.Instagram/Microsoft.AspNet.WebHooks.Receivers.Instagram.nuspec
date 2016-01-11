@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Instagram. For information about Instagram WebHooks, see "https://instagram.com/developer/realtime/".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Instagram</tags>
   </metadata>
 </package>

@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Stripe. For information about Stripe WebHooks, see "https://stripe.com/docs/webhooks".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Stripe</tags>
   </metadata>
 </package>

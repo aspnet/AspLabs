@@ -14,7 +14,7 @@
       This package provides support for receiving generic WebHooks with no special validation logic or security requirements. This can for example be used to receive WebHooks from IFTTT's Maker Channel or a Zapier WebHooks Action.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks IFTTT Zapier</tags>
   </metadata>
 </package>

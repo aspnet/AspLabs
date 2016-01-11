@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Paypal using the Paypal .NET SDK, see "https://www.nuget.org/packages/PayPal". For information about Paypal WebHooks, see "https://developer.paypal.com/webapps/developer/docs/integration/direct/rest-webhooks-overview/".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Paypal</tags>
   </metadata>
 </package>

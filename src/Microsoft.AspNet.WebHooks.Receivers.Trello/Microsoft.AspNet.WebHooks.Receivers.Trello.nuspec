@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Trello. For information about Trello WebHooks, see "https://trello.com/docs/gettingstarted/webhooks.html".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Trello</tags>
   </metadata>
 </package>

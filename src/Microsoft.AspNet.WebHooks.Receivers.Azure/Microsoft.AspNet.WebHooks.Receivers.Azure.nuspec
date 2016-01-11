@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from Kudu (Azure Web App Deployment) and Azure Alerts. For information about Kudu WebHooks, see "https://github.com/projectkudu/kudu/wiki/Web-hooks" and for Azure Alerts, see "https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks WebApp Kudu Azure Alerts</tags>
   </metadata>
 </package>

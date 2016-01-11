@@ -14,7 +14,7 @@
       This package provides support for receiving WebHooks from MailChimp. For information about MailChimp WebHooks, see "https://apidocs.mailchimp.com/webhooks/".
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks MailChimp</tags>
   </metadata>
 </package>

@@ -14,7 +14,7 @@
       This package exposes helpers for managing and triggering your custom WebHooks from within ASP.NET MVC Controllers.
     </description>
     <releaseNotes></releaseNotes>
-    <copyright>&#169; Microsoft Corporation. All rights reserved</copyright>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>microsoft aspnet webapi aspnetwebapi webhooks</tags>
   </metadata>
 </package>
