@@ -25,6 +25,7 @@ namespace Microsoft.AspNet.Proxy
         {
             var application = new WebApplicationBuilder()
                 .UseConfiguration(WebApplicationConfiguration.GetDefault(args))
+                .UseIISPlatformHandlerUrl()
                 .UseStartup<Startup>()
                 .Build();
 
