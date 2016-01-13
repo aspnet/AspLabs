@@ -26,7 +26,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class DropboxWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "dropbox";
+        internal const string RecName = "dropbox";
         internal const int SecretMinLength = 15;
         internal const int SecretMaxLength = 128;
 
@@ -34,10 +34,18 @@ namespace Microsoft.AspNet.WebHooks
         internal const string ChallengeParameter = "challenge";
         internal const string DefaultAction = "change";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

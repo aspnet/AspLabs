@@ -23,14 +23,22 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class KuduWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "kudu";
+        internal const string RecName = "kudu";
 
         internal const string ActionParameter = "status";
+
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
 
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

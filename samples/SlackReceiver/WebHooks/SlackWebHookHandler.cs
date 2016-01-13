@@ -10,7 +10,7 @@ namespace SlackReceiver.WebHooks
     {
         public SlackWebHookHandler()
         {
-            this.Receiver = "slack";
+            this.Receiver = SlackWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)

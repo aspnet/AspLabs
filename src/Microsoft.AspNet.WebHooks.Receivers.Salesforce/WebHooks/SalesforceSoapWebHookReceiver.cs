@@ -25,13 +25,21 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class SalesforceSoapWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "sfsoap";
+        internal const string RecName = "sfsoap";
         internal const string ReceiverConfigName = "SalesforceSoap";
+
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
 
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

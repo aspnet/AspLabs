@@ -24,6 +24,22 @@ namespace Microsoft.AspNet.WebHooks
         private HttpRequestMessage _postRequest;
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new PaypalWebHookReceiver(initialize: false);
+            string expected = "paypal";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = PaypalWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public void Constructor_Throws_IfNoConfig()
         {
             // Arrange

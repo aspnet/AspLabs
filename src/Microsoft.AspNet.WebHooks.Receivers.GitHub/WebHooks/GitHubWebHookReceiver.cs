@@ -26,7 +26,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class GitHubWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "github";
+        internal const string RecName = "github";
         internal const int SecretMinLength = 16;
         internal const int SecretMaxLength = 128;
 
@@ -36,10 +36,18 @@ namespace Microsoft.AspNet.WebHooks
         internal const string EventHeaderName = "X-Github-Event";
         internal const string PingEvent = "ping";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

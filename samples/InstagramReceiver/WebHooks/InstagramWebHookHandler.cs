@@ -9,7 +9,7 @@ namespace InstagramReceiver.WebHooks
     {
         public InstagramWebHookHandler()
         {
-            this.Receiver = "instagram";
+            this.Receiver = InstagramWebHookReceiver.ReceiverName;
         }
 
         public override async Task ExecuteAsync(string generator, WebHookHandlerContext context)

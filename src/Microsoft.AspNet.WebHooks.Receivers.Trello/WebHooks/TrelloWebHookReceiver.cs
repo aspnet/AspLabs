@@ -24,17 +24,25 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class TrelloWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "trello";
+        internal const string RecName = "trello";
         internal const int SecretMinLength = 32;
         internal const int SecretMaxLength = 128;
 
         internal const string DefaultAction = "change";
         internal const string SignatureHeaderName = "x-trello-webhook";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

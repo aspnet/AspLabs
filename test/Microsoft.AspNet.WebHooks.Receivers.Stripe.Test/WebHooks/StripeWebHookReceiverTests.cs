@@ -29,6 +29,22 @@ namespace Microsoft.AspNet.WebHooks
         private HttpResponseMessage _stripeResponse;
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new StripeWebHookReceiver();
+            string expected = "stripe";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = StripeWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotJson()
         {
             // Arrange

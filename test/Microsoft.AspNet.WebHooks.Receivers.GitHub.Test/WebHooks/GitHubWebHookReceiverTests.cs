@@ -66,6 +66,22 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new GitHubWebHookReceiver();
+            string expected = "github";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = GitHubWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public async Task ReceiveAsync_Throws_IfPostHasNoSignatureHeader()
         {
             // Arrange

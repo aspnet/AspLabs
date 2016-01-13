@@ -24,16 +24,24 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class BitbucketWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "bitbucket";
+        internal const string RecName = "bitbucket";
 
         internal const string EventHeaderKey = "X-Event-Key";
         internal const string UUIDHeaderName = "X-Hook-UUID";
         internal const string WebHookIdKey = "webHook_id";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

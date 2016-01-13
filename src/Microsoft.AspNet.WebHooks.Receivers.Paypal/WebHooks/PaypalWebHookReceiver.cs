@@ -24,7 +24,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class PaypalWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "paypal";
+        internal const string RecName = "paypal";
         internal const string EventTypeParameter = "event_type";
 
         private readonly object _thisLock = new object();
@@ -60,10 +60,18 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

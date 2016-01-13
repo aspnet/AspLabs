@@ -41,6 +41,22 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new WordPressWebHookReceiver();
+            string expected = "wordpress";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = WordPressWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotUsingHttps()
         {
             // Arrange
@@ -166,6 +182,7 @@ namespace Microsoft.AspNet.WebHooks
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, req, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
+
         public override void Initialize(string config)
         {
             base.Initialize(config);

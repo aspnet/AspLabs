@@ -44,6 +44,22 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new SlackWebHookReceiver();
+            string expected = "slack";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = SlackWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
         [Theory]
         [MemberData("Texts")]
         public void GetSubtext_GetsCorrectText(string trigger, string text, string expected)

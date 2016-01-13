@@ -22,12 +22,20 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class WordPressWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "wordpress";
+        internal const string RecName = "wordpress";
+
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
 
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

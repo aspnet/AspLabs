@@ -20,12 +20,13 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class InstagramWebHookClient : IDisposable
     {
-        internal const string ClientIdKey = InstagramWebHookReceiver.ReceiverName + "Id";
         internal const string DataKey = "data";
         internal const string InstagramApi = "https://api.instagram.com/v1/";
         internal const string SubscriptionAddress = InstagramApi + "subscriptions";
         internal const string SubscriptionAddressTemplate = SubscriptionAddress + "?client_id={0}&client_secret={1}{2}";
         internal const string GeoMediaTemplate = InstagramApi + "geographies/{0}/media/recent?client_id={1}{2}";
+
+        private static readonly string ClientIdKey = InstagramWebHookReceiver.ReceiverName + "Id";
 
         private readonly ConcurrentDictionary<string, string> _geoPagination = new ConcurrentDictionary<string, string>();
         private readonly HttpConfiguration _config;

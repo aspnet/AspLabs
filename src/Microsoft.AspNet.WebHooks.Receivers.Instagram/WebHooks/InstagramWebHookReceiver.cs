@@ -27,7 +27,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class InstagramWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "instagram";
+        internal const string RecName = "instagram";
         internal const int SecretMinLength = 32;
         internal const int SecretMaxLength = 128;
 
@@ -35,10 +35,18 @@ namespace Microsoft.AspNet.WebHooks
         internal const string ChallengeParameter = "hub.challenge";
         internal const string ActionKey = "object";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

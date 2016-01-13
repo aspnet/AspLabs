@@ -92,6 +92,22 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new CustomWebHookReceiver();
+            string expected = "custom";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = CustomWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
         [Theory]
         [MemberData("InvalidCustomData")]
         public async Task GetActions_Throws_IfInvalidData(string invalid)

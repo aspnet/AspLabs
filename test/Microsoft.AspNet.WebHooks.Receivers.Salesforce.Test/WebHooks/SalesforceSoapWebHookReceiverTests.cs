@@ -24,6 +24,22 @@ namespace Microsoft.AspNet.WebHooks
         private HttpRequestMessage _postRequest;
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new SalesforceSoapWebHookReceiver();
+            string expected = "sfsoap";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = SalesforceSoapWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotUsingHttps()
         {
             // Arrange

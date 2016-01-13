@@ -23,14 +23,22 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class GenericJsonWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "genericjson";
+        internal const string RecName = "genericjson";
         internal const string ActionQueryParameter = "action";
         internal const string DefaultAction = "change";
+
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
 
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

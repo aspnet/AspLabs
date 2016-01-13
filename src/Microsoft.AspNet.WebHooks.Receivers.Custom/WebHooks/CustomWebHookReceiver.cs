@@ -27,7 +27,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class CustomWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "custom";
+        internal const string RecName = "custom";
         internal const int SecretMinLength = 32;
         internal const int SecretMaxLength = 128;
 
@@ -39,10 +39,18 @@ namespace Microsoft.AspNet.WebHooks
         internal const string NotificationsKey = "Notifications";
         internal const string ActionKey = "Action";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

@@ -65,6 +65,22 @@ namespace Microsoft.AspNet.WebHooks
             }
         }
 
+        [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new InstagramWebHookReceiver();
+            string expected = "instagram";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = InstagramWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
         [Theory]
         [MemberData("InvalidInstagramData")]
         public async Task GetActions_Throws_IfInvalidData(string invalid)

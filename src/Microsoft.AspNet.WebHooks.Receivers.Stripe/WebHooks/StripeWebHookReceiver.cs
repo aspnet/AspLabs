@@ -23,7 +23,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class StripeWebHookReceiver : WebHookReceiver, IDisposable
     {
-        internal const string ReceiverName = "stripe";
+        internal const string RecName = "stripe";
         internal const int SecretMinLength = 16;
         internal const int SecretMaxLength = 128;
 
@@ -50,10 +50,18 @@ namespace Microsoft.AspNet.WebHooks
             _httpClient = httpClient ?? new HttpClient();
         }
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

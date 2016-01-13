@@ -10,9 +10,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using Microsoft.AspNet.WebHooks.Config;
-using Microsoft.TestUtilities.Mocks;
 using Moq;
 using Moq.Protected;
 using Xunit;
@@ -44,6 +41,22 @@ namespace Microsoft.AspNet.WebHooks
                 byte[] testHash = hasher.ComputeHash(combo);
                 _signature = EncodingUtilities.ToBase64(testHash, uriSafe: false);
             }
+        }
+
+        [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new TrelloWebHookReceiver();
+            string expected = "trello";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = TrelloWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
         }
 
         [Fact]

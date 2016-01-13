@@ -7,7 +7,7 @@ namespace AzureReceivers.WebHooks
     {
         public AzureAlertWebHookHandler()
         {
-            Receiver = "azurealert";
+            Receiver = AzureAlertWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)

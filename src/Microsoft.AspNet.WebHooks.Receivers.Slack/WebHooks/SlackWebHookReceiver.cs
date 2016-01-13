@@ -21,7 +21,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class SlackWebHookReceiver : WebHookReceiver
     {
-        internal const string ReceiverName = "slack";
+        internal const string RecName = "slack";
         internal const int SecretMinLength = 16;
         internal const int SecretMaxLength = 128;
 
@@ -31,10 +31,18 @@ namespace Microsoft.AspNet.WebHooks
         internal const string TextParameter = "text";
         internal const string SubtextParameter = "subtext";
 
+        /// <summary>
+        /// Gets the receiver name for this receiver.
+        /// </summary>
+        public static string ReceiverName
+        {
+            get { return RecName; }
+        }
+
         /// <inheritdoc />
         public override string Name
         {
-            get { return ReceiverName; }
+            get { return RecName; }
         }
 
         /// <inheritdoc />

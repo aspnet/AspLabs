@@ -7,7 +7,7 @@ namespace AzureReceivers.WebHooks
     {
         public KuduWebHookHandler()
         {
-            Receiver = "kudu";
+            Receiver = KuduWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)

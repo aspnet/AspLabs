@@ -8,7 +8,7 @@ namespace CustomReceiver.WebHooks
     {
         public CustomWebHookHandler()
         {
-            this.Receiver = "custom";
+            this.Receiver = CustomWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)

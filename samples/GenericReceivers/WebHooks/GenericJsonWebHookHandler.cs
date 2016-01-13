@@ -9,7 +9,7 @@ namespace GenericReceivers.WebHooks
     {
         public GenericJsonWebHookHandler()
         {
-            this.Receiver = "genericjson";
+            this.Receiver = GenericJsonWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string receiver, WebHookHandlerContext context)

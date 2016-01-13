@@ -9,7 +9,7 @@ namespace MailChimpReceiver.Selfhost.WebHooks
     {
         public MailChimpWebHookHandler()
         {
-            this.Receiver = "mailchimp";
+            this.Receiver = MailChimpWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)

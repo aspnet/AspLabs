@@ -43,6 +43,22 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void ReceiverName_IsConsistent()
+        {
+            // Arrange
+            IWebHookReceiver rec = new DynamicsCrmWebHookReceiver();
+            string expected = "dynamicscrm";
+
+            // Act
+            string actual1 = rec.Name;
+            string actual2 = DynamicsCrmWebHookReceiver.ReceiverName;
+
+            // Assert
+            Assert.Equal(expected, actual1);
+            Assert.Equal(actual1, actual2);
+        }
+
+        [Fact]
         public async Task ReceiveAsync_Throws_IfPostIsNotUsingHttps()
         {
             // Arrange
@@ -142,7 +158,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(TestSecret);
-            List<string> actions = new List<string> { "Create" };            
+            List<string> actions = new List<string> { "Create" };
             ReceiverMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", TestId, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())

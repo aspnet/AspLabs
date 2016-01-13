@@ -10,7 +10,7 @@ namespace BitbucketReceiver.WebHooks
     {
         public BitbucketWebHookHandler()
         {
-            this.Receiver = "bitbucket";
+            this.Receiver = BitbucketWebHookReceiver.ReceiverName;
         }
 
         public override Task ExecuteAsync(string generator, WebHookHandlerContext context)
