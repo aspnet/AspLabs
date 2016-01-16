@@ -16,6 +16,7 @@ using Xunit;
 
 namespace Microsoft.Azure.Applications.Storage
 {
+    [Collection("StoreCollection")]
     public class StorageManagerTests
     {
         private const int MaxCloudQueueMessages = 16;
