@@ -24,7 +24,7 @@ namespace Microsoft.AspNet.Proxy.Test
         [InlineData("DELETE", "3004")]
         public async Task PassthroughRequestsWithoutBodyWithResponseHeaders(string MethodType, string Port)
         {
-            var builder = new WebApplicationBuilder()
+            var builder = new WebHostBuilder()
                 .Configure(app =>
                 {
                     app.RunProxy(new ProxyOptions
@@ -69,7 +69,7 @@ namespace Microsoft.AspNet.Proxy.Test
         [InlineData("NewHttpMethod", "3008")]
         public async Task PassthroughReuestWithBody(string MethodType, string Port)
         {
-            var builder = new WebApplicationBuilder()
+            var builder = new WebHostBuilder()
                 .Configure(app =>
                 {
                     app.RunProxy(new ProxyOptions
