@@ -1,10 +1,10 @@
-﻿{
+{
   "version": "1.0.0-*",
 
   "dependencies": {
-    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-*",
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNet.Proxy": "1.0.0-*"
+    "Microsoft.AspNetCore.IISPlatformHandler": "1.0.0-*",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNetCore.Proxy": "1.0.0-*"
   },
 
   "compilationOptions": {
@@ -12,7 +12,7 @@
   },
 
   "commands": {
-    "web": "Microsoft.AspNet.Proxy.Samples"
+    "web": "Microsoft.AspNetCore.Proxy.Samples"
   },
 
   "frameworks": {

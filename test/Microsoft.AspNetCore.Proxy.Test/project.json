@@ -1,9 +1,9 @@
 {
   "version": "1.0.0-*",
-  "description": "Microsoft.AspNet.Proxy.Test Class Library",
+  "description": "Microsoft.AspNetCore.Proxy.Test Class Library",
   "dependencies": {
-      "Microsoft.AspNet.Proxy": "1.0.0-*",
-      "Microsoft.AspNet.TestHost": "1.0.0-*",
+      "Microsoft.AspNetCore.Proxy": "1.0.0-*",
+      "Microsoft.AspNetCore.TestHost": "1.0.0-*",
       "xunit": "2.1.0"
   },
   "frameworks": {
