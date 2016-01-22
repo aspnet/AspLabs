@@ -1,25 +1,20 @@
 {
   "version": "1.0.0-*",
-
   "dependencies": {
     "Microsoft.AspNetCore.IISPlatformHandler": "1.0.0-*",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNetCore.Proxy": "1.0.0-*"
+    "Microsoft.AspNetCore.Proxy": "0.1.0-*"
   },
-
   "compilationOptions": {
     "emitEntryPoint": true
   },
-
   "commands": {
     "web": "Microsoft.AspNetCore.Proxy.Samples"
   },
-
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": { }
+    "dnx451": {},
+    "dnxcore50": {}
   },
-
   "publishExclude": [
     "node_modules",
     "bower_components",
