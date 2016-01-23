@@ -31,4 +31,8 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 
 * Updates
   * [Updates to Microsoft ASP.NET WebHooks Preview Nov 2015](http://blogs.msdn.com/b/webdev/archive/2015/11/07/updates-to-microsoft-asp-net-webhooks-preview.aspx)
-  - [New Year Updates to ASP.NET WebHooks Preview Dec 2015](http://blogs.msdn.com/b/webdev/archive/2015/12/31/new-year-updates-to-asp-net-webhooks-preview.aspx)
+    * Sending events to *all* users
+    * Sending WebHooks scaling up and out using persistent queues  
+  * [New Year Updates to ASP.NET WebHooks Preview Dec 2015](http://blogs.msdn.com/b/webdev/archive/2015/12/31/new-year-updates-to-asp-net-webhooks-preview.aspx)
+    * Storing WebHook registrations in SQL
+    * Registering WebHook modules with a dependency engine
