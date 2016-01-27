@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WebHooks Stripe Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WebHooks Stripe Receiver</h1>
+
+    <p>This sample illustrates how to wire up a Stripe WebHooks receiver which can be used for
+        Stripe WebHooks. A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/stripe/{id}</pre>
+
+    <p>
+        The URI does not have to be HTTPS (yet?).
+    </p>
+    <p>
+        Set the <b>MS_WebHookReceiverSecret_Stripe</b> application setting to the Stripe 'token' parameter, optionally using IDs
+        to differentiate between multiple WebHooks, for example '<c>secret0, trigger=secret1</c>'. 
+    </p>
+    <p>
+        Set the <b>MS_WebHookStripePassThroughTestEvents</b> application setting to true if you want to be able to receive test events (with Id 'evt_00000000000000').
+        By default the test events will be consumed by the StripeWebHookReceiver which automatically returns a 200 response. <br/>
+        If MS_WebHookStripeInTestMode is set to true your own StripeWebHookHandler will receive the deserialized test data.
+        Normal events will still be verified by downloading the actual event data from Stripe.
+    </p>
+    <p>
+        In this example we registered one webhook URI. It is also possible to register multiple urls by providing different id's in the key. 
+        You should register the following URI with Stripe:
+    </p>
+    <pre>
+        https://&lt;host&gt;/api/webhooks/incoming/stripe/
+    </pre>
+    <p>
+        and then configure the application setting as follows
+    </p>
+<pre>
+        &lt;add key="MS_WebHookReceiverSecret_Stripe" value="&lt;token&gt;" /&gt;
+    </pre>
+<p>If you would like to register multiple URIs with different tokens you just add another id:</p>
+<pre>
+    https://&lt;host&gt;/api/webhooks/incoming/stripe/{id}
+    &lt;add key="MS_WebHookReceiverSecret_Stripe" value="&lt;token&gt;, {id}=&lt;token&gt;" /&gt; 
+</pre>
+    <p>
+        Please see <a href="https://stripe.com/docs/webhooks">Stripe WebHooks</a> and
+        <a href="https://github.com/aspnet/WebHooks">AspNet WebHooks</a>
+        for more information.
+    </p>
+</body>
+</html>

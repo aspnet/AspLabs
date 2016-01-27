@@ -13,6 +13,7 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 - [Bitbucket](/samples/BitbucketReceiver)
 - [Instagram](/samples/InstagramReceiver)
 - [Slack](/samples/SlackReceiver)
+- [Stripe](/samples/StripeReceiver)
 
 ###Resources
 * Overview

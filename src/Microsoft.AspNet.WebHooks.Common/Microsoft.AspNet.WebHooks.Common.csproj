@@ -69,6 +69,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CommonResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Serialization\UnixTimeConverter.cs" />
     <Compile Include="Utilities\EncodingUtilities.cs" />
     <Compile Include="Services\CommonServices.cs" />
     <Compile Include="Utilities\Hasher.cs" />

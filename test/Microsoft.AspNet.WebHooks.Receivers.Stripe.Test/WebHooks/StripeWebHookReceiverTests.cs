@@ -81,7 +81,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public async Task ReceiveAsync_Succeeds_IfTestId()
+        public async Task ReceiveAsync_Succeeds_WithoutCallingHandler_IfTestId()
         {
             // Arrange
             Initialize(TestSecret);
@@ -95,6 +95,26 @@ namespace Microsoft.AspNet.WebHooks
             Assert.Equal(0, _handlerMock.Counter);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
+        }
+
+        [Fact]
+        public async Task ReceiveAsync_Succeeds_CallingHandler_IfTestId_And_TestMode()
+        {
+            // Arrange
+            Initialize(TestSecret, inTestMode: true);
+            _postRequest.Content = new StringContent("{ \"type\": \"action\", \"id\": \"" + StripeWebHookReceiver.TestId + "\" }", Encoding.UTF8, "application/json");
+            List<string> actions = new List<string> { "action" };
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", string.Empty, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
+                .ReturnsAsync(new HttpResponseMessage())
+                .Verifiable();
+
+            // Act
+            await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+
+            // Assert
+            Assert.Equal(0, _handlerMock.Counter);
+            ReceiverMock.Verify();
         }
 
         [Fact]
@@ -170,6 +190,12 @@ namespace Microsoft.AspNet.WebHooks
             // Act
             Receiver.Dispose();
             Receiver.Dispose();
+        }
+
+        public void Initialize(string config, bool inTestMode)
+        {
+            Initialize(config);
+            Settings.Add(StripeWebHookReceiver.PassThroughTestEvents, inTestMode.ToString());
         }
 
         public override void Initialize(string config)

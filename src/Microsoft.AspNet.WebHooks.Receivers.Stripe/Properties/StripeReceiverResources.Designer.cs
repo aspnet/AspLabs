@@ -86,5 +86,14 @@ namespace Microsoft.AspNet.WebHooks.Properties {
                 return ResourceManager.GetString("Receiver_TestEvent", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Received a Stripe Test Event..
+        /// </summary>
+        internal static string Receiver_TestEvent_Process {
+            get {
+                return ResourceManager.GetString("Receiver_TestEvent_Process", resourceCulture);
+            }
+        }
     }
 }

@@ -58,6 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\EmbeddedResource.cs">
+      <Link>Common\EmbeddedResource.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebHooks\SalesforceNotificationsTests.cs" />
     <Compile Include="WebHooks\SalesforceSoapWebHookReceiverTests.cs" />

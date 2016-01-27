@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml.Linq;
 using Xunit;
 
@@ -17,12 +15,10 @@ namespace Microsoft.AspNet.WebHooks
 
         public SalesforceNotificationsTests()
         {
-            string msg1 = ReadResource("Microsoft.AspNet.WebHooks.Messages.OutboundMessage1.xml");
-            _doc1 = XElement.Parse(msg1);
+            _doc1 = EmbeddedResource.ReadAsJXElement("Microsoft.AspNet.WebHooks.Messages.OutboundMessage1.xml");
             _notifications1 = new SalesforceNotifications(_doc1);
 
-            string msg2 = ReadResource("Microsoft.AspNet.WebHooks.Messages.OutboundMessage2.xml");
-            _doc2 = XElement.Parse(msg2);
+            _doc2 = EmbeddedResource.ReadAsJXElement("Microsoft.AspNet.WebHooks.Messages.OutboundMessage2.xml");
             _notifications2 = new SalesforceNotifications(_doc2);
         }
 
@@ -181,16 +177,6 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             Assert.Equal(expected, actual);
-        }
-
-        private static string ReadResource(string name)
-        {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
-            using (StreamReader reader = new StreamReader(content))
-            {
-                return reader.ReadToEnd();
-            }
         }
     }
 }

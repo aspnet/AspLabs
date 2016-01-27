@@ -120,6 +120,12 @@
   <data name="Config_NotInitialized" xml:space="preserve">
     <value>WebHooks support has not been initialized correctly. Please call the initializer '{0}' on startup.</value>
   </data>
+  <data name="DateTime_BadFormat" xml:space="preserve">
+    <value>Cannot read value '{0}' as type '{1}'.</value>
+  </data>
+  <data name="DateTime_NullError" xml:space="preserve">
+    <value>Cannot convert null value to type '{0}'.</value>
+  </data>
   <data name="EncodingUtils_InvalidHexValue" xml:space="preserve">
     <value>Input is not a valid hex-encoded string: '{0}'. Please provide a valid hex-encoded string.</value>
   </data>

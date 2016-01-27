@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Dependencies;
+using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
@@ -23,6 +25,9 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class StripeWebHookReceiver : WebHookReceiver, IDisposable
     {
+        // Application setting to enable test mode
+        internal const string PassThroughTestEvents = "MS_WebHookStripePassThroughTestEvents";
+
         internal const string RecName = "stripe";
         internal const int SecretMinLength = 16;
         internal const int SecretMaxLength = 128;
@@ -98,8 +103,7 @@ namespace Microsoft.AspNet.WebHooks
                 // If test ID then just return here.
                 if (string.Equals(TestId, notificationId, StringComparison.OrdinalIgnoreCase))
                 {
-                    context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent);
-                    return request.CreateResponse();
+                    return await this.HandleTestEvent(id, context, request, data);
                 }
 
                 // Get data directly from Stripe as we don't know where the event comes from.
@@ -178,6 +182,28 @@ namespace Microsoft.AspNet.WebHooks
 
                 JObject result = await rsp.Content.ReadAsAsync<JObject>();
                 return result;
+            }
+        }
+
+        private async Task<HttpResponseMessage> HandleTestEvent(string id, HttpRequestContext context, HttpRequestMessage request, JObject data)
+        {
+            IDependencyResolver resolver = request.GetConfiguration().DependencyResolver;
+
+            // Check to see if we have been configured to process test events
+            SettingsDictionary settings = resolver.GetSettings();
+            string passThroughTestEventsValue = settings.GetValueOrDefault(PassThroughTestEvents);
+
+            bool passThroughTestEvents;
+            if (bool.TryParse(passThroughTestEventsValue, out passThroughTestEvents) && passThroughTestEvents == true)
+            {
+                context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent_Process);
+                var action = data.Value<string>("type");
+                return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
+            }
+            else
+            {
+                context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent);
+                return request.CreateResponse();
             }
         }
     }
