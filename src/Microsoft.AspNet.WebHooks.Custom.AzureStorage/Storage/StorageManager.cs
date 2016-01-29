@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
@@ -32,6 +33,8 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
         private static readonly ConcurrentDictionary<string, CloudStorageAccount> TableAccounts = new ConcurrentDictionary<string, CloudStorageAccount>();
         private static readonly ConcurrentDictionary<string, CloudStorageAccount> QueueAccounts = new ConcurrentDictionary<string, CloudStorageAccount>();
+
+        private static IStorageManager _storageManager;
 
         private readonly ILogger _logger;
 
@@ -473,6 +476,18 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             StorageException se = ex as StorageException;
             return se != null && se.RequestInformation != null ? se.RequestInformation.HttpStatusCode : 500;
+        }
+
+        internal static IStorageManager GetInstance(ILogger logger)
+        {
+            if (_storageManager != null)
+            {
+                return _storageManager;
+            }
+
+            IStorageManager instance = new StorageManager(logger);
+            Interlocked.CompareExchange(ref _storageManager, instance, null);
+            return _storageManager;
         }
 
         internal static void AddQueryConstraint(TableQuery query, string constraint)

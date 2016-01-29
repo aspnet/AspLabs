@@ -15,6 +15,7 @@ using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
 using Newtonsoft.Json;
 
@@ -52,6 +53,19 @@ namespace Microsoft.AspNet.WebHooks
             CheckSqlStorageConnectionString(settings);
             _protector = protector;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Provides a static method for creating a standalone <see cref="SqlWebHookStore"/> instance.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        /// <returns>An initialized <see cref="SqlWebHookStore"/> instance.</returns>
+        public static IWebHookStore CreateStore(ILogger logger)
+        {
+            SettingsDictionary settings = CommonServices.GetSettings();
+            IDataProtector protector = DataSecurity.GetDataProtector();
+            IWebHookStore store = new SqlWebHookStore(settings, protector, logger);
+            return store;
         }
 
         /// <inheritdoc />

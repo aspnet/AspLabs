@@ -258,6 +258,18 @@ namespace Microsoft.Azure.Applications.Storage
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        public void GetInstance_ReturnsSingletonInstance()
+        {
+            // Act
+            IStorageManager actual1 = StorageManager.GetInstance(_loggerMock.Object);
+            IStorageManager actual2 = StorageManager.GetInstance(_loggerMock.Object);
+
+            // Assert
+            Assert.NotNull(actual1);
+            Assert.Same(actual1, actual2);
+        }
+
         private CloudQueue InitializeQueue()
         {
             CloudQueue queue = _manager.GetCloudQueue("UseDevelopmentStorage=true;", "test");

@@ -5,7 +5,9 @@ using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Web.Http;
+using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Services;
+using Moq;
 using Xunit;
 using EF = Microsoft.AspNet.WebHooks.Migrations;
 
@@ -17,6 +19,19 @@ namespace Microsoft.AspNet.WebHooks
         public SqlWebHookStoreTests()
             : base(CreateStore())
         {
+        }
+
+        [Fact]
+        public void CreateStore_Succeeds()
+        {
+            // Arrange
+            ILogger logger = new Mock<ILogger>().Object;
+
+            // Act
+            IWebHookStore actual = SqlWebHookStore.CreateStore(logger);
+
+            // Assert
+            Assert.IsType<SqlWebHookStore>(actual);
         }
 
         private static IWebHookStore CreateStore()

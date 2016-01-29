@@ -10,6 +10,7 @@ using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
+using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
@@ -60,6 +61,20 @@ namespace Microsoft.AspNet.WebHooks
             _connectionString = manager.GetAzureStorageConnectionString(settings);
             _protector = protector;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
+        public static IWebHookStore CreateStore(ILogger logger)
+        {
+            SettingsDictionary settings = CommonServices.GetSettings();
+            IDataProtector protector = DataSecurity.GetDataProtector();
+            IStorageManager storageManager = StorageManager.GetInstance(logger);
+            IWebHookStore store = new AzureWebHookStore(storageManager, settings, protector, logger);
+            return store;
         }
 
         /// <inheritdoc />
