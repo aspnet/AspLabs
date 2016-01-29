@@ -40,7 +40,7 @@ namespace Microsoft.AspNet.WebHooks.Services
         {
             if (_settings == null)
             {
-                SettingsProvider settingsProvider = new SettingsProvider();
+                DefaultSettingsProvider settingsProvider = new DefaultSettingsProvider();
                 SettingsDictionary instance = settingsProvider.GetSettings();
                 Interlocked.CompareExchange(ref _settings, instance, null);
             }

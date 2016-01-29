@@ -8,14 +8,14 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Config
 {
-    public class SettingsProviderTests
+    public class DefaultSettingsProviderTests
     {
         [Fact]
         public void GetSettings_CallsInitializeSettingsAndReturnsResult()
         {
             // Arrange
             SettingsDictionary settings = new SettingsDictionary();
-            Mock<SettingsProvider> settingsProviderMock = new Mock<SettingsProvider>() { CallBase = true };
+            Mock<DefaultSettingsProvider> settingsProviderMock = new Mock<DefaultSettingsProvider>() { CallBase = true };
             settingsProviderMock.Protected()
                 .Setup<SettingsDictionary>("InitializeSettings")
                 .Returns(settings)
@@ -33,7 +33,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         public void GetSettings_ReturnsSameInstance()
         {
             // Arrange
-            SettingsProvider settingsProvider = new SettingsProvider();
+            DefaultSettingsProvider settingsProvider = new DefaultSettingsProvider();
 
             // Act
             SettingsDictionary settings1 = settingsProvider.GetSettings();
@@ -47,7 +47,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         public void GetSettings_SetsCustomProperties()
         {
             // Arrange
-            Mock<SettingsProvider> providerMock = GetProviderMock();
+            Mock<DefaultSettingsProvider> providerMock = GetProviderMock();
 
             // Act
             SettingsDictionary actual = providerMock.Object.GetSettings();
@@ -56,9 +56,9 @@ namespace Microsoft.AspNet.WebHooks.Config
             Assert.Equal(actual["SampleKey"], "你好世界");
         }
 
-        private static Mock<SettingsProvider> GetProviderMock()
+        private static Mock<DefaultSettingsProvider> GetProviderMock()
         {
-            Mock<SettingsProvider> settingsProviderMock = new Mock<SettingsProvider>() { CallBase = true };
+            Mock<DefaultSettingsProvider> settingsProviderMock = new Mock<DefaultSettingsProvider>() { CallBase = true };
             NameValueCollection appSettings = new NameValueCollection();
             appSettings["SampleKey"] = "你好世界";
             settingsProviderMock.Protected()

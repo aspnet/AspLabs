@@ -62,7 +62,7 @@
   <ItemGroup>
     <Compile Include="Config\ConnectionSettingsTests.cs" />
     <Compile Include="Config\SettingsDictionaryTests.cs" />
-    <Compile Include="Config\SettingsProviderTests.cs" />
+    <Compile Include="Config\DefaultSettingsProviderTests.cs" />
     <Compile Include="Config\WebHooksConfigTests.cs" />
     <Compile Include="Extensions\DependencyScopeExtensionsTests.cs" />
     <Compile Include="Extensions\DictionaryExtensionsTests.cs" />

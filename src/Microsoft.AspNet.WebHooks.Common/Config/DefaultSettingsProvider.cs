@@ -11,14 +11,14 @@ namespace Microsoft.AspNet.WebHooks.Config
     /// Provides a default <see cref="SettingsDictionary"/> based on application settings from the global 
     /// <see cref="ConfigurationManager"/>.
     /// </summary>
-    public class SettingsProvider
+    public class DefaultSettingsProvider
     {
         private readonly Lazy<SettingsDictionary> _settings;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SettingsProvider"/> class.
+        /// Initializes a new instance of the <see cref="DefaultSettingsProvider"/> class.
         /// </summary>
-        public SettingsProvider()
+        public DefaultSettingsProvider()
         {
             _settings = new Lazy<SettingsDictionary>(() => InitializeSettings());
         }
