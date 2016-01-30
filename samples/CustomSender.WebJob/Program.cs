@@ -37,10 +37,7 @@ namespace CustomSender.WebJob
                 StorageConnectionString = queueAddr
             };
             JobHost host = new JobHost(config);
-            host.Start();
-
-            Console.WriteLine("Hit ENTER to exit!");
-            Console.ReadLine();
+            host.RunAndBlock();
         }
 
         public static async Task ProcessQueueMessageAsync([QueueTrigger("listener")] string message, TextWriter logger)
