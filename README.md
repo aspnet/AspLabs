@@ -31,9 +31,10 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
   * [Announcing the ASP.NET WebHooks Visual Studio Extension Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/29/announcing-the-asp-net-webhooks-visual-studio-extension-preview.aspx)
 
 * Updates
-  * [Updates to Microsoft ASP.NET WebHooks Preview Nov 2015](http://blogs.msdn.com/b/webdev/archive/2015/11/07/updates-to-microsoft-asp-net-webhooks-preview.aspx)
-    * Sending events to *all* users
-    * Sending WebHooks scaling up and out using persistent queues  
+  * [Sending ASP.NET WebHooks from Azure WebJobs](http://blogs.msdn.com/b/webdev/archive/2016/01/31/sending-asp-net-webhooks-from-azure-webjobs.aspx)
   * [New Year Updates to ASP.NET WebHooks Preview Dec 2015](http://blogs.msdn.com/b/webdev/archive/2015/12/31/new-year-updates-to-asp-net-webhooks-preview.aspx)
     * Storing WebHook registrations in SQL
     * Registering WebHook modules with a dependency engine
+  * [Updates to Microsoft ASP.NET WebHooks Preview Nov 2015](http://blogs.msdn.com/b/webdev/archive/2015/11/07/updates-to-microsoft-asp-net-webhooks-preview.aspx)
+    * Sending events to *all* users
+    * Sending WebHooks scaling up and out using persistent queues  
