@@ -1,18 +1,16 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Configuration;
 using Microsoft.AspNet.WebHooks;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.Azure.WebJobs;
 
 namespace CustomSender.WebJob
 {
-    public class Program
+    internal class Program
     {
-        private const string QueueAddr = "MS_AzureStoreConnectionString";
-
-        private static IWebHookManager _manager;
+        /// <summary>
+        /// Gets or sets the <see cref="IWebHookManager"/> instance to use.
+        /// </summary>
+        public static IWebHookManager Manager { get; set; }
 
         public static void Main(string[] args)
         {
@@ -28,24 +26,16 @@ namespace CustomSender.WebJob
             IWebHookSender sender = new DataflowWebHookSender(logger);
 
             // Set up WebHook manager which we use for creating notifications.
-            _manager = new WebHookManager(store, sender, logger);
+            Manager = new WebHookManager(store, sender, logger);
 
             // Initialize WebJob
-            var queueAddr = ConfigurationManager.ConnectionStrings[QueueAddr].ConnectionString;
+            var listener = ConfigurationManager.ConnectionStrings["WebHookListener"].ConnectionString;
             JobHostConfiguration config = new JobHostConfiguration
             {
-                StorageConnectionString = queueAddr
+                StorageConnectionString = listener
             };
             JobHost host = new JobHost(config);
             host.RunAndBlock();
-        }
-
-        public static async Task ProcessQueueMessageAsync([QueueTrigger("listener")] string message, TextWriter logger)
-        {
-            await logger.WriteLineAsync(message);
-
-            // Send message to all subscribers as WebHooks
-            await _manager.NotifyAllAsync("event1", new { Message = message });
         }
     }
 }
