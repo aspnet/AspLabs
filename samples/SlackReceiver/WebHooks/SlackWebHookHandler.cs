@@ -32,9 +32,15 @@ namespace SlackReceiver.WebHooks
                     break;
 
                 case "slash":
-                    // Information can be returned in a plain text response
-                    context.Response = context.Request.CreateResponse();
-                    context.Response.Content = new StringContent("Hello slash command!");
+                    // Information can be returned using a SlackSlashResponse
+                    var slashReply = new SlackSlashResponse("hello");
+                    var att = new SlackAttachment("text", "fallback")
+                    {
+                        Color = "#439FE0",
+                        Title = "title"
+                    };
+                    slashReply.Attachments.Add(att);
+                    context.Response = context.Request.CreateResponse(slashReply);
                     break;
             }
 

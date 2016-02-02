@@ -58,12 +58,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\EmbeddedResource.cs">
+      <Link>Common\EmbeddedResource.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebHooks\SlackFieldTests.cs" />
+    <Compile Include="WebHooks\SlackAttachmentTests.cs" />
+    <Compile Include="WebHooks\SlackSlashResponseTests.cs" />
     <Compile Include="WebHooks\SlackWebHookReceiverTests.cs" />
     <Compile Include="WebHooks\SlackResponseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
+    <EmbeddedResource Include="Messages\SlashResponse.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
