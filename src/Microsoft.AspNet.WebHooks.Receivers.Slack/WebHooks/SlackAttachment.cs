@@ -156,6 +156,7 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets a set of <see cref="SlackField"/> instances that will be displayed in a table inside the message attachment
         /// </summary>
+        [JsonProperty("fields")]
         public Collection<SlackField> Fields
         {
             get

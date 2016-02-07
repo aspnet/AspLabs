@@ -64,6 +64,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SlackReceiverResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="WebHooks\ParameterCollection.cs" />
+    <Compile Include="WebHooks\SlackCommand.cs" />
     <Compile Include="WebHooks\SlackField.cs" />
     <Compile Include="WebHooks\SlackAttachment.cs" />
     <Compile Include="WebHooks\SlackSlashResponse.cs" />

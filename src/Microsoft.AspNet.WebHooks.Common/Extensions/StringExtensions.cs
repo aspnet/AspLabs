@@ -15,7 +15,7 @@ namespace System
     {
         /// <summary>
         /// Splits a string into segments based on a given <paramref name="separator"/>. The segments are 
-        /// trimmed and empty segments are removed.
+        /// trimmed and empty segments containing only white space are removed.
         /// </summary>
         /// <param name="input">The string to split.</param>
         /// <param name="separator">An array of Unicode characters that delimit the substrings in this instance, an empty array that contains no delimiters, or null.</param>
