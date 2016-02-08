@@ -77,5 +77,32 @@ namespace Microsoft.AspNet.WebHooks.Properties {
                 return ResourceManager.GetString("Receiver_BadToken", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter name cannot contain &apos;;&apos; characters: ({0})..
+        /// </summary>
+        internal static string Receiver_CommandNameInvalid {
+            get {
+                return ResourceManager.GetString("Receiver_CommandNameInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter name cannot be a quoted string: ({0})..
+        /// </summary>
+        internal static string Receiver_CommandNameQuotedString {
+            get {
+                return ResourceManager.GetString("Receiver_CommandNameQuotedString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unmatched quote ({0}) discovered at position {1}..
+        /// </summary>
+        internal static string Receiver_CommandUnmatchedQuote {
+            get {
+                return ResourceManager.GetString("Receiver_CommandUnmatchedQuote", resourceCulture);
+            }
+        }
     }
 }

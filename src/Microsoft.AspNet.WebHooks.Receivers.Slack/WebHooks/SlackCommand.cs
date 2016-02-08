@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNet.WebHooks.Properties;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -94,12 +95,13 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (name.Length > 0 && (name[0] == '\'' || name[0] == '"'))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, "Parameter name cannot be a quoted string: ({0})", name);
+                string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_CommandNameQuotedString, name);
                 throw new ArgumentException(msg);
             }
             if (name.IndexOf("\\\0", StringComparison.Ordinal) > -1)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, "Parameter name cannot contain ';' characters: ({0})", name);
+                name = name.Replace("\\\0", ";");
+                string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_CommandNameInvalid, name);
                 throw new ArgumentException(msg);
             }
         }
@@ -127,7 +129,7 @@ namespace Microsoft.AspNet.WebHooks
                     normalized.Append(quote);
                     if (++bytesConsumed == text.Length)
                     {
-                        string msg = string.Format(CultureInfo.CurrentCulture, "Unmatched quote ({0}) discovered at position {1}", quote, quoteOffset);
+                        string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_CommandUnmatchedQuote, quote, quoteOffset);
                         throw new ArgumentException(msg);
                     }
 
@@ -147,12 +149,12 @@ namespace Microsoft.AspNet.WebHooks
 
                         if (++bytesConsumed == text.Length)
                         {
-                            string msg = string.Format(CultureInfo.CurrentCulture, "Unmatched quote ({0}) discovered at position {1}", quote, quoteOffset);
+                            string msg = string.Format(CultureInfo.CurrentCulture, SlackReceiverResources.Receiver_CommandUnmatchedQuote, quote, quoteOffset);
                             throw new ArgumentException(msg);
                         }
                     }
 
-                    // Record and skip by closing quote
+                    // Record and move past closing quote
                     normalized.Append(text[bytesConsumed]);
                     if (++bytesConsumed == text.Length)
                     {

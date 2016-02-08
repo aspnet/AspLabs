@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
@@ -92,6 +93,10 @@ namespace Microsoft.AspNet.WebHooks
                     { "'''", '\'', 2 },
                     { "\"\"\"", '"', 2 },
 
+                    { "a='b;b=c", '\'', 2 },
+                    { "a=\"b;b=c", '"', 2 },
+                    { "a='b;b=\"c\"", '\'', 2 },
+                    { "a=\"b;b='c'", '"', 2 },
                     { "a='b;b='c'", '\'', 9 },
                     { "a=\"b;b=\"c\"", '"', 9 },
                     { "a=';b;b='c;'", '\'', 11 },
@@ -158,16 +163,27 @@ namespace Microsoft.AspNet.WebHooks
         [Theory]
         [InlineData("'text'")]
         [InlineData("\"text\"")]
-        [InlineData("\\\0text")]
-        [InlineData("te\\\0xt")]
-        [InlineData("text\\\0")]
-        public void ValidateParameterName_Throws_IfInvalidName(string name)
+        public void ValidateParameterName_Throws_IfQuotedName(string name)
         {
             // Act
             ArgumentException ex = Assert.Throws<ArgumentException>(() => SlackCommand.ValidateParameterName(name));
 
             // Assert
-            Assert.StartsWith("Parameter name cannot ", ex.Message);
+            Assert.StartsWith(string.Format(CultureInfo.CurrentCulture, "Parameter name cannot be a quoted string: ({0}).", name), ex.Message);
+        }
+
+        [Theory]
+        [InlineData("\\\0text")]
+        [InlineData("te\\\0xt")]
+        [InlineData("te\\\0\\\0xt")]
+        [InlineData("text\\\0")]
+        public void ValidateParameterName_Throws_IfInvalid(string name)
+        {
+            // Act
+            ArgumentException ex = Assert.Throws<ArgumentException>(() => SlackCommand.ValidateParameterName(name));
+
+            // Assert
+            Assert.Equal(string.Format(CultureInfo.CurrentCulture, "Parameter name cannot contain ';' characters: ({0}).", name.Replace("\\\0", ";")), ex.Message);
         }
 
         [Theory]
@@ -187,7 +203,7 @@ namespace Microsoft.AspNet.WebHooks
             ArgumentException ex = Assert.Throws<ArgumentException>(() => SlackCommand.EncodeNonSeparatorCharacters(input));
 
             // Assert
-            Assert.Equal(string.Format("Unmatched quote ({0}) discovered at position {1}", quote, offset), ex.Message);
+            Assert.Equal(string.Format(CultureInfo.CurrentCulture, "Unmatched quote ({0}) discovered at position {1}.", quote, offset), ex.Message);
         }
 
         private static KeyValuePair<string, string> GetPair(string key, string value)
