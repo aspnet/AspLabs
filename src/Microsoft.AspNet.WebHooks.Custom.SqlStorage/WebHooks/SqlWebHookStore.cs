@@ -197,6 +197,8 @@ namespace Microsoft.AspNet.WebHooks
             catch (OptimisticConcurrencyException ocex)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Insert", ocex.Message);
+                _logger.Error(msg, ocex);
+                return StoreResult.Conflict;
             }
             catch (SqlException sqlex)
             {
