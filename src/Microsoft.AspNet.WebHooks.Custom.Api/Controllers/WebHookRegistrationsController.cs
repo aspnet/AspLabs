@@ -88,6 +88,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             catch (Exception ex)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
                 HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
                 return ResponseMessage(error);
             }
@@ -115,8 +116,18 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             await VerifyFilters(webHook);
             await VerifyWebHook(webHook);
 
-            StoreResult result = await _store.UpdateWebHookAsync(userId, webHook);
-            return CreateHttpResult(result);
+            try
+            {
+                StoreResult result = await _store.UpdateWebHookAsync(userId, webHook);
+                return CreateHttpResult(result);
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_UpdateFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                return ResponseMessage(error);
+            }
         }
 
         /// <summary>
@@ -128,8 +139,18 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             string userId = await GetUserId();
 
-            StoreResult result = await _store.DeleteWebHookAsync(userId, id);
-            return CreateHttpResult(result);
+            try
+            {
+                StoreResult result = await _store.DeleteWebHookAsync(userId, id);
+                return CreateHttpResult(result);
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                return ResponseMessage(error);
+            }
         }
 
         /// <summary>
@@ -140,8 +161,18 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             string userId = await GetUserId();
 
-            await _store.DeleteAllWebHooksAsync(userId);
-            return Ok();
+            try
+            {
+                await _store.DeleteAllWebHooksAsync(userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteAllFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                return ResponseMessage(error);
+            }
         }
 
         /// <inheritdoc />
