@@ -154,7 +154,6 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
-            bool deleted = false;
             ConcurrentDictionary<string, WebHook> userHooks;
             StoreResult result = StoreResult.NotFound;
             if (_store.TryGetValue(user, out userHooks))
@@ -162,7 +161,7 @@ namespace Microsoft.AspNet.WebHooks
                 id = NormalizeKey(id);
 
                 WebHook current;
-                deleted = userHooks.TryRemove(id, out current);
+                bool deleted = userHooks.TryRemove(id, out current);
                 result = deleted ? StoreResult.Success : StoreResult.NotFound;
             }
             return Task.FromResult(result);
