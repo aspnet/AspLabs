@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             string userId = await GetUserId();
             IEnumerable<WebHook> webHooks = await _store.GetAllWebHooksAsync(userId);
+            RemovePrivateFilters(webHooks);
             return webHooks;
         }
 
@@ -51,7 +53,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             string userId = await GetUserId();
             WebHook webHook = await _store.LookupWebHookAsync(userId, id);
-            return webHook != null ? (IHttpActionResult)Ok(webHook) : NotFound();
+            if (webHook != null)
+            {
+                RemovePrivateFilters(new[] { webHook });
+                return Ok(webHook);
+            }
+            return NotFound();
         }
 
         /// <summary>
@@ -199,6 +206,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             if (webHook.Filters.Count == 0)
             {
                 webHook.Filters.Add(WildcardWebHookFilterProvider.Name);
+                await InvokeRegistrars(webHook);
                 return;
             }
 
@@ -237,12 +245,34 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                     webHook.Filters.Add(filter);
                 }
             }
+
+            await InvokeRegistrars(webHook);
+        }
+
+        /// <summary>
+        /// Removes all private filters from registered WebHooks.
+        /// </summary>
+        protected virtual void RemovePrivateFilters(IEnumerable<WebHook> webHooks)
+        {
+            if (webHooks == null)
+            {
+                throw new ArgumentNullException("webHooks");
+            }
+
+            foreach (WebHook webHook in webHooks)
+            {
+                var filters = webHook.Filters.Where(f => f.StartsWith(WebHookRegistrar.PrivateFilterPrefix, StringComparison.OrdinalIgnoreCase)).ToArray();
+                foreach (string filter in filters)
+                {
+                    webHook.Filters.Remove(filter);
+                }
+            }
         }
 
         /// <summary>
         /// Ensures that the provided <paramref name="webHook"/> has a reachable Web Hook URI.
         /// </summary>
-        protected virtual async Task VerifyWebHook(WebHook webHook)
+        private async Task VerifyWebHook(WebHook webHook)
         {
             if (webHook == null)
             {
@@ -263,7 +293,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         /// <summary>
         /// Gets the user ID for this request.
         /// </summary>
-        protected virtual async Task<string> GetUserId()
+        private async Task<string> GetUserId()
         {
             try
             {
@@ -282,7 +312,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         /// </summary>
         /// <param name="result">The result to use when creating the <see cref="IHttpActionResult"/>.</param>
         /// <returns>An initialized <see cref="IHttpActionResult"/>.</returns>
-        protected IHttpActionResult CreateHttpResult(StoreResult result)
+        private IHttpActionResult CreateHttpResult(StoreResult result)
         {
             switch (result)
             {
@@ -300,6 +330,34 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
                 default:
                     return InternalServerError();
+            }
+        }
+
+        /// <summary>
+        /// Calls all IWebHookRegistrar instances for server side manipulation, inspection, or rejection of registrations.
+        /// </summary>
+        private async Task InvokeRegistrars(WebHook webHook)
+        {
+            IEnumerable<IWebHookRegistrar> registrars = Configuration.DependencyResolver.GetRegistrars();
+            foreach (IWebHookRegistrar registrar in registrars)
+            {
+                try
+                {
+                    await registrar.RegisterAsync(Request, webHook);
+                }
+                catch (HttpResponseException rex)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarStatusCode, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, rex.Response.StatusCode);
+                    Configuration.DependencyResolver.GetLogger().Info(msg);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarException, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, ex.Message);
+                    Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                    HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                    throw new HttpResponseException(response);
+                }
             }
         }
     }

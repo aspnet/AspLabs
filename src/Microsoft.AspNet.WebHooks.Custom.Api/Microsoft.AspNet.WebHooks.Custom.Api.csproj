@@ -46,6 +46,7 @@
     </Compile>
     <Compile Include="Controllers\WebHookFiltersController.cs" />
     <Compile Include="Controllers\WebHookRegistrationsController.cs" />
+    <Compile Include="Extensions\DependencyScopeExtensions.cs" />
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
     <Compile Include="Filters\ValidateModelAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +56,9 @@
       <DependentUpon>CustomApiResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Routes\WebHookRouteNames.cs" />
+    <Compile Include="Services\CustomApiServices.cs" />
+    <Compile Include="WebHooks\WebHookRegistrar.cs" />
+    <Compile Include="WebHooks\IWebHookRegistrar.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\CustomApiResources.resx">

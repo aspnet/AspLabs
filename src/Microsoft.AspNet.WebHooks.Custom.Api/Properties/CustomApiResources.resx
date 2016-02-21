@@ -129,6 +129,12 @@
   <data name="RegistrationController_InvalidFilters" xml:space="preserve">
     <value>The following filters are not valid: '{0}'. A list of valid filters can be obtained from the path '{1}'.</value>
   </data>
+  <data name="RegistrationController_RegistrarException" xml:space="preserve">
+    <value>The '{0}' implementation of '{1}' caused an exception: {2}</value>
+  </data>
+  <data name="RegistrationController_RegistrarStatusCode" xml:space="preserve">
+    <value>The '{0}' implementation of '{1}' resulted in an HTTP response with status code {2}</value>
+  </data>
   <data name="RegistrationController_RegistrationFailure" xml:space="preserve">
     <value>Could not register WebHook due to error: {0}</value>
   </data>

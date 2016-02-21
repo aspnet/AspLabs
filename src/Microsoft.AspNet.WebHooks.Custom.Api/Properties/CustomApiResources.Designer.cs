@@ -97,6 +97,24 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; implementation of &apos;{1}&apos; caused an exception: {2}.
+        /// </summary>
+        internal static string RegistrationController_RegistrarException {
+            get {
+                return ResourceManager.GetString("RegistrationController_RegistrarException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; implementation of &apos;{1}&apos; resulted in an HTTP response with status code {2}.
+        /// </summary>
+        internal static string RegistrationController_RegistrarStatusCode {
+            get {
+                return ResourceManager.GetString("RegistrationController_RegistrarStatusCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not register WebHook due to error: {0}.
         /// </summary>
         internal static string RegistrationController_RegistrationFailure {

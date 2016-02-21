@@ -60,14 +60,20 @@
   <ItemGroup>
     <Compile Include="Controllers\WebHookFiltersControllerTests.cs" />
     <Compile Include="Controllers\WebHookRegistrationsControllerTests.cs" />
+    <Compile Include="Extensions\DependencyScopeExtensionsTests.cs" />
     <Compile Include="Filters\ValidateModelAttributeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CustomApiServicesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Common\Microsoft.AspNet.WebHooks.Common.csproj">
+      <Project>{f7dd0935-6320-4efc-9464-d5a2d2b8c2f7}</Project>
+      <Name>Microsoft.AspNet.WebHooks.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Custom.Api\Microsoft.AspNet.WebHooks.Custom.Api.csproj">
       <Project>{f0ee25b8-d851-40da-ab2a-e0bace9c1e5d}</Project>
       <Name>Microsoft.AspNet.WebHooks.Custom.Api</Name>
