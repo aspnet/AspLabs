@@ -79,6 +79,16 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
+        /// Sets a default <see cref="IWebHookReceiverConfig"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <param name="instance">The <see cref="IWebHookReceiverConfig"/> to use. If <c>null</c> then a default implementation is used.</param>
+        public static void SetReceiverConfig(IWebHookReceiverConfig instance)
+        {
+            _receiverConfig = instance;
+        }
+
+        /// <summary>
         /// Gets a default <see cref="IWebHookHandlerSorter"/> implementation which is used if none are registered with the
         /// Dependency Injection engine.
         /// </summary>

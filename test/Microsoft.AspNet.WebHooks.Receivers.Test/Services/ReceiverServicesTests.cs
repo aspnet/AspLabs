@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Web.Http;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Services
@@ -47,6 +48,22 @@ namespace Microsoft.AspNet.WebHooks.Services
 
             // Assert
             Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
+        public void SetReceiverConfig_GetReceiverConfig_Roundtrips()
+        {
+            // Arrange
+            SettingsDictionary settings = CommonServices.GetSettings();
+            ILogger logger = CommonServices.GetLogger();
+            Mock<IWebHookReceiverConfig> configMock = new Mock<IWebHookReceiverConfig>();
+
+            // Act
+            ReceiverServices.SetReceiverConfig(configMock.Object);
+            IWebHookReceiverConfig actual = ReceiverServices.GetReceiverConfig(settings, logger);
+
+            // Assert
+            Assert.Same(configMock.Object, actual);
         }
 
         [Fact]
