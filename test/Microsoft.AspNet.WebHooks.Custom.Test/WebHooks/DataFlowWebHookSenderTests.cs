@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -31,59 +32,83 @@ namespace Microsoft.AspNet.WebHooks
             _loggerMock = new Mock<ILogger>();
         }
 
-        public static TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int> NotifyAsyncData
+        public enum SendResult
+        {
+            None = 0,
+            Success,
+            Gone,
+            Failure
+        }
+
+        public static TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int, SendResult> NotifyAsyncData
         {
             get
             {
                 TimeSpan delay = TimeSpan.FromMilliseconds(25);
-                return new TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int>
+                return new TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int, SendResult>
                 {
-                    { new TimeSpan[0], CreateNotifyResponseHandler(1), 0 },
-                    { new[] { delay }, CreateNotifyResponseHandler(2), 1 },
-                    { new[] { delay, delay }, CreateNotifyResponseHandler(3), 2 },
-                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4), 3 },
-                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5), 4 },
+                    { new TimeSpan[0], CreateNotifyResponseHandler(1), 0, SendResult.Success },
+                    { new[] { delay }, CreateNotifyResponseHandler(2), 1, SendResult.Success },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3), 2, SendResult.Success },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4), 3, SendResult.Success },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5), 4, SendResult.Success },
 
-                    { new[] { delay }, CreateNotifyResponseHandler(2, isGone: true), -1 },
-                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, isGone: true), -2 },
-                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, isGone: true), -3 },
-                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, isGone: true), -4 },
+                    { new[] { delay }, CreateNotifyResponseHandler(2, isGone: true), 1, SendResult.Gone },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, isGone: true), 2, SendResult.Gone },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, isGone: true), 3, SendResult.Gone },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, isGone: true), 4, SendResult.Gone },
 
-                    { new TimeSpan[0], CreateNotifyResponseHandler(1, throwExceptions: true), 0 },
-                    { new[] { delay }, CreateNotifyResponseHandler(2, throwExceptions: true), 1 },
-                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, throwExceptions: true), 2 },
-                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, throwExceptions: true), 3 },
-                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, throwExceptions: true), 4 },
+                    { new TimeSpan[0], CreateNotifyResponseHandler(1, throwExceptions: true), 0, SendResult.Success },
+                    { new[] { delay }, CreateNotifyResponseHandler(2, throwExceptions: true), 1, SendResult.Success },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, throwExceptions: true), 2, SendResult.Success },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, throwExceptions: true), 3, SendResult.Success },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, throwExceptions: true), 4, SendResult.Success },
 
-                    { new TimeSpan[0], CreateNotifyResponseHandler(1, failuresOnly: true), -1 },
-                    { new[] { delay }, CreateNotifyResponseHandler(2, failuresOnly: true), -2 },
-                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true), -3 },
-                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true), -4 },
-                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true), -5 },
+                    { new TimeSpan[0], CreateNotifyResponseHandler(1, isGone: true), 0, SendResult.Gone },
+                    { new[] { delay }, CreateNotifyResponseHandler(2, isGone: true), 1, SendResult.Gone },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, isGone: true), 2, SendResult.Gone },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, isGone: true), 3, SendResult.Gone },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, isGone: true), 4, SendResult.Gone },
 
-                    { new TimeSpan[0], CreateNotifyResponseHandler(1, failuresOnly: true, throwExceptions: true), -1 },
-                    { new[] { delay }, CreateNotifyResponseHandler(2, failuresOnly: true, throwExceptions: true), -2 },
-                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true, throwExceptions: true), -3 },
-                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true, throwExceptions: true), -4 },
-                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true, throwExceptions: true), -5 },
+                    { new TimeSpan[0], CreateNotifyResponseHandler(1, failuresOnly: true), 1, SendResult.Failure },
+                    { new[] { delay }, CreateNotifyResponseHandler(2, failuresOnly: true), 2, SendResult.Failure },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true), 3, SendResult.Failure },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true), 4, SendResult.Failure },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true), 5, SendResult.Failure },
+
+                    { new TimeSpan[0], CreateNotifyResponseHandler(1, failuresOnly: true, throwExceptions: true), 1, SendResult.Failure },
+                    { new[] { delay }, CreateNotifyResponseHandler(2, failuresOnly: true, throwExceptions: true), 2, SendResult.Failure },
+                    { new[] { delay, delay }, CreateNotifyResponseHandler(3, failuresOnly: true, throwExceptions: true), 3, SendResult.Failure },
+                    { new[] { delay, delay, delay }, CreateNotifyResponseHandler(4, failuresOnly: true, throwExceptions: true), 4, SendResult.Failure },
+                    { new[] { delay, delay, delay, delay }, CreateNotifyResponseHandler(5, failuresOnly: true, throwExceptions: true), 5, SendResult.Failure },
                 };
             }
         }
 
         [Theory]
         [MemberData("NotifyAsyncData")]
-        public async Task SendWebHook_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expected)
+        public async Task SendWebHook_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expectedOffset, SendResult expectedResult)
         {
             // Arrange
+            SendResult actualResult = SendResult.None;
             ManualResetEvent done = new ManualResetEvent(initialState: false);
-            WebHookWorkItem success = null, failure = null;
-            _sender = new DataflowWebHookSender(_loggerMock.Object, delays, _options, _httpClient, onWebHookSuccess: item =>
+            WebHookWorkItem final = null;
+            _sender = new TestDataflowWebHookSender(_loggerMock.Object, delays, _options, _httpClient,
+            onWebHookSuccess: item =>
             {
-                success = item;
+                final = item;
+                actualResult = SendResult.Success;
                 done.Set();
-            }, onWebHookFailure: item =>
+            }, onWebHookGone: item =>
             {
-                failure = item;
+                final = item;
+                actualResult = SendResult.Gone;
+                done.Set();
+            },
+            onWebHookFailure: item =>
+            {
+                final = item;
+                actualResult = SendResult.Failure;
                 done.Set();
             });
             _handlerMock.Handler = handler;
@@ -99,14 +124,8 @@ namespace Microsoft.AspNet.WebHooks
             done.WaitOne();
 
             // Assert
-            if (expected >= 0)
-            {
-                Assert.Equal(expected, success.Offset);
-            }
-            else
-            {
-                Assert.Equal(Math.Abs(expected), failure.Offset);
-            }
+            Assert.Equal(expectedResult, actualResult);
+            Assert.Equal(expectedOffset, final.Offset);
         }
 
         [Fact]
@@ -162,6 +181,54 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 return Task.FromResult(response);
             };
+        }
+
+        private class TestDataflowWebHookSender : DataflowWebHookSender
+        {
+            private readonly Action<WebHookWorkItem> _onSuccess, _onGone, _onFailure;
+
+            public TestDataflowWebHookSender(
+                ILogger logger,
+                IEnumerable<TimeSpan> retryDelays,
+                ExecutionDataflowBlockOptions options,
+                HttpClient httpClient,
+                Action<WebHookWorkItem> onWebHookSuccess,
+                Action<WebHookWorkItem> onWebHookGone,
+                Action<WebHookWorkItem> onWebHookFailure)
+                : base(logger, retryDelays, options, httpClient)
+            {
+                _onSuccess = onWebHookSuccess;
+                _onGone = onWebHookGone;
+                _onFailure = onWebHookFailure;
+            }
+
+            protected override Task OnWebHookSuccess(WebHookWorkItem workItem)
+            {
+                if (_onSuccess != null)
+                {
+                    _onSuccess(workItem);
+                }
+                return Task.FromResult(true);
+            }
+
+            protected override Task OnWebHookGone(WebHookWorkItem workItem)
+            {
+                if (_onGone != null)
+                {
+                    _onGone(workItem);
+                }
+
+                return Task.FromResult(true);
+            }
+
+            protected override Task OnWebHookFailure(WebHookWorkItem workItem)
+            {
+                if (_onFailure != null)
+                {
+                    _onFailure(workItem);
+                }
+                return Task.FromResult(true);
+            }
         }
     }
 }
