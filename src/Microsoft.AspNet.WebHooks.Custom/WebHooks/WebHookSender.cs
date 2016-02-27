@@ -154,13 +154,18 @@ namespace Microsoft.AspNet.WebHooks
         /// HTTP header to the <see cref="HttpRequestMessage"/> along with the entity body.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
-        /// <param name="request">The request to add t</param>
-        /// <param name="body">The body to sign and add to the request</param>
+        /// <param name="request">The request to add the signature to.</param>
+        /// <param name="body">The body to sign and add to the request.</param>
         protected virtual void SignWebHookRequest(WebHookWorkItem workItem, HttpRequestMessage request, JObject body)
         {
             if (workItem == null)
             {
                 throw new ArgumentNullException("workItem");
+            }
+            if (workItem.WebHook == null)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Sender_BadWorkItem, this.GetType().Name, "WebHook");
+                throw new ArgumentException(msg, "workItem");
             }
             if (request == null)
             {

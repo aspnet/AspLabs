@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -71,6 +72,10 @@ namespace Microsoft.AspNet.WebHooks
             {
                 throw new ArgumentNullException("webHook");
             }
+
+            // Validate data annotations explicitly as the WebHook may not have gone through deserialization
+            ValidationContext context = new ValidationContext(webHook);
+            Validator.ValidateObject(webHook, context, validateAllProperties: true);
 
             // Check that WebHook URI is either 'http' or 'https'
             if (!(webHook.WebHookUri.IsHttp() || webHook.WebHookUri.IsHttps()))

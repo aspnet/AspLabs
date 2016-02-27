@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.TestUtilities;
 using Newtonsoft.Json;
 using Xunit;
@@ -17,6 +19,31 @@ namespace Microsoft.AspNet.WebHooks
         public WebHookTests()
         {
             _webHook = new WebHook();
+        }
+
+        public enum ValidationOutcome
+        {
+            Valid = 0,
+            Required,
+            Invalid
+        }
+
+        public static TheoryData<string, ValidationOutcome> WebHookSecretData
+        {
+            get
+            {
+                return new TheoryData<string, ValidationOutcome>
+                {
+                    { string.Empty, ValidationOutcome.Required },
+                    { " ", ValidationOutcome.Required },
+                    { "\r\n", ValidationOutcome.Required },
+                    { new string('a', 31), ValidationOutcome.Invalid },
+                    { new string('a', 65), ValidationOutcome.Invalid },
+                    { new string('a', 32), ValidationOutcome.Valid },
+                    { new string('a', 64), ValidationOutcome.Valid },
+                    { "你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界", ValidationOutcome.Valid },
+                };
+            }
         }
 
         [Fact]
@@ -36,6 +63,38 @@ namespace Microsoft.AspNet.WebHooks
         public void Secret_Roundtrips()
         {
             PropertyAssert.Roundtrips(_webHook, w => w.Secret, PropertySetter.NullRoundtrips, roundtripValue: "你好世界");
+        }
+
+        [Theory]
+        [MemberData("WebHookSecretData")]
+        public void Secret_Validates(string secret, ValidationOutcome expected)
+        {
+            // Arrange
+            WebHook webHook = new WebHook { Secret = secret };
+            var validationResults = new List<ValidationResult>();
+            var context = new ValidationContext(webHook) { MemberName = "Secret" };
+
+            // Act
+            bool actual = Validator.TryValidateProperty(webHook.Secret, context, validationResults);
+
+            // Assert
+            switch (expected)
+            {
+                case ValidationOutcome.Valid:
+                    Assert.True(actual);
+                    break;
+
+                case ValidationOutcome.Required:
+                    Assert.False(actual);
+                    Assert.Equal("The Secret field is required.", validationResults.Single().ErrorMessage);
+                    Assert.Equal("Secret", validationResults.Single().MemberNames.Single());
+                    break;
+
+                case ValidationOutcome.Invalid:
+                    Assert.Equal("The WebHook secret key parameter must be between 32 and 64 characters long.", validationResults.Single().ErrorMessage);
+                    Assert.Equal("Secret", validationResults.Single().MemberNames.Single());
+                    break;
+            }
         }
 
         [Fact]

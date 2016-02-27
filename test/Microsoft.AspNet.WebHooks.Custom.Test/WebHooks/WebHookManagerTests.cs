@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -41,6 +42,24 @@ namespace Microsoft.AspNet.WebHooks
             _senderMock = new Mock<IWebHookSender>();
             _loggerMock = new Mock<ILogger>();
             _response = new HttpResponseMessage();
+        }
+
+        public static TheoryData<WebHook, string> WebHookValidationData
+        {
+            get
+            {
+                Uri webHookUri = new Uri("http://localhost");
+                string secret = new string('a', 32);
+                return new TheoryData<WebHook, string>
+                {
+                    { new WebHook(), "The WebHookUri field is required." },
+                    { new WebHook { WebHookUri = null, Secret = secret }, "The WebHookUri field is required." },
+                    { new WebHook { WebHookUri = webHookUri, Secret = null }, "The Secret field is required." },
+                    { new WebHook { WebHookUri = webHookUri, Secret = string.Empty }, "The Secret field is required." },
+                    { new WebHook { WebHookUri = webHookUri, Secret = "a" }, "The WebHook secret key parameter must be between 32 and 64 characters long." },
+                    { new WebHook { WebHookUri = webHookUri, Secret = new string('a', 65) }, "The WebHook secret key parameter must be between 32 and 64 characters long." },
+                };
+            }
         }
 
         public static TheoryData<IEnumerable<WebHook>, NotificationDictionary> FilterSingleNotificationData
@@ -85,6 +104,20 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
+        [MemberData("WebHookValidationData")]
+        public async Task VerifyWebHookAsync_Throws_IfInvalidWebHook(WebHook webHook, string expected)
+        {
+            // Arrange
+            _manager = new WebHookManager(_storeMock.Object, _senderMock.Object, _loggerMock.Object, _httpClient);
+
+            // Act
+            ValidationException ex = await Assert.ThrowsAsync<ValidationException>(() => _manager.VerifyWebHookAsync(webHook));
+
+            // Assert
+            Assert.Equal(expected, ex.Message);
+        }
+
+        [Theory]
         [InlineData("ftp://localhost")]
         [InlineData("telnet://localhost")]
         [InlineData("htp://localhost")]
@@ -94,7 +127,7 @@ namespace Microsoft.AspNet.WebHooks
             // Arrange
             _manager = new WebHookManager(_storeMock.Object, _senderMock.Object, _loggerMock.Object, _httpClient);
             WebHook webHook = CreateWebHook();
-            webHook.WebHookUri = new Uri(webHookUri);
+            webHook.WebHookUri = webHookUri != null ? new Uri(webHookUri) : null;
 
             // Act
             InvalidOperationException ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _manager.VerifyWebHookAsync(webHook));

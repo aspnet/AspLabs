@@ -187,6 +187,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid &apos;{0}&apos; instance: &apos;{1}&apos; cannot be null..
+        /// </summary>
+        internal static string Sender_BadWorkItem {
+            get {
+                return ResourceManager.GetString("Sender_BadWorkItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The WebHook secret key parameter must be between 32 and 64 characters long..
         /// </summary>
         internal static string WebHook_InvalidSecret {

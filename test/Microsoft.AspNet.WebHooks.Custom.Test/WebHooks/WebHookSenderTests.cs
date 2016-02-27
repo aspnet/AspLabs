@@ -69,6 +69,22 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void SignWebHookRequest_HandlesNullWebHook()
+        {
+            WebHookWorkItem workItem = CreateWorkItem();
+            HttpRequestMessage request = new HttpRequestMessage();
+            _sender = new WebHookSenderMock(_loggerMock.Object);
+            JObject body = _sender.CreateWebHookRequestBody(workItem);
+            workItem.WebHook = null;
+
+            // Act
+            ArgumentException ex = Assert.Throws<ArgumentException>(() => _sender.SignWebHookRequest(workItem, request, body));
+
+            // Assert
+            Assert.StartsWith("Invalid 'WebHookSenderMock' instance: 'WebHook' cannot be null.", ex.Message);
+        }
+
+        [Fact]
         public async Task SignWebHookRequest_SignsBodyCorrectly()
         {
             // Arrange

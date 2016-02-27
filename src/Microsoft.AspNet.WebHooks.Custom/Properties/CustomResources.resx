@@ -159,6 +159,9 @@
   <data name="Notification_KeyNotFound" xml:space="preserve">
     <value>No Notification setting was found with key '{0}'.</value>
   </data>
+  <data name="Sender_BadWorkItem" xml:space="preserve">
+    <value>Invalid '{0}' instance: '{1}' cannot be null.</value>
+  </data>
   <data name="WebHook_InvalidSecret" xml:space="preserve">
     <value>The WebHook secret key parameter must be between 32 and 64 characters long.</value>
   </data>
