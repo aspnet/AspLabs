@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -44,20 +43,31 @@ namespace Microsoft.AspNet.WebHooks
             _response = new HttpResponseMessage();
         }
 
-        public static TheoryData<WebHook, string> WebHookValidationData
+        public static TheoryData<string> WebHookSecretData
         {
             get
             {
-                Uri webHookUri = new Uri("http://localhost");
-                string secret = new string('a', 32);
-                return new TheoryData<WebHook, string>
+                return new TheoryData<string>
                 {
-                    { new WebHook(), "The WebHookUri field is required." },
-                    { new WebHook { WebHookUri = null, Secret = secret }, "The WebHookUri field is required." },
-                    { new WebHook { WebHookUri = webHookUri, Secret = null }, "The Secret field is required." },
-                    { new WebHook { WebHookUri = webHookUri, Secret = string.Empty }, "The Secret field is required." },
-                    { new WebHook { WebHookUri = webHookUri, Secret = "a" }, "The WebHook secret key parameter must be between 32 and 64 characters long." },
-                    { new WebHook { WebHookUri = webHookUri, Secret = new string('a', 65) }, "The WebHook secret key parameter must be between 32 and 64 characters long." },
+                    null,
+                    string.Empty,
+                    new string('a', 31),
+                    new string('a', 65),
+                };
+            }
+        }
+
+        public static TheoryData<string> WebHookUriData
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                    null,
+                    "ftp://localhost",
+                    "telnet://localhost",
+                    "htp://localhost",
+                    "invalid://localhost",
                 };
             }
         }
@@ -104,24 +114,23 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookValidationData")]
-        public async Task VerifyWebHookAsync_Throws_IfInvalidWebHook(WebHook webHook, string expected)
+        [MemberData("WebHookSecretData")]
+        public async Task VerifyWebHookAsync_Throws_IfInvalidWebHookSecret(string secret)
         {
             // Arrange
             _manager = new WebHookManager(_storeMock.Object, _senderMock.Object, _loggerMock.Object, _httpClient);
+            WebHook webHook = CreateWebHook();
+            webHook.Secret = secret;
 
             // Act
-            ValidationException ex = await Assert.ThrowsAsync<ValidationException>(() => _manager.VerifyWebHookAsync(webHook));
+            InvalidOperationException ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _manager.VerifyWebHookAsync(webHook));
 
             // Assert
-            Assert.Equal(expected, ex.Message);
+            Assert.Equal("The WebHook secret key parameter must be between 32 and 64 characters long.", ex.Message);
         }
 
         [Theory]
-        [InlineData("ftp://localhost")]
-        [InlineData("telnet://localhost")]
-        [InlineData("htp://localhost")]
-        [InlineData("invalid://localhost")]
+        [MemberData("WebHookUriData")]
         public async Task VerifyWebHookAsync_Throws_IfNotHttpOrHttpsUri(string webHookUri)
         {
             // Arrange
