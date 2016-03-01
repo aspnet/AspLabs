@@ -3,7 +3,9 @@
   "compilationOptions": {
     "warningsAsErrors": true,
     "keyFile": "../../tools/Key.snk",
-    "nowarn": [ "CS1591" ],
+    "nowarn": [
+      "CS1591"
+    ],
     "xmlDoc": true
   },
   "description": "Proxy Library",
@@ -21,10 +23,13 @@
         "System.Net.Http": ""
       }
     },
-    "dotnet5.4": {
+    "netstandard1.3": {
       "dependencies": {
         "System.Net.Http": "4.0.1-*"
-      }
+      },
+      "imports": [
+        "dotnet5.4"
+      ]
     }
   }
 }
