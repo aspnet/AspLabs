@@ -17,13 +17,13 @@ namespace Microsoft.AspNet.WebHooks
         /// Gets or sets the kind of alert. Azure automatically sends activated and resolved alerts for the condition sets.
         /// Examples of values include '<c>Activated</c>' and '<c>Resolved</c>'.
         /// </summary>
-        [JsonProperty("status")]
+        [JsonProperty("status", Required = Required.Always)]
         public string Status { get; set; }
 
         /// <summary>
         /// Gets or sets context information for this alert.
         /// </summary>
-        [JsonProperty("context")]
+        [JsonProperty("context", Required = Required.Always)]
         public AzureAlertContext Context { get; set; }
 
         /// <summary>

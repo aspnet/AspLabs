@@ -19,6 +19,7 @@
     "timestamp": "2015-09-30T03:55:30.7037012Z",
     "resourceName": "testmachine",
     "resourceType": "microsoft.classiccompute/virtualmachines",
+    "resourceRegion": "West US",
     "resourceId": "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine",
     "portalLink": "https://portal.azure.com/#resource/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine"
   },

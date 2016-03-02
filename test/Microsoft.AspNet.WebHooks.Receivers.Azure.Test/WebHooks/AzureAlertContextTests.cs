@@ -46,6 +46,7 @@ namespace Microsoft.AspNet.WebHooks
                 Timestamp = DateTime.Parse("2015-09-30T03:55:30.7037012Z").ToUniversalTime(),
                 ResourceName = "testmachine",
                 ResourceType = "microsoft.classiccompute/virtualmachines",
+                ResourceRegion = "West US",
                 ResourceId = "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine",
                 PortalLink = "https://portal.azure.com/#resource/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/tests123/providers/Microsoft.ClassicCompute/virtualMachines/testmachine",
             };
@@ -57,6 +58,18 @@ namespace Microsoft.AspNet.WebHooks
             string expectedJson = JsonConvert.SerializeObject(expected, _serializerSettings);
             string actualJson = JsonConvert.SerializeObject(actual, _serializerSettings);
             Assert.Equal(expectedJson, actualJson);
+        }
+
+        [Fact]
+        public void AlertContext_SubscriptionIdIsRequired()
+        {
+            // Arrange
+            JObject data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.AlertMessage3.json");
+            ((JObject)data["context"]).Property("subscriptionId").Remove();
+            var json = JsonConvert.SerializeObject(data["context"], _serializerSettings);
+
+            // Act / Assert
+            Assert.Throws<JsonSerializationException>(() => JsonConvert.DeserializeObject<AzureAlertContext>(json));
         }
     }
 }

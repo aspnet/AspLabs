@@ -12,7 +12,7 @@ namespace Microsoft.AspNet.WebHooks
     public class KuduNotification
     {
         /// <summary>
-        /// Gets or sets the ID or the WebHook.
+        /// Gets or sets the ID of the WebHook.
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -42,7 +42,7 @@ namespace Microsoft.AspNet.WebHooks
         public string Author { get; set; }
 
         /// <summary>
-        /// Gets or set a message contained within the WebHook.
+        /// Gets or sets a message contained within the WebHook.
         /// </summary>
         [JsonProperty("message")]
         public string Message { get; set; }

@@ -75,6 +75,7 @@
     <EmbeddedResource Include="Messages\KuduMessage.json" />
     <EmbeddedResource Include="Messages\AlertMessage2.json" />
     <EmbeddedResource Include="Messages\AlertMessage1.json" />
+    <EmbeddedResource Include="Messages\AlertMessage3.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
