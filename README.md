@@ -19,6 +19,7 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 * Overview
   * [Announcement of Microsoft ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/04/introducing-microsoft-asp-net-webhooks-preview.aspx)
   * [Sending WebHooks with ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/15/sending-webhooks-with-asp-net-webhooks-preview.aspx)
+  * [Announcing ASP.NET WebHooks Release Candidate 1](https://blogs.msdn.microsoft.com/webdev/2016/03/05/announcing-asp-net-webhooks-release-candidate-1/)
 
 * Integration with WebHook Providers
   * [Integrating with Instagram using ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/21/integrating-with-instagram-using-asp-net-webhooks-preview.aspx)
