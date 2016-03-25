@@ -1,12 +1,15 @@
-﻿using System;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks;
-using Newtonsoft.Json.Linq;
 
 namespace InstagramReceiver.WebHooks
 {
     public class InstagramWebHookHandler : WebHookHandler
     {
+        private const string MediaEndpointTemplate = "https://api.instagram.com/v1/media/{0}?access_token={1}";
+
+        private static readonly HttpClient _client = new HttpClient();
+
         public InstagramWebHookHandler()
         {
             this.Receiver = InstagramWebHookReceiver.ReceiverName;
@@ -19,32 +22,21 @@ namespace InstagramReceiver.WebHooks
 
             // Convert the incoming data to a collection of InstagramNotifications
             var notifications = context.GetDataOrDefault<InstagramNotificationCollection>();
+
+            // Access media references in notifications
             foreach (var notification in notifications)
             {
-                // Use WebHook client to get detailed information about the posted media
-                JArray entries = await client.GetRecentGeoMedia(context.Id, notification.ObjectId);
-                foreach (JToken entry in entries)
+                string token;
+                if (Dependencies.Tokens.TryGetValue(notification.UserId, out token))
                 {
-                    InstagramPost post = entry.ToObject<InstagramPost>();
-
-                    // Image information
-                    if (post.Images != null)
+                    string mediaEndpoint = string.Format(MediaEndpointTemplate, notification.Data.MediaId, token);
+                    using (var response = await _client.GetAsync(mediaEndpoint))
                     {
-                        InstagramMedia thumbnail = post.Images.Thumbnail;
-                        InstagramMedia lowRes = post.Images.LowResolution;
-                        InstagramMedia stdRes = post.Images.StandardResolution;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            InstagramPost post = await response.Content.ReadAsAsync<InstagramPost>();
+                        }
                     }
-
-                    // Video information
-                    if (post.Videos != null)
-                    {
-                        InstagramMedia lowBandwidth = post.Videos.LowBandwidth;
-                        InstagramMedia lowRes = post.Videos.LowResolution;
-                        InstagramMedia stdRes = post.Videos.StandardResolution;
-                    }
-
-                    // Get direct links and sizes of media
-                    Uri link = post.Link;
                 }
             }
         }

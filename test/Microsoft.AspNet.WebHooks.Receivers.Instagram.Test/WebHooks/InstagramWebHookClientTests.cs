@@ -120,58 +120,6 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public async Task SubscribeAsync_CreatesTagSubscription()
-        {
-            // Arrange
-            Initialize(TestId);
-            HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent("{ \"meta\": { \"code\": 200 }, \"data\": { \"id\": \"1\", \"type\": \"subscribe\", \"object\": \"tag\", \"object_id\": \"12345\", \"aspect\": \"media\", \"callback_url\": \"" + TestCallback + "\" } }", Encoding.UTF8, "application/json");
-            _handlerMock.Handler = async (req, counter) =>
-            {
-                MultipartFormDataContent content = await ValidateCoreSubscriptionRequest(req);
-                await ValidateSubscriptionContent(content, 0, "object", "tag");
-                await ValidateSubscriptionContent(content, 1, "aspect", "media");
-                await ValidateSubscriptionContent(content, 2, "object_id", "12345");
-                return response;
-            };
-
-            // Act
-            InstagramSubscription actual = await _client.SubscribeAsync(TestId, _callback, "12345");
-
-            // Assert
-            Assert.Equal("1", actual.Id);
-            Assert.Equal("tag", actual.Object);
-            Assert.Equal(TestCallback, actual.Callback.AbsoluteUri);
-        }
-
-        [Fact]
-        public async Task SubscribeAsync_CreatesGeoSubscription()
-        {
-            // Arrange
-            Initialize(TestId);
-            HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent("{ \"meta\": { \"code\": 200 }, \"data\": { \"id\": \"1\", \"type\": \"subscribe\", \"object\": \"geography\", \"object_id\": \"12345\", \"aspect\": \"media\", \"callback_url\": \"" + TestCallback + "\" } }", Encoding.UTF8, "application/json");
-            _handlerMock.Handler = async (req, counter) =>
-            {
-                MultipartFormDataContent content = await ValidateCoreSubscriptionRequest(req);
-                await ValidateSubscriptionContent(content, 0, "object", "geography");
-                await ValidateSubscriptionContent(content, 1, "aspect", "media");
-                await ValidateSubscriptionContent(content, 2, "lat", "1.2345");
-                await ValidateSubscriptionContent(content, 3, "lng", "2.2345");
-                await ValidateSubscriptionContent(content, 4, "radius", "1000");
-                return response;
-            };
-
-            // Act
-            InstagramSubscription actual = await _client.SubscribeAsync(TestId, _callback, 1.2345, 2.2345, 1000);
-
-            // Assert
-            Assert.Equal("1", actual.Id);
-            Assert.Equal("geography", actual.Object);
-            Assert.Equal(TestCallback, actual.Callback.AbsoluteUri);
-        }
-
-        [Fact]
         public async Task CreateAsync_ThrowsOnErrorResponse()
         {
             // Arrange

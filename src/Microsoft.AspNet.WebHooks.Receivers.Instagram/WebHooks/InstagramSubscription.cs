@@ -8,31 +8,29 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Describes an Instagram WebHook subscription. For details about Instagram WebHooks, please 
-    /// see <c>https://instagram.com/developer/realtime/</c>.
+    /// see <c>https://www.instagram.com/developer/subscriptions/</c>.
     /// </summary>
     public class InstagramSubscription
     {
         /// <summary>
-        /// Gets or sets the subscription ID.
+        /// Gets or sets the unique ID of this subscription.
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the object type for this subscription. The basic types provided by Instagram
-        /// are 'user', 'tag', 'location', and 'geography'.
+        /// Gets or sets the object type for this subscription. Currently, the only type provided
+        /// by Instagram is 'user'.
         /// </summary>
         [JsonProperty("object")]
         public string Object { get; set; }
 
         /// <summary>
-        /// Gets or sets an additional parameter for this subscription depending on whether it is a user,
-        /// tag, location, or geography-based subscription. For instance, if you create a subscription for 
-        /// the tag '<c>nofilter</c>', you will will receive an event notification every time anyone posts 
-        /// a new photo with the tag '<c>#nofilter</c>'.
+        /// Gets or sets the aspect of the object for this subscription. Currently only 'media' is supported, 
+        /// but other types of subscriptions may be added in the future.
         /// </summary>
-        [JsonProperty("object_id")]
-        public string ObjectId { get; set; }
+        [JsonProperty("aspect")]
+        public string Aspect { get; set; }
 
         /// <summary>
         /// Gets or sets the callback URI where event notifications are sent.

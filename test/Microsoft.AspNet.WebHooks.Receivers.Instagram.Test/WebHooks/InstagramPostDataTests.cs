@@ -10,7 +10,7 @@ using Xunit;
 namespace Microsoft.AspNet.WebHooks
 {
     [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "PostTests", Justification = "This is the right name.")]
-    public class InstagramPostTests
+    public class InstagramPostDataTests
     {
         private DateTime _testTime = new DateTime(1970, 1, 1, 1, 0, 0, DateTimeKind.Utc);
 
@@ -19,7 +19,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             JObject data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.PostMessage.json");
-            InstagramPost expectedPost = new InstagramPost
+            InstagramPostData expectedPost = new InstagramPostData
             {
                 Id = "1077852647225486162_194771465",
                 Link = new Uri("https://instagram.com/p/3sFga24da/"),
@@ -100,7 +100,7 @@ namespace Microsoft.AspNet.WebHooks
             expectedPost.Tags.Add("drill");
 
             // Act
-            InstagramPost actualPost = data.ToObject<InstagramPost>();
+            InstagramPostData actualPost = data.ToObject<InstagramPostData>();
 
             // Assert
             string expectedJson = JsonConvert.SerializeObject(expectedPost);

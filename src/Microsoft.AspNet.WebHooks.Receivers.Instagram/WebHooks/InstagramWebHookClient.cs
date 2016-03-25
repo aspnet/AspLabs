@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -16,7 +15,7 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// The <see cref="InstagramWebHookClient"/> provides support for managing Instagram WebHook subscriptions programmatically.
-    /// For more information about Instagram WebHooks, please see <c>https://instagram.com/developer/realtime/</c>.
+    /// For more information about Instagram WebHooks, please see <c>https://www.instagram.com/developer/subscriptions/</c>.
     /// </summary>
     public class InstagramWebHookClient : IDisposable
     {
@@ -24,11 +23,9 @@ namespace Microsoft.AspNet.WebHooks
         internal const string InstagramApi = "https://api.instagram.com/v1/";
         internal const string SubscriptionAddress = InstagramApi + "subscriptions";
         internal const string SubscriptionAddressTemplate = SubscriptionAddress + "?client_id={0}&client_secret={1}{2}";
-        internal const string GeoMediaTemplate = InstagramApi + "geographies/{0}/media/recent?client_id={1}{2}";
 
         private static readonly string ClientIdKey = InstagramWebHookReceiver.ReceiverName + "Id";
 
-        private readonly ConcurrentDictionary<string, string> _geoPagination = new ConcurrentDictionary<string, string>();
         private readonly HttpConfiguration _config;
         private readonly HttpClient _httpClient;
         private readonly Uri _subscriptionAddress;
@@ -37,7 +34,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstagramWebHookClient"/> which can be used to create and delete WebHooks
-        /// with Instagram. For more information about Instagram WebHooks, please see <c>https://instagram.com/developer/realtime/</c>.
+        /// with Instagram. For more information about Instagram WebHooks, please see <c>https://www.instagram.com/developer/subscriptions/</c>.
         /// Set the application settings '<c>MS_WebHookReceiverSecret_Instagram</c>' and '<c>MS_WebHookReceiverSecret_InstagramId</c>' to 
         /// the Instagram client ID and secret respectively, optionally using the 'id' syntax to accommodate multiple configurations 
         /// using the same model as for receivers.
@@ -124,73 +121,6 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Subscribes to a particular tag. For example, For instance, a subscription for the tag <c>'nofilter</c>
-        /// will receive event notifications every time anyone posts a new photo with the tag <c>'#nofilter'</c>.
-        /// </summary>
-        /// <param name="id">A (potentially empty) ID of a particular configuration for this WebHook. This makes it possible to 
-        /// support multiple WebHooks with individual configurations.</param>
-        /// <param name="callback">The URI where WebHooks for the given subscription will be received. Typically this will 
-        /// be of the form <c>https://&lt;host&gt;/api/webhooks/incoming/instagram/{id}</c>.</param>
-        /// <param name="tag">The tag to subscribe to (without a leading '#')</param>
-        /// <returns>A <see cref="InstagramSubscription"/> instance.</returns>
-        public virtual Task<InstagramSubscription> SubscribeAsync(string id, Uri callback, string tag)
-        {
-            if (id == null)
-            {
-                throw new ArgumentNullException("id");
-            }
-            if (callback == null)
-            {
-                throw new ArgumentNullException("callback");
-            }
-            if (tag == null)
-            {
-                throw new ArgumentNullException("tag");
-            }
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>
-            {
-                { "object", "tag" },
-                { "aspect", "media" },
-                { "object_id", tag },
-            };
-            return CreateSubscription(id, callback, parameters);
-        }
-
-        /// <summary>
-        /// Subscribes to a geographic area identified by a center latitude and longitude and a radius extending from the center. 
-        /// </summary>
-        /// <param name="id">A (potentially empty) ID of a particular configuration for this WebHook. This makes it possible to 
-        /// support multiple WebHooks with individual configurations.</param>
-        /// <param name="callback">The URI where WebHooks for the given subscription will be received. Typically this will 
-        /// be of the form <c>https://&lt;host&gt;/api/webhooks/incoming/instagram/{id}</c>.</param>
-        /// <param name="latitude">The center latitude of the geo-area to subscribe to.</param>
-        /// <param name="longitude">The center longitude of the geo-area to subscribe to.</param>
-        /// <param name="radius">The radius of the geo-area in meters between 0 and 5000.</param>
-        /// <returns>A <see cref="InstagramSubscription"/> instance.</returns>
-        public virtual Task<InstagramSubscription> SubscribeAsync(string id, Uri callback, double latitude, double longitude, int radius)
-        {
-            if (id == null)
-            {
-                throw new ArgumentNullException("id");
-            }
-            if (callback == null)
-            {
-                throw new ArgumentNullException("callback");
-            }
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>
-            {
-                { "object", "geography" },
-                { "aspect", "media" },
-                { "lat", latitude },
-                { "lng", longitude },
-                { "radius", radius },
-            };
-            return CreateSubscription(id, callback, parameters);
-        }
-
-        /// <summary>
         /// Deletes all active subscriptions for this client.
         /// </summary>
         /// <param name="id">A (potentially empty) ID of a particular configuration for this WebHook. This makes it possible to 
@@ -225,57 +155,6 @@ namespace Microsoft.AspNet.WebHooks
 
             string parameter = "&id=" + subscriptionId;
             return DeleteSubscription(id, parameter);
-        }
-
-        /// <summary>
-        /// Gets information about recent media posted to a subscription to a geographic area identified by a center 
-        /// latitude and longitude and a radius extending from the center.
-        /// </summary>
-        /// <param name="id">A (potentially empty) ID of a particular configuration for this WebHook.</param>
-        /// <param name="geoId">The geo ID is the <see cref="InstagramSubscription.ObjectId"/> from a geographic subscription, for example '<c>12980749</c>'.</param>
-        /// <returns>A <see cref="JArray"/> containing information about available media posted within the geographic area
-        /// of the subscription.</returns>
-        public virtual async Task<JArray> GetRecentGeoMedia(string id, string geoId)
-        {
-            if (id == null)
-            {
-                throw new ArgumentNullException("id");
-            }
-            if (geoId == null)
-            {
-                throw new ArgumentNullException("geoId");
-            }
-
-            // Get client ID and secret for the given ID.
-            Tuple<string, string> clientInfo = await GetClientConfig(id);
-
-            // See if we have any pagination info.
-            string pagination = null, minId;
-            if (_geoPagination.TryGetValue(id, out minId))
-            {
-                pagination = "&min_id=" + minId;
-            }
-
-            string address = string.Format(CultureInfo.InvariantCulture, GeoMediaTemplate, geoId, clientInfo.Item1, pagination);
-            using (HttpResponseMessage response = await _httpClient.GetAsync(address))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    // As it can take some time to have old subscriptions 'drain' we don't throw but just return empty content.
-                    return new JArray();
-                }
-
-                // Update pagination if present
-                JObject geoMediaData = await response.Content.ReadAsAsync<JObject>();
-                string next_minId = geoMediaData.Value<JObject>("pagination").Value<string>("next_min_id");
-                if (!string.IsNullOrEmpty(next_minId))
-                {
-                    _geoPagination[id] = next_minId;
-                }
-
-                JArray data = geoMediaData.Value<JArray>(DataKey);
-                return data;
-            }
         }
 
         /// <inheritdoc />

@@ -26,9 +26,9 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public void ObjectId_Roundtrips()
+        public void Aspect_Roundtrips()
         {
-            PropertyAssert.Roundtrips(_sub, s => s.ObjectId, PropertySetter.NullRoundtrips, roundtripValue: "Value");
+            PropertyAssert.Roundtrips(_sub, s => s.Aspect, PropertySetter.NullRoundtrips, roundtripValue: "Value");
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 Id = "19985884",
                 Object = "tag",
-                ObjectId = "mytag",
+                Aspect = "media",
                 Callback = new Uri("http://requestb.in/18jwdvk1"),
             };
 

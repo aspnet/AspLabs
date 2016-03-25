@@ -15,10 +15,6 @@ namespace System.Web.Http
     {
         private const string Link = "http://localhost/some/path";
         private const string TestId = "12b2431e389abdc9c3632516";
-        private const string TestTag = "tag";
-        private const double TestLat = 1.12345;
-        private const double TestLng = 2.34567;
-        private const int TestRadius = 1000;
 
         private HttpConfiguration _config;
         private Mock<UrlHelper> _helperMock;
@@ -64,46 +60,6 @@ namespace System.Web.Http
 
             // Act
             InstagramSubscription actual = await _clientMock.Object.SubscribeAsync(TestId, _helperMock.Object);
-
-            // Assert
-            _helperMock.Verify();
-            _clientMock.Verify();
-            Assert.Equal(_sub, actual);
-        }
-
-        [Fact]
-        public async Task SubscribeAsync_SubscribersTags()
-        {
-            // Arrange
-            _helperMock.Setup(u => u.Link(WebHookReceiverRouteNames.ReceiversAction, It.Is<Dictionary<string, object>>(d => (string)d["webHookReceiver"] == InstagramWebHookReceiver.ReceiverName && (string)d["id"] == TestId)))
-                .Returns(Link)
-                .Verifiable();
-            _clientMock.Setup(c => c.SubscribeAsync(TestId, _callback, TestTag))
-                .ReturnsAsync(_sub)
-                .Verifiable();
-
-            // Act
-            InstagramSubscription actual = await _clientMock.Object.SubscribeAsync(TestId, _helperMock.Object, TestTag);
-
-            // Assert
-            _helperMock.Verify();
-            _clientMock.Verify();
-            Assert.Equal(_sub, actual);
-        }
-
-        [Fact]
-        public async Task SubscribeAsync_SubscribersGeo()
-        {
-            // Arrange
-            _helperMock.Setup(u => u.Link(WebHookReceiverRouteNames.ReceiversAction, It.Is<Dictionary<string, object>>(d => (string)d["webHookReceiver"] == InstagramWebHookReceiver.ReceiverName && (string)d["id"] == TestId)))
-                .Returns(Link)
-                .Verifiable();
-            _clientMock.Setup(c => c.SubscribeAsync(TestId, _callback, TestLat, TestLng, TestRadius))
-                .ReturnsAsync(_sub)
-                .Verifiable();
-
-            // Act
-            InstagramSubscription actual = await _clientMock.Object.SubscribeAsync(TestId, _helperMock.Object, TestLat, TestLng, TestRadius);
 
             // Assert
             _helperMock.Verify();

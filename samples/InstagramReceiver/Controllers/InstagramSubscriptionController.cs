@@ -13,8 +13,8 @@ namespace InstagramReceiver.Controllers
             // Get our WebHook Client
             InstagramWebHookClient client = Dependencies.Client;
 
-            // Subscribe to a geo location, in this case within 5000 meters of Times Square in NY
-            var sub = await client.SubscribeAsync(string.Empty, Url, 40.757626, -73.985794, 5000);
+            // Subscribe for updates from Instagram
+            var sub = await client.SubscribeAsync(string.Empty, Url);
 
             return Ok(sub);
         }

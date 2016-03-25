@@ -11,15 +11,21 @@ namespace Microsoft.AspNet.WebHooks
         private InstagramNotification _notification = new InstagramNotification();
 
         [Fact]
+        public void ChangedAspect_Roundtrips()
+        {
+            PropertyAssert.Roundtrips(_notification, n => n.ChangedAspect, PropertySetter.NullRoundtrips, roundtripValue: "Value");
+        }
+
+        [Fact]
         public void Object_Roundtrips()
         {
             PropertyAssert.Roundtrips(_notification, n => n.Object, PropertySetter.NullRoundtrips, roundtripValue: "Value");
         }
 
         [Fact]
-        public void ObjectId_Roundtrips()
+        public void UserId_Roundtrips()
         {
-            PropertyAssert.Roundtrips(_notification, n => n.ObjectId, PropertySetter.NullRoundtrips, roundtripValue: "Value");
+            PropertyAssert.Roundtrips(_notification, n => n.UserId, PropertySetter.NullRoundtrips, roundtripValue: "Value");
         }
 
         [Fact]

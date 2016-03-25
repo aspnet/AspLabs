@@ -11,7 +11,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides support for receiving WebHooks from Instagram. For information about Instagram WebHooks, see "https://instagram.com/developer/realtime/".
+      This package provides support for receiving WebHooks from Instagram. For information about Instagram WebHooks, see "https://www.instagram.com/developer/subscriptions/".
     </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>

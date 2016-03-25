@@ -61,15 +61,6 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not retrieve Instagram media for geo ID &apos;{0}&apos;. Received status code &apos;{1}&apos; and error message &apos;{2}&apos;..
-        /// </summary>
-        internal static string Client_GeoFailure {
-            get {
-                return ResourceManager.GetString("Client_GeoFailure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not get current Instagram subscriptions. Received status code &apos;{0}&apos; and error message &quot;{1}&apos;..
         /// </summary>
         internal static string Client_GetSubscriptionsFailure {

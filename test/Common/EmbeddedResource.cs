@@ -24,6 +24,18 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
+        public static JArray ReadAsJArray(string name)
+        {
+            Assembly asm = Assembly.GetExecutingAssembly();
+            Stream content = asm.GetManifestResourceStream(name);
+            using (StreamReader reader = new StreamReader(content))
+            {
+                string data = reader.ReadToEnd();
+                return JArray.Parse(data);
+            }
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
         public static XElement ReadAsJXElement(string name)
         {
             Assembly asm = Assembly.GetExecutingAssembly();
