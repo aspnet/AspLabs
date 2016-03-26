@@ -58,28 +58,15 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
-    <Compile Include="Extensions\InstagramWebHookClientExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\InstagramReceiverResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>InstagramReceiverResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Serialization\InstagramUnixTimeConverter.cs" />
-    <Compile Include="WebHooks\InstagramCaption.cs" />
-    <Compile Include="WebHooks\InstagramLocation.cs" />
-    <Compile Include="WebHooks\InstagramImages.cs" />
     <Compile Include="WebHooks\InstagramNotificationData.cs" />
-    <Compile Include="WebHooks\InstagramPost.cs" />
-    <Compile Include="WebHooks\InstagramPostMeta.cs" />
-    <Compile Include="WebHooks\InstagramVideos.cs" />
-    <Compile Include="WebHooks\InstagramPostData.cs" />
-    <Compile Include="WebHooks\InstagramMedia.cs" />
     <Compile Include="WebHooks\InstagramNotificationCollection.cs" />
     <Compile Include="WebHooks\InstagramNotification.cs" />
-    <Compile Include="WebHooks\InstagramSubscription.cs" />
-    <Compile Include="WebHooks\InstagramUser.cs" />
-    <Compile Include="WebHooks\InstagramWebHookClient.cs" />
     <Compile Include="WebHooks\InstagramWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>

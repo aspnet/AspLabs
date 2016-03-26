@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using InstagramReceiver.Models;
+using InstaSharp;
+using InstaSharp.Models;
+using InstaSharp.Models.Responses;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -47,19 +50,37 @@ namespace InstagramReceiver
             // This is similar to the RememberMe option when you log in.
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
-            // Wire up Instagram authentication
+            // Get the config used by Instasharp
+            InstagramConfig config = Dependencies.InstagramConfig;
+
+            // Wire up Instagram authentication so that we can access the media published by a user.
             var options = new InstagramAuthenticationOptions()
             {
-                ClientId = "3775be36ab65453bbe182cc4385fe3e2",
-                ClientSecret = "b5d2811bf8fe4cd6908168da65a2701c",
+                ClientId = config.ClientId,
+                ClientSecret = config.ClientSecret,
                 Provider = new InstagramAuthenticationProvider
                 {
                     OnAuthenticated = context =>
                     {
                         // Retrieve the OAuth access token to store for subsequent API calls
+                        OAuthResponse response = new OAuthResponse
+                        {
+                            User = new UserInfo
+                            {
+                                Id = long.Parse(context.Id),
+                                FullName = context.Name,
+                                ProfilePicture = context.ProfilePicture,
+                                Username = context.UserName,
+                            },
+                            AccessToken = context.AccessToken,
+                        };
+
                         string userId = context.Id;
                         string accessToken = context.AccessToken;
-                        Dependencies.Tokens[userId] = accessToken;
+
+                        // Store the token in memory so that we can use it for accessing media. In a real scenario
+                        // this would be stored somewhere else.
+                        Dependencies.Tokens[userId] = response;
                         return Task.FromResult(true);
                     }
                 }

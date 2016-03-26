@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Web.Http;
-using Microsoft.AspNet.WebHooks;
+using InstaSharp.Endpoints;
 
 namespace InstagramReceiver.Controllers
 {
@@ -10,33 +10,23 @@ namespace InstagramReceiver.Controllers
         [Route("subscribe")]
         public async Task<IHttpActionResult> PostSubscribe()
         {
-            // Get our WebHook Client
-            InstagramWebHookClient client = Dependencies.Client;
+            // Create Instasharp subscription endpoint
+            var subscriptions = new Subscription(Dependencies.InstagramConfig);
 
             // Subscribe for updates from Instagram
-            var sub = await client.SubscribeAsync(string.Empty, Url);
-
-            return Ok(sub);
+            var response = await subscriptions.CreateUser();
+            return Ok(response);
         }
 
         [Route("unsubscribe")]
-        public async Task PostUnsubscribeAll()
+        public async Task<IHttpActionResult> PostUnsubscribeAll()
         {
-            // Get our WebHook Client
-            InstagramWebHookClient client = Dependencies.Client;
+            // Create Instasharp subscription endpoint
+            var subscriptions = new Subscription(Dependencies.InstagramConfig);
 
-            // Unsubscribe from all subscriptions for the client configuration with id="".
-            await client.UnsubscribeAsync(string.Empty);
-        }
-
-        [Route("unsubscribe/{subId}")]
-        public async Task PostUnsubscribe(string subId)
-        {
-            // Get our WebHook Client
-            InstagramWebHookClient client = Dependencies.Client;
-
-            // Unsubscribe from the given subscription using client configuration with id="".
-            await client.UnsubscribeAsync(string.Empty, subId);
+            // Subscribe for updates from Instagram
+            var response = await subscriptions.RemoveAllSubscriptions();
+            return Ok(response);
         }
     }
 }

@@ -59,25 +59,14 @@
     <Compile Include="..\Common\EmbeddedResource.cs">
       <Link>Common\EmbeddedResource.cs</Link>
     </Compile>
-    <Compile Include="Extensions\InstagramWebHookClientExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\InstagramUnixTimeConverterTests.cs" />
     <Compile Include="WebHooks\InstagramNotificationCollectionTests.cs" />
     <Compile Include="WebHooks\InstagramNotificationDataTests.cs" />
-    <Compile Include="WebHooks\InstagramPostDataTests.cs" />
     <Compile Include="WebHooks\InstagramNotificationTests.cs" />
-    <Compile Include="WebHooks\InstagramCaptionTests.cs" />
-    <Compile Include="WebHooks\InstagramUserTests.cs" />
-    <Compile Include="WebHooks\InstagramSubscriptionTests.cs" />
-    <Compile Include="WebHooks\InstagramMediaTests.cs" />
-    <Compile Include="WebHooks\InstagramLocationTests.cs" />
     <Compile Include="WebHooks\InstagramWebHookReceiverTests.cs" />
-    <Compile Include="WebHooks\InstagramWebHookClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
-    <EmbeddedResource Include="Messages\PostMessage.json" />
-    <EmbeddedResource Include="Messages\SubscriptionMessage.json" />
     <EmbeddedResource Include="Messages\NotificationCollectionMessage.json" />
     <None Include="packages.config" />
   </ItemGroup>
