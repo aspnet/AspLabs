@@ -71,6 +71,11 @@ namespace Microsoft.AspNet.WebHooks.Mocks
             return base.ReadAsJsonAsync(request);
         }
 
+        public new Task<JToken> ReadAsJsonTokenAsync(HttpRequestMessage request)
+        {
+            return base.ReadAsJsonTokenAsync(request);
+        }
+
         public new Task<XElement> ReadAsXmlAsync(HttpRequestMessage request)
         {
             return base.ReadAsXmlAsync(request);

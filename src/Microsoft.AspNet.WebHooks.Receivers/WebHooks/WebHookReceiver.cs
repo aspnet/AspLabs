@@ -301,6 +301,16 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
+        /// Reads the JSON HTTP request entity body as a JSON token.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
+        /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
+        protected virtual Task<JToken> ReadAsJsonTokenAsync(HttpRequestMessage request)
+        {
+            return ReadAsJsonAsync<JToken>(request);
+        }
+
+        /// <summary>
         /// Reads the XML HTTP request entity body.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>

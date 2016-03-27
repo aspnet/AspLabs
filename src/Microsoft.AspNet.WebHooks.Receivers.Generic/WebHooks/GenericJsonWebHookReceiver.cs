@@ -12,8 +12,8 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Provides an <see cref="IWebHookReceiver"/> implementation which supports generic WebHooks 
-    /// with no special validation logic or security requirements. This can for example be used 
-    /// to receive WebHooks from IFTTT's Maker Channel or a Zapier WebHooks Action.
+    /// containing valid JSON with no special validation logic or security requirements. This can for 
+    /// example be used to receive WebHooks from IFTTT's Maker Channel or a Zapier WebHooks Action.
     /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/genericjson/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
     /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
     /// same value as configured in the '<c>MS_WebHookReceiverSecret_GenericJson</c>' application setting, optionally using IDs
@@ -66,7 +66,7 @@ namespace Microsoft.AspNet.WebHooks
             await EnsureValidCode(request, id);
 
             // Read the request entity body
-            JObject data = await ReadAsJsonAsync(request);
+            JToken data = await ReadAsJsonTokenAsync(request);
 
             // Get the action
             NameValueCollection queryParameters = request.RequestUri.ParseQueryString();
