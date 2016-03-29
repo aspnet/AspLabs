@@ -14,7 +14,7 @@ namespace InstagramReceiver
         private static ConcurrentDictionary<string, OAuthResponse> _tokens;
 
         /// <summary>
-        /// Gets the <see cref="InstagramConfig"/> used by Instasharp, see <c>http://instasharp.org/</c>.
+        /// Gets the <see cref="InstagramConfig"/> used by InstaSharp, see <c>http://instasharp.org/</c>.
         /// </summary>
         public static InstagramConfig InstagramConfig
         {

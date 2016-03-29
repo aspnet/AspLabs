@@ -18,13 +18,13 @@ namespace InstagramReceiver.WebHooks
             // Convert the incoming data to a collection of InstagramNotifications
             var notifications = context.GetDataOrDefault<InstagramNotificationCollection>();
 
-            // Get the config used by Instasharp client
+            // Get the config used by InstaSharp client
             InstagramConfig config = Dependencies.InstagramConfig;
 
             // Access media references in notifications
             foreach (var notification in notifications)
             {
-                // If we have an access token then get the media using Instasharp.
+                // If we have an access token then get the media using InstaSharp.
                 OAuthResponse auth;
                 if (Dependencies.Tokens.TryGetValue(notification.UserId, out auth))
                 {

@@ -13,7 +13,7 @@ to differentiate between multiple WebHooks, for example 'secret0, id1=secret1, i
 Also, set the MS_WebHookReceiverSecret_InstagramId application setting to the application id, again optionally using IDs
 to differentiate between multiple WebHooks, for example '<c>secret0, id1=secret1, id2=secret2'.
 
-We use Instasharp to subscribe, unsubscribe, as well as for downloading media from Instagram, see http://instasharp.org/
+We use InstaSharp to subscribe, unsubscribe, as well as for downloading media from Instagram, see http://instasharp.org/
 for details. 
 
 To subscribe to instagram, send an empty POST request to

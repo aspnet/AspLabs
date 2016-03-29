@@ -50,7 +50,7 @@ namespace InstagramReceiver
             // This is similar to the RememberMe option when you log in.
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
-            // Get the config used by Instasharp
+            // Get the config used by InstaSharp
             InstagramConfig config = Dependencies.InstagramConfig;
 
             // Wire up Instagram authentication so that we can access the media published by a user.

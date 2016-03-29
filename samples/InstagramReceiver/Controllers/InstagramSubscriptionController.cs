@@ -10,7 +10,7 @@ namespace InstagramReceiver.Controllers
         [Route("subscribe")]
         public async Task<IHttpActionResult> PostSubscribe()
         {
-            // Create Instasharp subscription endpoint
+            // Create InstaSharp subscription endpoint
             var subscriptions = new Subscription(Dependencies.InstagramConfig);
 
             // Subscribe for updates from Instagram
@@ -21,7 +21,7 @@ namespace InstagramReceiver.Controllers
         [Route("unsubscribe")]
         public async Task<IHttpActionResult> PostUnsubscribeAll()
         {
-            // Create Instasharp subscription endpoint
+            // Create InstaSharp subscription endpoint
             var subscriptions = new Subscription(Dependencies.InstagramConfig);
 
             // Subscribe for updates from Instagram
