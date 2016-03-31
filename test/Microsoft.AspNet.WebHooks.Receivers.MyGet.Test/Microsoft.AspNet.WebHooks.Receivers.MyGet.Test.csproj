@@ -64,6 +64,7 @@
     <Compile Include="..\Common\EmbeddedResource.cs">
       <Link>EmbeddedResource.cs</Link>
     </Compile>
+    <Compile Include="Handlers\MyGetWebHookHandlerBaseTests.cs" />
     <Compile Include="Payloads\BuildStartedPayloadTests.cs" />
     <Compile Include="Payloads\PackagePushedPayloadTests.cs" />
     <Compile Include="Payloads\PackagePinnedPayloadTests.cs" />
@@ -87,6 +88,8 @@
     <EmbeddedResource Include="Messages\PackagePushedMessage.json" />
     <EmbeddedResource Include="Messages\PingMessage.json" />
     <EmbeddedResource Include="Messages\InvalidMessage.json" />
+    <EmbeddedResource Include="Messages\UnknownMessage.json" />
+    <EmbeddedResource Include="Messages\NoPayloadMessage.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -26,6 +26,7 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         protected MyGetWebHookHandlerBase()
         {
+            this.Receiver = MyGetWebHookReceiver.ReceiverName;
         }
 
         /// <inheritdoc />
@@ -41,7 +42,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Check if a payload is available
             JToken payload;
-            if (!data.TryGetValue(PayloadPropertyName, out payload))
+            if (data == null || !data.TryGetValue(PayloadPropertyName, out payload))
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, MyGetReceiverResources.Receiver_NoPayload, PayloadPropertyName);
                 context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(msg);

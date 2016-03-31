@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WebHooks MyGet Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WebHooks MyGet Receiver</h1>
+
+    <p>
+        The MyGet WebHook Receiver provides support for receiving WebHooks from MyGet. A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/myget?code=83699ec7c1d794c0c780e49a5c72972590571fd8</pre>
+
+    <p>
+        For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
+        same value as configured in the <b>MS_WebHookReceiverSecret_MyGet</b> application setting.
+        The 'code' parameter must be between 32 and 128 characters long. Optionally you can use IDs
+        to differentiate between multiple WebHooks, for example '<c>code0, id1=code1, id2=code2</c>'. 
+    </p>
+
+    <p>
+        Please see <a href="http://docs.myget.org/docs/reference/webhooks">MyGet WebHooks</a>
+        for more information.
+    </p>
+</body>
+</html>
