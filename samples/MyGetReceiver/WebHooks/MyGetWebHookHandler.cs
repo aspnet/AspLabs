@@ -4,6 +4,10 @@ using Microsoft.AspNet.WebHooks.Payloads;
 
 namespace MyGetReceiver.WebHooks
 {
+    /// <summary>
+    /// This handler processes WebHooks from MyGet and leverages the <see cref="MyGetWebHookHandlerBase"/> base handler.
+    /// For details about MyGet WebHooks, please see <c>http://docs.myget.org/docs/reference/webhooks</c>.
+    /// </summary>
     public class MyGetWebHookHandler : MyGetWebHookHandlerBase
     {
         /// <summary>
