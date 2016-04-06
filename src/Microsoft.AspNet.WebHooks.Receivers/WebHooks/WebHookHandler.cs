@@ -13,9 +13,9 @@ namespace Microsoft.AspNet.WebHooks
         internal const int DefaultOrder = 50;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebHookHandler"/> class with a default <see cref="M:Order"/> of 50
+        /// Initializes a new instance of the <see cref="WebHookHandler"/> class with a default <see cref="Order"/> of 50
         /// and by default accepts WebHooks from all receivers. To limit which receiver this <see cref="IWebHookHandler"/>
-        /// will receive WebHook requests from, set the <see cref="M:Receiver"/> property to the name of that receiver.
+        /// will receive WebHook requests from, set the <see cref="Receiver"/> property to the name of that receiver.
         /// </summary>
         protected WebHookHandler()
         {

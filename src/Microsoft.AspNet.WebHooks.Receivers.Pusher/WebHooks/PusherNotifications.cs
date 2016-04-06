@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -16,8 +17,8 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         ///  Gets or sets a Unix time stamp in milliseconds which can be used to determine the order in which 
-        ///  Pusher events were generated. If desired, the time stamp can be converted using 
-        ///  <see cref="M:DateTimeOffset.FromUnixTimeMilliseconds"/>.
+        ///  Pusher events were generated. For conversion of Unix timestamps to <see cref="DateTimeOffset"/>,
+        ///  please see <c>https://msdn.microsoft.com/en-us/library/system.datetimeoffset.fromunixtimemilliseconds</c>.
         /// </summary>
         [JsonProperty("time_ms")]
         public long CreatedAt { get; set; }

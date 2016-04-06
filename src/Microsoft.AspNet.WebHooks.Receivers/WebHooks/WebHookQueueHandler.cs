@@ -19,9 +19,9 @@ namespace Microsoft.AspNet.WebHooks
     public abstract class WebHookQueueHandler : WebHookHandler
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebHookQueueHandler"/> class with a default <see cref="M:Order"/> of 50
+        /// Initializes a new instance of the <see cref="WebHookQueueHandler"/> class with a default <see cref="WebHookHandler.Order"/> of 50
         /// and by default accepts WebHooks from all receivers. To limit which receiver this <see cref="IWebHookHandler"/>
-        /// will receive WebHook requests from, set the <see cref="M:Receiver"/> property to the name of that receiver.
+        /// will receive WebHook requests from, set the <see cref="WebHookHandler.Receiver"/> property to the name of that receiver.
         /// </summary>
         protected WebHookQueueHandler() : base()
         {

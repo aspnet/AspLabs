@@ -33,7 +33,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         /// <summary>
-        /// Initializes the <see cref="SettingsDictionary"/> provided in response to <see cref="M:GetSettings"/>.
+        /// Initializes the <see cref="SettingsDictionary"/> provided in response to <see cref="GetSettings"/>.
         /// </summary>
         /// <returns>A fully initialized <see cref="SettingsDictionary"/>.</returns>
         protected virtual SettingsDictionary InitializeSettings()

@@ -10,7 +10,7 @@ namespace Microsoft.TestUtilities.Mocks
 {
     /// <summary>
     /// Provides an <see cref="HttpMessageHandler"/> where the response can be modified in flight by providing
-    /// an appropriate <see cref="M:Handler"/>.
+    /// an appropriate <see cref="Handler"/>.
     /// </summary>
     public class HttpMessageHandlerMock : HttpMessageHandler
     {

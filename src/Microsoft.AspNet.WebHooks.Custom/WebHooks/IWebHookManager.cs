@@ -9,8 +9,8 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Provides an abstraction for launching WebHooks based on events happening in the system. When 
-    /// the <see cref="M:NotifyAsync"/> method is called, all registered WebHooks with matching filters 
-    /// will launch indicating to the recipient of the WebHook that an event happened.
+    /// the <see cref="NotifyAsync(string, IEnumerable{NotificationDictionary}, Func{WebHook, string, bool})"/> method is called, 
+    /// all registered WebHooks with matching filters will launch indicating to the recipient of the WebHook that an event happened.
     /// </summary>
     public interface IWebHookManager
     {
