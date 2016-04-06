@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Web.Http;
 using Microsoft.AspNet.WebHooks.Config;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks.Services
@@ -15,6 +16,31 @@ namespace Microsoft.AspNet.WebHooks.Services
         {
             HttpConfiguration config = new HttpConfiguration();
             WebHooksConfig.Initialize(config);
+        }
+
+        [Fact]
+        public void GetIdValidator_ReturnsSingleInstance()
+        {
+            // Act
+            IWebHookIdValidator actual1 = CustomApiServices.GetIdValidator();
+            IWebHookIdValidator actual2 = CustomApiServices.GetIdValidator();
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
+        public void SetIdValidator_GetIdValidator_Roundtrips()
+        {
+            // Arrange
+            Mock<IWebHookIdValidator> idValidatorMock = new Mock<IWebHookIdValidator>();
+
+            // Act
+            CustomApiServices.SetIdValidator(idValidatorMock.Object);
+            IWebHookIdValidator actual = CustomApiServices.GetIdValidator();
+
+            // Assert
+            Assert.Same(idValidatorMock.Object, actual);
         }
 
         [Fact]

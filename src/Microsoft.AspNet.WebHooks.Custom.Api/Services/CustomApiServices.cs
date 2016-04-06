@@ -18,7 +18,35 @@ namespace Microsoft.AspNet.WebHooks.Services
     /// </summary>
     public static class CustomApiServices
     {
+        private static IWebHookIdValidator _idValidator;
         private static IEnumerable<IWebHookRegistrar> _registrars;
+
+        /// <summary>
+        /// Gets a default <see cref="IWebHookIdValidator"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <returns>A default <see cref="IWebHookIdValidator"/> instance.</returns>
+        public static IWebHookIdValidator GetIdValidator()
+        {
+            if (_idValidator != null)
+            {
+                return _idValidator;
+            }
+
+            IWebHookIdValidator instance = new DefaultWebHookIdValidator();
+            Interlocked.CompareExchange(ref _idValidator, instance, null);
+            return _idValidator;
+        }
+
+        /// <summary>
+        /// Sets a default <see cref="IWebHookIdValidator"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <param name="instance">The <see cref="IWebHookIdValidator"/> to use. If <c>null</c> then a default implementation is used.</param>
+        public static void SetIdValidator(IWebHookIdValidator instance)
+        {
+            _idValidator = instance;
+        }
 
         /// <summary>
         /// Gets the set of <see cref="IWebHookRegistrar"/> instances discovered by a default 
@@ -45,6 +73,7 @@ namespace Microsoft.AspNet.WebHooks.Services
         internal static void Reset()
         {
             _registrars = null;
+            _idValidator = null;
         }
     }
 }

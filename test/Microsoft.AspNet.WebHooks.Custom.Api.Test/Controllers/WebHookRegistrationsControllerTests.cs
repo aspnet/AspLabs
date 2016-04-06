@@ -38,7 +38,8 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         private Mock<IWebHookUser> _userMock;
         private IWebHookFilterManager _filterManager;
         private Mock<IWebHookFilterProvider> _filterProviderMock;
-        private Mock<IWebHookRegistrar> _registrar;
+        private Mock<IWebHookRegistrar> _registrarMock;
+        private Mock<IWebHookIdValidator> _idValidatorMock;
 
         public WebHookRegistrationsControllerTests()
         {
@@ -61,7 +62,8 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 _filterProviderMock.Object
             });
 
-            _registrar = new Mock<IWebHookRegistrar>();
+            _registrarMock = new Mock<IWebHookRegistrar>();
+            _idValidatorMock = new Mock<IWebHookIdValidator>();
 
             var services = new Dictionary<Type, object>
             {
@@ -69,7 +71,8 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 { typeof(IWebHookStore), _storeMock.Object },
                 { typeof(IWebHookUser), _userMock.Object },
                 { typeof(IWebHookFilterManager), _filterManager },
-                { typeof(IWebHookRegistrar), _registrar.Object }
+                { typeof(IWebHookRegistrar), _registrarMock.Object },
+                { typeof(IWebHookIdValidator), _idValidatorMock.Object },
             };
             _config = HttpConfigurationMock.Create(services);
             _config.Routes.Add(WebHookRouteNames.FiltersGetAction, new HttpRoute());
@@ -305,6 +308,20 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Fact]
+        public async Task Post_Calls_IdValidator()
+        {
+            // Arrange
+            await Initialize();
+            WebHook webHook = CreateWebHook();
+
+            // Act
+            IHttpActionResult actual = await _controller.Post(webHook);
+
+            // Assert
+            _idValidatorMock.Verify(v => v.ValidateIdAsync(_controllerContext.Request, webHook), Times.Once());
+        }
+
+        [Fact]
         public async Task Put_ReturnsBadRequest_IfNoRequestBody()
         {
             // Arrange
@@ -427,6 +444,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             await _controller.VerifyFilters(webHook);
 
             // Assert
+            _filterProviderMock.Verify();
             Assert.Equal(expected, webHook.Filters.Single());
         }
 
@@ -449,6 +467,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             // Assert
             HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The following filters are not valid: 'Unknown'. A list of valid filters can be obtained from the path 'http://localhost/'.", error.Message);
+            _filterProviderMock.Verify();
         }
 
         [Fact]
@@ -456,7 +475,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             // Arrange
             WebHook webHook = new WebHook();
-            _registrar.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
+            _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Returns(Task.FromResult(true))
                 .Verifiable();
 
@@ -464,7 +483,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             await _controller.VerifyFilters(webHook);
 
             // Assert
-            _registrar.Verify();
+            _registrarMock.Verify();
         }
 
         [Fact]
@@ -473,7 +492,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             // Arrange
             WebHook webHook = new WebHook();
             webHook.Filters.Add(FilterName);
-            _registrar.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
+            _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Returns(Task.FromResult(true))
                 .Verifiable();
 
@@ -481,7 +500,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             await _controller.VerifyFilters(webHook);
 
             // Assert
-            _registrar.Verify();
+            _registrarMock.Verify();
         }
 
         [Fact]
@@ -491,7 +510,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             Exception ex = new Exception("Catch this!");
             WebHook webHook = new WebHook();
             webHook.Filters.Add(FilterName);
-            _registrar.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
+            _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Throws(ex);
 
             // Act
@@ -509,7 +528,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             HttpResponseException rex = new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Conflict));
             WebHook webHook = new WebHook();
             webHook.Filters.Add(FilterName);
-            _registrar.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
+            _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Throws(rex);
 
             // Act

@@ -57,6 +57,8 @@
     </Compile>
     <Compile Include="Routes\WebHookRouteNames.cs" />
     <Compile Include="Services\CustomApiServices.cs" />
+    <Compile Include="WebHooks\DefaultWebHookIdValidator.cs" />
+    <Compile Include="WebHooks\IWebHookIdValidator.cs" />
     <Compile Include="WebHooks\WebHookRegistrar.cs" />
     <Compile Include="WebHooks\IWebHookRegistrar.cs" />
   </ItemGroup>

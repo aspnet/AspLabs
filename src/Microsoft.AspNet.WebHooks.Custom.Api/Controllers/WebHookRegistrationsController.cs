@@ -81,8 +81,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             try
             {
-                // Ensure we have a normalized ID for the WebHook
-                webHook.Id = null;
+                // Validate the provided WebHook ID (or force one to be created on server side)
+                IWebHookIdValidator idValidator = Configuration.DependencyResolver.GetIdValidator();
+                await idValidator.ValidateIdAsync(Request, webHook);
 
                 // Add WebHook for this user.
                 StoreResult result = await _store.InsertWebHookAsync(userId, webHook);

@@ -16,6 +16,18 @@ namespace Microsoft.AspNet.WebHooks
     public static class DependencyScopeExtensions
     {
         /// <summary>
+        /// Gets an <see cref="IWebHookIdValidator"/> implementation registered with the Dependency Injection engine
+        /// or a default implementation if none are registered.
+        /// </summary>
+        /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
+        /// <returns>The registered <see cref="IWebHookIdValidator"/> instance or a default implementation if none are registered.</returns>
+        public static IWebHookIdValidator GetIdValidator(this IDependencyScope services)
+        {
+            IWebHookIdValidator validator = services.GetService<IWebHookIdValidator>();
+            return validator ?? CustomApiServices.GetIdValidator();
+        }
+
+        /// <summary>
         /// Gets the set of <see cref="IWebHookRegistrar"/> instances registered with the Dependency Injection engine
         /// or an empty collection if none are registered.
         /// </summary>

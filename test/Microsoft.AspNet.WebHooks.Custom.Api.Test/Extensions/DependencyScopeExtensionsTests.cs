@@ -24,6 +24,50 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
+        public void GetIdValidator_ReturnsDependencyInstance_IfRegistered()
+        {
+            // Arrange
+            Mock<IWebHookIdValidator> instanceMock = new Mock<IWebHookIdValidator>();
+            _resolverMock.Setup(r => r.GetService(typeof(IWebHookIdValidator)))
+                .Returns(instanceMock.Object)
+                .Verifiable();
+
+            // Act
+            IWebHookIdValidator actual = _resolverMock.Object.GetIdValidator();
+
+            // Assert
+            Assert.Same(instanceMock.Object, actual);
+            instanceMock.Verify();
+        }
+
+        [Fact]
+        public void GetIdValidator_ReturnsDefaultInstance_IfNoneRegistered()
+        {
+            // Arrange
+            _config.InitializeCustomWebHooks();
+
+            // Act
+            IWebHookIdValidator actual = _resolverMock.Object.GetIdValidator();
+
+            // Assert
+            Assert.IsType<DefaultWebHookIdValidator>(actual);
+        }
+
+        [Fact]
+        public void GetIdValidator_ReturnsSameInstance_IfNoneRegistered()
+        {
+            // Arrange
+            _config.InitializeCustomWebHooks();
+
+            // Act
+            IWebHookIdValidator actual1 = _resolverMock.Object.GetIdValidator();
+            IWebHookIdValidator actual2 = _resolverMock.Object.GetIdValidator();
+
+            // Assert
+            Assert.Same(actual1, actual2);
+        }
+
+        [Fact]
         public void GetRegistrars_ReturnsDependencyInstances_IfRegistered()
         {
             // Arrange
