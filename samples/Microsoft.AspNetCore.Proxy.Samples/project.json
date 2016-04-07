@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNetCore.IISPlatformHandler": "1.0.0-*",
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-*",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
     "Microsoft.AspNetCore.Proxy": "0.1.0-*",
     "Microsoft.NETCore.Platforms": "1.0.1-*"
@@ -9,27 +9,18 @@
   "compilationOptions": {
     "emitEntryPoint": true
   },
-  "commands": {
-    "web": "Microsoft.AspNetCore.Proxy.Samples"
-  },
   "frameworks": {
-    "dnx451": {},
+    "net451": {},
     "netstandardapp1.5": {
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-*"
+      },
       "imports": [
         "dnxcore50"
       ]
     }
   },
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc"
-  ],
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components"
+  "content": [
+    "web.config"
   ]
 }
