@@ -156,6 +156,17 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
+        /// If delivery of a WebHook is not successful, i.e. something other than a 2xx or 410 Gone 
+        /// HTTP status code is received and the request is to be retried, then <see cref="OnWebHookRetry"/> 
+        /// is called enabling additional post-processing of a retry request. 
+        /// </summary>
+        /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
+        protected virtual Task OnWebHookRetry(WebHookWorkItem workItem)
+        {
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
         /// If delivery of a WebHook is successful, i.e. a 2xx HTTP status code is received,
         /// then <see cref="OnWebHookSuccess"/> is called enabling additional post-processing. 
         /// </summary>
@@ -233,7 +244,8 @@ namespace Microsoft.AspNet.WebHooks
                 workItem.Offset++;
                 if (workItem.Offset < _launchers.Length)
                 {
-                    // Submit work item
+                    // If we are to retry then we submit the request again after a delay.
+                    await OnWebHookRetry(workItem);
                     _launchers[workItem.Offset].Post(workItem);
                 }
                 else

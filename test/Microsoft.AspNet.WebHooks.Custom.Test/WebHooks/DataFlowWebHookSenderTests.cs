@@ -93,13 +93,19 @@ namespace Microsoft.AspNet.WebHooks
             SendResult actualResult = SendResult.None;
             ManualResetEvent done = new ManualResetEvent(initialState: false);
             WebHookWorkItem final = null;
+            int actualRetries = 0;
             _sender = new TestDataflowWebHookSender(_loggerMock.Object, delays, _options, _httpClient,
+            onWebHookRetry: item =>
+            {
+                actualRetries++;
+            },
             onWebHookSuccess: item =>
             {
                 final = item;
                 actualResult = SendResult.Success;
                 done.Set();
-            }, onWebHookGone: item =>
+            },
+            onWebHookGone: item =>
             {
                 final = item;
                 actualResult = SendResult.Gone;
@@ -124,6 +130,8 @@ namespace Microsoft.AspNet.WebHooks
             done.WaitOne();
 
             // Assert
+            int expectedRetries = expectedResult == SendResult.Failure ? Math.Max(0, expectedOffset - 1) : expectedOffset;
+            Assert.Equal(expectedRetries, actualRetries);
             Assert.Equal(expectedResult, actualResult);
             Assert.Equal(expectedOffset, final.Offset);
         }
@@ -185,21 +193,32 @@ namespace Microsoft.AspNet.WebHooks
 
         private class TestDataflowWebHookSender : DataflowWebHookSender
         {
-            private readonly Action<WebHookWorkItem> _onSuccess, _onGone, _onFailure;
+            private readonly Action<WebHookWorkItem> _onRetry, _onSuccess, _onGone, _onFailure;
 
             public TestDataflowWebHookSender(
                 ILogger logger,
                 IEnumerable<TimeSpan> retryDelays,
                 ExecutionDataflowBlockOptions options,
                 HttpClient httpClient,
+                Action<WebHookWorkItem> onWebHookRetry,
                 Action<WebHookWorkItem> onWebHookSuccess,
                 Action<WebHookWorkItem> onWebHookGone,
                 Action<WebHookWorkItem> onWebHookFailure)
                 : base(logger, retryDelays, options, httpClient)
             {
+                _onRetry = onWebHookRetry;
                 _onSuccess = onWebHookSuccess;
                 _onGone = onWebHookGone;
                 _onFailure = onWebHookFailure;
+            }
+
+            protected override Task OnWebHookRetry(WebHookWorkItem workItem)
+            {
+                if (_onRetry != null)
+                {
+                    _onRetry(workItem);
+                }
+                return Task.FromResult(true);
             }
 
             protected override Task OnWebHookSuccess(WebHookWorkItem workItem)
