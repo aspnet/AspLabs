@@ -19,6 +19,7 @@ namespace Microsoft.AspNet.WebHooks
         /// name can for example be <c>dropbox</c> or <c>github</c>.</param>
         /// <param name="id">A (possibly empty) ID of a particular configuration for the given <paramref name="name"/>.
         /// This can be used for one receiver to differentiate between multiple configurations.</param>
+        /// <returns>The requested config, or <c>null</c> if not found.</returns>
         Task<string> GetReceiverConfigAsync(string name, string id);
     }
 }
