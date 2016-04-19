@@ -3,6 +3,9 @@
 
 using System.Collections.Generic;
 using System.Web.Http.Dependencies;
+using Microsoft.AspNet.WebHooks.Config;
+using Microsoft.AspNet.WebHooks.Diagnostics;
+using Microsoft.AspNet.WebHooks.Services;
 using Moq;
 using Xunit;
 
@@ -21,6 +24,80 @@ namespace Microsoft.AspNet.WebHooks
             _resolver = _resolverMock.Object;
             _service1 = new Service();
             _service2 = new Service();
+            CommonServices.Reset();
+        }
+
+        [Fact]
+        public void GetLogger_ReturnsDependencyInstance_IfRegistered()
+        {
+            // Arrange
+            Mock<ILogger> instanceMock = new Mock<ILogger>();
+            _resolverMock.Setup(r => r.GetService(typeof(ILogger)))
+                .Returns(instanceMock.Object)
+                .Verifiable();
+
+            // Act
+            ILogger actual = _resolverMock.Object.GetLogger();
+
+            // Assert
+            Assert.Same(instanceMock.Object, actual);
+            instanceMock.Verify();
+        }
+
+        [Fact]
+        public void GetLogger_ReturnsDefaultInstance_IfNoneRegistered()
+        {
+            // Act
+            ILogger actual = _resolverMock.Object.GetLogger();
+
+            // Assert
+            Assert.IsType<TraceLogger>(actual);
+        }
+
+        [Fact]
+        public void GetSettings_ReturnsDependencyInstance_IfRegistered()
+        {
+            // Arrange
+            SettingsDictionary instance = new SettingsDictionary();
+            instance["key"] = "value";
+            _resolverMock.Setup(r => r.GetService(typeof(SettingsDictionary)))
+                .Returns(instance)
+                .Verifiable();
+
+            // Act
+            SettingsDictionary actual = _resolverMock.Object.GetSettings();
+
+            // Assert
+            Assert.Same(instance, actual);
+            _resolverMock.Verify();
+        }
+
+        [Fact]
+        public void GetSettings_ReturnsDefaultInstance_IfNoneRegistered()
+        {
+            // Act
+            SettingsDictionary actual = _resolverMock.Object.GetSettings();
+
+            // Assert
+            Assert.IsType<SettingsDictionary>(actual);
+        }
+
+        [Fact]
+        public void GetSettings_ReturnsDefaultInstance_IfEmptyDictionaryRegistered()
+        {
+            // Arrange
+            SettingsDictionary instance = new SettingsDictionary();
+            instance.Clear();
+            _resolverMock.Setup(r => r.GetService(typeof(SettingsDictionary)))
+                .Returns(instance)
+                .Verifiable();
+
+            // Act
+            SettingsDictionary actual = _resolverMock.Object.GetSettings();
+
+            // Assert
+            Assert.NotSame(instance, actual);
+            _resolverMock.Verify();
         }
 
         [Fact]

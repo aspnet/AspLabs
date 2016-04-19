@@ -54,17 +54,18 @@ namespace System.Web.Mvc
         public void GetSettings_ReturnsDependencyInstance_IfRegistered()
         {
             // Arrange
-            Mock<SettingsDictionary> instanceMock = new Mock<SettingsDictionary>();
+            SettingsDictionary instance = new SettingsDictionary();
+            instance["key"] = "value";
             _resolverMock.Setup(r => r.GetService(typeof(SettingsDictionary)))
-                .Returns(instanceMock.Object)
+                .Returns(instance)
                 .Verifiable();
 
             // Act
             SettingsDictionary actual = _resolverMock.Object.GetSettings();
 
             // Assert
-            Assert.Same(instanceMock.Object, actual);
-            instanceMock.Verify();
+            Assert.Same(instance, actual);
+            _resolverMock.Verify();
         }
 
         [Fact]
@@ -75,6 +76,24 @@ namespace System.Web.Mvc
 
             // Assert
             Assert.IsType<SettingsDictionary>(actual);
+        }
+
+        [Fact]
+        public void GetSettings_ReturnsDefaultInstance_IfEmptyDictionaryRegistered()
+        {
+            // Arrange
+            SettingsDictionary instance = new SettingsDictionary();
+            instance.Clear();
+            _resolverMock.Setup(r => r.GetService(typeof(SettingsDictionary)))
+                .Returns(instance)
+                .Verifiable();
+
+            // Act
+            SettingsDictionary actual = _resolverMock.Object.GetSettings();
+
+            // Assert
+            Assert.NotSame(instance, actual);
+            _resolverMock.Verify();
         }
 
         [Fact]
@@ -133,7 +152,7 @@ namespace System.Web.Mvc
             // Assert
             Assert.IsType<DataflowWebHookSender>(actual);
         }
-        
+
         [Fact]
         public void GetManager_ReturnsDependencyInstance_IfRegistered()
         {

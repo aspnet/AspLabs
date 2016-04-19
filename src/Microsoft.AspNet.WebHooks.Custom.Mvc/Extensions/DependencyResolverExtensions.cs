@@ -39,7 +39,7 @@ namespace System.Web.Mvc
         public static SettingsDictionary GetSettings(this IDependencyResolver services)
         {
             SettingsDictionary settings = services.GetService<SettingsDictionary>();
-            return settings ?? CommonServices.GetSettings();
+            return settings != null && settings.Count > 0 ? settings : CommonServices.GetSettings();
         }
 
         /// <summary>
