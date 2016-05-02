@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WebHooks Visual Studio Team Services Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WebHooks Visual Studio Team Services Receiver</h1>
+
+    <p>
+        The VSTS WebHook Receiver provides support for receiving WebHooks from Visual Studio Team Services. A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/vsts?code=83699ec7c1d794c0c780e49a5c72972590571fd8</pre>
+
+    <p>
+        For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
+        same value as configured in the <b>MS_WebHookReceiverSecret_VSTS</b> application setting.
+        The 'code' parameter must be between 32 and 128 characters long. Optionally you can use IDs
+        to differentiate between multiple WebHooks, for example '<c>code0, id1=code1, id2=code2</c>'. 
+    </p>
+
+    <p>
+        Please see <a href="https://www.visualstudio.com/en-us/get-started/integrate/service-hooks/webhooks-and-vso-vs">Visual Studio Team Services WebHooks</a>
+        for more information.
+    </p>
+</body>
+</html>

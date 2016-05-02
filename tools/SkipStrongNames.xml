@@ -24,6 +24,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Slack"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.VSTS"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Zendesk"/>
 
@@ -51,6 +52,7 @@
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Stripe.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Trello.Test"/>
+  <assembly name="Microsoft.AspNet.WebHooks.Receivers.VSTS.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.WordPress.Test"/>
   <assembly name="Microsoft.AspNet.WebHooks.Receivers.Zendesk.Test"/>
   <assembly name="Microsoft.TestUtilities"/>

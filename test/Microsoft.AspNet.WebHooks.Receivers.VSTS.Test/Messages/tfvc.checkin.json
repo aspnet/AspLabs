@@ -1,0 +1,40 @@
+﻿{
+  "subscriptionId": "00000000-0000-0000-0000-000000000000",
+  "notificationId": 2,
+  "id": "f9b4c23e-88dd-4516-b04d-849787304e32",
+  "eventType": "tfvc.checkin",
+  "publisherId": "tfs",
+  "message": {
+    "text": "John Smith checked in changeset 18: Dropping in new Java sample",
+    "html": "John Smith checked in changeset <a href=\"https://good-company.some.ssl.host/web/cs.aspx?id=d81542e4-cdfa-4333-b082-1ae2d6c3ad16&amp;cs=18\">18</a>: Dropping in new Java sample",
+    "markdown": "John Smith checked in changeset [18](https://good-company.some.ssl.host/web/cs.aspx?id=d81542e4-cdfa-4333-b082-1ae2d6c3ad16&cs=18): Dropping in new Java sample"
+  },
+  "detailedMessage": {
+    "text": "John Smith checked in changeset 18: Dropping in new Java sample",
+    "html": "John Smith checked in changeset <a href=\"https://good-company.some.ssl.host/web/cs.aspx?id=d81542e4-cdfa-4333-b082-1ae2d6c3ad16&amp;cs=18\">18</a>: Dropping in new Java sample",
+    "markdown": "John Smith checked in changeset [18](https://good-company.some.ssl.host/web/cs.aspx?id=d81542e4-cdfa-4333-b082-1ae2d6c3ad16&cs=18): Dropping in new Java sample"
+  },
+  "resource": {
+    "changesetId": 18,
+    "url": "https://good-company.some.ssl.host/DefaultCollection/_apis/tfvc/changesets/18",
+    "author": {
+      "id": "d6245f20-2af8-44f4-9451-8107cb2767db",
+      "displayName": "John Smith",
+      "uniqueName": "fabrikamfiber16@hotmail.com"
+    },
+    "checkedInBy": {
+      "id": "d6245f20-2af8-44f4-9451-8107cb2767db",
+      "displayName": "John Smith",
+      "uniqueName": "fabrikamfiber16@hotmail.com"
+    },
+    "createdDate": "2014-05-12T22:41:16Z",
+    "comment": "Dropping in new Java sample"
+  },
+  "resourceVersion": "1.0",
+  "resourceContainers": {
+    "collection": { "id": "c12d0eb8-e382-443b-9f9c-c52cba5014c2" },
+    "account": { "id": "f844ec47-a9db-4511-8281-8b63f4eaf94e" },
+    "project": { "id": "be9b3917-87e6-42a4-a549-2bc06a7a878f" }
+  },
+  "createdDate": "2016-05-02T19:01:11.7056821Z"
+}
