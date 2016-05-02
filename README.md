@@ -11,6 +11,8 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 - [All Samples](/samples/)
 - [Azure](/samples/AzureReceivers)
 - [Bitbucket](/samples/BitbucketReceiver)
+- [Dropbox](/samples/DropboxReceiver)
+- [GitHub](/samples/GitHubReceiver)
 - [Instagram](/samples/InstagramReceiver)
 - [Slack](/samples/SlackReceiver)
 - [Stripe](/samples/StripeReceiver)
