@@ -255,7 +255,7 @@ namespace Microsoft.Azure.Applications.Storage
             // Arrange
             CloudTable table = InitializeTable();
             await CreateTableRows(table);
-            TableQuery query = new TableQuery { FilterString = $"PartitionKey eq '{TestPartition}'" };
+            TableQuery query = new TableQuery { FilterString = "PartitionKey eq '" + TestPartition + "'" };
 
             // Act
             IEnumerable<DynamicTableEntity> actual = await _manager.ExecuteQueryAsync(table, query);
@@ -297,7 +297,7 @@ namespace Microsoft.Azure.Applications.Storage
         }
 
         [Fact]
-        public async Task ExecuteBatch_ReturnsEmptyList_OnError()
+        public async Task ExecuteBatch_ReturnsEmptyList_IfError()
         {
             // Arrange
             CloudTable table = InitializeTable();
@@ -349,7 +349,7 @@ namespace Microsoft.Azure.Applications.Storage
             await CreateTableRows(table);
 
             // Act
-            long actual = await _manager.ExecuteDeleteAllAsync(table, TestPartition, filter: $"RowKey eq 'Unknown'");
+            long actual = await _manager.ExecuteDeleteAllAsync(table, TestPartition, filter: "RowKey eq 'Unknown'");
 
             // Assert
             Assert.Equal(0, actual);
@@ -365,7 +365,7 @@ namespace Microsoft.Azure.Applications.Storage
 
             // Act
             long actual = await _manager.ExecuteDeleteAllAsync(table, TestPartition, filter: null);
-            IEnumerable<DynamicTableEntity> remaining = await _manager.ExecuteQueryAsync(table, new TableQuery { FilterString = $"PartitionKey eq 'Other'" });
+            IEnumerable<DynamicTableEntity> remaining = await _manager.ExecuteQueryAsync(table, new TableQuery { FilterString = "PartitionKey eq 'Other'" });
 
             // Assert
             Assert.Equal(1024, actual);
