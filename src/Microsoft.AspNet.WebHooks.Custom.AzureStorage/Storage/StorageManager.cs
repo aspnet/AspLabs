@@ -243,7 +243,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
                     continuationToken = segment.ContinuationToken;
                 }
                 while (continuationToken != null);
-                return segment;
+                return result;
             }
             catch (Exception ex)
             {
