@@ -61,7 +61,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WebHooks support has not been initialized correctly. Please call the initializer &apos;{0}&apos; on startup..
+        ///   Looks up a localized string similar to WebHooks support has not been initialized correctly. Please call the initializer &apos;{0}&apos; on startup. See &apos;http://go.microsoft.com/fwlink/?LinkId=799408&apos; for details on how to initialize WebHooks..
         /// </summary>
         internal static string Config_NotInitialized {
             get {

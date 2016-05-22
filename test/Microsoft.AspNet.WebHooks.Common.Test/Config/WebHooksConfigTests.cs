@@ -35,7 +35,7 @@ namespace Microsoft.AspNet.WebHooks.Config
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => WebHooksConfig.Config);
 
             // Assert
-            Assert.Equal("WebHooks support has not been initialized correctly. Please call the initializer 'WebHooksConfig.Initialize' on startup.", ex.Message);
+            Assert.StartsWith("WebHooks support has not been initialized correctly. Please call the initializer 'WebHooksConfig.Initialize' on startup.", ex.Message);
         }
     }
 }
