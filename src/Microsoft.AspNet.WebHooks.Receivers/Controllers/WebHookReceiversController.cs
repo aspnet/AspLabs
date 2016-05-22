@@ -78,11 +78,10 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                ex = ex.GetBaseException();
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Failure, webHookReceiver, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
-                return ResponseMessage(response);
+                Exception inner = ex.GetBaseException();
+                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Failure, webHookReceiver, inner.Message);
+                Configuration.DependencyResolver.GetLogger().Error(msg, inner);
+                throw;
             }
         }
     }

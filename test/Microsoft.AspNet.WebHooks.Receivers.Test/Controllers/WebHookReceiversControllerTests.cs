@@ -38,7 +38,78 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Fact]
-        public async Task Get_Returns_NotFoundWhenReceiverDoesNotExist()
+        public Task Get_Returns_NotFoundWhenReceiverDoesNotExist()
+        {
+            return Action_Returns_NotFoundWhenReceiverDoesNotExist(rec => _controller.Get(rec));
+        }
+
+        [Fact]
+        public Task Get_Returns_ReceiverResponse()
+        {
+            return Action_Returns_ReceiverResponse(rec => _controller.Get(rec));
+        }
+
+        [Fact]
+        public Task Get_Handles_ReceiverHttpResponseException()
+        {
+            return Action_Handles_ReceiverHttpResponseException(rec => _controller.Get(rec));
+        }
+
+        [Fact]
+        public Task Get_Handles_ReceiverException()
+        {
+            return Action_Handles_ReceiverException(rec => _controller.Get(rec));
+        }
+
+        [Fact]
+        public Task Head_Returns_NotFoundWhenReceiverDoesNotExist()
+        {
+            return Action_Returns_NotFoundWhenReceiverDoesNotExist(rec => _controller.Head(rec));
+        }
+
+        [Fact]
+        public Task Head_Returns_ReceiverResponse()
+        {
+            return Action_Returns_ReceiverResponse(rec => _controller.Head(rec));
+        }
+
+        [Fact]
+        public Task Head_Handles_ReceiverHttpResponseException()
+        {
+            return Action_Handles_ReceiverHttpResponseException(rec => _controller.Head(rec));
+        }
+
+        [Fact]
+        public Task Head_Handles_ReceiverException()
+        {
+            return Action_Handles_ReceiverException(rec => _controller.Head(rec));
+        }
+
+        [Fact]
+        public Task Post_Returns_NotFoundWhenReceiverDoesNotExist()
+        {
+            return Action_Returns_NotFoundWhenReceiverDoesNotExist(rec => _controller.Post(rec));
+        }
+
+        [Fact]
+        public Task Post_Returns_ReceiverResponse()
+        {
+            return Action_Returns_ReceiverResponse(rec => _controller.Post(rec));
+        }
+
+        [Fact]
+        public Task Post_Handles_ReceiverHttpResponseException()
+        {
+            return Action_Handles_ReceiverHttpResponseException(rec => _controller.Post(rec));
+        }
+
+        [Fact]
+        public Task Post_Handles_ReceiverException()
+        {
+            return Action_Handles_ReceiverException(rec => _controller.Post(rec));
+        }
+
+        private async Task Action_Returns_NotFoundWhenReceiverDoesNotExist(Func<string, Task<IHttpActionResult>> action)
         {
             // Arrange
             _managerMock.Setup(m => m.GetReceiver(TestReceiver))
@@ -46,15 +117,14 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IHttpActionResult result = await _controller.Get(TestReceiver);
+            IHttpActionResult result = await action(TestReceiver);
 
             // Assert
             _managerMock.Verify();
             Assert.IsType<NotFoundResult>(result);
         }
 
-        [Fact]
-        public async Task Get_Returns_ReceiverResponse()
+        private async Task Action_Returns_ReceiverResponse(Func<string, Task<IHttpActionResult>> action)
         {
             // Arrange
             HttpResponseMessage response = new HttpResponseMessage() { ReasonPhrase = "From Receiver!" };
@@ -64,7 +134,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IHttpActionResult result = await _controller.Get(TestReceiver);
+            IHttpActionResult result = await action(TestReceiver);
             HttpResponseMessage actual = ((ResponseMessageResult)result).Response;
 
             // Assert
@@ -72,8 +142,26 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             Assert.Equal("From Receiver!", actual.ReasonPhrase);
         }
 
-        [Fact]
-        public async Task Get_Handles_ReceiverException()
+        private async Task Action_Handles_ReceiverHttpResponseException(Func<string, Task<IHttpActionResult>> action)
+        {
+            // Arrange
+            HttpResponseMessage expected = new HttpResponseMessage();
+            HttpResponseException exception = new HttpResponseException(expected);
+            WebHookReceiverMock receiver = new WebHookReceiverMock(exception);
+            _managerMock.Setup(m => m.GetReceiver(TestReceiver))
+                .Returns(receiver)
+                .Verifiable();
+
+            // Act
+            IHttpActionResult result = await action(TestReceiver);
+            HttpResponseMessage actual = ((ResponseMessageResult)result).Response;
+
+            // Assert
+            _managerMock.Verify();
+            Assert.Same(expected, actual);
+        }
+
+        private async Task Action_Handles_ReceiverException(Func<string, Task<IHttpActionResult>> action)
         {
             // Arrange
             Exception exception = new Exception("Catch this!");
@@ -83,88 +171,11 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IHttpActionResult result = await _controller.Get(TestReceiver);
-            HttpResponseMessage response = ((ResponseMessageResult)result).Response;
-            HttpError error = await response.Content.ReadAsAsync<HttpError>();
+            Exception actual = await Assert.ThrowsAsync<Exception>(() => action(TestReceiver));
 
             // Assert
             _managerMock.Verify();
-            Assert.Equal("WebHook receiver 'TestReceiver' could not process WebHook due to error: Catch this!", error.Message);
-        }
-
-        [Fact]
-        public async Task Post_Returns_NotFoundWhenReceiverDoesNotExist()
-        {
-            // Arrange
-            _managerMock.Setup(m => m.GetReceiver(TestReceiver))
-                .Returns((IWebHookReceiver)null)
-                .Verifiable();
-
-            // Act
-            IHttpActionResult result = await _controller.Post(TestReceiver);
-
-            // Assert
-            _managerMock.Verify();
-            Assert.IsType<NotFoundResult>(result);
-        }
-
-        [Fact]
-        public async Task Post_Returns_ReceiverResponse()
-        {
-            // Arrange
-            HttpResponseMessage response = new HttpResponseMessage() { ReasonPhrase = "From Receiver!" };
-            WebHookReceiverMock receiver = new WebHookReceiverMock(response);
-            _managerMock.Setup(m => m.GetReceiver(TestReceiver))
-                .Returns(receiver)
-                .Verifiable();
-
-            // Act
-            IHttpActionResult result = await _controller.Post(TestReceiver);
-            HttpResponseMessage actual = ((ResponseMessageResult)result).Response;
-
-            // Assert
-            _managerMock.Verify();
-            Assert.Equal("From Receiver!", actual.ReasonPhrase);
-        }
-
-        [Fact]
-        public async Task Post_Handles_ReceiverException()
-        {
-            // Arrange
-            Exception exception = new Exception("Catch this!");
-            WebHookReceiverMock receiver = new WebHookReceiverMock(exception);
-            _managerMock.Setup(m => m.GetReceiver(TestReceiver))
-                .Returns(receiver)
-                .Verifiable();
-
-            // Act
-            IHttpActionResult result = await _controller.Post(TestReceiver);
-            HttpResponseMessage response = ((ResponseMessageResult)result).Response;
-            HttpError error = await response.Content.ReadAsAsync<HttpError>();
-
-            // Assert
-            _managerMock.Verify();
-            Assert.Equal("WebHook receiver 'TestReceiver' could not process WebHook due to error: Catch this!", error.Message);
-        }
-
-        [Fact]
-        public async Task Post_Handles_ReceiverHttpResponseException()
-        {
-            // Arrange
-            HttpResponseMessage response = new HttpResponseMessage();
-            HttpResponseException exception = new HttpResponseException(response);
-            WebHookReceiverMock receiver = new WebHookReceiverMock(exception);
-            _managerMock.Setup(m => m.GetReceiver(TestReceiver))
-                .Returns(receiver)
-                .Verifiable();
-
-            // Act
-            IHttpActionResult result = await _controller.Post(TestReceiver);
-            HttpResponseMessage actual = ((ResponseMessageResult)result).Response;
-
-            // Assert
-            _managerMock.Verify();
-            Assert.Same(response, actual);
+            Assert.Equal("Catch this!", actual.Message);
         }
     }
 }
