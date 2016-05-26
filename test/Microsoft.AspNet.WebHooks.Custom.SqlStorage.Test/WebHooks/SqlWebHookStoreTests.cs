@@ -60,7 +60,7 @@ namespace Microsoft.AspNet.WebHooks
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => SqlWebHookStore.CheckSqlStorageConnectionString(settings));
 
             // Assert
-            Assert.Equal("Please provide an Azure Table Storage connection string with name 'MS_SqlStoreConnectionString' in the configuration string section of the 'Web.Config' file.", ex.Message);
+            Assert.Equal("Please provide a SQL connection string with name 'MS_SqlStoreConnectionString' in the configuration string section of the 'Web.Config' file.", ex.Message);
         }
 
         private static IWebHookStore CreateStore()

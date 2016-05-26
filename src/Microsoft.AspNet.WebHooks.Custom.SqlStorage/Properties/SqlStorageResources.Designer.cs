@@ -79,7 +79,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide an Azure Table Storage connection string with name &apos;{0}&apos; in the configuration string section of the &apos;Web.Config&apos; file..
+        ///   Looks up a localized string similar to Please provide a SQL connection string with name &apos;{0}&apos; in the configuration string section of the &apos;Web.Config&apos; file..
         /// </summary>
         internal static string SqlStore_NoConnectionString {
             get {

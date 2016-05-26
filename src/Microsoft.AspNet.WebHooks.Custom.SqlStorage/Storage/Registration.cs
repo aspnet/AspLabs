@@ -8,31 +8,24 @@ using System.Diagnostics.CodeAnalysis;
 namespace Microsoft.AspNet.WebHooks.Storage
 {
     /// <summary>
-    /// Defines the WebHook registration data model for rows stored in SQL.
+    /// Defines the WebHook registration data model for rows stored in Microsoft SQL.
     /// </summary>
     [Table("WebHooks")]
-    public class Registration
+    public class Registration : IRegistration
     {
-        /// <summary>
-        /// Gets or sets the user ID for this WebHook registration.
-        /// </summary>
+        /// <inheritdoc />
         [Key]
         [StringLength(256)]
         [Column(Order = 0)]
         public string User { get; set; }
 
-        /// <summary>
-        /// Gets or sets the ID of this WebHook registration.
-        /// </summary>
+        /// <inheritdoc />
         [Key]
         [StringLength(64)]
         [Column(Order = 1)]
         public string Id { get; set; }
 
-        /// <summary>
-        /// Gets or sets the data included in this WebHook registration. Note that this is encrypted 
-        /// as it contains sensitive information.
-        /// </summary>
+        /// <inheritdoc />
         [Required]
         public string ProtectedData { get; set; }
 

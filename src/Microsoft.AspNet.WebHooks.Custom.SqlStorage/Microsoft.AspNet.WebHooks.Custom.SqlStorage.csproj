@@ -111,7 +111,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SqlStorageResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Storage\IRegistration.cs" />
     <Compile Include="Storage\Registration.cs" />
+    <Compile Include="WebHooks\DbWebHookStore.cs" />
     <Compile Include="WebHooks\WebHookStoreContext.cs" />
     <Compile Include="WebHooks\SqlWebHookStore.cs" />
   </ItemGroup>
