@@ -44,9 +44,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNet.WebHooks.Receivers.VSTS">
-      <HintPath>..\..\bin\CodeAnalysis\Microsoft.AspNet.WebHooks.Receivers.VSTS.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -113,6 +110,10 @@
     <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Common\Microsoft.AspNet.WebHooks.Common.csproj">
       <Project>{f7dd0935-6320-4efc-9464-d5a2d2b8c2f7}</Project>
       <Name>Microsoft.AspNet.WebHooks.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.AspNet.WebHooks.Receivers.VSTS\Microsoft.AspNet.WebHooks.Receivers.VSTS.csproj">
+      <Project>{6b501d55-2aa3-4757-a185-1277bb881de8}</Project>
+      <Name>Microsoft.AspNet.WebHooks.Receivers.VSTS</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Src\Microsoft.AspNet.WebHooks.Receivers\Microsoft.AspNet.WebHooks.Receivers.csproj">
       <Project>{8ced31fb-32f2-4ffb-9997-452fb9728577}</Project>
