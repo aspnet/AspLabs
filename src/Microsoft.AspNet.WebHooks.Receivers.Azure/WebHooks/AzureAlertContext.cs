@@ -79,7 +79,7 @@ namespace Microsoft.AspNet.WebHooks
         public string ResourceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the region where the resource is located.
+        /// Gets or sets the geographic location of the resource.
         /// </summary>
         [JsonProperty("resourceRegion", Required = Required.Always)]
         public string ResourceRegion { get; set; }
