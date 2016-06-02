@@ -17,6 +17,7 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 - [MyGet](/samples/MyGetReceiver)
 - [Slack](/samples/SlackReceiver)
 - [Stripe](/samples/StripeReceiver)
+- [VSTS](/samples/VstsReceiver)
 - [Zendesk](/samples/ZendeskReceiver)
 
 ###Resources
