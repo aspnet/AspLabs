@@ -7,14 +7,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
-using Microsoft.AspNet.WebHooks.Storage;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using Xunit;
 
-namespace Microsoft.Azure.Applications.Storage
+namespace Microsoft.AspNet.WebHooks.Storage
 {
     [Collection("StoreCollection")]
     public class StorageManagerTests
