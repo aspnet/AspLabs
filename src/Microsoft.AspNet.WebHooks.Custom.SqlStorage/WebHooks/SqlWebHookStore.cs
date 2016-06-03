@@ -3,12 +3,12 @@
 
 using System;
 using System.Globalization;
-using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Microsoft.AspNet.WebHooks
 {

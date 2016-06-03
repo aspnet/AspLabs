@@ -35,9 +35,9 @@
                         
                         string toParse;
                         
-                        if (versionInfo != null && versionInfo.ProductVersion != null)
+                        if (versionInfo != null && versionInfo.FileVersion != null)
                         {
-                            toParse = versionInfo.ProductVersion;
+                            toParse = versionInfo.FileVersion;
                         }
                         else
                         {
@@ -67,7 +67,7 @@
                     {
                         Log.LogMessage("Downloading latest version of NuGet.exe...");
                         WebClient webClient = new WebClient();
-                        webClient.DownloadFile("https://nuget.org/nuget.exe", OutputFileName);
+                        webClient.DownloadFile("http://dist.nuget.org/win-x86-commandline/latest/nuget.exe", OutputFileName);
                     }
 
                     return true;

@@ -4,11 +4,11 @@
 using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace System.Web.Http
 {

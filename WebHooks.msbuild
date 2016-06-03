@@ -52,7 +52,7 @@
   </Target>
 
   <Target Name="DownloadNuGet">
-    <DownloadNuGet OutputFileName="$(NuGetExe)" MinimumVersion="2.7.0" />
+    <DownloadNuGet OutputFileName="$(NuGetExe)" MinimumVersion="3.4.0" />
   </Target>
 
   <Target Name="RestoreSkipStrongNames" DependsOnTargets="DownloadNuGet">

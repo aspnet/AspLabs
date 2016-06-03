@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading;
-using Microsoft.AspNet.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNet.WebHooks

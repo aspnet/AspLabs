@@ -12,10 +12,10 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
+using Microsoft.AspNetCore.DataProtection;
 using Newtonsoft.Json;
 
 namespace Microsoft.AspNet.WebHooks

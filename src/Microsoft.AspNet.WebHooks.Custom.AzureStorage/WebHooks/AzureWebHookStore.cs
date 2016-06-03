@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Services;
 using Microsoft.AspNet.WebHooks.Storage;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 
