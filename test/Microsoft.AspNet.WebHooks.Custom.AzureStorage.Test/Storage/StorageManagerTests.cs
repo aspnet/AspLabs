@@ -253,14 +253,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             // Arrange
             CloudTable table = InitializeTable();
-            await CreateTableRows(table);
+            await CreateTableRows(table, rowCount: 1024);
+            await CreateTableRows(table, partitionKey: "Other");
             TableQuery query = new TableQuery { FilterString = "PartitionKey eq '" + TestPartition + "'" };
 
             // Act
             IEnumerable<DynamicTableEntity> actual = await _manager.ExecuteQueryAsync(table, query);
 
             // Assert
-            Assert.Equal(MaxDataEntries, actual.Count());
+            Assert.Equal(1024, actual.Count());
         }
 
         [Fact]
