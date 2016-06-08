@@ -61,7 +61,7 @@
 
   <Target Name="RestorePackages" DependsOnTargets="DownloadNuGet">
     <Message Text="Restoring NuGet packages..." Importance="High" />
-    <Exec Command='"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity detailed -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
+    <Exec Command='"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
     <!-- Pick the right Microsoft.Web.FxCop package to use and copy it to a standard location. -->
   </Target>
 
