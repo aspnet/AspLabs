@@ -19,7 +19,7 @@ namespace System
         /// </summary>
         /// <param name="input">The string to split.</param>
         /// <param name="separator">An array of Unicode characters that delimit the substrings in this instance, an empty array that contains no delimiters, or null.</param>
-        /// <returns>An <see cref="IEnumerable{T}"/> containing the resulting segments.</returns>
+        /// <returns>An <see cref="T:string[]"/> containing the resulting segments.</returns>
         public static string[] SplitAndTrim(this string input, params char[] separator)
         {
             if (input == null)
