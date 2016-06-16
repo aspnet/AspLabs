@@ -1,9 +1,9 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.1.0-*",
   "dependencies": {
-    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-*",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNetCore.Proxy": "0.1.0-*"
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0-*",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.1.0-*",
+    "Microsoft.AspNetCore.Proxy": "0.2.0-*"
   },
   "buildOptions": {
     "emitEntryPoint": true
