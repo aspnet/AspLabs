@@ -149,6 +149,45 @@ namespace Microsoft.AspNet.WebHooks.Handlers
             _handlerMock.Verify(h => h.ExecuteAsync(_context, It.IsAny<JObject>()), Times.Once());
         }
 
+        [Fact]
+        public async Task ExecuteAsync_Dispatches_GitPush()
+        {
+            // Arrange
+            _context = GetContext("Microsoft.AspNet.WebHooks.Messages.git.push.json", "git.push");
+
+            // Act
+            await _handler.ExecuteAsync(VstsWebHookReceiver.ReceiverName, _context);
+
+            // Assert
+            _handlerMock.Verify(h => h.ExecuteAsync(_context, It.IsAny<GitPushPayload>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_Dispatches_GitPullrequestCreated()
+        {
+            // Arrange
+            _context = GetContext("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.created.json", "git.pullrequest.created");
+
+            // Act
+            await _handler.ExecuteAsync(VstsWebHookReceiver.ReceiverName, _context);
+
+            // Assert
+            _handlerMock.Verify(h => h.ExecuteAsync(_context, It.IsAny<GitPullRequestCreatedPayload>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_Dispatches_GitPullrequestUpdated()
+        {
+            // Arrange
+            _context = GetContext("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.updated.json", "git.pullrequest.created");
+
+            // Act
+            await _handler.ExecuteAsync(VstsWebHookReceiver.ReceiverName, _context);
+
+            // Assert
+            _handlerMock.Verify(h => h.ExecuteAsync(_context, It.IsAny<GitPullRequestCreatedPayload>()), Times.Once());
+        }
+
         private static WebHookHandlerContext GetContext(string payload, string action)
         {
             JObject data = EmbeddedResource.ReadAsJObject(payload);

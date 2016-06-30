@@ -63,6 +63,9 @@
     <Compile Include="Handlers\VstsWebHookHandlerBaseTests.cs" />
     <Compile Include="Payloads\BuildCompletedPayloadTests.cs" />
     <Compile Include="Payloads\CodeCheckedInPayloadTests.cs" />
+    <Compile Include="Payloads\GitPullrequestCreatedPayloadTests.cs" />
+    <Compile Include="Payloads\GitPullRequestUpdatedPayloadTests.cs" />
+    <Compile Include="Payloads\GitPushPayloadTests.cs" />
     <Compile Include="Payloads\TeamRoomMessagePostedPayloadTests.cs" />
     <Compile Include="Payloads\WorkItemCommentedOnPayloadTests.cs" />
     <Compile Include="Payloads\WorkItemCreatedPayloadTests.cs" />
@@ -84,6 +87,9 @@
     <EmbeddedResource Include="Messages\message.posted.json" />
     <EmbeddedResource Include="Messages\bad.noEventType.json" />
     <EmbeddedResource Include="Messages\bad.notMappedEventType.json" />
+    <EmbeddedResource Include="Messages\git.push.json" />
+    <EmbeddedResource Include="Messages\git.pullrequest.created.json" />
+    <EmbeddedResource Include="Messages\git.pullrequest.updated.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

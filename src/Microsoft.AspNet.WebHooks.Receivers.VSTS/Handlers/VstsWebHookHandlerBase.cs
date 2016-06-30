@@ -47,6 +47,9 @@ namespace Microsoft.AspNet.WebHooks
                 case "message.posted": return ExecuteAsync(context, data.ToObject<TeamRoomMessagePostedPayload>());
                 case "tfvc.checkin": return ExecuteAsync(context, data.ToObject<CodeCheckedInPayload>());
                 case "build.complete": return ExecuteAsync(context, data.ToObject<BuildCompletedPayload>());
+                case "git.push": return ExecuteAsync(context, data.ToObject<GitPushPayload>());
+                case "git.pullrequest.created": return ExecuteAsync(context, data.ToObject<GitPullRequestCreatedPayload>());
+                case "git.pullrequest.updated": return ExecuteAsync(context, data.ToObject<GitPullRequestUpdatedPayload>());
                 default:
                     string msg = string.Format(CultureInfo.CurrentCulture, VstsReceiverResources.Handler_NonMappedEventType, action);
                     context.RequestContext.Configuration.DependencyResolver.GetLogger().Warn(msg);
@@ -130,6 +133,36 @@ namespace Microsoft.AspNet.WebHooks
         /// <param name="context">Provides context for the <see cref="IWebHookHandler"/> for further processing the incoming WebHook.</param>
         /// <param name="payload">Strong-typed WebHook payload.</param>
         public virtual Task ExecuteAsync(WebHookHandlerContext context, BuildCompletedPayload payload)
+        {
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Executes the incoming WebHook request for event '<c>git.push</c>'.
+        /// </summary>
+        /// <param name="context">Provides context for the <see cref="IWebHookHandler"/> for further processing the incoming WebHook.</param>
+        /// <param name="payload">Strong-typed WebHook payload.</param>
+        public virtual Task ExecuteAsync(WebHookHandlerContext context, GitPushPayload payload)
+        {
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Executes the incoming WebHook request for event '<c>git.pullrequest.created</c>'.
+        /// </summary>
+        /// <param name="context">Provides context for the <see cref="IWebHookHandler"/> for further processing the incoming WebHook.</param>
+        /// <param name="payload">Strong-typed WebHook payload.</param>
+        public virtual Task ExecuteAsync(WebHookHandlerContext context, GitPullRequestCreatedPayload payload)
+        {
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Executes the incoming WebHook request for event '<c>git.pullrequest.updated</c>'.
+        /// </summary>
+        /// <param name="context">Provides context for the <see cref="IWebHookHandler"/> for further processing the incoming WebHook.</param>
+        /// <param name="payload">Strong-typed WebHook payload.</param>
+        public virtual Task ExecuteAsync(WebHookHandlerContext context, GitPullRequestUpdatedPayload payload)
         {
             return Task.FromResult(true);
         }

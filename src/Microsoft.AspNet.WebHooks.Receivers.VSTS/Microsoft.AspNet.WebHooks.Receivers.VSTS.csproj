@@ -47,6 +47,9 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
+    <Compile Include="Payloads\GitPullRequestUpdatedPayload.cs" />
+    <Compile Include="Payloads\GitPullLinks.cs" />
+    <Compile Include="Payloads\GitPullRequestCreatedPayload.cs" />
     <Compile Include="Handlers\VstsWebHookHandlerBase.cs" />
     <Compile Include="Payloads\BuildCompletedDefinition.cs" />
     <Compile Include="Payloads\BuildCompletedDrop.cs" />
@@ -55,6 +58,20 @@
     <Compile Include="Payloads\BuildCompletedRequest.cs" />
     <Compile Include="Payloads\BuildCompletedResource.cs" />
     <Compile Include="Payloads\CodeCheckedInResource.cs" />
+    <Compile Include="Payloads\GitCommit.cs" />
+    <Compile Include="Payloads\GitLink.cs" />
+    <Compile Include="Payloads\GitProject.cs" />
+    <Compile Include="Payloads\GitPullRequestResource.cs" />
+    <Compile Include="Payloads\GitPullRequestUpdatedResource.cs" />
+    <Compile Include="Payloads\GitPushLinks.cs" />
+    <Compile Include="Payloads\GitPushPayload.cs" />
+    <Compile Include="Payloads\GitPushResource.cs" />
+    <Compile Include="Payloads\GitRefUpdate.cs" />
+    <Compile Include="Payloads\GitRepository.cs" />
+    <Compile Include="Payloads\GitReviewer.cs" />
+    <Compile Include="Payloads\GitUser.cs" />
+    <Compile Include="Payloads\GitUserInfo.cs" />
+    <Compile Include="Payloads\GitMergeCommit.cs" />
     <Compile Include="Payloads\PayloadMessage.cs" />
     <Compile Include="Payloads\PayloadResourceContainer.cs" />
     <Compile Include="Payloads\PayloadResourceContainers.cs" />
