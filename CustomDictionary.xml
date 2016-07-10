@@ -8,14 +8,18 @@
       <Word>apis</Word>
       <Word>awaitable</Word>
       <Word>bitbucket</Word>
-	  <Word>changeset</Word>
+      <Word>changeset</Word>
+      <Word>defaultcollection</Word>
       <Word>deployer</Word>
       <Word>dequeueing</Word>
       <Word>dequeues</Word>
       <Word>dropbox</Word>
+      <Word>fabrikam</Word>
       <Word>fnv</Word>
       <Word>fwlink</Word>
+      <Word>GBmaster</Word>
       <Word>git</Word>
+      <Word>goodcompany</Word>
       <Word>instagram</Word>
       <Word>kudu</Word>
       <Word>kanban</Word>
@@ -23,11 +27,13 @@
       <Word>nuget</Word>
       <Word>paypal</Word>
       <Word>salesforce</Word>
+      <Word>tfs</Word>
       <Word>trello</Word>
       <Word>ver</Word>
-	    <Word>vsts</Word>
+      <Word>vsts</Word>
       <Word>zapier</Word>
       <Word>zendesk</Word>
+      <Word>visualstudio</Word>
       <Word>你好</Word>
     </Recognized>
     <Deprecated/>
@@ -48,4 +54,4 @@
       <Acronym>VSTS</Acronym>
     </CasingExceptions>
   </Acronyms>
-  </Dictionary>
+</Dictionary>

@@ -10,10 +10,10 @@ using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
 {
-    public class GitPullrequestCreatedPayloadTests
+    public class GitPullRequestCreatedPayloadTests
     {
         [Fact]
-        public void GitPullrequestCreatedPayload_Roundtrips()
+        public void GitPullRequestCreatedPayload_Roundtrips()
         {
             JObject data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.created.json");
             var expected = new GitPullRequestCreatedPayload()

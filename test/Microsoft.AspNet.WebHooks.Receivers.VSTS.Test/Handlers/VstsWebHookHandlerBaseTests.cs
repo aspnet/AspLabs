@@ -163,7 +163,7 @@ namespace Microsoft.AspNet.WebHooks.Handlers
         }
 
         [Fact]
-        public async Task ExecuteAsync_Dispatches_GitPullrequestCreated()
+        public async Task ExecuteAsync_Dispatches_GitPullRequestCreated()
         {
             // Arrange
             _context = GetContext("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.created.json", "git.pullrequest.created");
@@ -176,7 +176,7 @@ namespace Microsoft.AspNet.WebHooks.Handlers
         }
 
         [Fact]
-        public async Task ExecuteAsync_Dispatches_GitPullrequestUpdated()
+        public async Task ExecuteAsync_Dispatches_GitPullRequestUpdated()
         {
             // Arrange
             _context = GetContext("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.updated.json", "git.pullrequest.created");

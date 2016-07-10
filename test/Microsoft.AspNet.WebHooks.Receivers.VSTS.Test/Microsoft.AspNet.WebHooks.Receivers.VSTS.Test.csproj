@@ -63,7 +63,7 @@
     <Compile Include="Handlers\VstsWebHookHandlerBaseTests.cs" />
     <Compile Include="Payloads\BuildCompletedPayloadTests.cs" />
     <Compile Include="Payloads\CodeCheckedInPayloadTests.cs" />
-    <Compile Include="Payloads\GitPullrequestCreatedPayloadTests.cs" />
+    <Compile Include="Payloads\GitPullRequestCreatedPayloadTests.cs" />
     <Compile Include="Payloads\GitPullRequestUpdatedPayloadTests.cs" />
     <Compile Include="Payloads\GitPushPayloadTests.cs" />
     <Compile Include="Payloads\TeamRoomMessagePostedPayloadTests.cs" />

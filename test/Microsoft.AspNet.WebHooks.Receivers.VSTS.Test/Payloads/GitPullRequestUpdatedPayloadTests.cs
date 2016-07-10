@@ -13,7 +13,7 @@ namespace Microsoft.AspNet.WebHooks
     public class GitPullRequestUpdatedPayloadTests
     {
         [Fact]
-        public void GitPullrequestUpdatedPayload_Roundtrips()
+        public void GitPullRequestUpdatedPayload_Roundtrips()
         {
             JObject data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.git.pullrequest.updated.json");
             var expected = new GitPullRequestUpdatedPayload()
