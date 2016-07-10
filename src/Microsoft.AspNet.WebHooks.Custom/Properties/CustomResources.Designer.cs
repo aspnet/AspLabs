@@ -106,6 +106,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The WebHook registrar requested no verification of WebHook URI..
+        /// </summary>
+        internal static string Manager_NoEcho {
+            get {
+                return ResourceManager.GetString("Manager_NoEcho", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The WebHook URI must be absolute with a scheme of either &apos;http&apos; or &apos;https&apos; but received &apos;{0}&apos;..
         /// </summary>
         internal static string Manager_NoHttpUri {

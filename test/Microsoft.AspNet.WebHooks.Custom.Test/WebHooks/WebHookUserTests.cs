@@ -26,13 +26,12 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public async Task GetUserIdAsync_Succeeds_IfValidNameClaim()
+        public async Task GetUserIdAsync_Succeeds_IfValidNameIdentifierClaim()
         {
             // Arrange
             WebHookUser user = new WebHookUser();
             ClaimsIdentity identity = new ClaimsIdentity();
-            Claim claim = new Claim(ClaimTypes.Name, "TestUser");
-            identity.AddClaim(claim);
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "TestUser"));
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             // Act
@@ -43,14 +42,32 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public async Task GetUserIdAsync_Succeeds_IfValidOtherClaim()
+        public async Task GetUserIdAsync_Succeeds_IfValidNameClaim()
         {
             // Arrange
-            WebHookUser.IdClaimsType = ClaimTypes.NameIdentifier;
             WebHookUser user = new WebHookUser();
             ClaimsIdentity identity = new ClaimsIdentity();
-            Claim claim = new Claim(ClaimTypes.NameIdentifier, "TestUser");
-            identity.AddClaim(claim);
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "NameIdentifier"));
+            identity.AddClaim(new Claim(ClaimTypes.Name, "TestUser"));
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+            // Act
+            string actual = await user.GetUserIdAsync(principal);
+
+            // Assert
+            Assert.Equal("TestUser", actual);
+        }
+
+        [Fact]
+        public async Task GetUserIdAsync_Succeeds_IfValidCustomClaim()
+        {
+            // Arrange
+            WebHookUser.IdClaimsType = ClaimTypes.PrimarySid;
+            WebHookUser user = new WebHookUser();
+            ClaimsIdentity identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ClaimTypes.Name, "Name"));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "NameIdentifier"));
+            identity.AddClaim(new Claim(ClaimTypes.PrimarySid, "TestUser"));
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             // Act

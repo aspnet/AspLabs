@@ -28,20 +28,14 @@ namespace Microsoft.AspNet.WebHooks
             Invalid
         }
 
-        public static TheoryData<string, ValidationOutcome> WebHookSecretData
+        public static TheoryData<Uri, ValidationOutcome> WebHookUriData
         {
             get
             {
-                return new TheoryData<string, ValidationOutcome>
+                return new TheoryData<Uri, ValidationOutcome>
                 {
-                    { string.Empty, ValidationOutcome.Required },
-                    { " ", ValidationOutcome.Required },
-                    { "\r\n", ValidationOutcome.Required },
-                    { new string('a', 31), ValidationOutcome.Invalid },
-                    { new string('a', 65), ValidationOutcome.Invalid },
-                    { new string('a', 32), ValidationOutcome.Valid },
-                    { new string('a', 64), ValidationOutcome.Valid },
-                    { "你好世界你好世界你好世界你好世界你好世界你好世界你好世界你好世界", ValidationOutcome.Valid },
+                    { null, ValidationOutcome.Required },
+                    { new Uri("http://localhost"), ValidationOutcome.Valid },
                 };
             }
         }
@@ -66,16 +60,16 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookSecretData")]
-        public void Secret_Validates(string secret, ValidationOutcome expected)
+        [MemberData("WebHookUriData")]
+        public void WebHookUri_Validates(Uri uri, ValidationOutcome expected)
         {
             // Arrange
-            WebHook webHook = new WebHook { Secret = secret };
+            WebHook webHook = new WebHook { WebHookUri = uri };
             var validationResults = new List<ValidationResult>();
-            var context = new ValidationContext(webHook) { MemberName = "Secret" };
+            var context = new ValidationContext(webHook) { MemberName = "WebHookUri" };
 
             // Act
-            bool actual = Validator.TryValidateProperty(webHook.Secret, context, validationResults);
+            bool actual = Validator.TryValidateProperty(webHook.WebHookUri, context, validationResults);
 
             // Assert
             switch (expected)
@@ -86,13 +80,12 @@ namespace Microsoft.AspNet.WebHooks
 
                 case ValidationOutcome.Required:
                     Assert.False(actual);
-                    Assert.Equal("The Secret field is required.", validationResults.Single().ErrorMessage);
-                    Assert.Equal("Secret", validationResults.Single().MemberNames.Single());
+                    Assert.Equal("The WebHookUri field is required.", validationResults.Single().ErrorMessage);
+                    Assert.Equal("WebHookUri", validationResults.Single().MemberNames.Single());
                     break;
 
-                case ValidationOutcome.Invalid:
-                    Assert.Equal("The WebHook secret key parameter must be between 32 and 64 characters long.", validationResults.Single().ErrorMessage);
-                    Assert.Equal("Secret", validationResults.Single().MemberNames.Single());
+                default:
+                    Assert.True(false);
                     break;
             }
         }

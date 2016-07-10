@@ -43,7 +43,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         /// <summary>
-        /// Looks up a registered WebHooks with the given <paramref name="id"/> for a given user.
+        /// Looks up a registered WebHook with the given <paramref name="id"/> for a given user.
         /// </summary>
         /// <returns>The registered <see cref="WebHook"/> instance for a given user.</returns>
         [Route("{id}", Name = WebHookRouteNames.RegistrationLookupAction)]
@@ -271,13 +271,22 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         /// <summary>
-        /// Ensures that the provided <paramref name="webHook"/> has a reachable Web Hook URI.
+        /// Ensures that the provided <paramref name="webHook"/> has a reachable Web Hook URI unless
+        /// the WebHook URI has a <c>NoEcho</c> query parameter.
         /// </summary>
         private async Task VerifyWebHook(WebHook webHook)
         {
             if (webHook == null)
             {
                 throw new ArgumentNullException("webHook");
+            }
+
+            // If no secret is provided then we create one here. This allows for scenarios
+            // where the caller may use a secret directly embedded in the WebHook URI, or
+            // has some other way of enforcing security.
+            if (string.IsNullOrEmpty(webHook.Secret))
+            {
+                webHook.Secret = Guid.NewGuid().ToString("N");
             }
 
             try

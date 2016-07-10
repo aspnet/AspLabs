@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -18,6 +19,7 @@ namespace Microsoft.AspNet.WebHooks
     /// </summary>
     public class WebHookManager : IWebHookManager, IDisposable
     {
+        internal const string NoEchoParameter = "noecho";
         internal const string EchoParameter = "echo";
 
         private readonly IWebHookStore _webHookStore;
@@ -195,6 +197,15 @@ namespace Microsoft.AspNet.WebHooks
             HttpResponseMessage response;
             try
             {
+                // If WebHook URI contains a "NoEcho" query parameter then we don't verify the URI using a GET request
+                NameValueCollection parameters = webHook.WebHookUri.ParseQueryString();
+                if (parameters[NoEchoParameter] != null)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoEcho);
+                    _logger.Info(msg);
+                    return;
+                }
+
                 // Get request URI with echo query parameter
                 UriBuilder webHookUri = new UriBuilder(webHook.WebHookUri);
                 webHookUri.Query = EchoParameter + "=" + echo;

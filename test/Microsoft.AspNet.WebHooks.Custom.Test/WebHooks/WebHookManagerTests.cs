@@ -51,8 +51,12 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     null,
                     string.Empty,
+                    " ",
+                    "\r\n",
                     new string('a', 31),
+                    new string('你', 31),
                     new string('a', 65),
+                    new string('你', 65),
                 };
             }
         }
@@ -109,6 +113,25 @@ namespace Microsoft.AspNet.WebHooks
                     { new[] { CreateWebHook("a"), CreateWebHook("_"), CreateWebHook("a") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 2 },
                     { new[] { CreateWebHook("a"), CreateWebHook("a"), CreateWebHook("a") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 3 },
                     { new[] { CreateWebHook("*"), CreateWebHook("a"), CreateWebHook("*") }, new[] { CreateNotification("a"), CreateNotification("b"), CreateNotification("c") }, 3 },
+                };
+            }
+        }
+
+        public static TheoryData<string> WebHookNoEchoData
+        {
+            get
+            {
+                return new TheoryData<string>
+                {
+                    "noecho",
+                    "noecho=",
+                    "noecho=value",
+                    "NoEcho",
+                    "NoEcho=",
+                    "NoEcho=value",
+                    "NOECHO",
+                    "NOECHO=",
+                    "NOECHO=value",
                 };
             }
         }
@@ -205,6 +228,29 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             Assert.Equal("The HTTP request echo query parameter was not returned as plain text in the response. Please return the echo parameter to verify that the WebHook is working as expected.", ex.Message);
+        }
+
+        [Theory]
+        [MemberData("WebHookNoEchoData")]
+        public async Task VerifyWebHookAsync_Stops_IfNoEchoParameter(string query)
+        {
+            // Arrange
+            bool error = false;
+            _response.Content = new StringContent("Hello World");
+            _manager = new WebHookManager(_storeMock.Object, _senderMock.Object, _loggerMock.Object, _httpClient);
+            _handlerMock.Handler = (req, counter) => 
+            {
+                error = true;
+                return Task.FromResult(_response);
+            };
+            WebHook webHook = CreateWebHook();
+            webHook.WebHookUri = new Uri("http://localhost/hook?" + query);
+
+            // Act
+            await _manager.VerifyWebHookAsync(webHook);
+
+            // Assert
+            Assert.False(error);
         }
 
         [Fact]

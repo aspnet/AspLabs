@@ -51,10 +51,10 @@ namespace Microsoft.AspNet.WebHooks
             ClaimsPrincipal principal = user as ClaimsPrincipal;
             if (principal != null)
             {
-                Claim claim = principal.FindFirst(_claimsType);
-                if (claim != null)
+                id = GetClaim(principal, _claimsType);
+                if (id == null)
                 {
-                    id = claim.Value;
+                    id = GetClaim(principal, ClaimTypes.NameIdentifier);
                 }
             }
 
@@ -71,6 +71,16 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             return Task.FromResult(id);
+        }
+
+        /// <summary>
+        /// Looks up a <paramref name="claimsType"/> in the provided <paramref name="principal"/> and returns the value if found or <c>null</c> otherwise.
+        /// </summary>
+        /// <returns>The value of the claim or <c>null</c> if not found.</returns>
+        internal static string GetClaim(ClaimsPrincipal principal, string claimsType)
+        {
+            Claim claim = principal != null ? principal.FindFirst(claimsType) : null;
+            return claim != null ? claim.Value : null;
         }
 
         /// <summary>

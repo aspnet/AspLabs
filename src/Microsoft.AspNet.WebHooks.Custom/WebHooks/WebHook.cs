@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNet.WebHooks.Properties;
 
 namespace Microsoft.AspNet.WebHooks
 {
@@ -59,7 +58,6 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets or sets the secret used to sign the body of the WebHook request.
         /// </summary>
-        [Required, StringLength(maximumLength: 64, MinimumLength = 32, ErrorMessageResourceType = typeof(CustomResources), ErrorMessageResourceName = "WebHook_InvalidSecret")]
         public string Secret { get; set; }
 
         /// <summary>
