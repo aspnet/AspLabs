@@ -92,6 +92,7 @@
     <Compile Include="Storage\StorageManagerTests.cs" />
     <Compile Include="WebHooks\AzureWebHookDequeueManagerTests.cs" />
     <Compile Include="WebHooks\AzureWebHookSenderTests.cs" />
+    <Compile Include="WebHooks\AzureWebHookStorePlaintextTests.cs" />
     <Compile Include="WebHooks\AzureWebHookStoreTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -21,9 +21,21 @@ namespace System.Web.Http
         /// <summary>
         /// Configures a Microsoft SQL Server Storage implementation of <see cref="IWebHookStore"/>
         /// which provides a persistent store for registered WebHooks used by the custom WebHooks module.
+        /// Using this initializer, the data will be encrypted using <see cref="IDataProtector"/>.
         /// </summary>
         /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>
         public static void InitializeCustomWebHooksSqlStorage(this HttpConfiguration config)
+        {
+            InitializeCustomWebHooksSqlStorage(config, encryptData: true);
+        }
+
+        /// <summary>
+        /// Configures a Microsoft SQL Server Storage implementation of <see cref="IWebHookStore"/>
+        /// which provides a persistent store for registered WebHooks used by the custom WebHooks module.
+        /// </summary>
+        /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>
+        /// <param name="encryptData">Indicates whether the data should be encrypted using <see cref="IDataProtector"/> while persisted.</param>
+        public static void InitializeCustomWebHooksSqlStorage(this HttpConfiguration config, bool encryptData)
         {
             if (config == null)
             {
@@ -38,8 +50,16 @@ namespace System.Web.Http
             // We explicitly set the DB initializer to null to avoid that an existing DB is initialized wrongly.
             Database.SetInitializer<WebHookStoreContext>(null);
 
-            IDataProtector protector = DataSecurity.GetDataProtector();
-            IWebHookStore store = new SqlWebHookStore(settings, protector, logger);
+            IWebHookStore store;
+            if (encryptData)
+            {
+                IDataProtector protector = DataSecurity.GetDataProtector();
+                store = new SqlWebHookStore(settings, protector, logger);
+            }
+            else
+            {
+                store = new SqlWebHookStore(settings, logger);
+            }
             CustomServices.SetStore(store);
         }
     }

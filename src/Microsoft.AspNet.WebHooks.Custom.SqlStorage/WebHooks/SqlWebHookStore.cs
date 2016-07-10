@@ -19,8 +19,24 @@ namespace Microsoft.AspNet.WebHooks
     public class SqlWebHookStore : DbWebHookStore<WebHookStoreContext, Registration>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>
+        /// and <paramref name="logger"/>. 
+        /// Using this constructor, the data will not be encrypted while persisted to the database.
+        /// </summary>
+        public SqlWebHookStore(SettingsDictionary settings, ILogger logger)
+            : base(logger)
+        {
+            if (settings == null)
+            {
+                throw new ArgumentNullException("settings");
+            }
+            CheckSqlStorageConnectionString(settings);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>,
-        /// <paramref name="protector"/>, and <paramref name="logger"/>.
+        /// <paramref name="protector"/>, and <paramref name="logger"/>. 
+        /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
         /// </summary>
         public SqlWebHookStore(SettingsDictionary settings, IDataProtector protector, ILogger logger)
             : base(protector, logger)
@@ -33,15 +49,35 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Provides a static method for creating a standalone <see cref="SqlWebHookStore"/> instance.
+        /// Provides a static method for creating a standalone <see cref="SqlWebHookStore"/> instance which will
+        /// encrypt the data to be stored using <see cref="IDataProtector"/>.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
         /// <returns>An initialized <see cref="SqlWebHookStore"/> instance.</returns>
         public static IWebHookStore CreateStore(ILogger logger)
         {
+            return CreateStore(logger, encryptData: true);
+        }
+
+        /// <summary>
+        /// Provides a static method for creating a standalone <see cref="SqlWebHookStore"/> instance.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        /// <param name="encryptData">Indicates whether the data should be encrypted using <see cref="IDataProtector"/> while persisted.</param>
+        /// <returns>An initialized <see cref="SqlWebHookStore"/> instance.</returns>
+        public static IWebHookStore CreateStore(ILogger logger, bool encryptData)
+        {
             SettingsDictionary settings = CommonServices.GetSettings();
-            IDataProtector protector = DataSecurity.GetDataProtector();
-            IWebHookStore store = new SqlWebHookStore(settings, protector, logger);
+            IWebHookStore store;
+            if (encryptData)
+            {
+                IDataProtector protector = DataSecurity.GetDataProtector();
+                store = new SqlWebHookStore(settings, protector, logger);
+            }
+            else
+            {
+                store = new SqlWebHookStore(settings, logger);
+            }
             return store;
         }
 

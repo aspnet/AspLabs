@@ -36,9 +36,10 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureWebHookStore"/> class with the given <paramref name="manager"/>,
-        /// <paramref name="settings"/>, <paramref name="protector"/>, and <paramref name="logger"/>.
+        /// <paramref name="settings"/>, and <paramref name="logger"/>.
+        /// Using this constructor, the data will not be encrypted while persisted to Azure Storage.
         /// </summary>
-        public AzureWebHookStore(IStorageManager manager, SettingsDictionary settings, IDataProtector protector, ILogger logger)
+        public AzureWebHookStore(IStorageManager manager, SettingsDictionary settings, ILogger logger)
         {
             if (manager == null)
             {
@@ -48,10 +49,6 @@ namespace Microsoft.AspNet.WebHooks
             {
                 throw new ArgumentNullException("settings");
             }
-            if (protector == null)
-            {
-                throw new ArgumentNullException("protector");
-            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
@@ -59,21 +56,55 @@ namespace Microsoft.AspNet.WebHooks
 
             _manager = manager;
             _connectionString = manager.GetAzureStorageConnectionString(settings);
-            _protector = protector;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureWebHookStore"/> class with the given <paramref name="manager"/>,
+        /// <paramref name="settings"/>, <paramref name="protector"/>, and <paramref name="logger"/>.
+        /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
+        /// </summary>
+        public AzureWebHookStore(IStorageManager manager, SettingsDictionary settings, IDataProtector protector, ILogger logger)
+            : this(manager, settings, logger)
+        {
+            if (protector == null)
+            {
+                throw new ArgumentNullException("protector");
+            }
+            _protector = protector;
+        }
+
+        /// <summary>
+        /// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance which will
+        /// encrypt the data to be stored using <see cref="IDataProtector"/>.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
+        public static IWebHookStore CreateStore(ILogger logger)
+        {
+            return CreateStore(logger, encryptData: true);
         }
 
         /// <summary>
         /// Provides a static method for creating a standalone <see cref="AzureWebHookStore"/> instance.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger"/> instance to use.</param>
+        /// <param name="encryptData">Indicates whether the data should be encrypted using <see cref="IDataProtector"/> while persisted.</param>
         /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
-        public static IWebHookStore CreateStore(ILogger logger)
+        public static IWebHookStore CreateStore(ILogger logger, bool encryptData)
         {
             SettingsDictionary settings = CommonServices.GetSettings();
-            IDataProtector protector = DataSecurity.GetDataProtector();
+            IWebHookStore store;
             IStorageManager storageManager = StorageManager.GetInstance(logger);
-            IWebHookStore store = new AzureWebHookStore(storageManager, settings, protector, logger);
+            if (encryptData)
+            {
+                IDataProtector protector = DataSecurity.GetDataProtector();
+                store = new AzureWebHookStore(storageManager, settings, protector, logger);
+            }
+            else
+            {
+                store = new AzureWebHookStore(storageManager, settings, logger);
+            }
             return store;
         }
 
@@ -321,7 +352,7 @@ namespace Microsoft.AspNet.WebHooks
                 string encryptedContent = property.StringValue;
                 if (encryptedContent != null)
                 {
-                    string content = _protector.Unprotect(encryptedContent);
+                    string content = _protector != null ? _protector.Unprotect(encryptedContent) : encryptedContent;
                     WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
                     return webHook;
                 }
@@ -341,7 +372,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Set data column with encrypted serialization of WebHook
             string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string encryptedContent = _protector.Protect(content);
+            string encryptedContent = _protector != null ? _protector.Protect(content) : content;
             EntityProperty property = EntityProperty.GeneratePropertyForString(encryptedContent);
             entity.Properties.Add(WebHookDataColumn, property);
 

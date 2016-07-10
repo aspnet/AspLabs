@@ -37,22 +37,33 @@ namespace Microsoft.AspNet.WebHooks
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DbWebHookStore{TContext,TRegistration}"/> class with the given <paramref name="protector"/>,
-        /// and <paramref name="logger"/>.
+        /// Initializes a new instance of the <see cref="DbWebHookStore{TContext,TRegistration}"/> class with the given <paramref name="logger"/>.
+        /// Using this constructor, the data will not be encrypted while persisted to the database.
         /// </summary>
-        protected DbWebHookStore(IDataProtector protector, ILogger logger)
+        protected DbWebHookStore(ILogger logger)
         {
-            if (protector == null)
-            {
-                throw new ArgumentNullException("protector");
-            }
             if (logger == null)
             {
                 throw new ArgumentNullException("logger");
             }
 
-            _protector = protector;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DbWebHookStore{TContext,TRegistration}"/> class with the given <paramref name="protector"/>
+        /// and <paramref name="logger"/>. 
+        /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
+        /// </summary>
+        protected DbWebHookStore(IDataProtector protector, ILogger logger)
+            : this(logger)
+        {
+            if (protector == null)
+            {
+                throw new ArgumentNullException("protector");
+            }
+
+            _protector = protector;
         }
 
         /// <inheritdoc />
@@ -397,7 +408,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                string content = _protector.Unprotect(registration.ProtectedData);
+                string content = _protector != null ? _protector.Unprotect(registration.ProtectedData) : registration.ProtectedData;
                 WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
                 return webHook;
             }
@@ -425,7 +436,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string protectedData = _protector.Protect(content);
+            string protectedData = _protector != null ? _protector.Protect(content) : content;
             var registration = new TRegistration
             {
                 User = user,
@@ -456,7 +467,7 @@ namespace Microsoft.AspNet.WebHooks
             registration.User = user;
             registration.Id = webHook.Id;
             string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string protectedData = _protector.Protect(content);
+            string protectedData = _protector != null ? _protector.Protect(content) : content;
             registration.ProtectedData = protectedData;
         }
 
