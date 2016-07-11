@@ -102,5 +102,21 @@ namespace Microsoft.AspNet.WebHooks.Config
                 this[key] = value;
             }
         }
+
+        /// <summary>
+        /// Returns <c>true</c> if the key has a value set to 'true'; otherwise <c>false</c>.
+        /// </summary>
+        /// <param name="key">The key to evaluate the value for.</param>
+        /// <returns><c>true</c> if the value is set to 'true'; otherwise <c>false</c>.</returns>
+        public bool IsTrue(string key)
+        {
+            string value = GetValueOrDefault(key);
+            if (value != null)
+            {
+                bool isSet;
+                return bool.TryParse(value.Trim(), out isSet) ? isSet : false;
+            }
+            return false;
+        }
     }
 }

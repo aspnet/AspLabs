@@ -44,6 +44,26 @@ namespace Microsoft.AspNet.WebHooks.Config
             }
         }
 
+        public static TheoryData<string, string, bool> IsTrueData
+        {
+            get
+            {
+                return new TheoryData<string, string, bool>
+                {
+                    { "key", null, false },
+                    { "key", string.Empty, false },
+                    { "key", "你好世界", false },
+                    { "key", "false", false },
+                    { "key", "0", false },
+                    { "key", "-1", false },
+                    { "你好世界", "true", true },
+                    { "你好世界", "True", true },
+                    { "你好世界", "TRUE", true },
+                    { "你好世界", " True ", true },
+                };
+            }
+        }
+
         [Theory]
         [MemberData("CustomSettings")]
         public void CustomSetting_Roundtrips(string key, string value)
@@ -107,6 +127,30 @@ namespace Microsoft.AspNet.WebHooks.Config
             {
                 Assert.Equal(value, _settings[key]);
             }
+        }
+
+        [Theory]
+        [MemberData("IsTrueData")]
+        public void IsTrue_DetectsBooleanValue(string key, string value, bool expected)
+        {
+            // Arrange
+            _settings[key] = value;
+
+            // Act
+            bool actual = _settings.IsTrue(key);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void IsTrue_HandlesUnknownKey()
+        {
+            // Act
+            bool actual = _settings.IsTrue("unknown");
+
+            // Assert
+            Assert.False(actual);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace StripeReceiver
             );
 
             // Initialize Stripe WebHook receiver
-            config.InitializeReceiveStripeWebHooks();
+            config.InitializeReceiveStripeDirectWebHooks();
         }
     }
 }

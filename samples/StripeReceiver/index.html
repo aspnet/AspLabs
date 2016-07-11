@@ -7,42 +7,42 @@
 <body>
     <h1>Microsoft ASP.NET WebHooks Stripe Receiver</h1>
 
-    <p>This sample illustrates how to wire up a Stripe WebHooks receiver which can be used for
-        Stripe WebHooks. A sample WebHook URI is:</p>
+    <p>
+        This sample illustrates how to wire up a Stripe WebHooks receiver which can be used for
+        Stripe WebHooks.
+    </p>
+    <h2>Direct vs Indirect WebHooks</h2>
+    <p>There are two ways in which you can configure Stripe WebHooks:</p>
+    <dl>
+        <dt>Direct</dt>
+        <dd>Using direct WebHooks, you register a WebHook URI with Stripe and Stripe sends the WebHook data as normal to your WebHook receiver.</dd>
+        <dt>Indirect</dt>
+        <dd>Using indirect WebHooks, upon receiving a WebHook, the actual WebHook data is retrieved using a follow-up HTTP GET request going back to Stripe.</dd>
+    </dl>
+    <p>
+        If using <b>indirect</b> WebHooks, then the URI looks like this:
+    </p>
 
-    <pre>https://&lt;host&gt;/api/webhooks/incoming/stripe/{id}</pre>
+    <pre>    https://&lt;host&gt;/api/webhooks/incoming/stripe/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</pre>
 
     <p>
-        The URI does not have to be HTTPS (yet?).
+        For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
+        same value as configured in the <b>MS_WebHookReceiverSecret_Stripe</b> application setting.
+        The 'code' parameter must be between 32 and 128 characters long.
     </p>
     <p>
-        Set the <b>MS_WebHookReceiverSecret_Stripe</b> application setting to the Stripe 'token' parameter, optionally using IDs
-        to differentiate between multiple WebHooks, for example '<c>secret0, trigger=secret1</c>'. 
+        If using <b>direct</b> WebHooks, then the URI looks like this:
     </p>
+    <pre>    http://&lt;host&gt;/api/webhooks/incoming/stripe/{id}</pre>
+    <p>
+        In this case set the <b>MS_WebHookReceiverSecret_Stripe</b> application setting to the Stripe 'token' parameter, optionally using IDs
+        to differentiate between multiple WebHooks, for example '<c>secret0, trigger=secret1</c>'.
+    </p>
+    <h2>Handling Test Events</h2>
     <p>
         Set the <b>MS_WebHookStripePassThroughTestEvents</b> application setting to true if you want to be able to receive test events (with Id 'evt_00000000000000').
-        By default the test events will be consumed by the StripeWebHookReceiver which automatically returns a 200 response. <br/>
-        If MS_WebHookStripeInTestMode is set to true your own StripeWebHookHandler will receive the deserialized test data.
-        Normal events will still be verified by downloading the actual event data from Stripe.
+        By default the test events will be consumed by the StripeWebHookReceiver which automatically returns a 200 response.
     </p>
-    <p>
-        In this example we registered one webhook URI. It is also possible to register multiple urls by providing different id's in the key. 
-        You should register the following URI with Stripe:
-    </p>
-    <pre>
-        https://&lt;host&gt;/api/webhooks/incoming/stripe/
-    </pre>
-    <p>
-        and then configure the application setting as follows
-    </p>
-<pre>
-        &lt;add key="MS_WebHookReceiverSecret_Stripe" value="&lt;token&gt;" /&gt;
-    </pre>
-<p>If you would like to register multiple URIs with different tokens you just add another id:</p>
-<pre>
-    https://&lt;host&gt;/api/webhooks/incoming/stripe/{id}
-    &lt;add key="MS_WebHookReceiverSecret_Stripe" value="&lt;token&gt;, {id}=&lt;token&gt;" /&gt; 
-</pre>
     <p>
         Please see <a href="https://stripe.com/docs/webhooks">Stripe WebHooks</a> and
         <a href="https://github.com/aspnet/WebHooks">AspNet WebHooks</a>

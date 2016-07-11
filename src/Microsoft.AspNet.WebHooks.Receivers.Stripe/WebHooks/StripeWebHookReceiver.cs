@@ -28,7 +28,11 @@ namespace Microsoft.AspNet.WebHooks
         // Application setting to enable test mode
         internal const string PassThroughTestEvents = "MS_WebHookStripePassThroughTestEvents";
 
+        // Do not verify the WebHook using a follow-up HTTP GET request but instead just use the WebHook as-is.
+        internal const string DirectWebHook = "MS_WebHookStripeDirect";
+
         internal const string RecName = "stripe";
+
         internal const int SecretMinLength = 16;
         internal const int SecretMaxLength = 128;
 
@@ -87,30 +91,53 @@ namespace Microsoft.AspNet.WebHooks
 
             if (request.Method == HttpMethod.Post)
             {
+                IDependencyResolver resolver = context.Configuration.DependencyResolver;
+                SettingsDictionary settings = resolver.GetSettings();
+
                 // Read the request entity body
                 JObject data = await ReadAsJsonAsync(request);
 
-                // There is no security in this WebHook so we only pick out the ID and submit an independent request for the information.
+                // Get notification ID
                 string notificationId = data.Value<string>("id");
                 if (string.IsNullOrEmpty(notificationId))
                 {
                     string msg = string.Format(CultureInfo.CurrentCulture, StripeReceiverResources.Receiver_BadBody, "id");
-                    context.Configuration.DependencyResolver.GetLogger().Error(msg);
+                    resolver.GetLogger().Error(msg);
                     HttpResponseMessage badId = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                     return badId;
                 }
 
-                // If test ID then just return here.
-                if (string.Equals(TestId, notificationId, StringComparison.OrdinalIgnoreCase))
+                // Check whether this is a test event
+                bool testEvent = IsTestEvent(notificationId);
+
+                // Check to see if we have been configured to use the WebHook as-is or validate using HTTP GET
+                if (settings.IsTrue(DirectWebHook))
                 {
-                    return await this.HandleTestEvent(id, context, request, data);
+                    // Ensure that we use https and have a valid code parameter
+                    await EnsureValidCode(request, id);
+                }
+                else if (!testEvent)
+                {
+                    // For no-test events we go back to Stripe and get the authoritative data for this WebHook.
+                    data = await GetEventDataAsync(request, id, notificationId);
                 }
 
-                // Get data directly from Stripe as we don't know where the event comes from.
-                data = await GetEventDataAsync(request, id, notificationId);
-                string action = data.Value<string>("type");
+                // See if we should call handler in case of a test event or stop here.
+                if (testEvent)
+                {
+                    if (settings.IsTrue(PassThroughTestEvents))
+                    {
+                        resolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent_Process);
+                    }
+                    else
+                    {
+                        resolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent);
+                        return request.CreateResponse();
+                    }
+                }
 
                 // Call registered handlers
+                string action = data.Value<string>("type");
                 return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
             }
             else
@@ -124,6 +151,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        internal static bool IsTestEvent(string notificationId)
+        {
+            return string.Equals(TestId, notificationId, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -182,28 +214,6 @@ namespace Microsoft.AspNet.WebHooks
 
                 JObject result = await rsp.Content.ReadAsAsync<JObject>();
                 return result;
-            }
-        }
-
-        private async Task<HttpResponseMessage> HandleTestEvent(string id, HttpRequestContext context, HttpRequestMessage request, JObject data)
-        {
-            IDependencyResolver resolver = request.GetConfiguration().DependencyResolver;
-
-            // Check to see if we have been configured to process test events
-            SettingsDictionary settings = resolver.GetSettings();
-            string passThroughTestEventsValue = settings.GetValueOrDefault(PassThroughTestEvents);
-
-            bool passThroughTestEvents;
-            if (bool.TryParse(passThroughTestEventsValue, out passThroughTestEvents) && passThroughTestEvents == true)
-            {
-                context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent_Process);
-                var action = data.Value<string>("type");
-                return await ExecuteWebHookAsync(id, context, request, new string[] { action }, data);
-            }
-            else
-            {
-                context.Configuration.DependencyResolver.GetLogger().Info(StripeReceiverResources.Receiver_TestEvent);
-                return request.CreateResponse();
             }
         }
     }

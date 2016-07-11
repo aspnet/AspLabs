@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -98,7 +99,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Fact]
-        public async Task ReceiveAsync_Succeeds_CallingHandler_IfTestId_And_TestMode()
+        public async Task ReceiveAsync_Succeeds_CallingHandler_IfTestIdAndTestMode()
         {
             // Arrange
             Initialize(TestSecret, inTestMode: true);
@@ -115,6 +116,65 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             Assert.Equal(0, _handlerMock.Counter);
             ReceiverMock.Verify();
+        }
+
+        [Fact]
+        public async Task ReceiveAsync_Succeeds_CallingHandlerButNotHttpClient_IfTestModeAndDirect()
+        {
+            // Arrange
+            Initialize(TestSecret, inTestMode: true, direct: true);
+            _postRequest.RequestUri = new Uri("https://localhost?code=" + TestSecret);
+            _postRequest.Content = new StringContent("{ \"type\": \"action\", \"id\": \"" + StripeWebHookReceiver.TestId + "\" }", Encoding.UTF8, "application/json");
+            List<string> actions = new List<string> { "action" };
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", string.Empty, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
+                .ReturnsAsync(new HttpResponseMessage())
+                .Verifiable();
+
+            // Act
+            await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+
+            // Assert
+            Assert.Equal(0, _handlerMock.Counter);
+            ReceiverMock.Verify();
+        }
+
+        [Fact]
+        public async Task ReceiveAsync_Succeeds_CallingHandlerButNotHttpClient_IfDirect()
+        {
+            // Arrange
+            Initialize(TestSecret, inTestMode: true, direct: true);
+            _postRequest.RequestUri = new Uri("https://localhost?code=" + TestSecret);
+            _postRequest.Content = new StringContent("{ \"type\": \"action\", \"id\": \"" + TestStripeId + "\" }", Encoding.UTF8, "application/json");
+            List<string> actions = new List<string> { "action" };
+            ReceiverMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", string.Empty, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
+                .ReturnsAsync(new HttpResponseMessage())
+                .Verifiable();
+
+            // Act
+            await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+
+            // Assert
+            Assert.Equal(0, _handlerMock.Counter);
+            ReceiverMock.Verify();
+        }
+
+        [Fact]
+        public async Task ReceiveAsync_Throws_IfPostHasWrongCodeParameter_IfDirect()
+        {
+            // Arrange
+            Initialize(TestSecret, inTestMode: false, direct: true);
+            _postRequest.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
+
+            // Act
+            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+
+            // Assert
+            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
+            ReceiverMock.Protected()
+                .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
 
         [Fact]
@@ -192,10 +252,14 @@ namespace Microsoft.AspNet.WebHooks
             Receiver.Dispose();
         }
 
-        public void Initialize(string config, bool inTestMode)
+        public void Initialize(string config, bool inTestMode, bool direct = false)
         {
             Initialize(config);
             Settings.Add(StripeWebHookReceiver.PassThroughTestEvents, inTestMode.ToString());
+            if (direct)
+            {
+                Settings.Add(StripeWebHookReceiver.DirectWebHook, direct.ToString());
+            }
         }
 
         public override void Initialize(string config)
