@@ -137,7 +137,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookSecretData")]
+        [MemberData(nameof(WebHookSecretData))]
         public async Task VerifyWebHookAsync_Throws_IfInvalidWebHookSecret(string secret)
         {
             // Arrange
@@ -153,7 +153,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookUriData")]
+        [MemberData(nameof(WebHookUriData))]
         public async Task VerifyWebHookAsync_Throws_IfNotHttpOrHttpsUri(string webHookUri)
         {
             // Arrange
@@ -231,7 +231,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookNoEchoData")]
+        [MemberData(nameof(WebHookNoEchoData))]
         public async Task VerifyWebHookAsync_Stops_IfNoEchoParameter(string query)
         {
             // Arrange
@@ -271,7 +271,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("FilterSingleNotificationData")]
+        [MemberData(nameof(FilterSingleNotificationData))]
         public void GetWorkItems_FilterSingleNotification(IEnumerable<WebHook> webHooks, NotificationDictionary notification)
         {
             // Act
@@ -286,7 +286,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("FilterMultipleNotificationData")]
+        [MemberData(nameof(FilterMultipleNotificationData))]
         public void GetWorkItems_FilterMultipleNotifications(IEnumerable<WebHook> webHooks, IEnumerable<NotificationDictionary> notifications, int expected)
         {
             // Act

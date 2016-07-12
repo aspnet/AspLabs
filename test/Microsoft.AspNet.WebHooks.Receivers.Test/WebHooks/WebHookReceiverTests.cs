@@ -157,7 +157,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidCodeQueries")]
+        [MemberData(nameof(InvalidCodeQueries))]
         public async Task EnsureValidCode_Throws_IfNoCodeParameter(string query)
         {
             // Arrange
@@ -173,7 +173,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task EnsureValidCode_Throws_IfWrongCodeParameter(string id)
         {
             // Arrange
@@ -189,7 +189,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public void EnsureValidCode_Succeeds_IfRightCodeParameter(string id)
         {
             // Arrange
@@ -268,7 +268,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidConfigData")]
+        [MemberData(nameof(ValidConfigData))]
         public async Task GetReceiverConfig_Succeeds_IfValidSecret(string name, string id, string secret, int minLength, int maxLength)
         {
             // Arrange
@@ -455,7 +455,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidJsonData")]
+        [MemberData(nameof(ValidJsonData))]
         public async Task ReadAsJsonTokenAsync_Succeeds_OnValidJson(string content, Type expectedType)
         {
             // Arrange
@@ -685,7 +685,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ByteCompareData")]
+        [MemberData(nameof(ByteCompareData))]
         public void SecretEqual_ComparesByteArraysCorrectly(byte[] inputA, byte[] inputB, bool expected)
         {
             // Arrange
@@ -699,7 +699,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("StringCompareData")]
+        [MemberData(nameof(StringCompareData))]
         public void SecretEqual_ComparesStringsCorrectly(string inputA, string inputB, bool expected)
         {
             // Arrange

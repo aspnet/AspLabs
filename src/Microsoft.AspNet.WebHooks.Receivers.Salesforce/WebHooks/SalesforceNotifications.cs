@@ -37,7 +37,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (doc == null)
             {
-                throw new ArgumentNullException("doc");
+                throw new ArgumentNullException(nameof(doc));
             }
             _doc = doc;
         }

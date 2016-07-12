@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (store == null)
             {
-                throw new ArgumentNullException("store");
+                throw new ArgumentNullException(nameof(store));
             }
             _store = store;
         }

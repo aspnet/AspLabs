@@ -27,11 +27,11 @@ namespace System.Web.Http
         {
             if (client == null)
             {
-                throw new ArgumentNullException("client");
+                throw new ArgumentNullException(nameof(client));
             }
             if (urlHelper == null)
             {
-                throw new ArgumentNullException("urlHelper");
+                throw new ArgumentNullException(nameof(urlHelper));
             }
 
             Dictionary<string, object> parameters = new Dictionary<string, object> { { "webHookReceiver", TrelloWebHookReceiver.ReceiverName } };

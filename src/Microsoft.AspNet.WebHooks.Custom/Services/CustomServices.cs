@@ -117,7 +117,7 @@ namespace Microsoft.AspNet.WebHooks.Services
 
             if (filterProviders == null)
             {
-                throw new ArgumentNullException("filterProviders");
+                throw new ArgumentNullException(nameof(filterProviders));
             }
 
             IWebHookFilterManager instance = new WebHookFilterManager(filterProviders);
@@ -139,7 +139,7 @@ namespace Microsoft.AspNet.WebHooks.Services
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             IWebHookSender instance = new DataflowWebHookSender(logger);
@@ -171,15 +171,15 @@ namespace Microsoft.AspNet.WebHooks.Services
             }
             if (store == null)
             {
-                throw new ArgumentNullException("store");
+                throw new ArgumentNullException(nameof(store));
             }
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             IWebHookManager instance = new WebHookManager(store, sender, logger);

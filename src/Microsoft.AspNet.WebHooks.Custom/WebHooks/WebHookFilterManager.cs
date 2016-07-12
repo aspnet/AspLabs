@@ -27,7 +27,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (providers == null)
             {
-                throw new ArgumentNullException("providers");
+                throw new ArgumentNullException(nameof(providers));
             }
 
             _providers = providers;

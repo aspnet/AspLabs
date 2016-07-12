@@ -28,11 +28,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (title == null)
             {
-                throw new ArgumentNullException("title");
+                throw new ArgumentNullException(nameof(title));
             }
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             _title = title;
             _value = value;
@@ -60,7 +60,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _title = value;
             }
@@ -81,7 +81,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _value = value;
             }

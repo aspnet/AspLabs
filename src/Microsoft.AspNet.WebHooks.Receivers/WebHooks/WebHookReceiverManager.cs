@@ -26,11 +26,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (receivers == null)
             {
-                throw new ArgumentNullException("receivers");
+                throw new ArgumentNullException(nameof(receivers));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             _receiverLookup = receivers
@@ -48,7 +48,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (receiverName == null)
             {
-                throw new ArgumentNullException("receiverName");
+                throw new ArgumentNullException(nameof(receiverName));
             }
 
             List<IWebHookReceiver> matches;

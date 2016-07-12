@@ -18,11 +18,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             // Ensure we have a normalized ID for the WebHook

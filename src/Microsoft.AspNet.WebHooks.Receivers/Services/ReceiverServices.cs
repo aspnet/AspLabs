@@ -40,11 +40,11 @@ namespace Microsoft.AspNet.WebHooks
 
             if (receivers == null)
             {
-                throw new ArgumentNullException("receivers");
+                throw new ArgumentNullException(nameof(receivers));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             IWebHookReceiverManager instance = new WebHookReceiverManager(receivers, logger);
@@ -66,11 +66,11 @@ namespace Microsoft.AspNet.WebHooks
 
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             IWebHookReceiverConfig instance = new WebHookReceiverConfig(settings, logger);

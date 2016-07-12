@@ -23,7 +23,7 @@ namespace Microsoft.AspNet.WebHooks.WebHooks
         }
 
         [Theory]
-        [MemberData("CollectionData")]
+        [MemberData(nameof(CollectionData))]
         public void ToString_PrintsCorrectly(IDictionary<string, string> parameters, string expected)
         {
             // Arrange

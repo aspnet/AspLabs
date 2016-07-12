@@ -74,7 +74,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidCodeQueries")]
+        [MemberData(nameof(InvalidCodeQueries))]
         public async Task ReceiveAsync_Throws_IfPostHasNoCodeParameter(string query)
         {
             // Arrange
@@ -143,7 +143,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange

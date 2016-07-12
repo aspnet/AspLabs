@@ -43,15 +43,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             _manager = manager;
@@ -69,7 +69,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (protector == null)
             {
-                throw new ArgumentNullException("protector");
+                throw new ArgumentNullException(nameof(protector));
             }
             _protector = protector;
         }
@@ -113,7 +113,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
 
             user = NormalizeKey(user);
@@ -134,11 +134,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (actions == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException(nameof(actions));
             }
 
             user = NormalizeKey(user);
@@ -161,11 +161,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             user = NormalizeKey(user);
@@ -189,11 +189,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             user = NormalizeKey(user);
@@ -218,11 +218,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             user = NormalizeKey(user);
@@ -247,11 +247,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             user = NormalizeKey(user);
@@ -278,7 +278,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
 
             user = NormalizeKey(user);
@@ -292,7 +292,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (actions == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException(nameof(actions));
             }
 
             CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);

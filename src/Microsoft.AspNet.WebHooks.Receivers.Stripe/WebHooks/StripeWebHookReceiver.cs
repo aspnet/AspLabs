@@ -78,15 +78,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (request.Method == HttpMethod.Post)
@@ -184,15 +184,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
             if (notificationId == null)
             {
-                throw new ArgumentNullException("notificationId");
+                throw new ArgumentNullException(nameof(notificationId));
             }
 
             // Create HTTP request for requesting authoritative event data from Stripe

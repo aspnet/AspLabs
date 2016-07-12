@@ -82,19 +82,19 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (connectionString == null)
             {
-                throw new ArgumentNullException("connectionString");
+                throw new ArgumentNullException(nameof(connectionString));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
             if (pollingFrequency <= TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException("pollingFrequency");
+                throw new ArgumentOutOfRangeException(nameof(pollingFrequency));
             }
             if (messageTimeout <= TimeSpan.Zero)
             {
-                throw new ArgumentOutOfRangeException("messageTimeout");
+                throw new ArgumentOutOfRangeException(nameof(messageTimeout));
             }
 
             _logger = logger;
@@ -236,7 +236,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (parent == null)
                 {
-                    throw new ArgumentNullException("parent");
+                    throw new ArgumentNullException(nameof(parent));
                 }
                 _parent = parent;
             }
@@ -246,7 +246,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (workItems == null)
                 {
-                    throw new ArgumentNullException("workItems");
+                    throw new ArgumentNullException(nameof(workItems));
                 }
 
                 // Keep track of which queued messages should be deleted because processing has completed.

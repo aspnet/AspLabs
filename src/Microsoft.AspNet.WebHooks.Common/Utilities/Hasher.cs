@@ -28,7 +28,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         {
             if (content == null)
             {
-                throw new ArgumentNullException("content");
+                throw new ArgumentNullException(nameof(content));
             }
             byte[] data = Encoding.UTF8.GetBytes(content);
 

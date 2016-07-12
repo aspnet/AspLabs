@@ -48,15 +48,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (webHookStore == null)
             {
-                throw new ArgumentNullException("webHookStore");
+                throw new ArgumentNullException(nameof(webHookStore));
             }
             if (webHookSender == null)
             {
-                throw new ArgumentNullException("webHookSender");
+                throw new ArgumentNullException(nameof(webHookSender));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             _webHookStore = webHookStore;
@@ -71,7 +71,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             VerifySecret(webHook.Secret);
@@ -86,11 +86,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (notifications == null)
             {
-                throw new ArgumentNullException("notifications");
+                throw new ArgumentNullException(nameof(notifications));
             }
 
             // Get all actions in this batch
@@ -113,7 +113,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (notifications == null)
             {
-                throw new ArgumentNullException("notifications");
+                throw new ArgumentNullException(nameof(notifications));
             }
 
             // Get all actions in this batch

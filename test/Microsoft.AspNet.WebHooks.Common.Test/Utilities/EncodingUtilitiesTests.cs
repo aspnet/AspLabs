@@ -40,7 +40,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("HexData")]
+        [MemberData(nameof(HexData))]
         public void ToHex_ConvertsCorrectly(string input)
         {
             // Arrange
@@ -55,7 +55,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("HexData")]
+        [MemberData(nameof(HexData))]
         public void FromHex_ConvertsCorrectly(string input)
         {
             // Arrange
@@ -73,7 +73,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("InvalidHexData")]
+        [MemberData(nameof(InvalidHexData))]
         public void FromHex_Throws_OnOddInput(string invalid)
         {
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => EncodingUtilities.FromHex(invalid));
@@ -82,7 +82,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("HexData")]
+        [MemberData(nameof(HexData))]
         public void ToHex_FromHex_Roundtrips_UriSafe(string input)
         {
             byte[] data = Encoding.UTF8.GetBytes(input);
@@ -93,14 +93,14 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("HexData")]
+        [MemberData(nameof(HexData))]
         public void ToBase64_FromBase64_Roundtrips_UriSafe(string input)
         {
             Base64RoundTrip(input, uriSafe: true);
         }
 
         [Theory]
-        [MemberData("HexData")]
+        [MemberData(nameof(HexData))]
         public void ToBase64_FromBase64_Roundtrips_NotUriSafe(string input)
         {
             Base64RoundTrip(input, uriSafe: false);

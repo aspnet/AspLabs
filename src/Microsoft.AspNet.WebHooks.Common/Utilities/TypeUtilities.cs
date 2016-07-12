@@ -40,7 +40,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         {
             if (predicate == null)
             {
-                throw new ArgumentNullException("predicate");
+                throw new ArgumentNullException(nameof(predicate));
             }
 
             List<Type> result = new List<Type>();

@@ -25,7 +25,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("HashData")]
+        [MemberData(nameof(HashData))]
         public void GetFnvHash32_ReturnsExpectedResult(string input, uint expected)
         {
             // Act

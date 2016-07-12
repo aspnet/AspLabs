@@ -141,7 +141,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange

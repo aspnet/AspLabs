@@ -127,7 +127,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ActionWithValueData")]
+        [MemberData(nameof(ActionWithValueData))]
         public void ParseActionWithValue_HandlesInput(string text, KeyValuePair<string, string> expected)
         {
             // Act
@@ -138,7 +138,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ActionWithParametersData")]
+        [MemberData(nameof(ActionWithParametersData))]
         public void ParseActionWithParameters_HandlesInput(string text, string expectedAction, string expectedParameters)
         {
             // Act
@@ -150,7 +150,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidParameterData")]
+        [MemberData(nameof(ValidParameterData))]
         public void EncodeNonSeparatorCharacters_ParsesCorrectInput(string input, string expected)
         {
             // Act
@@ -195,7 +195,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidParameterData")]
+        [MemberData(nameof(InvalidParameterData))]
 
         public void EncodeNonSeparatorCharacters_Throws_IfInvalidInput(string input, char quote, int offset)
         {

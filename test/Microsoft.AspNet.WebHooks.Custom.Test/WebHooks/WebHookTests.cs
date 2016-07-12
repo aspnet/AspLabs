@@ -60,7 +60,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("WebHookUriData")]
+        [MemberData(nameof(WebHookUriData))]
         public void WebHookUri_Validates(Uri uri, ValidationOutcome expected)
         {
             // Arrange

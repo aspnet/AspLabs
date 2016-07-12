@@ -23,11 +23,11 @@ namespace Microsoft.AspNet.WebHooks.Config
         {
             if (name == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
             if (connectionString == null)
             {
-                throw new ArgumentNullException("connectionString");
+                throw new ArgumentNullException(nameof(connectionString));
             }
 
             _name = name;
@@ -48,7 +48,7 @@ namespace Microsoft.AspNet.WebHooks.Config
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _name = value;
             }
@@ -68,7 +68,7 @@ namespace Microsoft.AspNet.WebHooks.Config
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
 
                 _connectionString = value;

@@ -18,7 +18,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (handlers == null)
             {
-                throw new ArgumentNullException("handlers");
+                throw new ArgumentNullException(nameof(handlers));
             }
 
             return handlers.OrderBy(h => h.Order).ToArray();

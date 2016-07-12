@@ -278,7 +278,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Theory]
-        [MemberData("StatusData")]
+        [MemberData(nameof(StatusData))]
         public async Task Post_ReturnsError_IfStoreReturnsNonsuccess(StoreResult result, Type response)
         {
             // Arrange
@@ -382,7 +382,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Theory]
-        [MemberData("StatusData")]
+        [MemberData(nameof(StatusData))]
         public async Task Put_ReturnsError_IfStoreReturnsNonsuccess(StoreResult result, Type response)
         {
             // Arrange
@@ -426,7 +426,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Theory]
-        [MemberData("NormalizedFilterData")]
+        [MemberData(nameof(NormalizedFilterData))]
         public async Task VerifyFilter_Adds_NormalizedFilters(string input, string expected)
         {
             // Arrange
@@ -539,7 +539,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         [Theory]
-        [MemberData("PrivateFilterData")]
+        [MemberData(nameof(PrivateFilterData))]
         public void RemovePrivateFilters_Succeeds(int count, string[] input, string[] expected)
         {
             // Arrange

@@ -41,7 +41,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
             _logger = logger;
         }
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (workItem == null)
             {
-                throw new ArgumentNullException("workItem");
+                throw new ArgumentNullException(nameof(workItem));
             }
 
             WebHook hook = workItem.WebHook;
@@ -127,7 +127,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (workItem == null)
             {
-                throw new ArgumentNullException("workItem");
+                throw new ArgumentNullException(nameof(workItem));
             }
 
             Dictionary<string, object> body = new Dictionary<string, object>();
@@ -160,7 +160,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (workItem == null)
             {
-                throw new ArgumentNullException("workItem");
+                throw new ArgumentNullException(nameof(workItem));
             }
             if (workItem.WebHook == null)
             {
@@ -169,11 +169,11 @@ namespace Microsoft.AspNet.WebHooks
             }
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
             if (body == null)
             {
-                throw new ArgumentNullException("body");
+                throw new ArgumentNullException(nameof(body));
             }
 
             byte[] secret = Encoding.UTF8.GetBytes(workItem.WebHook.Secret);

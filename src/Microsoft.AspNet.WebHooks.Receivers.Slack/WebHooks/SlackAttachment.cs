@@ -32,11 +32,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (text == null)
             {
-                throw new ArgumentNullException("text");
+                throw new ArgumentNullException(nameof(text));
             }
             if (fallback == null)
             {
-                throw new ArgumentNullException("fallback");
+                throw new ArgumentNullException(nameof(fallback));
             }
             _text = text;
             _fallback = fallback;
@@ -65,7 +65,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _fallback = value;
             }
@@ -134,7 +134,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _text = value;
             }

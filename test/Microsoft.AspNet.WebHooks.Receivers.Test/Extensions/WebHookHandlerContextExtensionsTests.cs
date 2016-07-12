@@ -37,7 +37,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("Data")]
+        [MemberData(nameof(Data))]
         public void GetDataOrDefault_ReturnsExpectedData<T>(T data)
             where T : class
         {
@@ -96,7 +96,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("Data")]
+        [MemberData(nameof(Data))]
         public void TryGetData_ReturnsExpectedData<T>(T data)
             where T : class
         {

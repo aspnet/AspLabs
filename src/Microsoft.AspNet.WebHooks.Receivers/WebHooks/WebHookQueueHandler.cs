@@ -32,11 +32,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (receiver == null)
             {
-                throw new ArgumentNullException("receiver");
+                throw new ArgumentNullException(nameof(receiver));
             }
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             try

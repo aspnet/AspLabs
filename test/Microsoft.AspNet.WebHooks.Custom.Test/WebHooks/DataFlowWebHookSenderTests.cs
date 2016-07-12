@@ -86,7 +86,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("NotifyAsyncData")]
+        [MemberData(nameof(NotifyAsyncData))]
         public async Task SendWebHook_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expectedOffset, SendResult expectedResult)
         {
             // Arrange

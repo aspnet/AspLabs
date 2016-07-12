@@ -21,7 +21,7 @@ namespace Microsoft.AspNet.WebHooks.Filters
         {
             if (actionContext == null)
             {
-                throw new ArgumentNullException("actionContext");
+                throw new ArgumentNullException(nameof(actionContext));
             }
 
             if (!actionContext.ModelState.IsValid)

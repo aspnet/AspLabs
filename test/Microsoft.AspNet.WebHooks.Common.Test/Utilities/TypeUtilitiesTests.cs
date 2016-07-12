@@ -38,7 +38,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         }
 
         [Theory]
-        [MemberData("IsTypeData")]
+        [MemberData(nameof(IsTypeData))]
         public void IsType_DetectsTypes(Type testType, Type type, bool expected)
         {
             // Arrange

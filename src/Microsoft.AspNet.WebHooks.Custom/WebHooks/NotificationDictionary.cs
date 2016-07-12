@@ -38,7 +38,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (action == null)
             {
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
             }
 
             this[ActionKey] = action;
@@ -86,7 +86,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 this[ActionKey] = value;
             }

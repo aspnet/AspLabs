@@ -36,15 +36,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             _manager = manager;
@@ -57,7 +57,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (workItems == null)
             {
-                throw new ArgumentNullException("workItems");
+                throw new ArgumentNullException(nameof(workItems));
             }
 
             // Serialize WebHook requests and convert to queue messages

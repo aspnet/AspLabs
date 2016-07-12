@@ -82,7 +82,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidInstagramData")]
+        [MemberData(nameof(InvalidInstagramData))]
         public async Task GetActions_Throws_IfInvalidData(string invalid)
         {
             Initialize(TestSecret);
@@ -98,7 +98,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InstagramData")]
+        [MemberData(nameof(InstagramData))]
         public void GetActions_ExtractsActions(string valid, IEnumerable<string> actions)
         {
             // Arrange
@@ -233,7 +233,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange
@@ -272,7 +272,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidGetRequest(string id)
         {
             // Act

@@ -34,7 +34,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             string action = context.Actions.First();

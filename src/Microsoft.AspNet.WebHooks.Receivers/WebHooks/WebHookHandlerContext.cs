@@ -24,7 +24,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (actions == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException(nameof(actions));
             }
             _actions = actions.ToList();
         }

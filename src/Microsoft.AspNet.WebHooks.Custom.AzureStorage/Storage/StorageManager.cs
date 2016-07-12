@@ -45,7 +45,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
             _logger = logger;
         }
@@ -55,7 +55,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
 
             ConnectionSettings connection;
@@ -94,11 +94,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (connectionString == null)
             {
-                throw new ArgumentNullException("connectionString");
+                throw new ArgumentNullException(nameof(connectionString));
             }
             if (tableName == null)
             {
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             }
 
             string tableKey = GetLookupKey(connectionString, tableName);
@@ -134,11 +134,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (connectionString == null)
             {
-                throw new ArgumentNullException("connectionString");
+                throw new ArgumentNullException(nameof(connectionString));
             }
             if (queueName == null)
             {
-                throw new ArgumentNullException("queueName");
+                throw new ArgumentNullException(nameof(queueName));
             }
 
             string queueKey = GetLookupKey(connectionString, queueName);
@@ -174,11 +174,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             if (partitionKey == null)
             {
-                throw new ArgumentNullException("partitionKey");
+                throw new ArgumentNullException(nameof(partitionKey));
             }
 
             string partitionKeyFilter = string.Format(CultureInfo.InvariantCulture, "{0} eq '{1}'", PartitionKey, partitionKey);
@@ -190,15 +190,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (table == null)
             {
-                throw new ArgumentNullException("table");
+                throw new ArgumentNullException(nameof(table));
             }
             if (partitionKey == null)
             {
-                throw new ArgumentNullException("partitionKey");
+                throw new ArgumentNullException(nameof(partitionKey));
             }
             if (rowKey == null)
             {
-                throw new ArgumentNullException("rowKey");
+                throw new ArgumentNullException(nameof(rowKey));
             }
 
             try
@@ -220,11 +220,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (table == null)
             {
-                throw new ArgumentNullException("table");
+                throw new ArgumentNullException(nameof(table));
             }
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
 
             try
@@ -259,11 +259,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (table == null)
             {
-                throw new ArgumentNullException("table");
+                throw new ArgumentNullException(nameof(table));
             }
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             try
@@ -287,11 +287,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (table == null)
             {
-                throw new ArgumentNullException("table");
+                throw new ArgumentNullException(nameof(table));
             }
             if (batch == null)
             {
-                throw new ArgumentNullException("batch");
+                throw new ArgumentNullException(nameof(batch));
             }
 
             try
@@ -314,11 +314,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (table == null)
             {
-                throw new ArgumentNullException("table");
+                throw new ArgumentNullException(nameof(table));
             }
             if (partitionKey == null)
             {
-                throw new ArgumentNullException("partitionKey");
+                throw new ArgumentNullException(nameof(partitionKey));
             }
 
             // Build query for retrieving exiting entries. We only ask for PK and RK.
@@ -380,7 +380,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (queue == null)
             {
-                throw new ArgumentNullException("queue");
+                throw new ArgumentNullException(nameof(queue));
             }
 
             try
@@ -408,7 +408,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (queue == null)
             {
-                throw new ArgumentNullException("queue");
+                throw new ArgumentNullException(nameof(queue));
             }
 
             try
@@ -431,7 +431,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         {
             if (queue == null)
             {
-                throw new ArgumentNullException("queue");
+                throw new ArgumentNullException(nameof(queue));
             }
 
             try

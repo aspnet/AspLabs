@@ -50,15 +50,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             if (request.Method == HttpMethod.Post)
@@ -133,7 +133,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             // Verify that we have the secret as an app setting

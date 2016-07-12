@@ -98,7 +98,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (workItems == null)
             {
-                throw new ArgumentNullException("workItems");
+                throw new ArgumentNullException(nameof(workItems));
             }
 
             foreach (WebHookWorkItem workItem in workItems)

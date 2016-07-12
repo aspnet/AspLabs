@@ -76,7 +76,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ConfigData")]
+        [MemberData(nameof(ConfigData))]
         public async Task GetReceiverConfigAsync_Returns_ExpectedValue(IDictionary<string, string> input, string receiver, string id, string expected)
         {
             // Arrange
@@ -91,7 +91,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("SettingsData")]
+        [MemberData(nameof(SettingsData))]
         public void ReadSettings_Parses_ValidValues(IDictionary<string, string> input, IDictionary<string, string> expected)
         {
             // Arrange
@@ -118,7 +118,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("KeyData")]
+        [MemberData(nameof(KeyData))]
         public void AddKey_AddsItem(string receiver, string id, string key)
         {
             // Arrange
@@ -146,7 +146,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("KeyData")]
+        [MemberData(nameof(KeyData))]
         public void GetConfigKey(string receiver, string id, string expected)
         {
             // Act

@@ -32,7 +32,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (modelBuilder == null)
             {
-                throw new ArgumentNullException("modelBuilder");
+                throw new ArgumentNullException(nameof(modelBuilder));
             }
 
             modelBuilder.HasDefaultSchema("WebHooks");

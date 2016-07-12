@@ -48,11 +48,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (text == null)
             {
-                throw new ArgumentNullException("text");
+                throw new ArgumentNullException(nameof(text));
             }
             if (attachments == null)
             {
-                throw new ArgumentNullException("attachments");
+                throw new ArgumentNullException(nameof(attachments));
             }
 
             _text = text;
@@ -83,7 +83,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _text = value;
             }

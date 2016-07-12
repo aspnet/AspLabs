@@ -101,7 +101,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("CustomProperties")]
+        [MemberData(nameof(CustomProperties))]
         public void Item_Roundtrips(string key, object value)
         {
             // Arrange
@@ -115,7 +115,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("UnknownKeys")]
+        [MemberData(nameof(UnknownKeys))]
         public void Item_Throws_IfKeyNotFound(string key)
         {
             KeyNotFoundException ex = Assert.Throws<KeyNotFoundException>(() => _notification[key]);
@@ -124,7 +124,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("UnknownKeys")]
+        [MemberData(nameof(UnknownKeys))]
         public void Item_OnInterface_Throws_IfKeyNotFound(string key)
         {
             IDictionary<string, object> dictionary = (IDictionary<string, object>)_notification;

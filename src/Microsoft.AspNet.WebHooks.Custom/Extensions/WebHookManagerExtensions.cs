@@ -25,7 +25,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return manager.NotifyAllAsync(notifications, predicate: null);
@@ -46,7 +46,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
             var notifications = new NotificationDictionary[] { new NotificationDictionary(action, data) };
             return manager.NotifyAllAsync(notifications, predicate);
@@ -63,7 +63,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
             return manager.NotifyAllAsync(notifications, predicate: null);
         }

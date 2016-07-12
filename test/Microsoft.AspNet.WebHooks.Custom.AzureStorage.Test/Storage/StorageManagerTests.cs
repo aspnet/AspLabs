@@ -119,7 +119,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         [Theory]
-        [MemberData("InvalidConnectionStringData")]
+        [MemberData(nameof(InvalidConnectionStringData))]
         public void GetCloudStorageAccount_Handles_InvalidConnectionStrings(string connectionString)
         {
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => _manager.GetCloudStorageAccount(connectionString));
@@ -127,7 +127,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         [Theory]
-        [MemberData("ValidConnectionStringData")]
+        [MemberData(nameof(ValidConnectionStringData))]
         public void GetCloudStorageAccount_Handles_ValidConnectionStrings(string connectionString)
         {
             // Act
@@ -158,7 +158,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         [Theory]
-        [MemberData("PartitionKeyConstraintData")]
+        [MemberData(nameof(PartitionKeyConstraintData))]
         public void AddPartitionKeyConstraint_CreatesExpectedQuery(string filter, string partitionKey, string expected)
         {
             // Arrange
@@ -449,7 +449,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         }
 
         [Theory]
-        [MemberData("StorageErrorMessageData")]
+        [MemberData(nameof(StorageErrorMessageData))]
         public void GetStorageErrorMessage_ExtractsMessage(Exception exception, string expected)
         {
             // Act

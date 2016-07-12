@@ -65,7 +65,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("CustomSettings")]
+        [MemberData(nameof(CustomSettings))]
         public void CustomSetting_Roundtrips(string key, string value)
         {
             // Arrange
@@ -79,7 +79,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("CustomSettings")]
+        [MemberData(nameof(CustomSettings))]
         public void Item_Roundtrips(string key, string value)
         {
             // Arrange
@@ -93,7 +93,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("UnknownKeys")]
+        [MemberData(nameof(UnknownKeys))]
         public void Item_Throws_KeyNotFoundException(string key)
         {
             KeyNotFoundException ex = Assert.Throws<KeyNotFoundException>(() => _settings[key]);
@@ -102,7 +102,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("UnknownKeys")]
+        [MemberData(nameof(UnknownKeys))]
         public void Item_OnInterface_Throws_KeyNotFoundException(string key)
         {
             IDictionary<string, string> dictionary = (IDictionary<string, string>)_settings;
@@ -112,7 +112,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("CustomSettings")]
+        [MemberData(nameof(CustomSettings))]
         public void SetOrClearValue_SetsNonNullValue(string key, string value)
         {
             // Act
@@ -130,7 +130,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         [Theory]
-        [MemberData("IsTrueData")]
+        [MemberData(nameof(IsTrueData))]
         public void IsTrue_DetectsBooleanValue(string key, string value, bool expected)
         {
             // Arrange

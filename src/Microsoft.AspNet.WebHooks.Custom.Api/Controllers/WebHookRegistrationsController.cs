@@ -200,7 +200,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             // If there are no filters then add our wildcard filter.
@@ -257,7 +257,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             if (webHooks == null)
             {
-                throw new ArgumentNullException("webHooks");
+                throw new ArgumentNullException(nameof(webHooks));
             }
 
             foreach (WebHook webHook in webHooks)
@@ -278,7 +278,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             // If no secret is provided then we create one here. This allows for scenarios

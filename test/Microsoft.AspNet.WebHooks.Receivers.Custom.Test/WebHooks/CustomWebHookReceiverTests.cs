@@ -109,7 +109,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidCustomData")]
+        [MemberData(nameof(InvalidCustomData))]
         public async Task GetActions_Throws_IfInvalidData(string invalid)
         {
             Initialize(TestSecret);
@@ -125,7 +125,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("CustomData")]
+        [MemberData(nameof(CustomData))]
         public void GetActions_ExtractsActions(string valid, IEnumerable<string> actions)
         {
             // Arrange
@@ -175,7 +175,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidPostHeaders")]
+        [MemberData(nameof(InvalidPostHeaders))]
         public async Task ReceiveAsync_Throws_IfPostHasInvalidSignatureHeader(string header)
         {
             // Arrange
@@ -228,7 +228,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_Throws_IfPostIsNotJson(string id, string header)
         {
             // Arrange
@@ -247,7 +247,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id, string header)
         {
             // Arrange

@@ -34,11 +34,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException("logger");
+                throw new ArgumentNullException(nameof(logger));
             }
 
             _config = ReadSettings(settings, logger);
@@ -49,7 +49,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (name == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
             if (id == null)
             {

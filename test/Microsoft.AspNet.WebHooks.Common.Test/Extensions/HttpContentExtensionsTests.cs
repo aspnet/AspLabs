@@ -99,7 +99,7 @@ namespace Microsoft.AspNet.WebHooks.Extensions
         }
 
         [Theory]
-        [MemberData("JsonMediaTypes")]
+        [MemberData(nameof(JsonMediaTypes))]
         public void IsJson_DetectsJson(string input, bool expected)
         {
             // Arrange
@@ -141,7 +141,7 @@ namespace Microsoft.AspNet.WebHooks.Extensions
         }
 
         [Theory]
-        [MemberData("XmlMediaTypes")]
+        [MemberData(nameof(XmlMediaTypes))]
         public void IsXml_DetectsXml(string input, bool expected)
         {
             // Arrange

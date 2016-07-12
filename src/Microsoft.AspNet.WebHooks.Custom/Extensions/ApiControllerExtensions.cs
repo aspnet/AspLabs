@@ -72,11 +72,11 @@ namespace System.Web.Http
         {
             if (controller == null)
             {
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
             }
             if (notifications == null)
             {
-                throw new ArgumentNullException("notifications");
+                throw new ArgumentNullException(nameof(notifications));
             }
             if (!notifications.Any())
             {
@@ -149,11 +149,11 @@ namespace System.Web.Http
         {
             if (controller == null)
             {
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
             }
             if (notifications == null)
             {
-                throw new ArgumentNullException("notifications");
+                throw new ArgumentNullException(nameof(notifications));
             }
             if (!notifications.Any())
             {

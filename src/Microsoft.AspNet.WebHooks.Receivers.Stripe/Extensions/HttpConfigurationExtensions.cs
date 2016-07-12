@@ -41,7 +41,7 @@ namespace System.Web.Http
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
             // Enable direct mode

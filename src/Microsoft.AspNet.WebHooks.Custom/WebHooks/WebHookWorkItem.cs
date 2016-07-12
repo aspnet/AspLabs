@@ -22,11 +22,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
             if (notifications == null)
             {
-                throw new ArgumentNullException("notifications");
+                throw new ArgumentNullException(nameof(notifications));
             }
 
             WebHook = webHook;

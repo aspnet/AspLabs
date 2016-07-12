@@ -156,7 +156,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             IDependencyResolver resolver = request.GetConfiguration().DependencyResolver;
@@ -194,7 +194,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             EnsureSecureConnection(request);
@@ -233,11 +233,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
             if (name == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             // Look up configuration for this receiver and instance
@@ -266,7 +266,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             IEnumerable<string> headers;
@@ -405,7 +405,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadMethod, request.Method, GetType().Name);
@@ -426,7 +426,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
 
             string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSignature, signatureHeaderName, GetType().Name);
@@ -448,15 +448,15 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
             if (request == null)
             {
-                throw new ArgumentNullException("request");
+                throw new ArgumentNullException(nameof(request));
             }
             if (actions == null)
             {

@@ -32,7 +32,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_TryGetValue_FindsValue<T>(string key, T value)
         {
             // Arrange
@@ -48,7 +48,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_TryGetValue_ReturnsDefaultValue_IfNotFound<T>(string key, T value)
         {
             // Arrange
@@ -64,7 +64,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_TryGetValue_ReturnsDefaultValue_IfWrongType<T>(string key, T value)
         {
             // Arrange
@@ -81,7 +81,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_GetValueOrDefault_FindsValue<T>(string key, T value)
         {
             // Arrange
@@ -95,7 +95,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_GetValueOrDefault_ReturnsDefaultValue_IfNotFound<T>(string key, T value)
         {
             // Act
@@ -107,7 +107,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_GetValueOrDefault_ReturnsDefaultValue_IfWrongType<T>(string key, T value)
         {
             // Arrange
@@ -136,7 +136,7 @@ namespace System.Collections.Generic
         }
 
         [Theory]
-        [MemberData("TestData")]
+        [MemberData(nameof(TestData))]
         public void DictionaryStringObject_SetOrClearValue_SetsEntry<T>(string key, T value)
         {
             // Act

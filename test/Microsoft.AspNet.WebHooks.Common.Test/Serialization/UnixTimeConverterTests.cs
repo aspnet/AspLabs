@@ -79,7 +79,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         [Theory]
-        [MemberData("NullDateTimeValues")]
+        [MemberData(nameof(NullDateTimeValues))]
         public void ReadJson_ThrowsOnNull(string input)
         {
             // Act
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         [Theory]
-        [MemberData("InvalidDateTimeValues")]
+        [MemberData(nameof(InvalidDateTimeValues))]
         public void ReadJson_ThrowsOnInvalidValue(string input)
         {
             // Act
@@ -101,7 +101,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         [Theory]
-        [MemberData("ValidReadDateTimeValues")]
+        [MemberData(nameof(ValidReadDateTimeValues))]
         public void ReadJson_ReadsValue_AsUtc(long delta)
         {
             // Arrange
@@ -118,7 +118,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         [Theory]
-        [MemberData("ValidWriteDateTimeValues")]
+        [MemberData(nameof(ValidWriteDateTimeValues))]
         public void WriteJson_WritesValue_AsUtc(DateTime input, string expected)
         {
             // Arrange
@@ -132,7 +132,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         [Theory]
-        [MemberData("RoundtripValues")]
+        [MemberData(nameof(RoundtripValues))]
         public void WriteJson_ReadJson_Roundtrips(DateTime expected)
         {
             // Arrange

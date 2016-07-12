@@ -49,7 +49,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ConnectionSettingsData")]
+        [MemberData(nameof(ConnectionSettingsData))]
         public void CheckSqlStorageConnectionString_Throws_IfNullOrEmptyConnectionString(ConnectionSettings connectionSettings)
         {
             // Arrange

@@ -99,7 +99,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidCodeQueries")]
+        [MemberData(nameof(InvalidCodeQueries))]
         public async Task ReceiveAsync_Throws_IfPostHasNoCodeParameter(string query)
         {
             // Arrange

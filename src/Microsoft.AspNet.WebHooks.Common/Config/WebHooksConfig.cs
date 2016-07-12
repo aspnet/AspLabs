@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.WebHooks.Config
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
             _httpConfig = config;

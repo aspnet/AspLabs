@@ -61,7 +61,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("Texts")]
+        [MemberData(nameof(Texts))]
         public void GetSubtext_GetsCorrectText(string trigger, string text, string expected)
         {
             // Act
@@ -140,7 +140,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidTriggerPostRequest(string id)
         {
             // Arrange
@@ -159,7 +159,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidSlashPostRequest(string id)
         {
             // Arrange

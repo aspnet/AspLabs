@@ -106,7 +106,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("DequeueData")]
+        [MemberData(nameof(DequeueData))]
         public async Task DequeueAndSendWebHooks_GetsMessagesAndSubmitsToSender(int[] count)
         {
             // Arrange
@@ -141,7 +141,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("SenderData")]
+        [MemberData(nameof(SenderData))]
         public async Task QueuedSender_Deletes_AllCompletedResponses(int[] statusCodes)
         {
             // Arrange
@@ -166,7 +166,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("SenderData")]
+        [MemberData(nameof(SenderData))]
         public async Task QueuedSender_Deletes_SuccessAndGoneResponses(int[] statusCodes)
         {
             // Arrange

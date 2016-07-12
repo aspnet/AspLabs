@@ -26,7 +26,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
 
             user = NormalizeKey(user);
@@ -41,11 +41,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (actions == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException(nameof(actions));
             }
 
             user = NormalizeKey(user);
@@ -68,11 +68,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             user = NormalizeKey(user);
@@ -93,11 +93,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             user = NormalizeKey(user);
@@ -115,11 +115,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (webHook == null)
             {
-                throw new ArgumentNullException("webHook");
+                throw new ArgumentNullException(nameof(webHook));
             }
 
             user = NormalizeKey(user);
@@ -145,11 +145,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
             if (id == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
             }
 
             user = NormalizeKey(user);
@@ -172,7 +172,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
 
             user = NormalizeKey(user);
@@ -191,7 +191,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (actions == null)
             {
-                throw new ArgumentNullException("actions");
+                throw new ArgumentNullException(nameof(actions));
             }
 
             predicate = predicate ?? DefaultPredicate;

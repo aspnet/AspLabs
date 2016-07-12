@@ -26,11 +26,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
             if (name == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             // Look up configuration for this receiver and instance

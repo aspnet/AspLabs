@@ -33,7 +33,7 @@ namespace Microsoft.AspNet.WebHooks
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _claimsType = value;
             }
@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
             }
 
             string id = null;

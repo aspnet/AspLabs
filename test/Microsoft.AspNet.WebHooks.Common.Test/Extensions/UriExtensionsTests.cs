@@ -59,7 +59,7 @@ namespace System
         }
 
         [Theory]
-        [MemberData("HttpData")]
+        [MemberData(nameof(HttpData))]
         public void IsHttp_DetectsHttpUris(string input, bool expected)
         {
             // Arrange
@@ -86,7 +86,7 @@ namespace System
         }
 
         [Theory]
-        [MemberData("HttpsData")]
+        [MemberData(nameof(HttpsData))]
         public void IsHttps_DetectsHttpsUris(string input, bool expected)
         {
             // Arrange

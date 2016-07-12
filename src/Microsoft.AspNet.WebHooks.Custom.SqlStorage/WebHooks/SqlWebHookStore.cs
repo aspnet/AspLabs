@@ -28,7 +28,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             CheckSqlStorageConnectionString(settings);
         }
@@ -43,7 +43,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
             CheckSqlStorageConnectionString(settings);
         }
@@ -85,7 +85,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
 
             ConnectionSettings connection;

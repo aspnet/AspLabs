@@ -66,7 +66,7 @@ namespace System.Collections.Generic
         {
             if (dictionary == null)
             {
-                throw new ArgumentNullException("dictionary");
+                throw new ArgumentNullException(nameof(dictionary));
             }
 
             if (EqualityComparer<T>.Default.Equals(value, default(T)))

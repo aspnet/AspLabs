@@ -116,7 +116,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidPostHeaders")]
+        [MemberData(nameof(InvalidPostHeaders))]
         public async Task ReceiveAsync_Throws_IfPostHasInvalidSignatureHeader(string header)
         {
             // Arrange
@@ -169,7 +169,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_Throws_IfPostIsNotJson(string id, string header)
         {
             // Arrange
@@ -188,7 +188,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_ReturnsError_IfPostHasNoEventHeader(string id, string header)
         {
             // Arrange
@@ -206,7 +206,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id, string header)
         {
             // Arrange
@@ -227,7 +227,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidPostRequest")]
+        [MemberData(nameof(ValidPostRequest))]
         public async Task ReceiveAsync_Succeeds_IfPostPing(string id, string header)
         {
             // Arrange

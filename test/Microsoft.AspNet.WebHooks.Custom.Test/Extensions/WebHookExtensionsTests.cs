@@ -56,7 +56,7 @@ namespace Microsoft.AspNet.WebHooks.Extensions
         }
 
         [Theory]
-        [MemberData("ActionData")]
+        [MemberData(nameof(ActionData))]
         public void MatchesAction_DetectsIndividualMatches(string action, bool expected)
         {
             // Act
@@ -96,7 +96,7 @@ namespace Microsoft.AspNet.WebHooks.Extensions
         }
 
         [Theory]
-        [MemberData("AnyActionData")]
+        [MemberData(nameof(AnyActionData))]
         public void MatchesAnyAction_DetectsIndividualMatches(string[] actions, bool expected)
         {
             // Act

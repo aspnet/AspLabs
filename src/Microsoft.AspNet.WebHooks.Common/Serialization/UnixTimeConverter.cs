@@ -42,7 +42,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         {
             if (writer == null)
             {
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
             }
             DateTime utc = ((DateTime)value).ToUniversalTime();
             long time = (long)(utc - _Epoch).TotalSeconds;
@@ -61,7 +61,7 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         {
             if (reader == null)
             {
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
             }
             if (reader.Value == null)
             {

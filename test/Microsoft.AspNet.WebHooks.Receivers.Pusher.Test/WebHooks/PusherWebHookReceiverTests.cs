@@ -114,7 +114,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidPusherData")]
+        [MemberData(nameof(InvalidPusherData))]
         public async Task GetActions_Throws_IfInvalidData(string invalid)
         {
             // Arrange
@@ -131,7 +131,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("PusherData")]
+        [MemberData(nameof(PusherData))]
         public void GetActions_ExtractsActions(string valid, IEnumerable<string> actions)
         {
             // Arrange
@@ -147,7 +147,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidSecretData")]
+        [MemberData(nameof(ValidSecretData))]
         public async Task GetSecretLookupTable_BuildsLookupTable(string id, string secret, IDictionary<string, string> expected)
         {
             // Arrange
@@ -177,7 +177,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("InvalidSecretData")]
+        [MemberData(nameof(InvalidSecretData))]
         public async Task GetSecretLookupTable_Throws_IfInvalidSecret(string id, string invalid)
         {
             // Arrange
@@ -193,7 +193,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task GetSecretLookupTable_Throws_IfNoSecrets(string id)
         {
             // Arrange
@@ -332,7 +332,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [Theory]
-        [MemberData("ValidIdData")]
+        [MemberData(nameof(ValidIdData))]
         public async Task ReceiveAsync_Succeeds_IfValidPostRequest(string id)
         {
             // Arrange

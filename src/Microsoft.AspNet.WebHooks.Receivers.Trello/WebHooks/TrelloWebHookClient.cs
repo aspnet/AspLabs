@@ -51,11 +51,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (userToken == null)
             {
-                throw new ArgumentNullException("userToken");
+                throw new ArgumentNullException(nameof(userToken));
             }
             if (applicationKey == null)
             {
-                throw new ArgumentNullException("applicationKey");
+                throw new ArgumentNullException(nameof(applicationKey));
             }
             _createWebHookUri = new Uri(string.Format(CultureInfo.InvariantCulture, CreateWebHookApiTemplate, userToken, applicationKey));
             _deleteWebHookUriTemplate = string.Format(CultureInfo.InvariantCulture, DeleteWebHookApiTemplate, applicationKey, userToken);
@@ -73,20 +73,20 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (callback == null)
             {
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
             }
             if (!callback.IsAbsoluteUri)
             {
                 string msg = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_NotAbsoluteCallback, "https://<host>/api/webhooks/incoming/trello");
-                throw new ArgumentException(msg, "receiver");
+                throw new ArgumentException(msg, nameof(callback));
             }
             if (modelId == null)
             {
-                throw new ArgumentNullException("modelId");
+                throw new ArgumentNullException(nameof(modelId));
             }
             if (description == null)
             {
-                throw new ArgumentNullException("description");
+                throw new ArgumentNullException(nameof(description));
             }
 
             JObject parameters = new JObject();
@@ -122,7 +122,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (webHookId == null)
             {
-                throw new ArgumentNullException("webHookId");
+                throw new ArgumentNullException(nameof(webHookId));
             }
 
             string address = string.Format(CultureInfo.InvariantCulture, _deleteWebHookUriTemplate, webHookId);
