@@ -29,7 +29,7 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 * Integration with WebHook Providers
   * [Integrating with Instagram using ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/21/integrating-with-instagram-using-asp-net-webhooks-preview.aspx)
   * [Integrating with Salesforce using ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/07/integrating-with-salesforce-using-asp-net-webhooks-preview.aspx)
-  * [Integrating with Slack Using ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/06/receiving-slack-webhooks-with-asp-net-webhooks.aspx)
+  * [Integrating with Slack Using ASP.NET WebHooks Preview](http://blogs.msdn.com/b/webdev/archive/2015/09/06/integrating-with-slack-using-asp-net-webhooks-preview.aspx)
   * [Using ASP.NET WebHooks with IFTTT and Zapier to Monitor Twitter and Google Sheets](http://blogs.msdn.com/b/webdev/archive/2015/11/21/using-asp-net-webhooks-with-ifttt-and-zapier-to-monitor-twitter-and-google-sheets.aspx)
   * [Receive WebHooks from Azure Alerts and Kudu (Azure Web App Deployment)](http://blogs.msdn.com/b/webdev/archive/2015/10/04/receive-webhooks-from-azure-alerts-and-kudu-azure-web-app-deployment.aspx)
   * [Sending WebHooks with Microsoft Dynamics CRM](http://blogs.msdn.com/b/crm/archive/2016/01/15/sending-webhooks-with-microsoft-dynamics-crm.aspx)
