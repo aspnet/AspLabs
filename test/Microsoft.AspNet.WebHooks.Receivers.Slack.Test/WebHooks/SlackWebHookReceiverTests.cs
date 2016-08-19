@@ -134,7 +134,7 @@ namespace Microsoft.AspNet.WebHooks
 
             // Assert
             HttpError error = await actual.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The HTTP request body did not contain a required 'command' property indicating a slash command or a 'trigger_word' property indicating an outgoing WebHook.", error.Message);
+            Assert.Equal("The HTTP request body did not contain a required 'command' property indicating a slash command or contained an empty 'trigger_word' parameter indicating an outgoing WebHook.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }

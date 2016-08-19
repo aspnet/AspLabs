@@ -80,16 +80,26 @@ namespace Microsoft.AspNet.WebHooks
                 }
 
                 // Get the action by looking for either trigger_word or command parameter
-                string action = data[TriggerParameter];
-                if (!string.IsNullOrEmpty(action))
+                string action = string.Empty;
+                if (data[TriggerParameter] != null)
                 {
+                    // Trigger parameter was supplied
                     // Get the subtext by removing the trigger word
+                    action = data[TriggerParameter];
                     string text = data[TextParameter];
                     data[SubtextParameter] = GetSubtext(action, text);
                 }
+                else if (data[CommandParameter] != null)
+                {
+                    // Command parameter was supplied
+                    action = data[CommandParameter];
+                }
                 else
                 {
-                    action = data[CommandParameter];
+                    // Trigger was omitted as optional
+                    // Set the subtext to the full text
+                    action = data[TextParameter];
+                    data[SubtextParameter] = data[TextParameter];
                 }
 
                 if (string.IsNullOrEmpty(action))

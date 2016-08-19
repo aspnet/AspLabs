@@ -61,7 +61,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property indicating a slash command or a &apos;{1}&apos; property indicating an outgoing WebHook..
+        ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property indicating a slash command or contained an empty &apos;{1}&apos; parameter indicating an outgoing WebHook..
         /// </summary>
         internal static string Receiver_BadBody {
             get {
