@@ -45,7 +45,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <inheritdoc />
-        public Task<string> GetReceiverConfigAsync(string name, string id)
+        public virtual Task<string> GetReceiverConfigAsync(string name, string id)
         {
             if (name == null)
             {
