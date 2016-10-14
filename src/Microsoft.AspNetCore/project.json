@@ -1,0 +1,24 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "allowUnsafe": true
+  },
+  "dependencies": {
+    "Microsoft.Extensions": {
+      "target": "project",
+      "type": "build"
+    },
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0",
+      "type": "build"
+    },
+    "System.Net.WebSockets": "4.0.0",
+    "System.Numerics.Vectors": "4.1.1",
+    "System.Security.Claims": "4.0.1"
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+    }
+  }
+}
