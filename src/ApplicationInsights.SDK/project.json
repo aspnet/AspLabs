@@ -1,0 +1,21 @@
+﻿{
+  "version": "0.0.1",
+
+  "dependencies": {
+    "Microsoft.ApplicationInsights": "2.1.0",
+    "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0",
+    "Microsoft.Extensions.DiagnosticAdapter": "1.0.0",
+    "NETStandard.Library": "1.6.0",
+    "System.Data.Common": "4.1.0",
+    "System.Data.SqlClient": "4.1.0"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": [
+        "dotnet5.6",
+        "portable-dnxcore50+net451+net45+win8+wp8+wpa81"
+      ]
+    }
+  }
+}
