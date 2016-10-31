@@ -1,6 +1,6 @@
 ﻿using Microsoft.ApplicationInsights;
+using ApplicationInsights;
 using ApplicationInsights.Extensions;
-using ApplicationInsights.Listener;
 using System;
 using System.Diagnostics;
 
@@ -16,8 +16,8 @@ namespace Microsoft.AspNetCore.Hosting
             }
 
             var client = new TelemetryClient();
-            var listener = new ApplicationInsightsListener(client);
-            DiagnosticListener.AllListeners.Subscribe(listener);
+            var observer = new ApplicationInsightsObserver(client);
+            DiagnosticListener.AllListeners.Subscribe(observer);
 
             return hostBuilder.ConfigureLogging(loggerFactory =>
             {

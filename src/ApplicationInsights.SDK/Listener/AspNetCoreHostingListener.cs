@@ -12,7 +12,7 @@ using System.Net.Http;
 
 namespace ApplicationInsights.Listener
 {
-    public class AspNetCoreHostingCallback
+    public class AspNetCoreHostingListener
     {
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
@@ -20,7 +20,7 @@ namespace ApplicationInsights.Listener
         private readonly AsyncLocal<long> _beginRequestTimestamp = new AsyncLocal<long>();
         private readonly string _sdkVersion;
 
-        public AspNetCoreHostingCallback(TelemetryClient client)
+        public AspNetCoreHostingListener(TelemetryClient client)
         {
             _client = client;
             _sdkVersion = SdkVersionUtils.VersionPrefix + SdkVersionUtils.GetAssemblyVersion();

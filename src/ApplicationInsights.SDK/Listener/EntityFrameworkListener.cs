@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -8,36 +9,34 @@ using Microsoft.Extensions.DiagnosticAdapter;
 
 namespace ApplicationInsights.Listener
 {
-    public class SystemNetHttpCallback
+    internal class EntityFrameworkListener
     {
+        private TelemetryClient _client;
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
-
-        private readonly TelemetryClient _client;
         private readonly AsyncLocal<long> _beginDependencyTimestamp = new AsyncLocal<long>();
 
-        public SystemNetHttpCallback(TelemetryClient client)
+        public EntityFrameworkListener(TelemetryClient client)
         {
             _client = client;
         }
 
-        [DiagnosticName("System.Net.Http.Request")]
-        public void OnOutgoingHttpRequest(HttpRequestMessage Request, Guid LoggingRequestId)
+        [DiagnosticName("Microsoft.EntityFrameworkCore.BeforeExecuteCommand")]
+        public void OnBeginCommand(DbCommand Command, string ExecuteMethod, Guid InstanceId, long Timestamp, bool IsAsync)
         {
             _beginDependencyTimestamp.Value = Stopwatch.GetTimestamp();
         }
 
-        [DiagnosticName("System.Net.Http.Response")]
-        public void OnOutgoingHttpResponse(HttpResponseMessage Response, Guid LoggingRequestId)
+        [DiagnosticName("Microsoft.EntityFrameworkCore.AfterExecuteCommand")]
+        public void OnEndCommand(DbCommand Command, string ExecuteMethod, Guid InstanceId, long Timestamp, bool IsAsync)
         {
             var start = _beginDependencyTimestamp.Value;
             var end = Stopwatch.GetTimestamp();
 
             var telemetry = new DependencyTelemetry();
-            telemetry.Name = "System.Net.Http";
-            telemetry.DependencyTypeName = "System.Net.Http";
+            telemetry.Name = "Microsoft.EntityFrameworkCore.ExecuteCommand";
+            telemetry.CommandName = ExecuteMethod;
             telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));
-            telemetry.Success = Response.IsSuccessStatusCode;
-
+            telemetry.StartTime = DateTime.Now - telemetry.Duration;
             _client.TrackDependency(telemetry);
         }
     }
