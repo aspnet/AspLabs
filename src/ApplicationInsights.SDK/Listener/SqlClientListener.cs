@@ -19,24 +19,25 @@ namespace ApplicationInsights.Listener
             _client = client;
         }
 
-        //[DiagnosticName("System.Data.SqlClient.WriteCommandBefore")]
-        public void OnBeginCommand(/*Guid OperationId, string Operation, string ConnectionId, SqlCommand Command*/)
+        [DiagnosticName("System.Data.SqlClient.WriteCommandBefore")]
+        public void OnBeginCommand(Guid OperationId, string Operation, Guid? ConnectionId, SqlCommand Command)
         {
-            
-            //_beginDependencyTimestamp.Value = Stopwatch.GetTimestamp();
+            _beginDependencyTimestamp.Value = Stopwatch.GetTimestamp();
         }
 
         [DiagnosticName("System.Data.SqlClient.WriteCommandAfter")]
-        public void OnEndCommand(/*Guid OperationId, string Operation, string ConnectionId, SqlCommand Command*/)
+        public void OnEndCommand(Guid OperationId, string Operation, Guid? ConnectionId, SqlCommand Command)
         {
-            //var start = _beginDependencyTimestamp.Value;
-            //var end = Stopwatch.GetTimestamp();
-
-            //var telemetry = new DependencyTelemetry();
-            //telemetry.Name = "Microsoft.EntityFrameworkCore.ExecuteCommand";
-            //telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));
-            //telemetry.StartTime = DateTime.Now - telemetry.Duration;
-            //_client.TrackDependency(telemetry);
+            var start = _beginDependencyTimestamp.Value;
+            var end = Stopwatch.GetTimestamp();
+                  
+            var telemetry = new DependencyTelemetry();
+            telemetry.Name = "Microsoft.EntityFrameworkCore.ExecuteCommand";
+            telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));
+            telemetry.StartTime = DateTime.Now - telemetry.Duration;
+            telemetry.CommandName = Command.ToString();
+            telemetry.DependencyTypeName = "SQL Client";
+            _client.TrackDependency(telemetry);
         }
     }
 }

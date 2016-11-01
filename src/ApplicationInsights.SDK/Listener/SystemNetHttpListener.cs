@@ -37,7 +37,7 @@ namespace ApplicationInsights.Listener
             telemetry.DependencyTypeName = "System.Net.Http";
             telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));
             telemetry.Success = Response.IsSuccessStatusCode;
-
+            telemetry.DependencyTypeName = "HTTP Request";
             _client.TrackDependency(telemetry);
         }
     }

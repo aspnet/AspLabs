@@ -12,17 +12,6 @@ namespace HelloMVC.Controllers
             return View();
         }
 
-        //[HttpGet("{timeout}")]
-        public async Task<string> Wait(int timeout)
-        {
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync($"https://httpbin.org/delay/{timeout}");
-                return response.StatusCode.ToString();
-            }
-
-        }
-
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -30,8 +19,12 @@ namespace HelloMVC.Controllers
             //return View();
         }
 
-        public IActionResult Contact()
+        public async Task<IActionResult> Contact()
         {
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync($"https://httpbin.org/delay/3");
+            }
             ViewData["Message"] = "Your contact page.";
 
             return View();

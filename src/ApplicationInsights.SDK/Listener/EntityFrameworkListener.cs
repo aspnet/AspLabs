@@ -34,9 +34,10 @@ namespace ApplicationInsights.Listener
 
             var telemetry = new DependencyTelemetry();
             telemetry.Name = "Microsoft.EntityFrameworkCore.ExecuteCommand";
-            telemetry.CommandName = ExecuteMethod;
+            telemetry.CommandName = Command.ToString();
             telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));
             telemetry.StartTime = DateTime.Now - telemetry.Duration;
+            telemetry.DependencyTypeName = "Entity Framework";
             _client.TrackDependency(telemetry);
         }
     }
