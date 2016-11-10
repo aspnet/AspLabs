@@ -37,7 +37,7 @@ namespace HealthChecks
             return builder;
         }
 
-        public static HealthCheckBuilder AddWorkingSet64Check(this HealthCheckBuilder builder, long maxSize)
+        public static HealthCheckBuilder AddWorkingSetCheck(this HealthCheckBuilder builder, long maxSize)
         {
             builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
             {
@@ -52,7 +52,7 @@ namespace HealthChecks
             return builder;
         }
 
-        public static HealthCheckBuilder AddPrivateMemorySize64Check(this HealthCheckBuilder builder, long maxSize)
+        public static HealthCheckBuilder AddPrivateMemorySizeCheck(this HealthCheckBuilder builder, long maxSize)
         {
             builder.AddCheck($"PrivateMemorySize64 ({maxSize})", () =>
             {
