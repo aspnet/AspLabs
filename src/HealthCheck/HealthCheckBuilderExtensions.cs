@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System.Data.SqlClient;
 using System.Data;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace HealthChecks
 {
@@ -18,6 +19,51 @@ namespace HealthChecks
                 var response = await httpClient.GetAsync(url);
                 return response.StatusCode == HttpStatusCode.OK;
             });
+            return builder;
+        }
+
+        public static HealthCheckBuilder AddVirtualMemorySizeCheck(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        {
+            builder.AddCheck($"VirtualMemorySize ({maxSize})", () =>
+            {
+                if (Process.GetCurrentProcess().VirtualMemorySize64 >= maxSize)
+                {
+                    return true;
+                }
+
+                return false;
+            });
+            
+            return builder;
+        }
+
+        public static HealthCheckBuilder AddWorkingSet64Check(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        {
+            builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
+            {
+                if (Process.GetCurrentProcess().WorkingSet64 >= maxSize)
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
+            return builder;
+        }
+
+        public static HealthCheckBuilder AddPrivateMemorySize64Check(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        {
+            builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
+            {
+                if (Process.GetCurrentProcess().PrivateMemorySize64 >= maxSize)
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
             return builder;
         }
 
