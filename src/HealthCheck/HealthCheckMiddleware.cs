@@ -30,7 +30,7 @@ namespace HealthChecks
                 }
                 else
                 {
-                    context.Response.StatusCode = 500;
+                    context.Response.StatusCode = 502;
                     await context.Response.WriteAsync("HealthStatus: Unhealthy");
                 }
                 return;
