@@ -26,7 +26,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"VirtualMemorySize ({maxSize})", () =>
             {
-                if (Process.GetCurrentProcess().VirtualMemorySize64 >= maxSize)
+                if (Process.GetCurrentProcess().VirtualMemorySize64 <= maxSize)
                 {
                     return true;
                 }
@@ -41,7 +41,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
             {
-                if (Process.GetCurrentProcess().WorkingSet64 >= maxSize)
+                if (Process.GetCurrentProcess().WorkingSet64 <= maxSize)
                 {
                     return true;
                 }
@@ -56,7 +56,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"PrivateMemorySize64 ({maxSize})", () =>
             {
-                if (Process.GetCurrentProcess().PrivateMemorySize64 >= maxSize)
+                if (Process.GetCurrentProcess().PrivateMemorySize64 <= maxSize)
                 {
                     return true;
                 }
