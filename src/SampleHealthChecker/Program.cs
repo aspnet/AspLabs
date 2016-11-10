@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder;
 
 namespace SampleHealthChecker
 {
@@ -14,7 +13,7 @@ namespace SampleHealthChecker
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
-                .UseHealthChecks(5050)
+				.UseHealthChecks(5050)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

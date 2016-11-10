@@ -6,13 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SampleHealthChecker.Controllers
 {
-    [Route("api/[controller]")]
     public class HomeController : Controller
     {
-        [HttpGet]
-        public string Get()
+        public IActionResult Index()
         {
-            return "yes I'm heathly";
+            ViewData["Message"] = "Your application description page.";
+            return View();
         }
 
     }
