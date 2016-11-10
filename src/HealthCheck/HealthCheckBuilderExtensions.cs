@@ -22,7 +22,7 @@ namespace HealthChecks
             return builder;
         }
 
-        public static HealthCheckBuilder AddVirtualMemorySizeCheck(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        public static HealthCheckBuilder AddVirtualMemorySizeCheck(this HealthCheckBuilder builder, long maxSize)
         {
             builder.AddCheck($"VirtualMemorySize ({maxSize})", () =>
             {
@@ -37,7 +37,7 @@ namespace HealthChecks
             return builder;
         }
 
-        public static HealthCheckBuilder AddWorkingSet64Check(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        public static HealthCheckBuilder AddWorkingSet64Check(this HealthCheckBuilder builder, long maxSize)
         {
             builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
             {
@@ -52,9 +52,9 @@ namespace HealthChecks
             return builder;
         }
 
-        public static HealthCheckBuilder AddPrivateMemorySize64Check(this HealthCheckBuilder builder, long maxSize, Func<HttpResponseMessage, bool> checkFunc)
+        public static HealthCheckBuilder AddPrivateMemorySize64Check(this HealthCheckBuilder builder, long maxSize)
         {
-            builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
+            builder.AddCheck($"PrivateMemorySize64 ({maxSize})", () =>
             {
                 if (Process.GetCurrentProcess().PrivateMemorySize64 >= maxSize)
                 {
