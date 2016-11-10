@@ -29,7 +29,6 @@ namespace HealthChecks
                 {
                     healthy &= await check.Value();
                     logMessage.AppendLine($"HealthCheck: {check.Key} : {(healthy ? "Healthy" : "Unhealthy")}");
-                    return healthy;
                 }
                 catch
                 {
