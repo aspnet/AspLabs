@@ -29,9 +29,9 @@ namespace SampleHealthChecker
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks(checks => {
-                checks.AddPrivateMemorySize64Check(1);
+                checks.AddPrivateMemorySizeCheck(1);
                 checks.AddVirtualMemorySizeCheck(2);
-                checks.AddWorkingSet64Check(1);
+                checks.AddWorkingSetCheck(1);
             });
 
             services.AddMvc();
