@@ -71,6 +71,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"UrlCheck ({url})", async () =>{
                 var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
                 var response = await httpClient.GetAsync(url);
                 return checkFunc(response);
             });

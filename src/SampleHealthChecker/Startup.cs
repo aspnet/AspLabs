@@ -29,6 +29,7 @@ namespace SampleHealthChecker
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks(checks => {
+                checks.AddUrlCheck("https://github.com");
                 checks.AddPrivateMemorySizeCheck(1);
                 checks.AddVirtualMemorySizeCheck(2);
                 checks.AddWorkingSetCheck(1);
