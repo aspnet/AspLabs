@@ -11,9 +11,9 @@ namespace HealthChecks
         int _healthCheckPort;
         IHealthCheckService _checkupService;
 
-        public HealthCheckMiddleware(RequestDelegate next, HealthCheckOptions options, IHealthCheckService checkupService)
+        public HealthCheckMiddleware(RequestDelegate next, IHealthCheckService checkupService, int port)
         {
-            _healthCheckPort = options.HealthCheckPort;
+            _healthCheckPort = port;
             _checkupService = checkupService;
             _next = next;
         }

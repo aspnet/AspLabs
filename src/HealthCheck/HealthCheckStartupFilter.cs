@@ -16,7 +16,7 @@ namespace HealthChecks
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
             return app => {
-                app.UseMiddleware<HealthCheckMiddleware>();
+                app.UseMiddleware<HealthCheckMiddleware>(_port);
                 next(app);
             };
         }
