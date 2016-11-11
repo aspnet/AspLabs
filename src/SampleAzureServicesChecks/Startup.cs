@@ -30,16 +30,16 @@ namespace SampleAzureServicesChecks
             services.AddHealthChecks(builder =>
             {
                 builder.AddAzureBlobStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==");
-                builder.AddAzureBlobStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "table");
+                builder.AddAzureBlobStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "container");
 
                 builder.AddAzureTableStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==");
                 builder.AddAzureTableStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "table");
 
                 builder.AddAzureFileStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==");
-                builder.AddAzureFileStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "table");
+                builder.AddAzureFileStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "share");
 
                 builder.AddAzureQueueStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==");
-                builder.AddAzureQueueStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "table");
+                builder.AddAzureQueueStorageCheck("mvpsummit2016", "jbnAN6YtNuaspvsG96FWYSYM8azkMYCdPGznUlhd4EfGfMUysdYyqDT9neHFQ792xBykBQgvkEQJ4Lk2c8lTDw==", "queue");
 
             });
         }

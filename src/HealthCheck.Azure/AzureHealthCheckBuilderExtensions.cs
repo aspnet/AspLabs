@@ -14,7 +14,7 @@ namespace HealthChecks
         }
         public static HealthCheckBuilder AddAzureBlobStorageCheck(HealthCheckBuilder builder, CloudStorageAccount storageAccount, string containerName = null)
         {
-            builder.AddCheck($"AddAzureBlobStorageCheck {storageAccount.BlobStorageUri} {containerName}", async () =>
+            builder.AddCheck($"AzureBlobStorageCheck {storageAccount.BlobStorageUri} {containerName}", async () =>
             {
                 try
                 {
@@ -44,11 +44,11 @@ namespace HealthChecks
         {
             var credentials = new StorageCredentials(accountName, accountKey);
             var storageAccount = new CloudStorageAccount(credentials, true);
-            return AddAzureTableStorageCheck(builder, storageAccount);
+            return AddAzureTableStorageCheck(builder, storageAccount, tableName);
         }
         public static HealthCheckBuilder AddAzureTableStorageCheck(HealthCheckBuilder builder, CloudStorageAccount storageAccount, string tableName = null)
         {
-            builder.AddCheck($"AddAzureTableStorageCheck {storageAccount.BlobStorageUri} {tableName}", async () =>
+            builder.AddCheck($"AzureTableStorageCheck {storageAccount.TableStorageUri} {tableName}", async () =>
             {
                 try
                 {
@@ -82,7 +82,7 @@ namespace HealthChecks
         }
         public static HealthCheckBuilder AddAzureFileStorageCheck(HealthCheckBuilder builder, CloudStorageAccount storageAccount, string shareName = null)
         {
-            builder.AddCheck($"AddAzureFileStorageCheck {storageAccount.BlobStorageUri} {shareName}", async () =>
+            builder.AddCheck($"AzureFileStorageCheck {storageAccount.FileStorageUri} {shareName}", async () =>
             {
                 try
                 {
@@ -116,7 +116,7 @@ namespace HealthChecks
         }
         public static HealthCheckBuilder AddAzureQueueStorageCheck(HealthCheckBuilder builder, CloudStorageAccount storageAccount, string queueName = null)
         {
-            builder.AddCheck($"AddAzureQueueStorageCheck {storageAccount.BlobStorageUri} {queueName}", async () =>
+            builder.AddCheck($"AzureQueueStorageCheck {storageAccount.QueueStorageUri} {queueName}", async () =>
             {
                 try
                 {
