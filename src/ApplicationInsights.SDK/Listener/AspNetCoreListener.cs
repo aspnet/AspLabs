@@ -9,10 +9,13 @@ using Microsoft.Extensions.DiagnosticAdapter;
 using ApplicationInsights.Extensions;
 using ApplicationInsights.Helpers;
 using System.Net.Http;
+using Microsoft.AspNetCore.Routing;
+using System.Linq;
+using Microsoft.AspNetCore.Routing.Tree;
 
 namespace ApplicationInsights.Listener
 {
-    public class AspNetCoreHostingListener
+    public class AspNetCoreListener
     {
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
@@ -20,7 +23,7 @@ namespace ApplicationInsights.Listener
         private readonly AsyncLocal<long> _beginRequestTimestamp = new AsyncLocal<long>();
         private readonly string _sdkVersion;
 
-        public AspNetCoreHostingListener(TelemetryClient client)
+        public AspNetCoreListener(TelemetryClient client)
         {
             _client = client;
             _sdkVersion = SdkVersionUtils.VersionPrefix + SdkVersionUtils.GetAssemblyVersion();
@@ -71,6 +74,54 @@ namespace ApplicationInsights.Listener
         private void OnException(HttpContext context, Exception exception)
         {
             _client.TrackException(exception);
+        }
+
+        private string GetNameFromRouteContext(RouteData routeData)
+        {
+            string name = null;
+
+            if (routeData.Values.Count > 0)
+            {
+                var routeValues = routeData.Values;
+
+                object controller;
+                routeValues.TryGetValue("controller", out controller);
+                string controllerString = (controller == null) ? string.Empty : controller.ToString();
+
+                if (!string.IsNullOrEmpty(controllerString))
+                {
+                    name = controllerString;
+
+                    object action;
+                    routeValues.TryGetValue("action", out action);
+                    string actionString = (action == null) ? string.Empty : action.ToString();
+
+                    if (!string.IsNullOrEmpty(actionString))
+                    {
+                        name += "/" + actionString;
+                    }
+
+                    if (routeValues.Keys.Count > 2)
+                    {
+                        // Add parameters
+                        var sortedKeys = routeValues.Keys
+                            .Where(key =>
+                                !string.Equals(key, "controller", StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(key, "action", StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(key, TreeRouter.RouteGroupKey, StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+                            .ToArray();
+
+                        if (sortedKeys.Length > 0)
+                        {
+                            string arguments = string.Join(@"/", sortedKeys);
+                            name += " [" + arguments + "]";
+                        }
+                    }
+                }
+            }
+
+            return name;
         }
     }
 }

@@ -1,10 +1,15 @@
-﻿{
+{
   "version": "0.0.1",
 
   "dependencies": {
     "Microsoft.ApplicationInsights": "2.1.0",
     "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.Html.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.Http": "1.0.0",
+    "Microsoft.AspNetCore.Routing": "1.0.1",
+    "Microsoft.AspNetCore.Routing.Abstractions": "1.0.1",
     "Microsoft.Extensions.DiagnosticAdapter": "1.0.0",
+    "Microsoft.Extensions.Options": "1.0.0",
     "NETStandard.Library": "1.6.0",
     "System.Data.Common": "4.1.0",
     "System.Data.SqlClient": "4.1.0"

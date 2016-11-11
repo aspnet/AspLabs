@@ -30,7 +30,7 @@ namespace ApplicationInsights.Listener
         {
             var start = _beginDependencyTimestamp.Value;
             var end = Stopwatch.GetTimestamp();
-                  
+
             var telemetry = new DependencyTelemetry();
             telemetry.Name = "Microsoft.EntityFrameworkCore.ExecuteCommand";
             telemetry.Duration = TimeSpan.FromTicks((long)((end - start) * TimestampToTicks));

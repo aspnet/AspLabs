@@ -43,11 +43,6 @@ namespace ApplicationInsights.Logging
             }
             else
             {
-                //telemetry.Context.GetInternalContext().SdkVersion = this.sdkVersion;
-                //telemetry.Timestamp = DateTime.Now;
-                //telemetry.Message = formatter(state, exception);
-                //telemetry.Context.GetInternalContext().SdkVersion = this.sdkVersion;
-                //telemetry.Timestamp = DateTime.Now;
                 var id = telemetryClient.Context.Operation.Id;
                 telemetryClient.TrackTrace(formatter(state, exception), GetSeverityLevel(logLevel), dict);
             }

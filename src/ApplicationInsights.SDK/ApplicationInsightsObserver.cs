@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using ApplicationInsights.Helpers;
 using ApplicationInsights.Listener;
 using Microsoft.ApplicationInsights;
 
@@ -8,14 +7,14 @@ namespace ApplicationInsights
 {
     public class ApplicationInsightsObserver : IObserver<DiagnosticListener>
     {
-        private readonly AspNetCoreHostingListener _aspNetCoreHostingListener;
+        private readonly AspNetCoreListener _aspNetCoreListener;
         private readonly SystemNetHttpListener _systemNetHttpListener;    
         private readonly EntityFrameworkListener _entityFrameworkListener;
         private readonly SqlClientListener _sqlClientListener;
 
         public ApplicationInsightsObserver(TelemetryClient client)
         {
-            _aspNetCoreHostingListener = new AspNetCoreHostingListener(client);
+            _aspNetCoreListener = new AspNetCoreListener(client);
             _systemNetHttpListener = new SystemNetHttpListener(client);
             _entityFrameworkListener = new EntityFrameworkListener(client);
             _sqlClientListener = new SqlClientListener(client);
@@ -35,7 +34,7 @@ namespace ApplicationInsights
         {
             if (value.Name == "Microsoft.AspNetCore")
             {
-                value.SubscribeWithAdapter(_aspNetCoreHostingListener);
+                value.SubscribeWithAdapter(_aspNetCoreListener);
             }
             if (value.Name == "HttpHandlerDiagnosticListener")
             {
