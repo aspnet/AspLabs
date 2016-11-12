@@ -15,9 +15,25 @@ namespace HealthChecks
         public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url)
         {
             builder.AddCheck($"UrlCheck ({url})", async () => {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "url",
+                    Description = $"UrlCheck: {url}"
+                };
+
                 var httpClient = new HttpClient();
                 var response = await httpClient.GetAsync(url);
-                return response.StatusCode == HttpStatusCode.OK;
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    healthCheckResult.CheckStatus = CheckStatus.Ok;
+                    healthCheckResult.Success = true;
+                };
+
+                return healthCheckResult;
+
             });
             return builder;
         }
@@ -26,12 +42,21 @@ namespace HealthChecks
         {
             builder.AddCheck($"VirtualMemorySize ({maxSize})", () =>
             {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "memory",
+                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
+                };
+
                 if (Process.GetCurrentProcess().VirtualMemorySize64 <= maxSize)
                 {
-                    return true;
+                    healthCheckResult.Success = true;
+                    healthCheckResult.CheckStatus = CheckStatus.Ok;
                 }
 
-                return false;
+                return healthCheckResult;
             });
             
             return builder;
@@ -41,12 +66,21 @@ namespace HealthChecks
         {
             builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
             {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "memory",
+                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
+                };
+
                 if (Process.GetCurrentProcess().WorkingSet64 <= maxSize)
                 {
-                    return true;
+                    healthCheckResult.Success = true;
+                    healthCheckResult.CheckStatus = CheckStatus.Ok;
                 }
 
-                return false;
+                return healthCheckResult;
             });
 
             return builder;
@@ -56,37 +90,62 @@ namespace HealthChecks
         {
             builder.AddCheck($"PrivateMemorySize64 ({maxSize})", () =>
             {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "memory",
+                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
+                };
+
                 if (Process.GetCurrentProcess().PrivateMemorySize64 <= maxSize)
                 {
-                    return true;
+                    healthCheckResult.Success = true;
+                    healthCheckResult.CheckStatus = CheckStatus.Ok;
                 }
 
-                return false;
+                return healthCheckResult;
             });
 
             return builder;
         }
 
-        public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url, Func<HttpResponseMessage, bool> checkFunc)
-        {
-            builder.AddCheck($"UrlCheck ({url})", async () =>{
-                var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                var response = await httpClient.GetAsync(url);
-                return checkFunc(response);
-            });
-            return builder;
-        }
+        ////public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url, Func<HttpResponseMessage, bool> checkFunc)
+        ////{
+        ////    builder.AddCheck($"UrlCheck ({url})", async () =>{
+        ////        var healthCheckResult = new HealthCheckResult
+        ////        {
+        ////            Success = false,
+        ////            CheckStatus = CheckStatus.Failed,
+        ////            CheckType = "memory",
+        ////            Description = $"UrlCheck: {url}"
+        ////        };
+
+        ////        var httpClient = new HttpClient();
+        ////        httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
+        ////        var response = await httpClient.GetAsync(url);
+        ////        return checkFunc(response);
+        ////    });
+        ////    return builder;
+        ////}
 
         //TODO: Move this into a seperate project. Avoid DB dependencies in the main lib.
         //TODO: It is probably better if this is more generic, not SQL specific.
         public static HealthCheckBuilder AddSqlCheck(this HealthCheckBuilder builder, string connectionString)
         {
             builder.AddCheck($"SQL Check:", async ()=>{
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "database",
+                    Description = $"AddSqlCheck: {connectionString}"
+                };
+
                 try
                 {
                     //TODO: There is probably a much better way to do this.
-                    using(var connection = new SqlConnection(connectionString))
+                    using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
                         using(var command = connection.CreateCommand())
@@ -94,13 +153,18 @@ namespace HealthChecks
                             command.CommandType = CommandType.Text;
                             command.CommandText = "SELECT 1";
                             var result = (int) await command.ExecuteScalarAsync();
-                            return result == 1;
+                            if(result == 1)
+                            {
+                                healthCheckResult.Success = true;
+                                healthCheckResult.CheckStatus = CheckStatus.Ok;
+                            }
+                            return healthCheckResult;
                         }
                     }
                 }
                 catch
                 {
-                    return false;
+                    return healthCheckResult;
                 }
             });
             return builder;

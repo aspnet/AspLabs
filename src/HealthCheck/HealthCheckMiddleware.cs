@@ -32,6 +32,7 @@ namespace HealthChecks
                 else
                 {
                     context.Response.StatusCode = 502;
+                    context.Response.Headers.Add("content-type", "application/json");
                     await context.Response.WriteAsync(JsonConvert.SerializeObject(_checkupService.CheckResults));
                 }
                 return;

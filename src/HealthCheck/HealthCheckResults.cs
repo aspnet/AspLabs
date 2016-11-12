@@ -4,7 +4,7 @@ namespace HealthChecks
 {
     public class HealthCheckResults
     {
-        public Dictionary<string, HealthCheckResult> CheckResults { get; set; }
+        public List<HealthCheckResult> CheckResults { get; set; }
     }
 
     public class HealthCheckResult

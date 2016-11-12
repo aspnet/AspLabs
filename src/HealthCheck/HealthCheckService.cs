@@ -8,7 +8,7 @@ namespace HealthChecks
 {
     public class HealthCheckService : IHealthCheckService
     {
-        public Dictionary<string, Func<ValueTask<bool>>> _checks;
+        public Dictionary<string, Func<ValueTask<HealthCheckResult>>> _checks;
 
         private ILogger<HealthCheckService> _logger;
 
@@ -24,14 +24,16 @@ namespace HealthChecks
         {
             StringBuilder logMessage = new StringBuilder();
             CheckResults = new HealthCheckResults();
-            CheckResults.CheckResults = new Dictionary<string, HealthCheckResult>();
+            CheckResults.CheckResults = new List<HealthCheckResult>();
 
             var healthy = true;
             foreach(var check in _checks)
             {
                 try
                 {
-                    healthy &= await check.Value();
+                    var healthCheckResult = await check.Value();
+                    CheckResults.CheckResults.Add(healthCheckResult);
+                    healthy &= healthCheckResult.Success;
                     logMessage.AppendLine($"HealthCheck: {check.Key} : {(healthy ? "Healthy" : "Unhealthy")}");
                 }
                 catch
