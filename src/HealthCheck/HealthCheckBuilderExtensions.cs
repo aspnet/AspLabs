@@ -1,11 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using System.Data.SqlClient;
 using System.Data;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace HealthChecks
@@ -72,7 +69,7 @@ namespace HealthChecks
                     Success = false,
                     CheckStatus = CheckStatus.Failed,
                     CheckType = "memory",
-                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
+                    Description = $"AddWorkingSetCheck, maxSize: {maxSize}"
                 };
 
                 if (Process.GetCurrentProcess().WorkingSet64 <= maxSize)
@@ -96,7 +93,7 @@ namespace HealthChecks
                     Success = false,
                     CheckStatus = CheckStatus.Failed,
                     CheckType = "memory",
-                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
+                    Description = $"AddPrivateMemorySizeCheck, maxSize: {maxSize}"
                 };
 
                 if (Process.GetCurrentProcess().PrivateMemorySize64 <= maxSize)
@@ -119,7 +116,7 @@ namespace HealthChecks
                 {
                     Success = false,
                     CheckStatus = CheckStatus.Failed,
-                    CheckType = "memory",
+                    CheckType = "url",
                     Description = $"UrlCheck: {url}"
                 };
 
