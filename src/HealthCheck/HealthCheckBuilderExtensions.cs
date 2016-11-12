@@ -24,6 +24,7 @@ namespace HealthChecks
                 };
 
                 var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
                 var response = await httpClient.GetAsync(url);
 
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -110,24 +111,25 @@ namespace HealthChecks
             return builder;
         }
 
-        ////public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url, Func<HttpResponseMessage, bool> checkFunc)
-        ////{
-        ////    builder.AddCheck($"UrlCheck ({url})", async () =>{
-        ////        var healthCheckResult = new HealthCheckResult
-        ////        {
-        ////            Success = false,
-        ////            CheckStatus = CheckStatus.Failed,
-        ////            CheckType = "memory",
-        ////            Description = $"UrlCheck: {url}"
-        ////        };
+        public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url, Func<HttpResponseMessage, HealthCheckResult> checkFunc)
+        {
+            builder.AddCheck($"UrlCheck ({url})", async () =>
+            {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "memory",
+                    Description = $"UrlCheck: {url}"
+                };
 
-        ////        var httpClient = new HttpClient();
-        ////        httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
-        ////        var response = await httpClient.GetAsync(url);
-        ////        return checkFunc(response);
-        ////    });
-        ////    return builder;
-        ////}
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
+                var response = await httpClient.GetAsync(url);
+                return checkFunc(response);
+            });
+            return builder;
+        }
 
         //TODO: Move this into a seperate project. Avoid DB dependencies in the main lib.
         //TODO: It is probably better if this is more generic, not SQL specific.
