@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Newtonsoft.Json;
 
 namespace HealthChecks
 {
@@ -31,7 +32,7 @@ namespace HealthChecks
                 else
                 {
                     context.Response.StatusCode = 502;
-                    await context.Response.WriteAsync("HealthStatus: Unhealthy");
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(_checkupService.CheckResults));
                 }
                 return;
             }

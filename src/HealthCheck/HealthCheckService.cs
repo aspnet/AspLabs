@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -10,7 +9,10 @@ namespace HealthChecks
     public class HealthCheckService : IHealthCheckService
     {
         public Dictionary<string, Func<ValueTask<bool>>> _checks;
+
         private ILogger<HealthCheckService> _logger;
+
+        public HealthCheckResults CheckResults { get; set; }
 
         public HealthCheckService(HealthCheckBuilder builder, ILogger<HealthCheckService> logger)
         {
@@ -21,7 +23,9 @@ namespace HealthChecks
         public async Task<bool> CheckHealthAsync()
         {
             StringBuilder logMessage = new StringBuilder();
-            
+            CheckResults = new HealthCheckResults();
+            CheckResults.CheckResults = new Dictionary<string, HealthCheckResult>();
+
             var healthy = true;
             foreach(var check in _checks)
             {
