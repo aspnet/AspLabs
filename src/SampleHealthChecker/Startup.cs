@@ -33,6 +33,7 @@ namespace SampleHealthChecker
                 checks.AddPrivateMemorySizeCheck(1);
                 checks.AddVirtualMemorySizeCheck(2);
                 checks.AddWorkingSetCheck(1);
+                checks.AddUrlChecks(new List<string> { "https://github.com", "https://google.com", "https://githudwefefe.cm" }, "servers");
             });
 
             services.AddMvc();

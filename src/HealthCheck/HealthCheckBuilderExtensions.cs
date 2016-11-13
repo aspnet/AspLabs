@@ -4,11 +4,68 @@ using System.Net.Http;
 using System.Data.SqlClient;
 using System.Data;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Text;
 
 namespace HealthChecks
 {
     public static class HealthCheckBuilderExtensions
     {
+
+        public static HealthCheckBuilder AddUrlChecks(this HealthCheckBuilder builder, List<string> urlItems, string group)
+        {
+            builder.AddCheck($"UrlChecks ({group})", async () => {
+                var healthCheckResult = new HealthCheckResult
+                {
+                    Success = false,
+                    CheckStatus = CheckStatus.Failed,
+                    CheckType = "url",
+                };
+
+                var successFulChecks = 0;
+                var description = new StringBuilder();
+                var httpClient = new HttpClient();
+
+                foreach (var url in urlItems)
+                {
+                    try
+                    {
+                        httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
+                        var response = await httpClient.GetAsync(url);
+
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            successFulChecks++;
+                            description.Append($"UrlCheck SUCCESS ({url}) ");
+                        }
+                        else
+                        {
+                            description.Append($"UrlCheck FAILED ({url}) ");
+                        }
+                    }
+                    catch
+                    {
+                        description.Append($"UrlCheck FAILED ({url}) ");
+                    }
+                }
+
+                if (successFulChecks == urlItems.Count)
+                {
+                    healthCheckResult.CheckStatus = CheckStatus.Ok;
+                    healthCheckResult.Success = true;
+                }
+                else if(successFulChecks > 0)
+                {
+                    healthCheckResult.CheckStatus = CheckStatus.Warning;
+                }
+                healthCheckResult.Description = description.ToString();
+
+                return healthCheckResult;
+
+            });
+            return builder;
+        }
+
         public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url)
         {
             builder.AddCheck($"UrlCheck ({url})", async () => {
