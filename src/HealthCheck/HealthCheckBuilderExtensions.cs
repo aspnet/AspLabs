@@ -17,10 +17,6 @@ namespace HealthChecks
         {
             var urls = urlItems.ToList();
             builder.AddCheck($"UrlChecks ({group})", async () => {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                };
 
                 var successfulChecks = 0;
                 var description = new StringBuilder();
@@ -51,15 +47,14 @@ namespace HealthChecks
 
                 if (successfulChecks == urls.Count)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                    return HealthCheckResult.Healthy(description.ToString());
                 }
                 else if (successfulChecks > 0)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Warning;
+                    return HealthCheckResult.Warning(description.ToString());
                 }
-                healthCheckResult.Description = description.ToString();
 
-                return healthCheckResult;
+                return HealthCheckResult.Unhealthy(description.ToString());
 
             });
             return builder;
@@ -68,22 +63,16 @@ namespace HealthChecks
         public static HealthCheckBuilder AddUrlCheck(this HealthCheckBuilder builder, string url)
         {
             builder.AddCheck($"UrlCheck ({url})", async () => {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"UrlCheck: {url}"
-                };
-
                 var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
                 var response = await httpClient.GetAsync(url);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                    return HealthCheckResult.Healthy($"UrlCheck: {url}");
                 };
 
-                return healthCheckResult;
+                return HealthCheckResult.Unhealthy($"UrlCheck: {url}");
 
             });
             return builder;
@@ -93,18 +82,12 @@ namespace HealthChecks
         {
             builder.AddCheck($"VirtualMemorySize ({maxSize})", () =>
             {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
-                };
-
                 if (Process.GetCurrentProcess().VirtualMemorySize64 <= maxSize)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                    return HealthCheckResult.Healthy($"AddVirtualMemorySizeCheck, maxSize: {maxSize}");
                 }
 
-                return healthCheckResult;
+                return HealthCheckResult.Unhealthy($"AddVirtualMemorySizeCheck, maxSize: {maxSize}");
             });
 
             return builder;
@@ -114,18 +97,12 @@ namespace HealthChecks
         {
             builder.AddCheck($"WorkingSet64 ({maxSize})", () =>
             {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"AddWorkingSetCheck, maxSize: {maxSize}"
-                };
-
                 if (Process.GetCurrentProcess().WorkingSet64 <= maxSize)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                    return HealthCheckResult.Healthy($"AddWorkingSetCheck, maxSize: {maxSize}");
                 }
 
-                return healthCheckResult;
+                return HealthCheckResult.Unhealthy($"AddWorkingSetCheck, maxSize: {maxSize}");
             });
 
             return builder;
@@ -135,18 +112,12 @@ namespace HealthChecks
         {
             builder.AddCheck($"PrivateMemorySize64 ({maxSize})", () =>
             {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"AddPrivateMemorySizeCheck, maxSize: {maxSize}"
-                };
-
                 if (Process.GetCurrentProcess().PrivateMemorySize64 <= maxSize)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                    return HealthCheckResult.Healthy($"AddPrivateMemorySizeCheck, maxSize: {maxSize}");
                 }
 
-                return healthCheckResult;
+                return HealthCheckResult.Unhealthy($"AddPrivateMemorySizeCheck, maxSize: {maxSize}");
             });
 
             return builder;
@@ -156,12 +127,6 @@ namespace HealthChecks
         {
             builder.AddCheck($"UrlCheck ({url})", async () =>
             {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"UrlCheck: {url}"
-                };
-
                 var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
                 var response = await httpClient.GetAsync(url);
@@ -175,12 +140,6 @@ namespace HealthChecks
         public static HealthCheckBuilder AddSqlCheck(this HealthCheckBuilder builder, string connectionString)
         {
             builder.AddCheck($"SQL Check:", async () => {
-                var healthCheckResult = new HealthCheckResult
-                {
-                    CheckStatus = CheckStatus.Unhealthy,
-                    Description = $"AddSqlCheck: {connectionString}"
-                };
-
                 try
                 {
                     //TODO: There is probably a much better way to do this.
@@ -194,17 +153,19 @@ namespace HealthChecks
                             var result = (int)await command.ExecuteScalarAsync();
                             if (result == 1)
                             {
-                                healthCheckResult.CheckStatus = CheckStatus.Healthy;
+                                return HealthCheckResult.Healthy($"AddSqlCheck: {connectionString}");
                             }
-                            return healthCheckResult;
+
+                            return HealthCheckResult.Unhealthy($"AddSqlCheck: {connectionString}");
                         }
                     }
                 }
                 catch
                 {
-                    return healthCheckResult;
+                    return HealthCheckResult.Unhealthy($"AddSqlCheck: {connectionString}");
                 }
             });
+
             return builder;
         }
     }
