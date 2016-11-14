@@ -6,23 +6,23 @@ using System.Data;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace HealthChecks
 {
     public static class HealthCheckBuilderExtensions
     {
 
-        public static HealthCheckBuilder AddUrlChecks(this HealthCheckBuilder builder, List<string> urlItems, string group)
+        public static HealthCheckBuilder AddUrlChecks(this HealthCheckBuilder builder, IEnumerable<string> urlItems, string group)
         {
+            var urls = urlItems.ToList();
             builder.AddCheck($"UrlChecks ({group})", async () => {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "url",
+                    CheckStatus = CheckStatus.Unhealthy,
                 };
 
-                var successFulChecks = 0;
+                var successfulChecks = 0;
                 var description = new StringBuilder();
                 var httpClient = new HttpClient();
 
@@ -35,7 +35,7 @@ namespace HealthChecks
 
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
-                            successFulChecks++;
+                            successfulChecks++;
                             description.Append($"UrlCheck SUCCESS ({url}) ");
                         }
                         else
@@ -49,12 +49,11 @@ namespace HealthChecks
                     }
                 }
 
-                if (successFulChecks == urlItems.Count)
+                if (successfulChecks == urls.Count)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Ok;
-                    healthCheckResult.Success = true;
+                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
                 }
-                else if(successFulChecks > 0)
+                else if (successfulChecks > 0)
                 {
                     healthCheckResult.CheckStatus = CheckStatus.Warning;
                 }
@@ -71,9 +70,7 @@ namespace HealthChecks
             builder.AddCheck($"UrlCheck ({url})", async () => {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "url",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"UrlCheck: {url}"
                 };
 
@@ -83,8 +80,7 @@ namespace HealthChecks
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    healthCheckResult.CheckStatus = CheckStatus.Ok;
-                    healthCheckResult.Success = true;
+                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
                 };
 
                 return healthCheckResult;
@@ -99,21 +95,18 @@ namespace HealthChecks
             {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "memory",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"AddVirtualMemorySizeCheck, maxSize: {maxSize}"
                 };
 
                 if (Process.GetCurrentProcess().VirtualMemorySize64 <= maxSize)
                 {
-                    healthCheckResult.Success = true;
-                    healthCheckResult.CheckStatus = CheckStatus.Ok;
+                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
                 }
 
                 return healthCheckResult;
             });
-            
+
             return builder;
         }
 
@@ -123,16 +116,13 @@ namespace HealthChecks
             {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "memory",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"AddWorkingSetCheck, maxSize: {maxSize}"
                 };
 
                 if (Process.GetCurrentProcess().WorkingSet64 <= maxSize)
                 {
-                    healthCheckResult.Success = true;
-                    healthCheckResult.CheckStatus = CheckStatus.Ok;
+                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
                 }
 
                 return healthCheckResult;
@@ -147,16 +137,13 @@ namespace HealthChecks
             {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "memory",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"AddPrivateMemorySizeCheck, maxSize: {maxSize}"
                 };
 
                 if (Process.GetCurrentProcess().PrivateMemorySize64 <= maxSize)
                 {
-                    healthCheckResult.Success = true;
-                    healthCheckResult.CheckStatus = CheckStatus.Ok;
+                    healthCheckResult.CheckStatus = CheckStatus.Healthy;
                 }
 
                 return healthCheckResult;
@@ -171,9 +158,7 @@ namespace HealthChecks
             {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "url",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"UrlCheck: {url}"
                 };
 
@@ -189,12 +174,10 @@ namespace HealthChecks
         //TODO: It is probably better if this is more generic, not SQL specific.
         public static HealthCheckBuilder AddSqlCheck(this HealthCheckBuilder builder, string connectionString)
         {
-            builder.AddCheck($"SQL Check:", async ()=>{
+            builder.AddCheck($"SQL Check:", async () => {
                 var healthCheckResult = new HealthCheckResult
                 {
-                    Success = false,
-                    CheckStatus = CheckStatus.Failed,
-                    CheckType = "database",
+                    CheckStatus = CheckStatus.Unhealthy,
                     Description = $"AddSqlCheck: {connectionString}"
                 };
 
@@ -204,15 +187,14 @@ namespace HealthChecks
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
-                        using(var command = connection.CreateCommand())
+                        using (var command = connection.CreateCommand())
                         {
                             command.CommandType = CommandType.Text;
                             command.CommandText = "SELECT 1";
-                            var result = (int) await command.ExecuteScalarAsync();
-                            if(result == 1)
+                            var result = (int)await command.ExecuteScalarAsync();
+                            if (result == 1)
                             {
-                                healthCheckResult.Success = true;
-                                healthCheckResult.CheckStatus = CheckStatus.Ok;
+                                healthCheckResult.CheckStatus = CheckStatus.Healthy;
                             }
                             return healthCheckResult;
                         }

@@ -24,16 +24,15 @@ namespace HealthChecks
         {
             StringBuilder logMessage = new StringBuilder();
             CheckResults = new HealthCheckResults();
-            CheckResults.CheckResults = new List<HealthCheckResult>();
 
             var healthy = true;
-            foreach(var check in _checks)
+            foreach (var check in _checks)
             {
                 try
                 {
                     var healthCheckResult = await check.Value();
                     CheckResults.CheckResults.Add(healthCheckResult);
-                    healthy &= healthCheckResult.Success;
+                    healthy &= healthCheckResult.CheckStatus == CheckStatus.Healthy || healthCheckResult.CheckStatus == CheckStatus.Warning;
                     logMessage.AppendLine($"HealthCheck: {check.Key} : {(healthy ? "Healthy" : "Unhealthy")}");
                 }
                 catch
@@ -42,7 +41,7 @@ namespace HealthChecks
                 }
             }
 
-            _logger.Log((healthy ? LogLevel.Information : LogLevel.Error), 0, logMessage, null, MessageFormatter);            
+            _logger.Log((healthy ? LogLevel.Information : LogLevel.Error), 0, logMessage, null, MessageFormatter);
             return healthy;
         }
 
@@ -50,5 +49,5 @@ namespace HealthChecks
         {
             return state.ToString();
         }
-    } 
+    }
 }

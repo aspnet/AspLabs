@@ -22,10 +22,10 @@ namespace HealthChecks
         public async Task Invoke(HttpContext context)
         {
             var connInfo = context.Features.Get<IHttpConnectionFeature>();
-            if(connInfo.LocalPort == _healthCheckPort)
+            if (connInfo.LocalPort == _healthCheckPort)
             {
                 var healthy = await _checkupService.CheckHealthAsync();
-                if(healthy)
+                if (healthy)
                 {
                     await context.Response.WriteAsync("HealthCheck: OK");
                 }
