@@ -4,11 +4,16 @@ namespace HealthChecks
 {
     public class HealthCheckResults
     {
+        private IList<HealthCheckResult> _checkResults { get; set; }
+
         public HealthCheckResults()
         {
-            CheckResults = new List<HealthCheckResult>();
+            _checkResults = new List<HealthCheckResult>();
         }
 
-        public IList<HealthCheckResult> CheckResults { get; set; }
+        public IList<HealthCheckResult> CheckResults
+        {
+            get { return _checkResults; }
+        }
     }
 }
