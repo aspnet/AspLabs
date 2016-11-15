@@ -2,53 +2,48 @@
 {
     public class HealthCheckResult
     {
-        private CheckStatus _checkStatus;
+        public CheckStatus CheckStatus { get; private set; }
+        public string Description { get; private set; }
 
-        private string _description;
-
-        public CheckStatus CheckStatus
+        private HealthCheckResult(CheckStatus checkStatus, string description)
         {
-            get { return _checkStatus; }
-        }
-
-        public string Description
-        {
-            get { return _description; }
+            CheckStatus = checkStatus;
+            Description = description;
         }
 
         public static HealthCheckResult Unhealthy(string description)
         {
-            return new HealthCheckResult()
+            return new HealthCheckResult(CheckStatus.Unhealthy, description)
             {
-                _description = description,
-                _checkStatus = CheckStatus.Unhealthy
+                Description = description,
+                CheckStatus = CheckStatus.Unhealthy
             };
         }
 
         public static HealthCheckResult Healthy(string description)
         {
-            return new HealthCheckResult()
+            return new HealthCheckResult(CheckStatus.Healthy, description)
             {
-                _description = description,
-                _checkStatus = CheckStatus.Healthy
+                Description = description,
+                CheckStatus = CheckStatus.Healthy
             };
         }
 
         public static HealthCheckResult Warning(string description)
         {
-            return new HealthCheckResult()
+            return new HealthCheckResult(CheckStatus.Warning, description)
             {
-                _description = description,
-                _checkStatus = CheckStatus.Warning
+                Description = description,
+                CheckStatus = CheckStatus.Warning
             };
         }
 
         public static HealthCheckResult Unknown(string description)
         {
-            return new HealthCheckResult()
+            return new HealthCheckResult(CheckStatus.Unknown, description)
             {
-                _description = description,
-                _checkStatus = CheckStatus.Unknown
+                Description = description,
+                CheckStatus = CheckStatus.Unknown
             };
         }
     }
