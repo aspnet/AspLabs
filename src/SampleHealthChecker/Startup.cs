@@ -34,6 +34,22 @@ namespace SampleHealthChecker
                 checks.AddVirtualMemorySizeCheck(2);
                 checks.AddWorkingSetCheck(1);
                 checks.AddUrlChecks(new List<string> { "https://github.com", "https://google.com", "https://twitddter.com" }, "servers");
+
+                /*
+                // add valid storage account credentials first
+                checks.AddAzureBlobStorageCheck("accountName", "accountKey");
+                checks.AddAzureBlobStorageCheck("accountName", "accountKey", "containerName");
+
+                checks.AddAzureTableStorageCheck("accountName", "accountKey");
+                checks.AddAzureTableStorageCheck("accountName", "accountKey", "tableName");
+
+                checks.AddAzureFileStorageCheck("accountName", "accountKey");
+                checks.AddAzureFileStorageCheck("accountName", "accountKey", "shareName");
+
+                checks.AddAzureQueueStorageCheck("accountName", "accountKey");
+                checks.AddAzureQueueStorageCheck("accountName", "accountKey", "queueName");
+                */
+
             });
 
             services.AddMvc();
