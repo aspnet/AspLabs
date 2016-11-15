@@ -13,7 +13,7 @@ namespace HealthChecks
     public static class HealthCheckBuilderExtensions
     {
 
-        public static HealthCheckBuilder AddUrlChecks(this HealthCheckBuilder builder, IEnumerable<string> urlItems, string group)
+        public static HealthCheckBuilder AddUrlChecks(this HealthCheckBuilder builder, IEnumerable<string> urlItems, string group, bool strict = false)
         {
             var urls = urlItems.ToList();
             builder.AddCheck($"UrlChecks ({group})", async () => {
@@ -51,6 +51,11 @@ namespace HealthChecks
                 }
                 else if (successfulChecks > 0)
                 {
+                    if(strict)
+                    {
+                        return HealthCheckResult.Unhealthy(description.ToString());
+                    }
+
                     return HealthCheckResult.Warning(description.ToString());
                 }
 
