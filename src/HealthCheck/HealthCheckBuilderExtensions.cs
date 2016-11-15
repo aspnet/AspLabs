@@ -51,7 +51,7 @@ namespace HealthChecks
                 }
                 else if (successfulChecks > 0)
                 {
-                    if(strict)
+                    if (strict)
                     {
                         return HealthCheckResult.Unhealthy(description.ToString());
                     }
