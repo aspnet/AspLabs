@@ -1,5 +1,4 @@
-﻿@using ApplicationInsights.AspNetCore;
-@inject ApplicationInsightsJavascriptService appInsights;
+﻿@inject ApplicationInsights.AspNetCore.ApplicationInsightsJavascriptService AppInsights;
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,7 +63,7 @@
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
-    @appInsights.Script;
+    @AppInsights.GetScript();
     @RenderSection("scripts", required: false)
 </body>
 </html>

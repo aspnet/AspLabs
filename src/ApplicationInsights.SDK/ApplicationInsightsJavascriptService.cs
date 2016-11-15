@@ -23,12 +23,9 @@ namespace ApplicationInsights.AspNetCore
             _instrumentationKey = telemetryConfigurationOptions.Value.InstrumentationKey;
         }
 
-        public IHtmlContent Script
+        public IHtmlContent GetScript()
         {
-            get
-            {
-                return new HtmlString(string.Format(_snippet, _instrumentationKey));
-            }
+            return new HtmlString(string.Format(_snippet, _instrumentationKey));
         }
     }
 }
