@@ -16,6 +16,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"AzureBlobStorageCheck {storageAccount.BlobStorageUri} {containerName}", async () =>
             {
+                bool result;
                 try
                 {
                     var blobClient = storageAccount.CreateCloudBlobClient();
@@ -26,15 +27,19 @@ namespace HealthChecks
                     {
                         var container = blobClient.GetContainerReference(containerName);
 
-                        return await container.ExistsAsync();
+                        result = await container.ExistsAsync();
                     }
 
-                    return true;
+                    result = true;
                 }
                 catch (Exception)
                 {
-                    return false;
+                    result = false;
                 }
+
+                return result
+                    ? HealthCheckResult.Healthy($"AzureBlobStorage {storageAccount.BlobStorageUri} is available")
+                    : HealthCheckResult.Unhealthy($"AzureBlobStorage {storageAccount.BlobStorageUri} is unavailable");
             });
 
             return builder;
@@ -50,6 +55,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"AzureTableStorageCheck {storageAccount.TableStorageUri} {tableName}", async () =>
             {
+                bool result;
                 try
                 {
                     var tableClient = storageAccount.CreateCloudTableClient();
@@ -60,15 +66,19 @@ namespace HealthChecks
                     {
                         var table = tableClient.GetTableReference(tableName);
 
-                        return await table.ExistsAsync();
+                        result = await table.ExistsAsync();
                     }
-                    return true;
+                    result = true;
                 }
                 catch (Exception)
                 {
-                    return false;
+                    result = false;
                 }
-                
+
+                return result
+                    ? HealthCheckResult.Healthy($"AzureTableStorage {storageAccount.BlobStorageUri} is available")
+                    : HealthCheckResult.Unhealthy($"AzureTableStorage {storageAccount.BlobStorageUri} is unavailable");
+
             });
 
             return builder;
@@ -84,6 +94,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"AzureFileStorageCheck {storageAccount.FileStorageUri} {shareName}", async () =>
             {
+                bool result;
                 try
                 {
                     var blobClient = storageAccount.CreateCloudBlobClient();
@@ -94,15 +105,19 @@ namespace HealthChecks
                     {
                         var share = blobClient.GetContainerReference(shareName);
 
-                        return await share.ExistsAsync();
+                        result = await share.ExistsAsync();
                     }
 
-                    return true;
+                    result = true;
                 }
                 catch (Exception)
                 {
-                    return false;
+                    result = false;
                 }
+
+                return result
+                    ? HealthCheckResult.Healthy($"AzureFileStorage {storageAccount.BlobStorageUri} is available")
+                    : HealthCheckResult.Unhealthy($"AzureFileStorage {storageAccount.BlobStorageUri} is unavailable");
             });
 
             return builder;
@@ -118,6 +133,7 @@ namespace HealthChecks
         {
             builder.AddCheck($"AzureQueueStorageCheck {storageAccount.QueueStorageUri} {queueName}", async () =>
             {
+                bool result;
                 try
                 {
                     var tableClient = storageAccount.CreateCloudTableClient();
@@ -128,14 +144,18 @@ namespace HealthChecks
                     {
                         var queue = tableClient.GetTableReference(queueName);
 
-                        return await queue.ExistsAsync();
+                        result = await queue.ExistsAsync();
                     }
-                    return true;
+                    result = true;
                 }
                 catch (Exception)
                 {
-                    return false;
+                    result = false;
                 }
+
+                return result
+                    ? HealthCheckResult.Healthy($"AzureFileStorage {storageAccount.BlobStorageUri} is available")
+                    : HealthCheckResult.Unhealthy($"AzureFileStorage {storageAccount.BlobStorageUri} is unavailable");
 
             });
 
