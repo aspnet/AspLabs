@@ -2,8 +2,8 @@
 {
     public class HealthCheckResult
     {
-        public CheckStatus CheckStatus { get; private set; }
-        public string Description { get; private set; }
+        public CheckStatus CheckStatus { get; }
+        public string Description { get; }
 
         private HealthCheckResult(CheckStatus checkStatus, string description)
         {
@@ -13,38 +13,22 @@
 
         public static HealthCheckResult Unhealthy(string description)
         {
-            return new HealthCheckResult(CheckStatus.Unhealthy, description)
-            {
-                Description = description,
-                CheckStatus = CheckStatus.Unhealthy
-            };
+            return new HealthCheckResult(CheckStatus.Unhealthy, description);
         }
 
         public static HealthCheckResult Healthy(string description)
         {
-            return new HealthCheckResult(CheckStatus.Healthy, description)
-            {
-                Description = description,
-                CheckStatus = CheckStatus.Healthy
-            };
+            return new HealthCheckResult(CheckStatus.Healthy, description);
         }
 
         public static HealthCheckResult Warning(string description)
         {
-            return new HealthCheckResult(CheckStatus.Warning, description)
-            {
-                Description = description,
-                CheckStatus = CheckStatus.Warning
-            };
+            return new HealthCheckResult(CheckStatus.Warning, description);
         }
 
         public static HealthCheckResult Unknown(string description)
         {
-            return new HealthCheckResult(CheckStatus.Unknown, description)
-            {
-                Description = description,
-                CheckStatus = CheckStatus.Unknown
-            };
+            return new HealthCheckResult(CheckStatus.Unknown, description);
         }
     }
 }
