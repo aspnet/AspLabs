@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Newtonsoft.Json;
 
 namespace HealthChecks
 {
@@ -21,17 +22,18 @@ namespace HealthChecks
         public async Task Invoke(HttpContext context)
         {
             var connInfo = context.Features.Get<IHttpConnectionFeature>();
-            if(connInfo.LocalPort == _healthCheckPort)
+            if (connInfo.LocalPort == _healthCheckPort)
             {
                 var healthy = await _checkupService.CheckHealthAsync();
-                if(healthy)
+                if (healthy)
                 {
                     await context.Response.WriteAsync("HealthCheck: OK");
                 }
                 else
                 {
                     context.Response.StatusCode = 502;
-                    await context.Response.WriteAsync("HealthStatus: Unhealthy");
+                    context.Response.Headers.Add("content-type", "application/json");
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(_checkupService.CheckResults));
                 }
                 return;
             }

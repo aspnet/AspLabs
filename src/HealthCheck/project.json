@@ -9,7 +9,8 @@
         "System.Threading.Thread": "4.0.0",
         "System.Threading.Tasks.Extensions": "4.0.0",
         "System.Data.SqlClient": "4.1.0",
-        "System.Diagnostics.Process": "4.1.0"
+        "System.Diagnostics.Process": "4.1.0",
+        "Newtonsoft.Json": "9.0.1"
     },
   "frameworks": {
     "netstandard1.6": {

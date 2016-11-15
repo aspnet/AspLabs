@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HealthChecks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace SampleHealthChecker.Controllers
 {
@@ -29,6 +30,7 @@ namespace SampleHealthChecker.Controllers
                 result = "unhealthy!";
             }
 
+            ViewData["Results"] = JsonConvert.SerializeObject(_healthCheck.CheckResults); 
             ViewData["AppStatus"] = result;
 
             return View();
