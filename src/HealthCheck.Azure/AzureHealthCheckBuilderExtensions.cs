@@ -97,13 +97,13 @@ namespace HealthChecks
                 bool result;
                 try
                 {
-                    var blobClient = storageAccount.CreateCloudBlobClient();
+                    var fileClient = storageAccount.CreateCloudFileClient();
 
-                    var properties = await blobClient.GetServicePropertiesAsync();
+                    var properties = await fileClient.GetServicePropertiesAsync();
 
                     if (!String.IsNullOrWhiteSpace(shareName))
                     {
-                        var share = blobClient.GetContainerReference(shareName);
+                        var share = fileClient.GetShareReference(shareName);
 
                         result = await share.ExistsAsync();
                     }
@@ -136,13 +136,13 @@ namespace HealthChecks
                 bool result;
                 try
                 {
-                    var tableClient = storageAccount.CreateCloudTableClient();
+                    var queueClient = storageAccount.CreateCloudQueueClient();
 
-                    var properties = await tableClient.GetServicePropertiesAsync();
+                    var properties = await queueClient.GetServicePropertiesAsync();
 
                     if (String.IsNullOrWhiteSpace(queueName))
                     {
-                        var queue = tableClient.GetTableReference(queueName);
+                        var queue = queueClient.GetQueueReference(queueName);
 
                         result = await queue.ExistsAsync();
                     }
