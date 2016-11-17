@@ -62,10 +62,11 @@ namespace Microsoft.AspNetCore.Proxy
         public async Task Invoke(HttpContext context)
         {
             var requestMessage = new HttpRequestMessage();
-            if (!string.Equals(context.Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(context.Request.Method, "HEAD", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(context.Request.Method, "DELETE", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(context.Request.Method, "TRACE", StringComparison.OrdinalIgnoreCase))
+            var requestMethod = context.Request.Method;
+            if (!HttpMethods.IsGet(requestMethod)&&
+                !HttpMethods.IsHead(requestMethod) &&
+                !HttpMethods.IsDelete(requestMethod)&&
+                !HttpMethods.IsTrace(requestMethod))
             {
                 var streamContent = new StreamContent(context.Request.Body);
                 requestMessage.Content = streamContent;
