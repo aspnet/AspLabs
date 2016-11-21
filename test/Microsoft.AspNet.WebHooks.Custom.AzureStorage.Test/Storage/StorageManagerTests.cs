@@ -21,6 +21,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         private const string TestPartition = "12345";
         private const int MaxDataEntries = 16;
 
+        private readonly TimeSpan _timeout = TimeSpan.FromMinutes(2);
         private readonly Mock<ILogger> _loggerMock;
         private readonly IStorageManager _manager;
 
@@ -379,7 +380,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
             CloudQueue queue = InitializeQueue();
 
             // Act
-            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, _timeout);
 
             // Assert
             Assert.Empty(actual);
@@ -394,7 +395,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             // Act
             await _manager.AddMessagesAsync(queue, expected);
-            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> actual = await _manager.GetMessagesAsync(queue, 16, _timeout);
 
             // Assert
             Assert.Equal(expected.Count(), actual.Count());
@@ -409,9 +410,9 @@ namespace Microsoft.AspNet.WebHooks.Storage
             await _manager.AddMessagesAsync(queue, messages);
 
             // Act
-            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxDataEntries, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxDataEntries, _timeout);
             await _manager.DeleteMessagesAsync(queue, initial);
-            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxDataEntries, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxDataEntries, _timeout);
 
             // Assert
             Assert.Equal(MaxDataEntries, initial.Count());
@@ -427,10 +428,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
             await _manager.AddMessagesAsync(queue, messages);
 
             // Act
-            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxDataEntries, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> initial = await _manager.GetMessagesAsync(queue, MaxDataEntries, _timeout);
             await _manager.DeleteMessagesAsync(queue, initial);
             await _manager.DeleteMessagesAsync(queue, initial);
-            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxDataEntries, TimeSpan.FromMinutes(1));
+            IEnumerable<CloudQueueMessage> final = await _manager.GetMessagesAsync(queue, MaxDataEntries, _timeout);
 
             // Assert
             Assert.Equal(MaxDataEntries, initial.Count());
