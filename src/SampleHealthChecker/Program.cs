@@ -13,7 +13,6 @@ namespace SampleHealthChecker
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
-                .UseHealthChecks(5050)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Hosting
             var loops = 0;
             do
             {
-                if(healthChecks.CheckHealthAsync().Result)
+                if(healthChecks.CheckHealthAsync().Result.IsHealthy)
                 {
                     webHost.Run();
                     break;

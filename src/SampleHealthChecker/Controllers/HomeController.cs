@@ -20,17 +20,9 @@ namespace SampleHealthChecker.Controllers
 
         public async Task<IActionResult> Index()
         {
-            string result;
-            if (await _healthCheck.CheckHealthAsync())
-            {
-                result = "healthy";
-            }
-            else
-            {
-                result = "unhealthy!";
-            }
+            var result = await _healthCheck.CheckHealthAsync();
 
-            ViewData["Results"] = JsonConvert.SerializeObject(_healthCheck.CheckResults); 
+            ViewData["Results"] = JsonConvert.SerializeObject(result); 
             ViewData["AppStatus"] = result;
 
             return View();

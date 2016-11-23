@@ -9,32 +9,48 @@ namespace HealthChecks
     public class HealthCheckMiddleware
     {
         RequestDelegate _next;
-        int _healthCheckPort;
-        IHealthCheckService _checkupService;
+        int? _healthCheckPort;
+        string _path;
+        IHealthCheckService _healthCheckService;
 
-        public HealthCheckMiddleware(RequestDelegate next, IHealthCheckService checkupService, int port)
+        //TODO: This would be some sort of options rather than this presumably.
+        public HealthCheckMiddleware(RequestDelegate next, IHealthCheckService checkupService, string path)
+            : this(next, checkupService, path, null)
+        {
+
+        }
+
+        public HealthCheckMiddleware(RequestDelegate next, IHealthCheckService checkupService, string path, int? port)
         {
             _healthCheckPort = port;
-            _checkupService = checkupService;
+            _path = path;
+            _healthCheckService = checkupService;
             _next = next;
         }
 
         public async Task Invoke(HttpContext context)
         {
-            var connInfo = context.Features.Get<IHttpConnectionFeature>();
-            if (connInfo.LocalPort == _healthCheckPort)
+            if(_healthCheckPort.HasValue)
             {
-                var healthy = await _checkupService.CheckHealthAsync();
-                if (healthy)
+                var connInfo = context.Features.Get<IHttpConnectionFeature>();
+                if (connInfo.LocalPort != _healthCheckPort)
                 {
-                    await context.Response.WriteAsync("HealthCheck: OK");
+                    await _next.Invoke(context);
+                    return;
                 }
-                else
+            }
+
+            if (context.Request.Path == _path)
+            {
+                var result = await _healthCheckService.CheckHealthAsync();
+                if (!result.IsHealthy)
                 {
                     context.Response.StatusCode = 502;
-                    context.Response.Headers.Add("content-type", "application/json");
-                    await context.Response.WriteAsync(JsonConvert.SerializeObject(_checkupService.CheckResults));
                 }
+
+                context.Response.Headers.Add("content-type", "application/json");
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(result));
+
                 return;
             }
             else

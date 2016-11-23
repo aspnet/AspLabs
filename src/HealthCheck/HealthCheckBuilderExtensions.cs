@@ -65,15 +65,27 @@ namespace HealthChecks
             builder.AddCheck($"UrlCheck ({url})", async () => {
                 var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
-                var response = await httpClient.GetAsync(url);
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                var result = new UrlHealthCheckResult
                 {
-                    return HealthCheckResult.Healthy($"UrlCheck: {url}");
+                    Name = $"UrlCheck ({url})",
+                    Url = url
                 };
 
-                return HealthCheckResult.Unhealthy($"UrlCheck: {url}");
-
+                var timer = Stopwatch.StartNew();
+                try
+                {
+                    var response = await httpClient.GetAsync(url);
+                    timer.Stop();
+                    result.StatusCode = response.StatusCode;
+                    result.CheckStatus = response.StatusCode == HttpStatusCode.OK ? CheckStatus.Healthy : CheckStatus.Unhealthy;
+                }
+                catch { }
+                finally
+                {
+                    result.ResponseMilliseconds = timer.ElapsedMilliseconds;
+                }
+                return result;
             });
             return builder;
         }

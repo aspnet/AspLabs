@@ -6,22 +6,22 @@ namespace HealthChecks
 {
     public class HealthCheckBuilder
     {
-        public Dictionary<string, Func<ValueTask<HealthCheckResult>>> Checks { get; private set; }
+        public Dictionary<string, Func<ValueTask<IHealthCheckResult>>> Checks { get; private set; }
 
         public HealthCheckBuilder()
         {
-            Checks = new Dictionary<string, Func<ValueTask<HealthCheckResult>>>();
+            Checks = new Dictionary<string, Func<ValueTask<IHealthCheckResult>>>();
         }
 
-        public HealthCheckBuilder AddCheck(string name, Func<Task<HealthCheckResult>> check)
+        public HealthCheckBuilder AddCheck(string name, Func<Task<IHealthCheckResult>> check)
         {
-            Checks.Add(name, () => new ValueTask<HealthCheckResult>(check()));
+            Checks.Add(name, () => new ValueTask<IHealthCheckResult>(check()));
             return this;
         }
 
-        public HealthCheckBuilder AddCheck(string name, Func<HealthCheckResult> check)
+        public HealthCheckBuilder AddCheck(string name, Func<IHealthCheckResult> check)
         {
-            Checks.Add(name, () => new ValueTask<HealthCheckResult>(check()));
+            Checks.Add(name, () => new ValueTask<IHealthCheckResult>(check()));
             return this;
         }
     }
