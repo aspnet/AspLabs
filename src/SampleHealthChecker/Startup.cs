@@ -30,8 +30,13 @@ namespace SampleHealthChecker
         {
             services.AddHealthChecks(checks => {
                 checks.AddUrlCheck("https://github.com");
-                checks.AddPrivateMemorySizeCheck(1);
-                checks.AddVirtualMemorySizeCheck(2);
+
+                checks.AddHealthCheckGroup("memory", group =>
+                {
+                    group.AddPrivateMemorySizeCheck(285147136);
+                    group.AddVirtualMemorySizeCheck(2);
+                }, true);
+
                 checks.AddWorkingSetCheck(1);
                 checks.AddUrlChecks(new List<string> { "https://github.com", "https://google.com", "https://twitddter.com" }, "servers");
 
