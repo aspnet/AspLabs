@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.WebHooks;
 
-namespace GenericReceivers.DependencyInjection.Dependencies
+namespace GenericReceivers.Dependencies
 {
     /// <summary>
     /// This provides a sample implementation of <see cref="IWebHookReceiverConfig"/> which gets the 

@@ -2,8 +2,7 @@
 using Autofac;
 using Autofac.Integration.WebApi;
 using GenericReceivers.Dependencies;
-using GenericReceivers.DependencyInjection.Dependencies;
-using GenericReceivers.DependencyInjection.WebHooks;
+using GenericReceivers.WebHooks;
 using log4net.Config;
 using Microsoft.AspNet.WebHooks;
 using Microsoft.AspNet.WebHooks.Diagnostics;
@@ -33,6 +32,9 @@ namespace GenericReceivers.DependencyInjection
 
             // Register WebHook handlers
             builder.RegisterType<GenericJsonWebHookHandler>().As<IWebHookHandler>();
+
+            // Register our custom dependencies used by our GenericJsonWebHookHandler
+            builder.RegisterType<MyDependency>().As<IMyDependency>();
 
             // Register our log4net logger
             builder.RegisterType<Log4NetLogger>().As<ILogger>().SingleInstance();

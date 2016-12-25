@@ -13,7 +13,7 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GenericReceivers.DependencyInjection</RootNamespace>
+    <RootNamespace>GenericReceivers</RootNamespace>
     <AssemblyName>GenericReceivers.DependencyInjection</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
@@ -103,6 +103,8 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Dependencies\Log4NetLogger.cs" />
+    <Compile Include="Dependencies\IMyDependency.cs" />
+    <Compile Include="Dependencies\MyDependency.cs" />
     <Compile Include="Dependencies\ReceiverConfig.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

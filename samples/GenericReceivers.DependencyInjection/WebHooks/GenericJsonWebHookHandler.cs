@@ -1,14 +1,23 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GenericReceivers.Dependencies;
 using Microsoft.AspNet.WebHooks;
 using Newtonsoft.Json.Linq;
 
-namespace GenericReceivers.DependencyInjection.WebHooks
+namespace GenericReceivers.WebHooks
 {
     public class GenericJsonWebHookHandler : WebHookHandler
     {
-        public GenericJsonWebHookHandler()
+        private readonly IMyDependency _dependency;
+
+        public GenericJsonWebHookHandler(IMyDependency dependency)
         {
+            if (dependency == null)
+            {
+                throw new ArgumentNullException(nameof(dependency));
+            }
+            _dependency = dependency;
             this.Receiver = GenericJsonWebHookReceiver.ReceiverName;
         }
 
