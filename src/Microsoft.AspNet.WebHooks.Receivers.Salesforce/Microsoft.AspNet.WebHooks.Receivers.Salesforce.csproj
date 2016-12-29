@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Messages\NotificationResponse.xml" />
+    <EmbeddedResource Include="Messages\FaultResponse.xml" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

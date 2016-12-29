@@ -11,7 +11,7 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Describes one or more event notifications received as an Outbound Message from Salesforce.
-    /// For details about Salesforce Outbound Messages, see <c>https://help.salesforce.com/htviewhelpdoc?id=workflow_defining_outbound_messages.htm</c>. 
+    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>. 
     /// </summary>
     public class SalesforceNotifications
     {

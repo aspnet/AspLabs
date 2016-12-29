@@ -21,7 +21,7 @@ namespace Microsoft.AspNet.WebHooks
     /// For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>' 
     /// application setting must be configured to the Salesforce Organization IDs. The Organizational IDs can be found at 
     /// <c>http://www.salesforce.com</c> under <c>Setup | Company Profile | Company Information</c>.
-    /// For details about Salesforce Outbound Messages, see <c>https://help.salesforce.com/htviewhelpdoc?id=workflow_defining_outbound_messages.htm</c>. 
+    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>. 
     /// </summary>
     public class SalesforceSoapWebHookReceiver : WebHookReceiver
     {
@@ -74,7 +74,8 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadValue, "OrganizationId");
                     context.Configuration.DependencyResolver.GetLogger().Error(msg);
-                    HttpResponseMessage invalidId = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                    string fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), msg);
+                    HttpResponseMessage invalidId = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
                     return invalidId;
                 }
 
@@ -84,7 +85,8 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadBody, "ActionId");
                     context.Configuration.DependencyResolver.GetLogger().Error(msg);
-                    HttpResponseMessage badType = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                    string fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), msg);
+                    HttpResponseMessage badType = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
                     return badType;
                 }
 
@@ -94,9 +96,8 @@ namespace Microsoft.AspNet.WebHooks
                 // Add SOAP response if not already present
                 if (response == null || response.Content == null || !response.Content.IsXml())
                 {
-                    response = request.CreateResponse();
                     string ack = ReadResource("Microsoft.AspNet.WebHooks.Messages.NotificationResponse.xml");
-                    response.Content = new StringContent(ack, Encoding.UTF8, "application/xml");
+                    response = GetXmlResponse(request, HttpStatusCode.OK, ack);
                 }
                 return response;
             }
@@ -113,6 +114,13 @@ namespace Microsoft.AspNet.WebHooks
                 return fullOrgId.Substring(0, 15);
             }
             return fullOrgId;
+        }
+
+        internal static HttpResponseMessage GetXmlResponse(HttpRequestMessage request, HttpStatusCode statusCode, string msg)
+        {
+            HttpResponseMessage response = request.CreateResponse(statusCode);
+            response.Content = new StringContent(msg, Encoding.UTF8, "application/xml");
+            return response;
         }
 
         internal static string ReadResource(string name)

@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Xml.Linq;
 using Moq;
 using Moq.Protected;
 using Xunit;
@@ -16,6 +17,8 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class SalesforceSoapWebHookReceiverTests : WebHookReceiverTestsBase<SalesforceSoapWebHookReceiver>
     {
+        private static readonly XNamespace Soap = "http://schemas.xmlsoap.org/soap/envelope/";
+
         private const string TestContent = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/'><soapenv:Body><notifications xmlns='http://soap.sforce.com/2005/09/outbound'><OrganizationId>123456789012345</OrganizationId><ActionId>abcde</ActionId></notifications></soapenv:Body></soapenv:Envelope>";
         private const string TestId = "";
         private const string TestSecret = "123456789012345";
@@ -84,8 +87,12 @@ namespace Microsoft.AspNet.WebHooks
             HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            HttpError error = await actual.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The 'OrganizationId' parameter provided in the HTTP request did not match the expected value.", error.Message);
+            XElement error = await actual.Content.ReadAsAsync<XElement>();
+            string msg = error
+                .Element(Soap + "Body")
+                .Element(Soap + "Fault")
+                .Element("faultstring").Value;
+            Assert.Equal("The 'OrganizationId' parameter provided in the HTTP request did not match the expected value.", msg);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
@@ -101,8 +108,12 @@ namespace Microsoft.AspNet.WebHooks
             HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            HttpError error = await actual.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The HTTP request body did not contain a required 'ActionId' property.", error.Message);
+            XElement error = await actual.Content.ReadAsAsync<XElement>();
+            string msg = error
+                .Element(Soap + "Body")
+                .Element(Soap + "Fault")
+                .Element("faultstring").Value;
+            Assert.Equal("The HTTP request body did not contain a required 'ActionId' property.", msg);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }

@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET WebHooks Salesforce Receiver</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET WebHooks Salesforce Receiver</h1>
+
+    <p>
+        The Salesforce WebHook receiver supports Salesforce SOAP-based Outbound Messages as a WebHook even though it is
+        indeed a SOAP message.
+    </p>
+
+    <p>A sample WebHook URI is:</p>
+
+    <pre>https://&lt;host&gt;/api/webhooks/incoming/sfsoap/{id}</pre>
+
+    <p>
+        For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>'
+        application setting must be configured to the Salesforce Organization IDs. The Organizational IDs can be found at
+        <a href="http://www.salesforce.com">Salesforce</a> under <c>Setup | Company Profile | Company Information</c>.
+    </p>
+    <p>
+        Optionally you can use the {id} field to differentiate between multiple WebHooks. You can configure each endpoint by setting
+        the <c>MS_WebHookReceiverSecret_SalesforceSoap</c> application setting to contain multiple config values, for example '
+        <c>code0, id1=code1, id2=code2</c>'.
+    </p>
+
+    <p>
+        For more details about using ASP.NET WebHooks with Salesforce Outbound Messages, see the blog
+        <a href="https://blogs.msdn.microsoft.com/webdev/2015/09/06/integrating-with-salesforce-using-asp-net-webhooks-preview/">Integrating with Salesforce using ASP.NET WebHooks Preview</a>.
+    </p>
+</body>
+</html>
