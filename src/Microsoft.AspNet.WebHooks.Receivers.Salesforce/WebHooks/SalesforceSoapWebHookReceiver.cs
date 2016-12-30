@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -116,6 +117,7 @@ namespace Microsoft.AspNet.WebHooks
             return fullOrgId;
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         internal static HttpResponseMessage GetXmlResponse(HttpRequestMessage request, HttpStatusCode statusCode, string msg)
         {
             HttpResponseMessage response = request.CreateResponse(statusCode);

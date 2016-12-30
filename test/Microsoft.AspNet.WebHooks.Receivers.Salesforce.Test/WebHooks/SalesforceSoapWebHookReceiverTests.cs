@@ -17,12 +17,12 @@ namespace Microsoft.AspNet.WebHooks
 {
     public class SalesforceSoapWebHookReceiverTests : WebHookReceiverTestsBase<SalesforceSoapWebHookReceiver>
     {
-        private static readonly XNamespace Soap = "http://schemas.xmlsoap.org/soap/envelope/";
-
         private const string TestContent = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/'><soapenv:Body><notifications xmlns='http://soap.sforce.com/2005/09/outbound'><OrganizationId>123456789012345</OrganizationId><ActionId>abcde</ActionId></notifications></soapenv:Body></soapenv:Envelope>";
         private const string TestId = "";
         private const string TestSecret = "123456789012345";
         private const string ReceiverConfigName = "SalesforceSoap";
+
+        private static readonly XNamespace Soap = "http://schemas.xmlsoap.org/soap/envelope/";
 
         private HttpRequestMessage _postRequest;
 
