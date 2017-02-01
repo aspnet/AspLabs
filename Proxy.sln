@@ -1,24 +1,19 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26127.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{339381AB-344C-47CD-BA9D-30310AEB8DFF}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4579A551-D026-4701-94A2-E1818AD24432}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{21867C30-38A2-44B0-AF3C-6C49F069734F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B7063BC9-D86B-49CE-90AD-7743788F7FC0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test\Microsoft.AspNetCore.Proxy.Test.xproj", "{B2AF7BAB-E974-42A8-93A2-6CFE10BD8919}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test\Microsoft.AspNetCore.Proxy.Test.csproj", "{B2AF7BAB-E974-42A8-93A2-6CFE10BD8919}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.xproj", "{4DAA0A9D-056E-4429-8C04-83715A93B56E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj", "{4DAA0A9D-056E-4429-8C04-83715A93B56E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Proxy.Samples", "samples\Microsoft.AspNetCore.Proxy.Samples\Microsoft.AspNetCore.Proxy.Samples.xproj", "{038E3540-8594-4DC5-965D-7F24C56E1CF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy.Samples", "samples\Microsoft.AspNetCore.Proxy.Samples\Microsoft.AspNetCore.Proxy.Samples.csproj", "{038E3540-8594-4DC5-965D-7F24C56E1CF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
