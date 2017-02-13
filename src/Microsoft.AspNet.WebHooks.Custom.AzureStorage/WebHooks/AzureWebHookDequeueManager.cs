@@ -252,8 +252,8 @@ namespace Microsoft.AspNet.WebHooks
                 // Keep track of which queued messages should be deleted because processing has completed.
                 List<CloudQueueMessage> deleteMessages = new List<CloudQueueMessage>();
 
-                // Submit WebHook requests in parallel
-                List<Task<HttpResponseMessage>> requestTasks = new List<Task<HttpResponseMessage>>();
+                // Keep track of the response messages
+                List<HttpResponseMessage> responses = new List<HttpResponseMessage>();
                 foreach (var workItem in workItems)
                 {
                     HttpRequestMessage request = CreateWebHookRequest(workItem);
@@ -261,8 +261,9 @@ namespace Microsoft.AspNet.WebHooks
 
                     try
                     {
-                        Task<HttpResponseMessage> requestTask = _parent._httpClient.SendAsync(request);
-                        requestTasks.Add(requestTask);
+                        // Await for responses, so that invalid response exceptions can be caught.
+                        HttpResponseMessage requestTask = await _parent._httpClient.SendAsync(request);
+                        responses.Add(requestTask);
                     }
                     catch (Exception ex)
                     {
@@ -277,8 +278,7 @@ namespace Microsoft.AspNet.WebHooks
                     }
                 }
 
-                // Wait for all responses and see which messages should be deleted from the queue based on the response statuses.
-                HttpResponseMessage[] responses = await Task.WhenAll(requestTasks);
+                // Loop through the responses to see which messages should be deleted from the queue based on the response statuses.
                 foreach (HttpResponseMessage response in responses)
                 {
                     WebHookWorkItem workItem = response.RequestMessage.Properties.GetValueOrDefault<WebHookWorkItem>(WorkItemKey);
