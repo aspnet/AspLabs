@@ -13,15 +13,14 @@ namespace Microsoft.AspNetCore.Builder
         /// Sends request to remote server as specified in options
         /// </summary>
         /// <param name="app"></param>
-        /// <returns></returns>
-        public static IApplicationBuilder RunProxy(this IApplicationBuilder app)
+        public static void RunProxy(this IApplicationBuilder app)
         {
             if (app == null)
             {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            return app.UseMiddleware<ProxyMiddleware>();
+            app.UseMiddleware<ProxyMiddleware>();
         }
 
         /// <summary>
@@ -29,8 +28,7 @@ namespace Microsoft.AspNetCore.Builder
         /// </summary>
         /// <param name="app"></param>
         /// <param name="options">Options for setting port, host, and scheme</param>
-        /// <returns></returns>
-        public static IApplicationBuilder RunProxy(this IApplicationBuilder app, ProxyOptions options)
+        public static void RunProxy(this IApplicationBuilder app, ProxyOptions options)
         {
             if (app == null)
             {
@@ -41,7 +39,7 @@ namespace Microsoft.AspNetCore.Builder
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
+            app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
         }
     }
 }
