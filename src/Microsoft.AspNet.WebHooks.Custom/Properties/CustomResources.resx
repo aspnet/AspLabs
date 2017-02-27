@@ -162,6 +162,9 @@
   <data name="Notification_KeyNotFound" xml:space="preserve">
     <value>No Notification setting was found with key '{0}'.</value>
   </data>
+  <data name="RegistrationsManager_InvalidFilters" xml:space="preserve">
+    <value>The following filters are not valid: '{0}'.</value>
+  </data>
   <data name="Sender_BadWorkItem" xml:space="preserve">
     <value>Invalid '{0}' instance: '{1}' cannot be null.</value>
   </data>

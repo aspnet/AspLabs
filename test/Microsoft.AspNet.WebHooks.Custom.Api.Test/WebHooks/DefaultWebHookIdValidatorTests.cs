@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Microsoft.AspNet.WebHooks.WebHooks
+namespace Microsoft.AspNet.WebHooks
 {
     public class DefaultWebHookIdValidatorTests
     {

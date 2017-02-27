@@ -88,15 +88,6 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following filters are not valid: &apos;{0}&apos;. A list of valid filters can be obtained from the path &apos;{1}&apos;..
-        /// </summary>
-        internal static string RegistrationController_InvalidFilters {
-            get {
-                return ResourceManager.GetString("RegistrationController_InvalidFilters", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; implementation of &apos;{1}&apos; caused an exception: {2}.
         /// </summary>
         internal static string RegistrationController_RegistrarException {

@@ -25,9 +25,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
     [RoutePrefix("api/webhooks/registrations")]
     public class WebHookRegistrationsController : ApiController
     {
-        private IWebHookManager _manager;
-        private IWebHookStore _store;
-        private IWebHookUser _user;
+        private IWebHookRegistrationsManager _registrationsManager;
 
         /// <summary>
         /// Gets all registered WebHooks for a given user.
@@ -36,10 +34,17 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         [Route("")]
         public async Task<IEnumerable<WebHook>> Get()
         {
-            string userId = await GetUserId();
-            IEnumerable<WebHook> webHooks = await _store.GetAllWebHooksAsync(userId);
-            RemovePrivateFilters(webHooks);
-            return webHooks;
+            try
+            {
+                IEnumerable<WebHook> webHooks = await _registrationsManager.GetWebHooksAsync(User, RemovePrivateFilters);
+                return webHooks;
+            }
+            catch (Exception ex)
+            {
+                Configuration.DependencyResolver.GetLogger().Error(ex.Message, ex);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
+                throw new HttpResponseException(error);
+            }
         }
 
         /// <summary>
@@ -51,14 +56,21 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         [ResponseType(typeof(WebHook))]
         public async Task<IHttpActionResult> Lookup(string id)
         {
-            string userId = await GetUserId();
-            WebHook webHook = await _store.LookupWebHookAsync(userId, id);
-            if (webHook != null)
+            try
             {
-                RemovePrivateFilters(new[] { webHook });
-                return Ok(webHook);
+                WebHook webHook = await _registrationsManager.LookupWebHookAsync(User, id, RemovePrivateFilters);
+                if (webHook != null)
+                {
+                    return Ok(webHook);
+                }
+                return NotFound();
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                Configuration.DependencyResolver.GetLogger().Error(ex.Message, ex);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
+                throw new HttpResponseException(error);
+            }
         }
 
         /// <summary>
@@ -75,18 +87,29 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 return BadRequest();
             }
 
-            string userId = await GetUserId();
-            await VerifyFilters(webHook);
-            await VerifyWebHook(webHook);
-
             try
             {
                 // Validate the provided WebHook ID (or force one to be created on server side)
                 IWebHookIdValidator idValidator = Configuration.DependencyResolver.GetIdValidator();
                 await idValidator.ValidateIdAsync(Request, webHook);
 
+                // Validate other parts of WebHook
+                await _registrationsManager.VerifySecretAsync(webHook);
+                await _registrationsManager.VerifyFiltersAsync(webHook);
+                await _registrationsManager.VerifyAddressAsync(webHook);
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                return ResponseMessage(error);
+            }
+
+            try
+            {
                 // Add WebHook for this user.
-                StoreResult result = await _store.InsertWebHookAsync(userId, webHook);
+                StoreResult result = await _registrationsManager.AddWebHookAsync(User, webHook, AddPrivateFilters);
                 if (result == StoreResult.Success)
                 {
                     return CreatedAtRoute(WebHookRouteNames.RegistrationLookupAction, new { id = webHook.Id }, webHook);
@@ -120,13 +143,25 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 return BadRequest();
             }
 
-            string userId = await GetUserId();
-            await VerifyFilters(webHook);
-            await VerifyWebHook(webHook);
+            try
+            {
+                // Validate parts of WebHook
+                await _registrationsManager.VerifySecretAsync(webHook);
+                await _registrationsManager.VerifyFiltersAsync(webHook);
+                await _registrationsManager.VerifyAddressAsync(webHook);
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Info(msg);
+                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                return ResponseMessage(error);
+            }
 
             try
             {
-                StoreResult result = await _store.UpdateWebHookAsync(userId, webHook);
+                // Update WebHook for this user
+                StoreResult result = await _registrationsManager.UpdateWebHookAsync(User, webHook, AddPrivateFilters);
                 return CreateHttpResult(result);
             }
             catch (Exception ex)
@@ -145,11 +180,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         [Route("{id}")]
         public async Task<IHttpActionResult> Delete(string id)
         {
-            string userId = await GetUserId();
-
             try
             {
-                StoreResult result = await _store.DeleteWebHookAsync(userId, id);
+                StoreResult result = await _registrationsManager.DeleteWebHookAsync(User, id);
                 return CreateHttpResult(result);
             }
             catch (Exception ex)
@@ -167,11 +200,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         [Route("")]
         public async Task<IHttpActionResult> DeleteAll()
         {
-            string userId = await GetUserId();
-
             try
             {
-                await _store.DeleteAllWebHooksAsync(userId);
+                await _registrationsManager.DeleteAllWebHooksAsync(User);
                 return Ok();
             }
             catch (Exception ex)
@@ -188,132 +219,54 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             base.Initialize(controllerContext);
 
-            _manager = Configuration.DependencyResolver.GetManager();
-            _store = Configuration.DependencyResolver.GetStore();
-            _user = Configuration.DependencyResolver.GetUser();
+            _registrationsManager = Configuration.DependencyResolver.GetRegistrationsManager();
         }
 
         /// <summary>
-        /// Ensure that the provided <paramref name="webHook"/> only has registered filters.
+        /// Removes all private (server side) filters from the given <paramref name="webHook"/>.
         /// </summary>
-        protected virtual async Task VerifyFilters(WebHook webHook)
+        protected virtual Task RemovePrivateFilters(string user, WebHook webHook)
         {
             if (webHook == null)
             {
                 throw new ArgumentNullException(nameof(webHook));
             }
 
-            // If there are no filters then add our wildcard filter.
-            if (webHook.Filters.Count == 0)
+            var filters = webHook.Filters.Where(f => f.StartsWith(WebHookRegistrar.PrivateFilterPrefix, StringComparison.OrdinalIgnoreCase)).ToArray();
+            foreach (string filter in filters)
             {
-                webHook.Filters.Add(WildcardWebHookFilterProvider.Name);
-                await InvokeRegistrars(webHook);
-                return;
+                webHook.Filters.Remove(filter);
             }
-
-            IWebHookFilterManager filterManager = Configuration.DependencyResolver.GetFilterManager();
-            IDictionary<string, WebHookFilter> filters = await filterManager.GetAllWebHookFiltersAsync();
-            HashSet<string> normalizedFilters = new HashSet<string>();
-            List<string> invalidFilters = new List<string>();
-            foreach (string filter in webHook.Filters)
-            {
-                WebHookFilter hookFilter;
-                if (filters.TryGetValue(filter, out hookFilter))
-                {
-                    normalizedFilters.Add(hookFilter.Name);
-                }
-                else
-                {
-                    invalidFilters.Add(filter);
-                }
-            }
-
-            if (invalidFilters.Count > 0)
-            {
-                string invalidFiltersMsg = string.Join(", ", invalidFilters);
-                string link = Url.Link(WebHookRouteNames.FiltersGetAction, routeValues: null);
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_InvalidFilters, invalidFiltersMsg, link);
-                Configuration.DependencyResolver.GetLogger().Info(msg);
-
-                HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
-                throw new HttpResponseException(response);
-            }
-            else
-            {
-                webHook.Filters.Clear();
-                foreach (string filter in normalizedFilters)
-                {
-                    webHook.Filters.Add(filter);
-                }
-            }
-
-            await InvokeRegistrars(webHook);
+            return Task.FromResult(true);
         }
 
         /// <summary>
-        /// Removes all private filters from registered WebHooks.
+        /// Executes all <see cref="IWebHookRegistrar"/> instances for server side manipulation, inspection, or
+        /// rejection of registrations. This can for example be used to add server side only filters that 
+        /// are not governed by <see cref="IWebHookFilterManager"/>.
         /// </summary>
-        protected virtual void RemovePrivateFilters(IEnumerable<WebHook> webHooks)
+        protected virtual async Task AddPrivateFilters(string user, WebHook webHook)
         {
-            if (webHooks == null)
+            IEnumerable<IWebHookRegistrar> registrars = Configuration.DependencyResolver.GetRegistrars();
+            foreach (IWebHookRegistrar registrar in registrars)
             {
-                throw new ArgumentNullException(nameof(webHooks));
-            }
-
-            foreach (WebHook webHook in webHooks)
-            {
-                var filters = webHook.Filters.Where(f => f.StartsWith(WebHookRegistrar.PrivateFilterPrefix, StringComparison.OrdinalIgnoreCase)).ToArray();
-                foreach (string filter in filters)
+                try
                 {
-                    webHook.Filters.Remove(filter);
+                    await registrar.RegisterAsync(Request, webHook);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Ensures that the provided <paramref name="webHook"/> has a reachable Web Hook URI unless
-        /// the WebHook URI has a <c>NoEcho</c> query parameter.
-        /// </summary>
-        private async Task VerifyWebHook(WebHook webHook)
-        {
-            if (webHook == null)
-            {
-                throw new ArgumentNullException(nameof(webHook));
-            }
-
-            // If no secret is provided then we create one here. This allows for scenarios
-            // where the caller may use a secret directly embedded in the WebHook URI, or
-            // has some other way of enforcing security.
-            if (string.IsNullOrEmpty(webHook.Secret))
-            {
-                webHook.Secret = Guid.NewGuid().ToString("N");
-            }
-
-            try
-            {
-                await _manager.VerifyWebHookAsync(webHook);
-            }
-            catch (Exception ex)
-            {
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message, ex);
-                throw new HttpResponseException(error);
-            }
-        }
-
-        /// <summary>
-        /// Gets the user ID for this request.
-        /// </summary>
-        private async Task<string> GetUserId()
-        {
-            try
-            {
-                string id = await _user.GetUserIdAsync(User);
-                return id;
-            }
-            catch (Exception ex)
-            {
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message, ex);
-                throw new HttpResponseException(error);
+                catch (HttpResponseException rex)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarStatusCode, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, rex.Response.StatusCode);
+                    Configuration.DependencyResolver.GetLogger().Info(msg);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarException, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, ex.Message);
+                    Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                    HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                    throw new HttpResponseException(response);
+                }
             }
         }
 
@@ -340,34 +293,6 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
                 default:
                     return InternalServerError();
-            }
-        }
-
-        /// <summary>
-        /// Calls all IWebHookRegistrar instances for server side manipulation, inspection, or rejection of registrations.
-        /// </summary>
-        private async Task InvokeRegistrars(WebHook webHook)
-        {
-            IEnumerable<IWebHookRegistrar> registrars = Configuration.DependencyResolver.GetRegistrars();
-            foreach (IWebHookRegistrar registrar in registrars)
-            {
-                try
-                {
-                    await registrar.RegisterAsync(Request, webHook);
-                }
-                catch (HttpResponseException rex)
-                {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarStatusCode, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, rex.Response.StatusCode);
-                    Configuration.DependencyResolver.GetLogger().Info(msg);
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarException, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, ex.Message);
-                    Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                    HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
-                    throw new HttpResponseException(response);
-                }
             }
         }
     }

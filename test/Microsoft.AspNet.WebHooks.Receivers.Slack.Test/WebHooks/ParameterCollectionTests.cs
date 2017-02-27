@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace Microsoft.AspNet.WebHooks.WebHooks
+namespace Microsoft.AspNet.WebHooks
 {
     public class ParameterCollectionTests
     {

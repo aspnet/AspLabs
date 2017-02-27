@@ -196,6 +196,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following filters are not valid: &apos;{0}&apos;..
+        /// </summary>
+        internal static string RegistrationsManager_InvalidFilters {
+            get {
+                return ResourceManager.GetString("RegistrationsManager_InvalidFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid &apos;{0}&apos; instance: &apos;{1}&apos; cannot be null..
         /// </summary>
         internal static string Sender_BadWorkItem {

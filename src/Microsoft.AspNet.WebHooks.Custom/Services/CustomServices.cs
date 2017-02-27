@@ -27,6 +27,7 @@ namespace Microsoft.AspNet.WebHooks.Services
         private static IWebHookStore _store;
         private static IWebHookSender _sender;
         private static IWebHookManager _manager;
+        private static IWebHookRegistrationsManager _registrationsManager;
         private static IWebHookUser _user;
 
         /// <summary>
@@ -188,6 +189,50 @@ namespace Microsoft.AspNet.WebHooks.Services
         }
 
         /// <summary>
+        /// Gets a default <see cref="IWebHookRegistrationsManager"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <returns>A default <see cref="IWebHookManager"/> instance.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by AppDomain")]
+        public static IWebHookRegistrationsManager GetRegistrationsManager(IWebHookManager manager, IWebHookStore store, IWebHookFilterManager filterManager, IWebHookUser userManager)
+        {
+            if (_registrationsManager != null)
+            {
+                return _registrationsManager;
+            }
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+            if (store == null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
+            if (filterManager == null)
+            {
+                throw new ArgumentNullException(nameof(filterManager));
+            }
+            if (userManager == null)
+            {
+                throw new ArgumentNullException(nameof(userManager));
+            }
+
+            IWebHookRegistrationsManager instance = new WebHookRegistrationsManager(manager, store, filterManager, userManager);
+            Interlocked.CompareExchange(ref _registrationsManager, instance, null);
+            return _registrationsManager;
+        }
+
+        /// <summary>
+        /// Sets a default <see cref="IWebHookRegistrationsManager"/> implementation which is used if none are registered with the 
+        /// Dependency Injection engine.
+        /// </summary>
+        /// <param name="instance">The <see cref="IWebHookRegistrationsManager"/> to use. If <c>null</c> then a default implementation is used.</param>
+        public static void SetRegistrationsManager(IWebHookRegistrationsManager instance)
+        {
+            _registrationsManager = instance;
+        }
+
+        /// <summary>
         /// For testing purposes
         /// </summary>
         internal static void Reset()
@@ -197,6 +242,7 @@ namespace Microsoft.AspNet.WebHooks.Services
             _store = null;
             _sender = null;
             _manager = null;
+            _registrationsManager = null;
             _user = null;
         }
     }

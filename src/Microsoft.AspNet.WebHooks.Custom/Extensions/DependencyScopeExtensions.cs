@@ -111,5 +111,26 @@ namespace Microsoft.AspNet.WebHooks
             }
             return manager;
         }
+
+        /// <summary>
+        /// Gets an <see cref="IWebHookRegistrationsManager"/> implementation registered with the Dependency Injection engine
+        /// or a default implementation if none are registered.
+        /// </summary>
+        /// <param name="services">The <see cref="IDependencyScope"/> implementation.</param>
+        /// <returns>The registered <see cref="IWebHookRegistrationsManager"/> instance or a default implementation if none are registered.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
+        public static IWebHookRegistrationsManager GetRegistrationsManager(this IDependencyScope services)
+        {
+            IWebHookRegistrationsManager registrationsManager = services.GetService<IWebHookRegistrationsManager>();
+            if (registrationsManager == null)
+            {
+                IWebHookManager manager = services.GetManager();
+                IWebHookStore store = services.GetStore();
+                IWebHookFilterManager filterManager = services.GetFilterManager();
+                IWebHookUser userManager = services.GetUser();
+                registrationsManager = CustomServices.GetRegistrationsManager(manager, store, filterManager, userManager);
+            }
+            return registrationsManager;
+        }
     }
 }

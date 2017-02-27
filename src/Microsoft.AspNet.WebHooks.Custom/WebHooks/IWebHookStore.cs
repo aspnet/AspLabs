@@ -39,7 +39,7 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="user">The user for which to lookup a registered <see cref="WebHook"/> instance.</param>
         /// <param name="id">The ID uniquely identifying the WebHook.</param>
-        /// <returns>The cached <see cref="WebHook"/>.</returns>
+        /// <returns>The <see cref="WebHook"/> instance or <c>null</c>.</returns>
         Task<WebHook> LookupWebHookAsync(string user, string id);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="user">The user for which to register the <see cref="WebHook"/>.</param>
         /// <param name="webHook">The <see cref="WebHook"/> to register.</param>
-        /// <returns><c>true</c> if the WebHook is registered; <c>false</c> if it already exists.</returns>
+        /// <returns>A <see cref="StoreResult"/> indicating the result of the operation.</returns>
         Task<StoreResult> InsertWebHookAsync(string user, WebHook webHook);
 
         /// <summary>
@@ -55,21 +55,22 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         /// <param name="user">The user for which to update the <see cref="WebHook"/>.</param>
         /// <param name="webHook">The <see cref="WebHook"/> to update.</param>
-        /// <returns><c>true</c> if the WebHook is updated; <c>false</c> if it does not exist.</returns>
+        /// <returns>A <see cref="StoreResult"/> indicating the result of the operation.</returns>
         Task<StoreResult> UpdateWebHookAsync(string user, WebHook webHook);
 
         /// <summary>
         /// Deletes a registered <see cref="WebHook"/> for a given <paramref name="user"/>. If a <see cref="WebHook"/> 
-        /// with the given <paramref name="id"/> is not found then the method returns <c>false</c>.
+        /// with the given <paramref name="id"/> is not found then the method returns <see cref="StoreResult.NotFound"/>.
         /// </summary>
-        /// <param name="user">The user for which to delete all <see cref="WebHook"/> instances.</param>
+        /// <param name="user">The user for which to delete the <see cref="WebHook"/>.</param>
         /// <param name="id">The ID uniquely identifying the WebHook.</param>
-        /// <returns><c>true</c> if the <see cref="WebHook"/> was removed, otherwise <c>false</c>.</returns>
+        /// <returns>A <see cref="StoreResult"/> indicating the result of the operation.</returns>
         Task<StoreResult> DeleteWebHookAsync(string user, string id);
 
         /// <summary>
         /// Deletes all existing <see cref="WebHook"/> instances for a given <paramref name="user"/>.
         /// </summary>
+        /// <param name="user">The user for which to delete all <see cref="WebHook"/> instances.</param>
         Task DeleteAllWebHooksAsync(string user);
 
         /// <summary>
