@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Proxy
             const string scheme = "https";
             const string host = "example.com";
             const string port = "443";
-            app.RunProxy(new ProxyOptions
+            app.UseWebSockets().RunProxy(new ProxyOptions
             {
                 Scheme = scheme,
                 Host = host,
