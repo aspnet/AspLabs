@@ -1,6 +1,11 @@
 <Project>
   <PropertyGroup>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <AspNetCoreVersion>1.2.0-*</AspNetCoreVersion>
     <CoreFxVersion>4.3.0</CoreFxVersion>
+    <NetHttpVersion>4.3.1</NetHttpVersion>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <TestSdkVersion>15.0.0</TestSdkVersion>
+    <WebSockets>1.1.0-*</WebSockets>
+    <XunitVersion>2.2.0</XunitVersion>
   </PropertyGroup>
 </Project>

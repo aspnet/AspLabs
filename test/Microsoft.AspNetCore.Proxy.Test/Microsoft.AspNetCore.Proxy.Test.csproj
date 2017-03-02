@@ -5,24 +5,20 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.1;net46</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp1.1</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup>
+    <PlatformTarget>x64</PlatformTarget>
     <!-- TODO remove when https://github.com/Microsoft/vstest/issues/428 is resolved -->
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.1'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.2.0-*" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.2.0-*" />
-    <PackageReference Include="Microsoft.AspNetCore.Testing" Version="1.2.0-*" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-*" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-*" />
-    <PackageReference Include="xunit" Version="2.2.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Testing" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit" Version="$(XunitVersion)" />
   </ItemGroup>
 
 </Project>
