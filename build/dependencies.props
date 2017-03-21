@@ -4,6 +4,7 @@
     <CoreFxVersion>4.3.0</CoreFxVersion>
     <NetHttpVersion>4.3.1</NetHttpVersion>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <RuntimeFrameworkVersion>2.0.0-*</RuntimeFrameworkVersion>
     <TestSdkVersion>15.0.0</TestSdkVersion>
     <WebSocketsVersion>1.1.0-*</WebSocketsVersion>
     <XunitVersion>2.2.0</XunitVersion>
