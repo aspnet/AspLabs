@@ -48,6 +48,8 @@ namespace Microsoft.AspNet.WebHooks
         public StripeWebHookReceiver()
             : this(httpClient: null)
         {
+            // Set the security protocols
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
         /// <summary>
