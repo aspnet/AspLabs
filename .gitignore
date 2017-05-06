@@ -4,9 +4,11 @@ TestResults/
 .nuget/
 .build/
 .testPublish/
+publish/
 *.sln.ide/
 _ReSharper.*/
 packages/
+shared/
 artifacts/
 PublishProfiles/
 .vs/
