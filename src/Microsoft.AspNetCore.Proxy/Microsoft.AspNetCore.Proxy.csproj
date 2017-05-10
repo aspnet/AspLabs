@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\build\common.props" />
 
@@ -13,8 +13,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="System.Net.WebSockets.Client" Version="$(CoreFxVersion)" />
-    <PackageReference Include="System.Net.Http" Version="$(NetHttpVersion)" />
   </ItemGroup>
 
 </Project>
