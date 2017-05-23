@@ -3,7 +3,7 @@
   <Import Project="..\..\build\dependencies.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -13,4 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="$(AspNetCoreVersion)" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'">
+    <PackageReference Include="NETStandard.Library.NETFramework" Version="$(NETStandardLibraryNETFrameworkVersion)" />
+  </ItemGroup>
 </Project>
