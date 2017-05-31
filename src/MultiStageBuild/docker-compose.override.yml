@@ -1,0 +1,38 @@
+version: "2"
+volumes:
+  dcsync:
+services:
+  dcsync:
+    image: stephpr/dcsync
+    volumes:
+    - dcsync:/.dcsync
+  my-mvc-app:
+    depends_on:
+    - dcsync
+    # This needs docker/compose issue #4790
+    # build:
+    #   target: run
+    image: my-mvc-app:run
+    volumes:
+    - dcsync:/.dcsync:ro
+    - .:/.src
+    ports:
+    - "5000:80"
+    environment:
+      DCSYNC_TARGET: /src
+    entrypoint: /.dcsync/exec
+    command: dotnet watch run
+  my-mvc-app-tests:
+    depends_on:
+    - dcsync
+    # This needs docker/compose issue #4790
+    # build:
+    #   target: tests
+    image: my-mvc-app:tests
+    volumes:
+    - dcsync:/.dcsync:ro
+    - .:/.src
+    environment:
+      DCSYNC_TARGET: /src
+    entrypoint: /.dcsync/exec
+    command: dotnet watch test

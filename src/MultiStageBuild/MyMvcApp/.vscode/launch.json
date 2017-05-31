@@ -1,0 +1,75 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ASP .NET Core Launch",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/bin/Debug/netcoreapp1.1/MyMvcApp.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "launchBrowser": {
+                "enabled": true,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            }
+        },
+        {
+            "name": "ASP .NET Core Launch (Docker)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "docker-build",
+            "pipeTransport": {
+                "pipeProgram": "docker",
+                "pipeCwd": "${workspaceRoot}",
+                "pipeArgs": [
+                    "run",
+                    "-v", "${workspaceRoot}/.vscode/docker/vsdbg:/vsdbg",
+                    "-v", "${workspaceRoot}:/.src",
+                    "-p", "5000:80",
+                    "--entrypoint", "/bin/sh",
+                    "-i",
+                    "--rm",
+                    "my-mvc-app:develop",
+                    "/.src/.vscode/docker/run.sh"
+                ],
+                "quoteArgs": false,
+                "debuggerPath": "/vsdbg/vsdbg"
+            },
+            "program": "/src/bin/Debug/netcoreapp1.1/MyMvcApp.dll",
+            "args": [],
+            "cwd": "/src",
+            "stopAtEntry": false,
+            "sourceFileMap": {
+                "/src": "${workspaceRoot}"
+            },
+            "launchBrowser": {
+                "enabled": true,
+                "args": "http://localhost:5000",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start http://localhost:5000"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            }
+        }
+    ]
+}

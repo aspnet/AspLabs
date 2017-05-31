@@ -1,0 +1,11 @@
+.dockerignore
+.git
+.gitignore
+.vscode
+Dockerfile
+MyMvcApp/.vscode
+MyMvcApp/bin
+MyMvcApp/obj
+MyMvcApp.Tests/.vscode
+MyMvcApp.Tests/bin
+MyMvcApp.Tests/obj
