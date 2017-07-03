@@ -9,7 +9,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnableApiCheck>false</EnableApiCheck>
-    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81</PackageTargetFallback>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <RuntimeIdentifiers>win7-x64;win7-x86;linux-x64;osx.10.10-x64</RuntimeIdentifiers>
     <SelfContained>true</SelfContained>
