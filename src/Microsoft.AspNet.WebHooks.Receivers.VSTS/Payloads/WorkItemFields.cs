@@ -48,6 +48,12 @@ namespace Microsoft.AspNet.WebHooks.Payloads
         public string SystemReason { get; set; }
 
         /// <summary>
+        /// Gets the value of field <c>System.AssignedTo</c>.
+        /// </summary>
+        [JsonProperty("System.AssignedTo")]
+        public string SystemAssignedTo { get; set; }
+        
+        /// <summary>
         /// Gets the value of field <c>System.CreatedDate</c>.
         /// </summary>
         [JsonProperty("System.CreatedDate")]
