@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ASP.NET Core Pusher WebHooks infrastructure. Contains the PusherWebHookAttribute class and AddPusherWebHooks method.</Description>
+    <PackageTags>aspnetcore;webhook;receiver;pusher</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Pusher\WebHooks\PusherNotifications.cs">
+      <Link>PusherNotifications.cs</Link>
+    </Compile>
+    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+  </ItemGroup>
+</Project>

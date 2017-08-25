@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ASP.NET Core Kudu WebHooks infrastructure. Contains the KuduWebHookAttribute class and AddKuduWebHooks method.</Description>
+    <PackageTags>aspnetcore;webhook;receiver;kudu</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Azure\WebHooks\KuduNotification.cs">
+      <Link>KuduNotification.cs</Link>
+    </Compile>
+    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+  </ItemGroup>
+</Project>

@@ -5,7 +5,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Describes one or more event notifications received as a Pusher WebHook.
@@ -16,7 +20,7 @@ namespace Microsoft.AspNet.WebHooks
         private readonly List<IDictionary<string, object>> _events = new List<IDictionary<string, object>>();
 
         /// <summary>
-        ///  Gets or sets a Unix time stamp in milliseconds which can be used to determine the order in which 
+        ///  Gets or sets a Unix time stamp in milliseconds which can be used to determine the order in which
         ///  Pusher events were generated. For conversion of Unix timestamps to <see cref="DateTimeOffset"/>,
         ///  please see <c>https://msdn.microsoft.com/en-us/library/system.datetimeoffset.fromunixtimemilliseconds</c>.
         /// </summary>
@@ -26,7 +30,7 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets the set of events contained in this notification from a Pusher WebHook. Each notification
         /// is represented as a <see cref="Dictionary{TKey, TValue}"/> where <c>TKey</c> is a property
-        /// name and <c>TValue</c> is the value of that property. For each notification, the Action 
+        /// name and <c>TValue</c> is the value of that property. For each notification, the Action
         /// can be found using the key '<c>name</c>'.
         /// </summary>
         [JsonProperty("events")]

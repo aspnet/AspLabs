@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <_ImportParentFile>false</_ImportParentFile>
+    <_ImportParentFile Condition="$(MSBuildProjectName.StartsWith( 'Microsoft.AspNetCore.' ))">true</_ImportParentFile>
+  </PropertyGroup>
+
+  <Import Project="..\Directory.Build.props" Condition="$(_ImportParentFile)" />
+
+  <PropertyGroup Condition="$(_ImportParentFile)">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+</Project>

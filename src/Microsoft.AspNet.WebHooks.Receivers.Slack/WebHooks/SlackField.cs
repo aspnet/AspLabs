@@ -4,11 +4,15 @@
 using System;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// The <see cref="SlackField"/> class is used for expression table fields as part of a <see cref="SlackAttachment"/>,
-    /// please see <c>https://api.slack.com/docs/attachments</c> for details. Fields are displayed in a table inside the message 
+    /// please see <c>https://api.slack.com/docs/attachments</c> for details. Fields are displayed in a table inside the message
     /// attachment.
     /// </summary>
     public class SlackField
@@ -18,11 +22,11 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlackField"/> with the given <paramref name="title"/>
-        /// and <paramref name="value"/>. 
+        /// and <paramref name="value"/>.
         /// </summary>
         /// <param name="title">The field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
         /// by the receiver.</param>
-        /// <param name="value">The field value which may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>. 
+        /// <param name="value">The field value which may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>.
         /// The value may be multi-line and must be escaped following Markdown rules.</param>
         public SlackField(string title, string value)
         {
@@ -67,7 +71,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets the field value. It may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>. 
+        /// Gets or sets the field value. It may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>.
         /// The value may be multi-line and must be escaped following Markdown rules.
         /// </summary>
         [JsonProperty("value")]

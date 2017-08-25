@@ -4,7 +4,11 @@
 using System;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Contains information sent in a WebHook notification from Kudu (Azure Web App Deployment Service).

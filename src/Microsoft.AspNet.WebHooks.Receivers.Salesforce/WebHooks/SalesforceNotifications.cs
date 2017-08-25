@@ -7,11 +7,15 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml.Linq;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Describes one or more event notifications received as an Outbound Message from Salesforce.
-    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>. 
+    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>.
     /// </summary>
     public class SalesforceNotifications
     {
@@ -29,7 +33,7 @@ namespace Microsoft.AspNet.WebHooks
         private List<Dictionary<string, string>> _notifications;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SalesforceNotifications"/> with a given 
+        /// Initializes a new instance of the <see cref="SalesforceNotifications"/> with a given
         /// <paramref name="doc"/> representing an Outbound SOAP Message received from Salesforce.
         /// </summary>
         /// <param name="doc">An Outbound SOAP Message received from Salesforce.</param>
@@ -69,8 +73,8 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets the Action ID for this Outbound Message. 
-        /// The Action ID indicates the workflow rule (action) that triggers the message. 
+        /// Gets the Action ID for this Outbound Message.
+        /// The Action ID indicates the workflow rule (action) that triggers the message.
         /// </summary>
         public string ActionId
         {
@@ -101,8 +105,8 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets the enterprise URI for this Outbound Message. This is the URI to use to make calls back to 
-        /// Salesforce using the enterprise WSDL. 
+        /// Gets the enterprise URI for this Outbound Message. This is the URI to use to make calls back to
+        /// Salesforce using the enterprise WSDL.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "These are directly deserialized values.")]
         public string EnterpriseUrl
@@ -118,7 +122,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets the partner URI for this Outbound Message. This is the URI to use to make calls back to 
+        /// Gets the partner URI for this Outbound Message. This is the URI to use to make calls back to
         /// Salesforce using the partner WSDL.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "These are directly deserialized values.")]
@@ -137,8 +141,8 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets the collection of notifications included in this Outbound Message. Each notification
         /// is represented as a <see cref="Dictionary{TKey, TValue}"/> where <c>TKey</c> is a property
-        /// name and <c>TValue</c> is the value of that property. For each notification, the Notification ID 
-        /// can be found using the key <c>_NotificationId</c>. Similarly, the type of notification can be found 
+        /// name and <c>TValue</c> is the value of that property. For each notification, the Notification ID
+        /// can be found using the key <c>_NotificationId</c>. Similarly, the type of notification can be found
         /// using the key <c>_NotificationType</c>.
         /// </summary>
         public IEnumerable<Dictionary<string, string>> Notifications

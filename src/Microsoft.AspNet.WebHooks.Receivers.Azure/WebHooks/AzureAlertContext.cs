@@ -4,7 +4,11 @@
 using System;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Provides context information for a WebHook notification sent from Azure Alert Service.
@@ -42,7 +46,7 @@ namespace Microsoft.AspNet.WebHooks
         public string SubscriptionId { get; set; }
 
         /// <summary>
-        /// Gets or sets the time at which the alert was triggered. The alert is triggered as soon as 
+        /// Gets or sets the time at which the alert was triggered. The alert is triggered as soon as
         /// the metric is read from the diagnostics storage.
         /// </summary>
         [JsonProperty("timestamp", Required = Required.Always)]

@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft ASP.NET Core Pusher WebHooks receiver sample</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>Microsoft ASP.NET Core Pusher WebHooks receiver sample</h1>
+
+    <p>
+        This sample illustrates how to wire up a Pusher WebHooks receiver. A sample WebHook URI is:
+        <code>https://&lt;host&gt;/api/webhooks/incoming/pusher/{id}</code>
+    </p>
+
+    <p>
+        Set the <code>MS_WebHookReceiverSecret_Pusher</code> configuration value to the Pusher application key / secret
+        key pairs, optionally using IDs to differentiate between multiple WebHooks. Key pairs are divided by
+        underscores, pairs are separated by semicolons, and IDs are separated by commas. For example
+        <code>47e5a8cd8f6bb492252a_42fef23870926753d345; ba3af8f38f3be37d476a_9eb6d047bb5465a43cb2, id1=39edd0bdb9834a588e98_16e92a1c11b6b2f43df7</code>.
+    </p>
+
+    <p>
+        Please see <a href="https://pusher.com/docs/webhooks">Pusher WebHooks</a> for more information.
+    </p>
+</body>
+</html>

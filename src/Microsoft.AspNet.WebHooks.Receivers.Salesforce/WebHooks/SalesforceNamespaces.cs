@@ -4,7 +4,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Common XML namespace URIs used by Salesforce SOAP messages.
@@ -24,7 +28,7 @@ namespace Microsoft.AspNet.WebHooks
         public static readonly XNamespace Xsi = "http://www.w3.org/2001/XMLSchema-instance";
 
         /// <summary>
-        /// The XML namespace URI identifying a Salesforce Outbound Message. 
+        /// The XML namespace URI identifying a Salesforce Outbound Message.
         /// </summary>
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "XNamespace is immutable.")]
         public static readonly XNamespace OutboundMessage = "http://soap.sforce.com/2005/09/outbound";

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ASP.NET Core Slack WebHooks infrastructure. Contains the SlackWebHookAttribute class and AddSlackWebHooks method.</Description>
+    <PackageTags>aspnetcore;webhook;receiver;slack</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\ParameterCollection.cs">
+      <Link>ParameterCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackAttachment.cs">
+      <Link>SlackAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackField.cs">
+      <Link>SlackField.cs</Link>
+    </Compile>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackResponse.cs">
+      <Link>SlackResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackSlashResponse.cs">
+      <Link>SlackSlashResponse.cs</Link>
+    </Compile>
+    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+  </ItemGroup>
+</Project>

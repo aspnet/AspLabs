@@ -1,0 +1,28 @@
+<Project>
+  <!-- Will also stop MsBuild searching parent directories for this file. -->
+
+  <!-- $(Configuration) is not defined until after Directory.Build.props runs. -->
+  <PropertyGroup Condition="$(_ImportParentFile)">
+    <!-- Update $(PackageOutputPath) only if it has a default value. Users can override this e.g. on command line. -->
+    <PackageOutputPath Condition=" 	'$(PackageOutputPath)' == '$(BaseOutputPath)$(Configuration)\' ">
+      $(RepositoryRoot)bin\$(Configuration)\
+    </PackageOutputPath>
+    <PackageOutputPath Condition=" '$(PackageOutputPath)' == '$(BaseOutputPath)$(PlatformName)\$(Configuration)\' ">
+      $(RepositoryRoot)bin\$(PlatformName)\$(Configuration)\
+    </PackageOutputPath>
+  </PropertyGroup>
+
+  <!-- Default items are added after Directory.Build.props runs, causing invalid duplicate entries. -->
+  <ItemGroup Condition="$(_ImportParentFile) AND Exists( '$(MSBuildProjectDirectory)\Properties\Resources.resx' )">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

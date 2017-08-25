@@ -3,7 +3,11 @@
 
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Provides information about the condition under which the WebHook notification was sent from Azure Alert Service.
@@ -17,7 +21,7 @@ namespace Microsoft.AspNet.WebHooks
         public string MetricName { get; set; }
 
         /// <summary>
-        /// Gets or sets the units allowed in the metric, e.g. 'Bytes' and 'Percent'. 
+        /// Gets or sets the units allowed in the metric, e.g. 'Bytes' and 'Percent'.
         /// See '<c>https://msdn.microsoft.com/en-us/library/microsoft.azure.insights.models.unit.aspx</c>'
         /// for details.
         /// </summary>
@@ -37,14 +41,14 @@ namespace Microsoft.AspNet.WebHooks
         public string Threshold { get; set; }
 
         /// <summary>
-        /// Gets or sets the period of time that is used to monitor alert activity based on 
+        /// Gets or sets the period of time that is used to monitor alert activity based on
         /// the threshold. The value is between 5 minutes and 1 day.
         /// </summary>
         [JsonProperty("windowSize")]
         public string WindowSize { get; set; }
 
         /// <summary>
-        /// Gets or sets how the data is collection, e.g. 'Average' and 'Last'. 
+        /// Gets or sets how the data is collection, e.g. 'Average' and 'Last'.
         /// See '<c>https://msdn.microsoft.com/en-us/library/microsoft.azure.insights.models.aggregationtype.aspx</c>' for details.
         /// </summary>
         [JsonProperty("timeAggregation")]

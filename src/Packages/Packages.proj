@@ -11,7 +11,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetsToBuild Include="..\**\*.nuspec" />
+    <NuGetsToBuild Include="..\**\*.nuspec" Exclude="..\**\obj\**\*.nuspec" />
   </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -4,13 +4,24 @@
 using System;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
+#if NETSTANDARD2_0
     /// <summary>
-    ///  An <see cref="IWebHookHandler"/> can post back a response to a Slack channel by updating the
-    ///  <see cref="System.Net.Http.HttpResponseMessage"/> on the <see cref="WebHookHandlerContext"/> with a response
-    ///  containing a <see cref="SlackResponse"/>.
+    /// An Slack WebHook action can post back a response to a Slack channel by returning a <see cref="SlackResponse"/>
+    /// or an <see cref="Mvc.IActionResult"/> with a <see cref="SlackResponse"/> as its content.
     /// </summary>
+#else
+    /// <summary>
+    /// An <see cref="IWebHookHandler"/> can post back a response to a Slack channel by updating the
+    /// <see cref="System.Net.Http.HttpResponseMessage"/> on the <see cref="WebHookHandlerContext"/> with a response
+    /// containing a <see cref="SlackResponse"/>.
+    /// </summary>
+#endif
     public class SlackResponse
     {
         private string _text;
@@ -29,7 +40,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets the text to send to Slack in response to an incoming WebHook request. 
+        /// Gets or sets the text to send to Slack in response to an incoming WebHook request.
         /// </summary>
         [JsonProperty("text")]
         public string Text

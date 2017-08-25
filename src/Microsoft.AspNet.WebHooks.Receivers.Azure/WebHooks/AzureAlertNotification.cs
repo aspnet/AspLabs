@@ -4,7 +4,11 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Contains information sent in a WebHook notification from Azure Alert Service.

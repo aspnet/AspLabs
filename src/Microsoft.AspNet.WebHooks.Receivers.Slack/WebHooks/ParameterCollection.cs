@@ -4,7 +4,11 @@
 using System.Collections.Specialized;
 using System.Text;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// This version of <see cref="NameValueCollection"/> creates the output supported by <see cref="SlackCommand.ParseActionWithParameters"/>

@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <_ImportParentFile>false</_ImportParentFile>
+    <_ImportParentFile Condition="$(MSBuildProjectName.EndsWith( 'CoreReceiver' ))">true</_ImportParentFile>
+  </PropertyGroup>
+
+  <Import Project="..\Directory.Build.props" Condition="$(_ImportParentFile)" />
+
+  <PropertyGroup Condition="$(_ImportParentFile)">
+    <IsPackable>false</IsPackable>
+
+    <!-- ??? Required if we revisit $(OutputPath) decision in parent Directory.Build.props file. -->
+    <!-- OutputPath>bin\</OutputPath -->
+  </PropertyGroup>
+</Project>

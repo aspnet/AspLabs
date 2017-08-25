@@ -5,14 +5,27 @@ using System;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
+#if NETSTANDARD2_0
     /// <summary>
-    ///  An <see cref="IWebHookHandler"/> can post a response to a Slack Slash request by updating the
-    ///  <see cref="System.Net.Http.HttpResponseMessage"/> on the <see cref="WebHookHandlerContext"/> with a response
-    ///  containing a <see cref="SlackSlashResponse"/>. Please see <c>https://api.slack.com/docs/attachments#message_formatting</c> 
-    ///  for additional details.
+    /// An Slack WebHook action can post back a response to a Slack Slash request by returning a
+    /// <see cref="SlackSlashResponse"/> or an <see cref="Mvc.IActionResult"/> with a <see cref="SlackSlashResponse"/>
+    /// as its content. Please see <see href="https://api.slack.com/docs/attachments#message_formatting"/> for
+    /// additional details about Slack Slash messages.
     /// </summary>
+#else
+    /// <summary>
+    /// An <see cref="IWebHookHandler"/> can post a response to a Slack Slash request by updating the
+    /// <see cref="System.Net.Http.HttpResponseMessage"/> on the <see cref="WebHookHandlerContext"/> with a response
+    /// containing a <see cref="SlackSlashResponse"/>. Please see <c>https://api.slack.com/docs/attachments#message_formatting</c>
+    /// for additional details.
+    /// </summary>
+#endif
     public class SlackSlashResponse
     {
         private readonly Collection<SlackAttachment> _attachments = new Collection<SlackAttachment>();
@@ -20,11 +33,11 @@ namespace Microsoft.AspNet.WebHooks
         private string _text;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SlackSlashResponse"/> class with the given <paramref name="text"/>. 
+        /// Initializes a new instance of the <see cref="SlackSlashResponse"/> class with the given <paramref name="text"/>.
         /// </summary>
-        /// <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting 
-        /// as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed 
-        /// if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with 
+        /// <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting
+        /// as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed
+        /// if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with
         /// a <c>"Show more..."</c> link to the contents.
         /// </param>
         public SlackSlashResponse(string text)
@@ -33,13 +46,13 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SlackSlashResponse"/> class with the given <paramref name="text"/> and 
-        /// one or more <see cref="SlackAttachment"/> instances for additional response information. Please see 
+        /// Initializes a new instance of the <see cref="SlackSlashResponse"/> class with the given <paramref name="text"/> and
+        /// one or more <see cref="SlackAttachment"/> instances for additional response information. Please see
         /// <see cref="SlackAttachment"/> for all the options available.
         /// </summary>
-        /// <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting 
-        /// as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed 
-        /// if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with 
+        /// <param name="text">The Slack Slash command response text. The text may contain Markdown-style formatting
+        /// as described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed
+        /// if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with
         /// a <c>"Show more..."</c> link to the contents.
         /// </param>
         /// <param name="attachments">One or more <see cref="SlackAttachment"/> instances providing additional response information.
@@ -70,7 +83,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets the Slack Slash Response text. 
+        /// Gets or sets the Slack Slash Response text.
         /// </summary>
         [JsonProperty("text")]
         public string Text

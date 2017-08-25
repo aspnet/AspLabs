@@ -2,10 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.WebHooks.Serialization;
+#else
 using Microsoft.AspNet.WebHooks.Serialization;
+#endif
 using Newtonsoft.Json;
 
+#if NETSTANDARD2_0
+namespace Microsoft.AspNetCore.WebHooks
+#else
 namespace Microsoft.AspNet.WebHooks
+#endif
 {
     /// <summary>
     /// Contains information sent in a WebHook notification from Stripe, see
