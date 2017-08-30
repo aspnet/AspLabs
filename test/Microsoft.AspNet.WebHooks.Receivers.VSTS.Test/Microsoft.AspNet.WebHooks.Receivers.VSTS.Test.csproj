@@ -64,6 +64,7 @@
     <Compile Include="Payloads\BuildCompletedPayloadTests.cs" />
     <Compile Include="Payloads\CodeCheckedInPayloadTests.cs" />
     <Compile Include="Payloads\GitPullRequestCreatedPayloadTests.cs" />
+    <Compile Include="Payloads\GitPullRequestMergeCommitCreatedPayloadTests.cs" />
     <Compile Include="Payloads\GitPullRequestUpdatedPayloadTests.cs" />
     <Compile Include="Payloads\GitPushPayloadTests.cs" />
     <Compile Include="Payloads\TeamRoomMessagePostedPayloadTests.cs" />
@@ -90,6 +91,7 @@
     <EmbeddedResource Include="Messages\git.push.json" />
     <EmbeddedResource Include="Messages\git.pullrequest.created.json" />
     <EmbeddedResource Include="Messages\git.pullrequest.updated.json" />
+    <EmbeddedResource Include="Messages\git.pullrequest.merged.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

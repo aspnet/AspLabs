@@ -47,6 +47,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Extensions\HttpConfigurationExtensions.cs" />
+    <Compile Include="Payloads\GitPullRequestMergeCommitCreatedPayload.cs" />
     <Compile Include="Payloads\GitPullRequestUpdatedPayload.cs" />
     <Compile Include="Payloads\GitPullLinks.cs" />
     <Compile Include="Payloads\GitPullRequestCreatedPayload.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Payloads\GitLink.cs" />
     <Compile Include="Payloads\GitProject.cs" />
     <Compile Include="Payloads\GitPullRequestResource.cs" />
+    <Compile Include="Payloads\GitPullRequestMergeCommitCreatedResource.cs" />
     <Compile Include="Payloads\GitPullRequestUpdatedResource.cs" />
     <Compile Include="Payloads\GitPushLinks.cs" />
     <Compile Include="Payloads\GitPushPayload.cs" />
