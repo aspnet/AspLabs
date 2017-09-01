@@ -17,6 +17,12 @@ namespace Microsoft.AspNet.WebHooks.Payloads
         public GitLink Self { get; set; }
 
         /// <summary>
+        /// Link to pull request web view
+        /// </summary>
+        [JsonProperty("web")]
+        public GitLink Web { get; set; }
+
+        /// <summary>
         /// Repository Link
         /// </summary>
         [JsonProperty("repository")]
