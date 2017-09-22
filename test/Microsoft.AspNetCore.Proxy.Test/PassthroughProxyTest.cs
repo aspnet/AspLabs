@@ -10,7 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Proxy.Test
@@ -18,37 +20,32 @@ namespace Microsoft.AspNetCore.Proxy.Test
     public class ProxyTest
     {
         [Theory]
-        [InlineData("GET", "3001")]
-        [InlineData("HEAD", "3002")]
-        [InlineData("TRACE", "3003")]
-        [InlineData("DELETE", "3004")]
-        public async Task PassthroughRequestsWithoutBodyWithResponseHeaders(string MethodType, string Port)
+        [InlineData("GET", 3001)]
+        [InlineData("HEAD", 3002)]
+        [InlineData("TRACE", 3003)]
+        [InlineData("DELETE", 3004)]
+        public async Task PassthroughRequestsWithoutBodyWithResponseHeaders(string MethodType, int Port)
         {
             var builder = new WebHostBuilder()
-                .Configure(app =>
+                .ConfigureServices(services => services.AddProxy(options =>
                 {
-                    app.RunProxy(new ProxyOptions
+                    options.MessageHandler = new TestMessageHandler
                     {
-                        Scheme = "http",
-                        Host = "localhost",
-                        Port = Port,
-                        BackChannelMessageHandler = new TestMessageHandler
+                        Sender = req =>
                         {
-                            Sender = req =>
-                            {
-                                IEnumerable<string> hostValue;
-                                req.Headers.TryGetValues("Host", out hostValue);
-                                Assert.Equal("localhost:" + Port, hostValue.Single());
-                                Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
-                                Assert.Equal(new HttpMethod(MethodType), req.Method);
-                                var response = new HttpResponseMessage(HttpStatusCode.Created);
-                                response.Headers.Add("testHeader", "testHeaderValue");
-                                response.Content = new StringContent("Response Body");
-                                return response;
-                            }
+                            IEnumerable<string> hostValue;
+                            req.Headers.TryGetValues("Host", out hostValue);
+                            Assert.Equal("localhost:" + Port, hostValue.Single());
+                            Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
+                            Assert.Equal(new HttpMethod(MethodType), req.Method);
+                            var response = new HttpResponseMessage(HttpStatusCode.Created);
+                            response.Headers.Add("testHeader", "testHeaderValue");
+                            response.Content = new StringContent("Response Body");
+                            return response;
                         }
-                    });
-                });
+                    };
+                }))
+                .Configure(app => app.RunProxy(new Uri($"http://localhost:{Port}")));
             var server = new TestServer(builder);
 
             var requestMessage = new HttpRequestMessage(new HttpMethod(MethodType), "");
@@ -63,43 +60,51 @@ namespace Microsoft.AspNetCore.Proxy.Test
         }
 
         [Theory]
-        [InlineData("POST", "3005")]
-        [InlineData("PUT", "3006")]
-        [InlineData("OPTIONS", "3007")]
-        [InlineData("NewHttpMethod", "3008")]
-        public async Task PassthroughReuestWithBody(string MethodType, string Port)
+        [InlineData("POST", 3005)]
+        [InlineData("PUT", 3006)]
+        [InlineData("OPTIONS", 3007)]
+        [InlineData("NewHttpMethod", 3008)]
+        public async Task PassthroughRequestsWithBody(string MethodType, int Port)
         {
+            const string hostHeader = "mydomain.example";
             var builder = new WebHostBuilder()
-                .Configure(app =>
+                .ConfigureServices(services => services.AddProxy(options =>
                 {
-                    app.RunProxy(new ProxyOptions
+                    options.PrepareRequest = (originalRequest, message) =>
                     {
-                        Scheme = "http",
-                        Host = "localhost",
-                        Port = Port,
-                        BackChannelMessageHandler = new TestMessageHandler
+                        message.Headers.Add("X-Forwarded-Host", originalRequest.Host.Host);
+                        return Task.FromResult(0);
+                    };
+                    options.MessageHandler = new TestMessageHandler
+                    {
+                        Sender = req =>
                         {
-                            Sender = req =>
-                            {
-                                IEnumerable<string> hostValue;
-                                req.Headers.TryGetValues("Host", out hostValue);
-                                Assert.Equal("localhost:" + Port, hostValue.Single());
-                                Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
-                                Assert.Equal(new HttpMethod(MethodType), req.Method);
-                                var content = req.Content.ReadAsStringAsync();
-                                Assert.True(content.Wait(3000) && !content.IsFaulted);
-                                Assert.Equal("Request Body", content.Result);
-                                var response = new HttpResponseMessage(HttpStatusCode.Created);
-                                response.Headers.Add("testHeader", "testHeaderValue");
-                                response.Content = new StringContent("Response Body");
-                                return response;
-                            }
+                            IEnumerable<string> hostValue;
+                            req.Headers.TryGetValues("Host", out hostValue);
+                            IEnumerable<string> forwardedHostValue;
+                            req.Headers.TryGetValues("X-Forwarded-Host", out forwardedHostValue);
+                            Assert.Equal(hostHeader, forwardedHostValue.Single());
+                            Assert.Equal("localhost:" + Port, hostValue.Single());
+                            Assert.Equal("http://localhost:" + Port + "/", req.RequestUri.ToString());
+                            Assert.Equal(new HttpMethod(MethodType), req.Method);
+                            var content = req.Content.ReadAsStringAsync();
+                            Assert.True(content.Wait(3000) && !content.IsFaulted);
+                            Assert.Equal("Request Body", content.Result);
+                            var response = new HttpResponseMessage(HttpStatusCode.Created);
+                            response.Headers.Add("testHeader", "testHeaderValue");
+                            response.Content = new StringContent("Response Body");
+                            return response;
                         }
-                    });
-                });
+                    };
+                }))
+                .Configure(app => app.RunProxy(new ProxyOptions
+                {
+                    Scheme = "http",
+                    Host = new HostString("localhost", Port),
+                }));
             var server = new TestServer(builder);
 
-            var requestMessage = new HttpRequestMessage(new HttpMethod(MethodType), "");
+            var requestMessage = new HttpRequestMessage(new HttpMethod(MethodType), "http://mydomain.example");
             requestMessage.Content = new StringContent("Request Body");
             var responseMessage = await server.CreateClient().SendAsync(requestMessage);
             var responseContent = responseMessage.Content.ReadAsStringAsync();
