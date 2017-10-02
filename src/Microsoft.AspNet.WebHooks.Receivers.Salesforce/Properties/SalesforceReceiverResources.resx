@@ -132,6 +132,9 @@
   <data name="Receiver_BadXml" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as valid XML.</value>
   </data>
+  <data name="Receiver_HandlerFailed" xml:space="preserve">
+    <value>Handler's status: {0}, '{1}'.</value>
+  </data>
   <data name="Receiver_NoBody" xml:space="preserve">
     <value>The WebHook request entity body cannot be empty.</value>
   </data>

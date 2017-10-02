@@ -30,16 +30,35 @@ namespace Microsoft.AspNet.WebHooks
                 return default(T);
             }
 
-            if (context.Data is JToken && !typeof(JToken).IsAssignableFrom(typeof(T)))
+            // Do explicit conversion if Data is a JToken subtype and T is not e.g. Data is a JObject and T is
+            // one of the strong types for request content.
+            //
+            // IsAssignableFrom(...) check looks odd because return statement effectively assigns from Data to T.
+            // However, this check avoids useless "conversions" e.g. from a JObject to a JObject without attempting
+            // impossible conversions e.g. from a JObject to a JArray. Json.NET does not support semantically-invalid
+            // conversions between JToken subtypes.
+            //
+            // !typeof(T).IsAssignableFrom(context.Data.GetType()) may be more precise but is less efficient. That
+            // check would not change the (null) outcome in the JObject to JArray case, just adds a first-chance
+            // Exception (because the code would attempt the impossible conversion). About the only new cases it
+            // handles with a cast instead of ToObject<T>() are extreme corner cases such as when T is
+            // IDictionary<string, JToken> or another interface the current Data (e.g. JObject) may implement. Even
+            // then, Json.NET can usually perform an explicit conversion.
+            if (context.Data is JToken token && !typeof(JToken).IsAssignableFrom(typeof(T)))
             {
                 try
                 {
-                    var data = ((JToken)context.Data).ToObject<T>();
+                    var data = token.ToObject<T>();
                     return data;
                 }
                 catch (Exception ex)
                 {
-                    var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.GetDataOrDefault_Failure, context.Data.GetType(), typeof(T), ex.Message);
+                    var message = string.Format(
+                        CultureInfo.CurrentCulture,
+                        ReceiverResources.GetDataOrDefault_Failure,
+                        context.Data.GetType(),
+                        typeof(T),
+                        ex.Message);
                     context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(message, ex);
                     return default(T);
                 }

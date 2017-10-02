@@ -54,7 +54,6 @@ namespace Microsoft.AspNet.WebHooks
                     { string.Empty, "\"data\"" },
                     { "你好", "\"data\"" },
                     { "id", "\"data\"" },
-                    { "id", "\"data\"" },
                     { "id", "1234" },
                     { "id", "1234.5678" },
                     { "id", "{}" },

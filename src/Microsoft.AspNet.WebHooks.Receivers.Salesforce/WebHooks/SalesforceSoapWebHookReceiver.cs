@@ -93,12 +93,33 @@ namespace Microsoft.AspNet.WebHooks
                 // Call registered handlers
                 var response = await ExecuteWebHookAsync(id, context, request, new string[] { action }, notifications);
 
-                // Add SOAP response if not already present
-                if (response == null || response.Content == null || !response.Content.IsXml())
+                // Add SOAP response content if not already present or isn't XML. Ignore current (e.g. JSON) content.
+                if (response?.Content == null || !response.Content.IsXml())
                 {
-                    var success = ReadResource("Microsoft.AspNet.WebHooks.Messages.NotificationResponse.xml");
-                    response = GetXmlResponse(request, HttpStatusCode.OK, success);
+                    // Ignore redirects because SOAP 1.1 doesn't mention them and they're corner cases in SOAP.
+                    var statusCode = response?.StatusCode ?? HttpStatusCode.OK;
+                    if (statusCode >= (HttpStatusCode)200 && statusCode < (HttpStatusCode)300)
+                    {
+                        var success = ReadResource("Microsoft.AspNet.WebHooks.Messages.NotificationResponse.xml");
+                        response = GetXmlResponse(request, statusCode, success);
+                    }
+                    else
+                    {
+                        // Move failure information into a SOAP fault response. Fault contains code soapenv:Client and
+                        // that must be transmitted with HTTP status 400, Bad Request according to SOAP 1.2 (mixing
+                        // that sensible choice into this SOAP 1.1 implementation).
+                        var resource = ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml");
+                        var faultString = string.Format(
+                            CultureInfo.CurrentCulture,
+                            SalesforceReceiverResources.Receiver_HandlerFailed,
+                            statusCode,
+                            response.ReasonPhrase);
+
+                        var failure = string.Format(CultureInfo.InvariantCulture, resource, faultString);
+                        response = GetXmlResponse(request, HttpStatusCode.BadRequest, failure);
+                    }
                 }
+
                 return response;
             }
             else
