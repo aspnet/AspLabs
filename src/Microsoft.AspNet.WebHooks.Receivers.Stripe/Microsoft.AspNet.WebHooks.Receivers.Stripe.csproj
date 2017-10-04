@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="WebHooks\StripeEvent.cs" />
     <Compile Include="WebHooks\StripeEventData.cs" />
+    <Compile Include="WebHooks\StripeRequestData.cs" />
     <Compile Include="WebHooks\StripeWebHookReceiver.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,8 @@
   },
   "livemode": true,
   "pending_webhooks": 10,
-  "request": "req_7nbnyKCObIkSXC",
+  "request": {
+    "id": "req_7nbnyKCObIkSXC"
+  },
   "type": "customer.source.created"
 }

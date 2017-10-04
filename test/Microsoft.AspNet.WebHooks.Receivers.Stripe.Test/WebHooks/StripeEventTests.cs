@@ -30,7 +30,10 @@ namespace Microsoft.AspNet.WebHooks
                 },
                 LiveMode = true,
                 PendingWebHooks = 10,
-                Request = "req_7nbnyKCObIkSXC",
+                RequestData = new StripeRequestData
+                {
+                    Id = "req_7nbnyKCObIkSXC",
+                },
                 EventType = "customer.source.created",
             };
 
