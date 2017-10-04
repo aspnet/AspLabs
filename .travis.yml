@@ -1,0 +1,11 @@
+language: csharp
+sudo: false
+dist: trusty
+mono: none
+os:
+  - linux
+branches:
+  only:
+   - not.a.branch
+script:
+  - echo Skipping builds for now.

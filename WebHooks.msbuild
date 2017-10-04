@@ -11,7 +11,7 @@
     <BuildPortable Condition=" '$(BuildPortable)' == '' ">true</BuildPortable>
     <BuildInParallel Condition=" '$(BuildInParallel)' == '' And $(MSBuildNodeCount) &gt; 1 ">true</BuildInParallel>
     <BuildInParallel Condition=" '$(BuildInParallel)' == '' ">false</BuildInParallel>
-    <TestResultsDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\test\TestResults\</TestResultsDirectory>
+    <TestResultsDirectory>$(MSBuildThisFileDirectory)bin\Test\$(Configuration)\TestResults\</TestResultsDirectory>
     <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
     <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
     <NuGetExe>.nuget\NuGet.exe</NuGetExe>
@@ -101,7 +101,7 @@
 
   <Target Name="RunTests" DependsOnTargets="CheckSkipStrongNames">
     <ItemGroup>
-      <TestDLLsXunit Include="bin\$(Configuration)\test\*.Test.dll;bin\$(Configuration)\test\*.Test.*.dll;bin\$(Configuration)\Test\NetCore\*.Test.dll" />
+      <TestDLLsXunit Include="bin\Test\$(Configuration)\*.Test.dll;bin\Test\$(Configuration)\*.Test.*.dll;bin\Test\$(Configuration)\NetCore\*.Test.dll" />
       <XunitProject Include="tools\WebHooks.xunit.targets">
         <Properties>TestAssembly=%(TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(TestDLLsXunit.FileName)-XunitResults.xml</Properties>
       </XunitProject>

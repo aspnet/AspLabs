@@ -18,3 +18,4 @@ _[Ss]cripts
 *.dot[Cc]over
 *.pubxml
 *.zip
+*launchSettings.json

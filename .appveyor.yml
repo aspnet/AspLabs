@@ -1,0 +1,18 @@
+﻿init:
+  - git config --global core.autocrlf true
+branches:
+  only:
+    - dev
+    - /^(.*\/)?ci-.*$/
+    - /^rel\/.*/
+configuration:
+  CodeAnalysis
+  Release
+matrix:
+  fast_finish: true
+build_script:
+  - cmd: .\build.cmd BuildPackages /P:Configuration=$(configuration)
+clone_depth: 1
+test: off
+deploy: off
+os: Visual Studio 2017
