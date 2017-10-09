@@ -11,6 +11,7 @@
     <BuildPortable Condition=" '$(BuildPortable)' == '' ">true</BuildPortable>
     <BuildInParallel Condition=" '$(BuildInParallel)' == '' And $(MSBuildNodeCount) &gt; 1 ">true</BuildInParallel>
     <BuildInParallel Condition=" '$(BuildInParallel)' == '' ">false</BuildInParallel>
+    <TestInParallel Condition=" '$(TestInParallel)' == '' ">$(BuildInParallel)</TestInParallel>
     <TestResultsDirectory>$(MSBuildThisFileDirectory)bin\Test\$(Configuration)\TestResults\</TestResultsDirectory>
     <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
     <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
@@ -111,7 +112,7 @@
     <RemoveDir Directories="$(TestResultsDirectory)" />
     <MakeDir Directories="$(TestResultsDirectory)" />
 
-    <MSBuild Projects="@(XunitProject)" BuildInParallel="$(BuildInParallel)" Targets="Xunit" />
+    <MSBuild Projects="@(XunitProject)" BuildInParallel="$(TestInParallel)" Targets="Xunit" />
   </Target>
 
   <Target Name="CheckSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
