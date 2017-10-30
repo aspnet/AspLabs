@@ -6,7 +6,6 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.ApplicationModels;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Routing;
@@ -54,31 +53,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddWebHookSingletonFilter<WebHookVerifyCodeFilter>(WebHookSecurityFilter.Order)
                 .AddWebHookSingletonFilter<WebHookVerifyMethodFilter>(WebHookVerifyMethodFilter.Order)
                 .AddWebHookSingletonFilter<WebHookVerifyRequiredValueFilter>(WebHookVerifyRequiredValueFilter.Order);
-        }
-
-        /// <summary>
-        /// Add WebHook configuration and services to the specified <paramref name="builder"/>.
-        /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
-        /// <param name="setupAction">
-        /// An <see cref="Action{WebHookOptions}"/> to configure the provided <see cref="WebHookOptions"/>.
-        /// </param>
-        /// <returns>The <paramref name="builder"/>.</returns>
-        public static IMvcCoreBuilder AddWebHooks(this IMvcCoreBuilder builder, Action<WebHookOptions> setupAction)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
-
-            builder.AddWebHooks();
-            builder.Services.Configure(setupAction);
-
-            return builder;
         }
 
         /// <summary>

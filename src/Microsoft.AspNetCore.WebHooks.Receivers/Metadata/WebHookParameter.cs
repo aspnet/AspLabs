@@ -11,57 +11,37 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     public class WebHookParameter
     {
         /// <summary>
-        /// Initializes a new <see cref="WebHookParameter"/> with the given <paramref name="name"/> and
-        /// <paramref name="headerName"/>. <see cref="IsQueryParameter"/> and <see cref="IsRequired"/> are
+        /// Initializes a new <see cref="WebHookParameter"/> with the given <paramref name="name"/>,
+        /// <paramref name="parameterType"/> and <paramref name="sourceName"/>. <see cref="IsRequired"/> is
         /// <see langword="false"/> when using this constructor.
         /// </summary>
         /// <param name="name">The name of an action parameter.</param>
-        /// <param name="headerName">The name of the HTTP header containing this parameter's value.</param>
-        public WebHookParameter(string name, string headerName)
-            : this(name, sourceName: headerName, isQueryParameter: false)
+        /// <param name="parameterType">The <see cref="WebHookParameterType"/> of this parameter.</param>
+        /// <param name="sourceName">
+        /// The name of the HTTP header, <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query parameter
+        /// containing this parameter's value.
+        /// </param>
+        public WebHookParameter(string name, WebHookParameterType parameterType, string sourceName)
+            : this(name, parameterType, sourceName, isRequired: false)
         {
         }
 
         /// <summary>
         /// Initializes a new <see cref="WebHookParameter"/> with the given <paramref name="name"/>,
-        /// <paramref name="sourceName"/> and <paramref name="isQueryParameter"/>. <see cref="IsRequired"/> is
-        /// <see langword="false"/> when using this constructor.
+        /// <paramref name="parameterType"/>, <paramref name="sourceName"/>, and <paramref name="isRequired"/>.
         /// </summary>
         /// <param name="name">The name of an action parameter.</param>
+        /// <param name="parameterType">The <see cref="WebHookParameterType"/> of this parameter.</param>
         /// <param name="sourceName">
-        /// The name of the HTTP header or, if <paramref name="isQueryParameter"/> is <see langword="true"/>, query
-        /// parameter containing this parameter's value.
-        /// </param>
-        /// <param name="isQueryParameter">
-        /// Specifies whether <paramref name="sourceName"/> refers to a query parameter. If <see langword="true"/>,
-        /// <paramref name="sourceName"/> refers to a query parameter. Otherwise, <paramref name="sourceName"/> refers
-        /// to an HTTP header.
-        /// </param>
-        public WebHookParameter(string name, string sourceName, bool isQueryParameter)
-            : this(name, sourceName, isQueryParameter, isRequired: false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="WebHookParameter"/> with the given <paramref name="name"/>,
-        /// <paramref name="sourceName"/>, <paramref name="isQueryParameter"/>, and <paramref name="isRequired"/>.
-        /// </summary>
-        /// <param name="name">The name of an action parameter.</param>
-        /// <param name="sourceName">
-        /// The name of the HTTP header or, if <paramref name="isQueryParameter"/> is <see langword="true"/> query
-        /// parameter containing this parameter's value.
-        /// </param>
-        /// <param name="isQueryParameter">
-        /// Specifies whether <paramref name="sourceName"/> refers to a query parameter. If <see langword="true"/>,
-        /// <paramref name="sourceName"/> refers to a query parameter. Otherwise, <paramref name="sourceName"/> refers
-        /// to an HTTP header.
+        /// The name of the HTTP header, <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query parameter
+        /// containing this parameter's value.
         /// </param>
         /// <param name="isRequired">
-        /// Specifies whether the <paramref name="sourceName"/> HTTP header or, if <paramref name="isQueryParameter"/>
-        /// is <see langword="true"/>, query parameter is required in a WebHook request. If <see langword="true"/> and
-        /// the header or query parameter is missing, the receiver will respond with status code 400 "Bad Request".
+        /// Specifies whether the <see cref="SourceName"/> HTTP header,
+        /// <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query parameter is required in a WebHook
+        /// request.
         /// </param>
-        public WebHookParameter(string name, string sourceName, bool isQueryParameter, bool isRequired)
+        public WebHookParameter(string name, WebHookParameterType parameterType, string sourceName, bool isRequired)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -73,8 +53,8 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
             }
 
             Name = name;
+            ParameterType = parameterType;
             SourceName = sourceName;
-            IsQueryParameter = isQueryParameter;
             IsRequired = isRequired;
         }
 
@@ -84,27 +64,26 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         public string Name { get; }
 
         /// <summary>
-        /// Gets the name of the HTTP header or, if <see cref="IsQueryParameter"/> is <see langword="true"/>, query
+        /// Gets the <see cref="WebHookParameterType"/> of this parameter.
+        /// </summary>
+        public WebHookParameterType ParameterType { get; }
+
+        /// <summary>
+        /// Gets the name of the HTTP header, <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query
         /// parameter containing this parameter's value.
         /// </summary>
+        /// <seealso cref="ParameterType"/>
         public string SourceName { get; }
 
         /// <summary>
-        /// Gets an indication <see cref="SourceName"/> refers to a query parameter.
+        /// Gets an indication the <see cref="SourceName"/> HTTP header,
+        /// <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query parameter is required in a WebHook
+        /// request.
         /// </summary>
         /// <value>
-        /// If <see langword="true"/>, <see cref="SourceName"/> refers to a query parameter. Otherwise,
-        /// <see cref="SourceName"/> refers to an HTTP header.
-        /// </value>
-        public bool IsQueryParameter { get; }
-
-        /// <summary>
-        /// Gets an indication the <see cref="SourceName"/> HTTP header or, if <see cref="IsQueryParameter"/> is
-        /// <see langword="true"/>, query parameter is required in a WebHook request.
-        /// </summary>
-        /// <value>
-        /// If <see langword="true"/> and the header or query parameter is missing, the receiver will respond with
-        /// status code 400 "Bad Request". Otherwise, no additional validation is performed.
+        /// If <see langword="true"/> and the <see cref="SourceName"/> HTTP header
+        /// <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry or query parameter is missing, the receiver
+        /// will respond with status code 400 "Bad Request". Otherwise, no additional validation is performed.
         /// </value>
         public bool IsRequired { get; }
     }

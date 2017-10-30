@@ -19,12 +19,11 @@ namespace Microsoft.AspNetCore.WebHooks
     /// </para>
     /// <para>The signature of the action should be:
     /// <code>
-    /// Task{TResult} ActionName(string id, string @event, TData data)
+    /// Task{TResult} ActionName(string id, string @event, string subtext, TData data)
     /// </code>
     /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
-    /// <see cref="Http.IFormCollection"/> or <see cref="System.Collections.Specialized.NameValueCollection"/>.
-    /// <c>TResult</c> may be <see cref="SlackResponse"/>, <see cref="SlackSlashResponse"/>, or an
-    /// <see cref="IActionResult"/> implementation.
+    /// <see cref="Http.IFormCollection"/>. <c>TResult</c> may be <see cref="SlackResponse"/>,
+    /// <see cref="SlackSlashResponse"/>, or an <see cref="IActionResult"/> implementation.
     /// </para>
     /// <para>
     /// The '<c>MS_WebHookReceiverSecret_Slack</c>' configuration value contains Slack shared-private security tokens.

@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ namespace SlackCoreReceiver.Controllers
         }
 
         [SlackWebHook(Id = "command")]
-        public IActionResult SlackForCommand(string @event, IFormCollection data)
+        public IActionResult SlackForCommand(string @event, string subtext, IFormCollection data)
         {
             if (!ModelState.IsValid)
             {
@@ -42,7 +41,6 @@ namespace SlackCoreReceiver.Controllers
                 trigger);
 
             string text = data[SlackConstants.TextRequestFieldName];
-            string subtext = data[SlackConstants.SubtextRequestFieldName];
             _logger.LogInformation(
                 2,
                 "Data contains text '{Text}' and subtext '{Subtext}'.",
@@ -73,7 +71,7 @@ namespace SlackCoreReceiver.Controllers
         }
 
         [SlackWebHook(Id = "trigger")]
-        public IActionResult SlackForTrigger(string @event, NameValueCollection data)
+        public IActionResult SlackForTrigger(string @event, string subtext, IFormCollection data)
         {
             if (!ModelState.IsValid)
             {
@@ -81,7 +79,7 @@ namespace SlackCoreReceiver.Controllers
             }
 
             _logger.LogInformation(
-                0,
+                3,
                 "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
                 nameof(SlackController),
                 "trigger",
@@ -92,16 +90,15 @@ namespace SlackCoreReceiver.Controllers
             var command = data[SlackConstants.CommandRequestFieldName];
             var trigger = data[SlackConstants.TriggerRequestFieldName];
             _logger.LogInformation(
-                1,
+                4,
                 "Data contains channel '{ChannelName}', command '{Command}', and trigger '{Trigger}'.",
                 channel,
                 command,
                 trigger);
 
             var text = data[SlackConstants.TextRequestFieldName];
-            var subtext = data[SlackConstants.SubtextRequestFieldName];
             _logger.LogInformation(
-                2,
+                5,
                 "Data contains text '{Text}' and subtext '{Subtext}'.",
                 text,
                 subtext);
@@ -120,7 +117,7 @@ namespace SlackCoreReceiver.Controllers
         }
 
         [SlackWebHook]
-        public IActionResult Slack(string id, string @event, NameValueCollection data)
+        public IActionResult Slack(string id, string @event, string subtext, IFormCollection data)
         {
             if (!ModelState.IsValid)
             {
@@ -128,7 +125,7 @@ namespace SlackCoreReceiver.Controllers
             }
 
             _logger.LogInformation(
-                3,
+                6,
                 "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
                 nameof(SlackController),
                 id,
@@ -139,16 +136,15 @@ namespace SlackCoreReceiver.Controllers
             var command = data[SlackConstants.CommandRequestFieldName];
             var trigger = data[SlackConstants.TriggerRequestFieldName];
             _logger.LogInformation(
-                4,
+                7,
                 "Data contains channel '{ChannelName}', command '{Command}', and trigger '{Trigger}'.",
                 channel,
                 command,
                 trigger);
 
             var text = data[SlackConstants.TextRequestFieldName];
-            var subtext = data[SlackConstants.SubtextRequestFieldName];
             _logger.LogInformation(
-                5,
+                8,
                 "Data contains text '{Text}' and subtext '{Subtext}'.",
                 text,
                 subtext);

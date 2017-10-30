@@ -186,10 +186,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 5. Success. Provide request data and event name for model binding.
+            // 5. Success. Provide event name for model binding.
             routeData.Values[WebHookConstants.EventKeyName] = eventName;
-            context.HttpContext.Items[typeof(XElement)] = data;
-            context.HttpContext.Items[typeof(SalesforceNotifications)] = notifications;
 
             await next();
         }

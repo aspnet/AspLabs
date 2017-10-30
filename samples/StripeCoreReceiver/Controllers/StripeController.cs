@@ -16,7 +16,7 @@ namespace StripeCoreReceiver.Controllers
         }
 
         [StripeWebHook(Id = "It")]
-        public IActionResult StripeForIt(string @event, JObject data)
+        public IActionResult StripeForIt(string @event, string notificationId, JObject data)
         {
             if (!ModelState.IsValid)
             {
@@ -27,7 +27,7 @@ namespace StripeCoreReceiver.Controllers
         }
 
         [StripeWebHook]
-        public IActionResult Stripe(string id, string @event, StripeEvent data)
+        public IActionResult Stripe(string id, string @event, string notificationId, StripeEvent data)
         {
             if (!ModelState.IsValid)
             {
@@ -44,10 +44,11 @@ namespace StripeCoreReceiver.Controllers
 
             _logger.LogInformation(
                 1,
-                "Data created at '{Created}' and contains Notification ID '{Id}', Live mode '{DetailsLiveMode}', " +
-                "and Request ID '{RequestId}'.",
+                "Data created at '{Created}' and contains Notification ID '{Id}' / '{NotificationId}', Live mode " +
+                "'{DetailsLiveMode}', and Request ID '{RequestId}'.",
                 data.Created,
                 data.Id,
+                notificationId,
                 data.LiveMode,
                 data.Request);
 

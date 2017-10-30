@@ -63,9 +63,6 @@ namespace Microsoft.AspNetCore.WebHooks
             }
         }
 
-        /// <inheritdoc />
-        public bool UseHttpContextModelBinder => false;
-
         /// <summary>
         /// Gets or sets the name of the event the associated controller action accepts.
         /// </summary>

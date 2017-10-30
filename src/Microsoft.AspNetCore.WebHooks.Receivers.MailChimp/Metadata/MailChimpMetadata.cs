@@ -21,9 +21,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Form;
 
-        /// <inheritdoc />
-        public bool UseHttpContextModelBinder => false;
-
         // IWebHookSecurityMetadata...
 
         /// <inheritdoc />

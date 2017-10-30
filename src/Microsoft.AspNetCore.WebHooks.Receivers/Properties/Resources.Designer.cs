@@ -88,15 +88,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; associated with model of unsupported type &apos;{1}&apos;..
-        /// </summary>
-        internal static string HttpContextModelBinder_UnsupportedType {
-            get {
-                return ResourceManager.GetString("HttpContextModelBinder_UnsupportedType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Duplicate &apos;{0}&apos; registrations found..
         /// </summary>
         internal static string MetadataProvider_DuplicateMetadata {

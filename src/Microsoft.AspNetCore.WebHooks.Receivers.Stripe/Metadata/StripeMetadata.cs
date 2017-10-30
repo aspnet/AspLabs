@@ -1,9 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Globalization;
-using Microsoft.AspNetCore.WebHooks.Properties;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
@@ -11,7 +9,10 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Stripe receiver.
     /// </summary>
-    public class StripeMetadata : WebHookMetadata, IWebHookRequestMetadataService, IWebHookSecurityMetadata
+    public class StripeMetadata : WebHookMetadata,
+        IWebHookBindingMetadata,
+        IWebHookRequestMetadataService,
+        IWebHookSecurityMetadata
     {
         private readonly IConfiguration _configuration;
 
@@ -27,13 +28,22 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
             _configuration = configuration;
         }
 
+        // IWebHookBindingMetadata...
+
+        /// <inheritdoc />
+        public IReadOnlyList<WebHookParameter> Parameters { get; } = new List<WebHookParameter>
+        {
+            new WebHookParameter(
+                StripeConstants.NotificationIdParameterName,
+                WebHookParameterType.RouteValue,
+                StripeConstants.NotificationIdKeyName,
+                isRequired: false),
+        };
+
         // IWebHookRequestMetadataService...
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;
-
-        /// <inheritdoc />
-        public bool UseHttpContextModelBinder => true;
 
         // IWebHookSecurityMetadata...
 

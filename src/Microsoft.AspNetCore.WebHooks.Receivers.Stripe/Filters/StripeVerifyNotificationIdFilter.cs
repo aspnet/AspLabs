@@ -209,10 +209,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
             }
 
-            // 6. Success. Provide request data and event name for model binding.
+            // 6. Success. Provide event name and notification id for model binding.
             routeData.Values[WebHookConstants.EventKeyName] = eventName;
-            context.HttpContext.Items[typeof(JObject)] = data;
-            context.HttpContext.Items[typeof(StripeEvent)] = data.ToObject<StripeEvent>();
+            routeData.Values[StripeConstants.NotificationIdKeyName] = notificationId;
 
             await next();
         }

@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// </para>
     /// <para>The signature of the action should be:
     /// <code>
-    /// Task{IActionResult} ActionName(string id, string @event, TData data)
+    /// Task{IActionResult} ActionName(string id, string @event, string notificationId, TData data)
     /// </code>
     /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
     /// <see cref="Newtonsoft.Json.Linq.JObject"/> or <see cref="StripeEvent"/>.

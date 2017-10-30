@@ -126,9 +126,6 @@
   <data name="General_MissingQueryParameter" xml:space="preserve">
     <value>The WebHook verification request must contain a '{0}' query parameter.</value>
   </data>
-  <data name="HttpContextModelBinder_UnsupportedType" xml:space="preserve">
-    <value>'{0}' associated with model of unsupported type '{1}'.</value>
-  </data>
   <data name="MetadataProvider_DuplicateMetadata" xml:space="preserve">
     <value>Duplicate '{0}' registrations found.</value>
   </data>

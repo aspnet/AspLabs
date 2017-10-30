@@ -54,6 +54,19 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string EventUriTemplate => "https://api.stripe.com/v1/events/{0}";
 
         /// <summary>
+        /// Gets the name of the <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry containing the Stripe
+        /// notification identifier for the current request.
+        /// </summary>
+        /// <seealso cref="NotificationIdPropertyName"/>
+        public static string NotificationIdKeyName = "notificationId";
+
+        /// <summary>
+        /// Gets the name of a parameter bound to the Stripe notification identifier for the current request.
+        /// </summary>
+        /// <seealso cref="NotificationIdKeyName"/>
+        public static string NotificationIdParameterName => "notificationId";
+
+        /// <summary>
         /// Gets the name of the JSON property in a Stripe request body containing the notification identifier.
         /// </summary>
         public static string NotificationIdPropertyName => "id";

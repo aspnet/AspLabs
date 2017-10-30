@@ -35,14 +35,21 @@ namespace Microsoft.AspNetCore.WebHooks
         public static int SecretKeyMaxLength => 128;
 
         /// <summary>
-        /// Gets the name of a entry optionally added to bound
-        /// <see cref="System.Collections.Specialized.NameValueCollection"/> data. Entry contains the portion of the
-        /// <see cref="TextRequestFieldName"/> value which does not match the <see cref="TriggerRequestFieldName"/>
-        /// value if <see cref="TriggerRequestFieldName"/> is non-<see langword="null"/>. Entry contains the
+        /// Gets the name of the <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry containing the subtext
+        /// value for the current request. This entry contains the portion of the <see cref="TextRequestFieldName"/>
+        /// value which does not match the <see cref="TriggerRequestFieldName"/> value if
+        /// <see cref="TriggerRequestFieldName"/> is non-<see langword="null"/>. This entry contains the
         /// <see cref="TextRequestFieldName"/> value if both <see cref="CommandRequestFieldName"/> and
-        /// <see cref="TriggerRequestFieldName"/> values are <see langword="null"/>. Otherwise, no entry is added.
+        /// <see cref="TriggerRequestFieldName"/> values are <see langword="null"/>. Otherwise, the
+        /// <see cref="AspNetCore.Routing.RouteValueDictionary"/> will not contain this entry.
         /// </summary>
-        public static string SubtextRequestFieldName => "subtext";
+        public static string SubtextRequestKeyName => "subtext";
+
+        /// <summary>
+        /// Gets the name of a parameter bound to the Slack subtext value for the current request.
+        /// </summary>
+        /// <seealso cref="SubtextRequestKeyName"/>
+        public static string SubtextParameterName => "subtext";
 
         /// <summary>
         /// Gets the name of the posted value in a Slack WebHook request body containing the text of the event. This is

@@ -2,14 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
@@ -70,25 +67,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            if (!context.HttpContext.Items.TryGetValue(typeof(JObject), out var item) || !(item is JObject data))
-            {
-                _logger.LogCritical(
-                    0,
-                    "Unable to retrieve '{DataType}' request data from '{ClassName}.{PropertyName}'.",
-                    typeof(JObject),
-                    nameof(context.HttpContext),
-                    nameof(context.HttpContext.Items));
-
-                var message = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.TestEvent_MissingItem,
-                    typeof(JObject),
-                    nameof(context.HttpContext),
-                    nameof(context.HttpContext.Items));
-                throw new InvalidOperationException(message);
-            }
-
-            var notificationId = data.Value<string>(StripeConstants.NotificationIdPropertyName);
+            var notificationId = (string)routeData.Values[StripeConstants.NotificationIdKeyName];
             if (StripeVerifyNotificationIdFilter.IsTestEvent(notificationId))
             {
                 // Short-circuit this test event.

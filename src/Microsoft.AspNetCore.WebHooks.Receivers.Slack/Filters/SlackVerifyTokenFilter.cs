@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -22,10 +21,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IAsyncResourceFilter"/> that verifies the Slack request body. Confirms the body deserializes as
-    /// an <see cref="IFormCollection"/> that can be converted to a <see cref="NameValueCollection"/>. Then confirms
-    /// the token and event name are present and that the token matches the configured secret key. Adds a
-    /// <see cref="SlackConstants.SubtextRequestFieldName"/> value to the <see cref="NameValueCollection"/> in most
-    /// cases.
+    /// an <see cref="IFormCollection"/>. Then confirms the token and event name are present in the data and that the
+    /// token matches the configured secret key. Adds a <see cref="SlackConstants.SubtextRequestKeyName"/> entry to the
+    /// <see cref="RouteValueDictionary"/> in most cases.
     /// </summary>
     public class SlackVerifyTokenFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
     {
@@ -142,21 +140,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 4. Convert data to a NameValueCollection to enable additions.
-            // ??? Should we instead use a wrapping IFormCollection that handles subtext but delegates for other keys?
-            var nameValues = new NameValueCollection(data.Count, StringComparer.OrdinalIgnoreCase);
-            foreach (var keyValuePair in data)
-            {
-                nameValues.Add(keyValuePair.Key, keyValuePair.Value);
-            }
-
-            // 5. Get the event name and subtext.
+            // 4. Get the event name and subtext.
             string eventName = data[SlackConstants.TriggerRequestFieldName];
             if (eventName != null)
             {
                 // Trigger was supplied. Remove the trigger word to get subtext.
                 string text = data[SlackConstants.TextRequestFieldName];
-                nameValues[SlackConstants.SubtextRequestFieldName] = GetSubtext(eventName, text);
+                routeData.Values[SlackConstants.SubtextRequestKeyName] = GetSubtext(eventName, text);
             }
             else if ((eventName = data[SlackConstants.CommandRequestFieldName]) != null)
             {
@@ -166,7 +156,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 // Trigger and command were omitted. Set subtext to the full text (if any).
                 eventName = data[SlackConstants.TextRequestFieldName];
-                nameValues[SlackConstants.SubtextRequestFieldName] = eventName;
+                routeData.Values[SlackConstants.SubtextRequestKeyName] = eventName;
             }
 
             if (string.IsNullOrEmpty(eventName))
@@ -190,10 +180,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 6. Success. Provide request data and event name for model binding.
+            // 5. Success. Provide event name for model binding.
             routeData.Values[WebHookConstants.EventKeyName] = eventName;
-            context.HttpContext.Items[typeof(IFormCollection)] = data;
-            context.HttpContext.Items[typeof(NameValueCollection)] = nameValues;
 
             await next();
         }

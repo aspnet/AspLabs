@@ -18,9 +18,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// <para>
-    /// An <see cref="IResourceFilter"/> to verify required HTTP headers and query parameters are present in a WebHook
-    /// request. Uses <see cref="IWebHookBindingMetadata"/> services to determine the requirements for the requested
-    /// WebHook receiver.
+    /// An <see cref="IResourceFilter"/> to verify required HTTP headers, <see cref="RouteValueDictionary"/> entries
+    /// and query parameters are present in a WebHook request. Uses <see cref="IWebHookBindingMetadata"/> services to
+    /// determine the requirements for the requested WebHook receiver.
     /// </para>
     /// <para>
     /// Short-circuits the request if required values are missing. The response in that case will have a 400
@@ -56,7 +56,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
         /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
         /// </item>
-        /// <item>Confirm required headers and query parameters are provided (in this filter).</item>
+        /// <item>
+        /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
+        /// this filter).
+        /// </item>
         /// <item>
         /// Short-circuit GET or HEAD requests, if receiver supports either (in
         /// <see cref="WebHookGetResponseFilter"/>).
@@ -79,7 +82,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!context.RouteData.TryGetWebHookReceiverName(out var receiverName))
+            var routeData = context.RouteData;
+            if (!routeData.TryGetWebHookReceiverName(out var receiverName))
             {
                 // Not a WebHook request.
                 return;
@@ -93,17 +97,37 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var request = context.HttpContext.Request;
-            var headers = request.Headers;
-            var query = request.Query;
             for (var i = 0; i < bindingMetadata.Parameters.Count; i++)
             {
                 var parameter = bindingMetadata.Parameters[i];
                 if (parameter.IsRequired)
                 {
+                    bool found;
+                    string message;
                     var sourceName = parameter.SourceName;
-                    var found = parameter.IsQueryParameter ?
-                        VerifyQueryParameter(query, sourceName, receiverName, out var message) :
-                        VerifyHeader(headers, sourceName, receiverName, out message);
+                    switch (parameter.ParameterType)
+                    {
+                        case WebHookParameterType.Header:
+                            found = VerifyHeader(request.Headers, sourceName, receiverName, out message);
+                            break;
+
+                        case WebHookParameterType.RouteValue:
+                            found = VerifyRouteData(routeData, sourceName, receiverName, out message);
+                            break;
+
+                        case WebHookParameterType.QueryParameter:
+                            found = VerifyQueryParameter(request.Query, sourceName, receiverName, out message);
+                            break;
+
+                        default:
+                            message = string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.General_InvalidEnumValue,
+                                nameof(WebHookParameterType),
+                                parameter.ParameterType);
+                            throw new InvalidOperationException(message);
+                    }
+
                     if (!found)
                     {
                         // Do not return after first error. Instead log about all issues.
@@ -119,6 +143,28 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // No-op
         }
 
+        private bool VerifyRouteData(RouteData routeData, string keyName, string receiverName, out string message)
+        {
+            if (routeData.Values.TryGetValue(keyName, out var value) && !string.IsNullOrEmpty(value as string))
+            {
+                message = null;
+                return true;
+            }
+
+            _logger.LogError(
+                500,
+                "A {ReceiverName} WebHook request must contain a '{KeyName}' value in the route data.",
+                receiverName,
+                keyName);
+            message = string.Format(
+                CultureInfo.CurrentCulture,
+                Resources.VerifyRequiredValue_NoHeader,
+                receiverName,
+                keyName);
+
+            return false;
+        }
+
         private bool VerifyHeader(
             IHeaderDictionary headers,
             string headerName,
@@ -132,7 +178,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             _logger.LogError(
-                500,
+                501,
                 "A {ReceiverName} WebHook request must contain a '{HeaderName}' HTTP header.",
                 receiverName,
                 headerName);
@@ -158,7 +204,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             _logger.LogError(
-                501,
+                502,
                 "A {ReceiverName} WebHook request must contain a '{QueryParameterName}' query parameter.",
                 receiverName,
                 parameterName);

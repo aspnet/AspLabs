@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -58,8 +59,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
         /// </item>
         /// <item>
-        /// Confirm required headers and query parameters are provided (in
-        /// <see cref="WebHookVerifyRequiredValueFilter"/>).
+        /// Confirm required headers, <see cref="AspNetCore.Routing.RouteValueDictionary"/> entries and query
+        /// parameters are provided (in <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit GET or HEAD requests, if receiver supports either (in
@@ -109,6 +110,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         context.Result = CreateUnsupportedMediaTypeResult(Resources.VerifyBody_NoXml);
                     }
                     break;
+
+                default:
+                    var message = string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.General_InvalidEnumValue,
+                        nameof(WebHookBodyType),
+                        _requestMetadata.BodyType);
+                    throw new InvalidOperationException(message);
             }
         }
 

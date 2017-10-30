@@ -30,13 +30,13 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         {
             new WebHookParameter(
                 BitbucketConstants.WebHookIdParameterName1,
+                WebHookParameterType.Header,
                 BitbucketConstants.WebHookIdHeaderName,
-                isQueryParameter: false,
                 isRequired: true),
             new WebHookParameter(
                 BitbucketConstants.WebHookIdParameterName2,
+                WebHookParameterType.Header,
                 BitbucketConstants.WebHookIdHeaderName,
-                isQueryParameter: false,
                 isRequired: true),
         };
 
@@ -58,9 +58,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;
-
-        /// <inheritdoc />
-        public bool UseHttpContextModelBinder => false;
 
         // IWebHookSecurityMetadata...
 

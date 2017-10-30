@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.AspNetCore.WebHooks.ModelBinding;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
@@ -21,17 +21,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
     /// </summary>
     public class WebHookModelBindingProvider : IApplicationModelProvider
     {
-        private readonly IList<Type> _allowedTypes;
-
-        /// <summary>
-        /// Instantiates a new <see cref="WebHookModelBindingProvider"/> instance.
-        /// </summary>
-        /// <param name="optionsAccessor">The accessor for the <see cref="WebHookOptions"/>.</param>
-        public WebHookModelBindingProvider(IOptions<WebHookOptions> optionsAccessor)
-        {
-            _allowedTypes = optionsAccessor.Value.HttpContextItemsTypes;
-        }
-
         /// <inheritdoc />
         public int Order => WebHookMetadataProvider.Order + 20;
 
@@ -107,7 +96,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     break;
 
                 case "DATA":
-                    SourceData(bindingInfo, parameterType, requestMetadata);
+                    SourceData(bindingInfo, requestMetadata);
                     break;
 
                 case "EVENT":
@@ -138,37 +127,22 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     // If additional parameters are configured and match, map them. If not, treat IFormCollection,
                     // JContainer and XElement parameters as data. IsAssignableFrom(...) looks reversed because this
                     // check is about model binding system support, not an actual assignment to the parameter.
-                    //
-                    // ??? Should fallbacks support NameValueCollection here and in model binding to ease migration
-                    // ??? from current WebHooks?
                     if (!TrySourceAdditionalParameter(bindingInfo, bindingMetadata, parameterName) &&
                         (typeof(IFormCollection).IsAssignableFrom(parameterType) ||
                          // ??? Any need to support simple JToken's? JContainer is the base for JArray and JObject.
                          typeof(JContainer).IsAssignableFrom(parameterType) ||
                          typeof(XElement).IsAssignableFrom(parameterType)))
                     {
-                        SourceData(bindingInfo, parameterType, requestMetadata);
+                        SourceData(bindingInfo, requestMetadata);
                     }
                     break;
             }
         }
 
-        private void SourceData(
-            BindingInfo bindingInfo,
-            Type parameterType,
-            IWebHookRequestMetadata requestMetadata)
+        private void SourceData(BindingInfo bindingInfo, IWebHookRequestMetadata requestMetadata)
         {
             if (requestMetadata == null)
             {
-                return;
-            }
-
-            if (requestMetadata.UseHttpContextModelBinder &&
-                _allowedTypes.Any(allowedType => parameterType.IsAssignableFrom(allowedType)))
-            {
-                bindingInfo.BinderModelName = WebHookErrorKeys.MessageKey;
-                bindingInfo.BinderType = typeof(WebHookHttpContextModelBinder);
-                bindingInfo.BindingSource = BindingSource.Custom;
                 return;
             }
 
@@ -236,7 +210,28 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             }
 
             bindingInfo.BinderModelName = parameter.SourceName;
-            bindingInfo.BindingSource = parameter.IsQueryParameter ? BindingSource.Query : BindingSource.Header;
+            switch (parameter.ParameterType)
+            {
+                case WebHookParameterType.Header:
+                    bindingInfo.BindingSource = BindingSource.Header;
+                    break;
+
+                case WebHookParameterType.RouteValue:
+                    bindingInfo.BindingSource = BindingSource.Path;
+                    break;
+
+                case WebHookParameterType.QueryParameter:
+                    bindingInfo.BindingSource = BindingSource.Query;
+                    break;
+
+                default:
+                    var message = string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.General_InvalidEnumValue,
+                        nameof(WebHookParameterType),
+                        parameter.ParameterType);
+                    throw new InvalidOperationException(message);
+            }
 
             return true;
         }

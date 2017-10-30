@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
         /// </item>
         /// <item>
-        /// Confirm required headers and query parameters are provided (in
+        /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
         /// <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>Short-circuit GET or HEAD requests, if receiver supports either (in this filter).</item>
