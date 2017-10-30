@@ -41,8 +41,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 .TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, WebHookRoutingProvider>());
 
+            services.TryAddSingleton<WebHookEventMapperConstraint>();
             services.TryAddSingleton<WebHookReceiverExistsConstraint>();
-            services.TryAddSingleton<WebHookMultipleEventMapperConstraint>();
 
             services.TryAddSingleton<WebHookReceiverExistsFilter>();
 

@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
         public WebHookReceiverExistsConstraint(IEnumerable<IWebHookMetadata> metadata)
         {
-            _receiverMetadata = new List<IWebHookReceiver>(metadata.OfType<IWebHookReceiver>());
+            _receiverMetadata = metadata.OfType<IWebHookReceiver>().ToArray();
         }
 
         /// <summary>

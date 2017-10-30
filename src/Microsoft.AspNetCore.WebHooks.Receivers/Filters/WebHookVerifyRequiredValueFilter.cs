@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public WebHookVerifyRequiredValueFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
         {
             _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
-            _bindingMetadata = new List<IWebHookBindingMetadata>(metadata.OfType<IWebHookBindingMetadata>());
+            _bindingMetadata = metadata.OfType<IWebHookBindingMetadata>().ToArray();
         }
 
         /// <summary>

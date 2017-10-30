@@ -22,22 +22,21 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
     public class WebHookRoutingProvider : IApplicationModelProvider
     {
         private readonly WebHookReceiverExistsConstraint _existsConstraint;
-        private readonly WebHookMultipleEventMapperConstraint _eventMapperConstraint;
+        private readonly WebHookEventMapperConstraint _eventMapperConstraint;
         private readonly ILoggerFactory _loggerFactory;
 
         // ??? Should we use constraint factories to let DI choose the constraint lifetimes?
-        // ??? Should we use a factory for just WebHookMultipleEventMapperConstraint? It's not universally used.
         /// <summary>
         /// Instantiates a new <see cref="WebHookRoutingProvider"/> with the given
         /// <paramref name="existsConstraint"/>, <paramref name="eventMapperConstraint"/> and
         /// <paramref name="loggerFactory"/>.
         /// </summary>
         /// <param name="existsConstraint">The <see cref="WebHookReceiverExistsConstraint"/>.</param>
-        /// <param name="eventMapperConstraint">The <see cref="WebHookMultipleEventMapperConstraint"/>.</param>
+        /// <param name="eventMapperConstraint">The <see cref="WebHookEventMapperConstraint"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         public WebHookRoutingProvider(
             WebHookReceiverExistsConstraint existsConstraint,
-            WebHookMultipleEventMapperConstraint eventMapperConstraint,
+            WebHookEventMapperConstraint eventMapperConstraint,
             ILoggerFactory loggerFactory)
         {
             _existsConstraint = existsConstraint;
@@ -175,17 +174,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         {
             if (properties.TryGetValue(typeof(IWebHookEventMetadata), out var eventMetadata))
             {
-                IActionConstraintMetadata constraint;
-                if (eventMetadata is IWebHookEventMetadata singleEventMetadata)
-                {
-                    constraint = new WebHookSingleEventMapperConstraint(_loggerFactory, singleEventMetadata);
-                }
-                else
-                {
-                    constraint = _eventMapperConstraint;
-                }
-
-                AddConstraint(constraint, selectors);
+                AddConstraint(_eventMapperConstraint, selectors);
             }
 
             if (properties.TryGetValue(typeof(IWebHookEventSelectorMetadata), out var eventSourceMetadata))

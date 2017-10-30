@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public WebHookPingResponseFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
         {
             _logger = loggerFactory.CreateLogger<WebHookPingResponseFilter>();
-            _eventMetadata = new List<IWebHookEventMetadata>(metadata.OfType<IWebHookEventMetadata>());
+            _eventMetadata = metadata.OfType<IWebHookEventMetadata>().ToArray();
         }
 
         /// <summary>

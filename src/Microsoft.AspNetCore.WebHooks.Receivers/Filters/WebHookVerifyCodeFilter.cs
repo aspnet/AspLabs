@@ -50,10 +50,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             : base(configuration, hostingEnvironment, loggerFactory)
         {
             // No need to keep track of IWebHookSecurityMetadata instances that do not request code verification.
-            var codeVerifierMetadata = metadata
+            _codeVerifierMetadata = metadata
                 .OfType<IWebHookSecurityMetadata>()
-                .Where(item => item.VerifyCodeParameter);
-            _codeVerifierMetadata = new List<IWebHookSecurityMetadata>(codeVerifierMetadata);
+                .Where(item => item.VerifyCodeParameter)
+                .ToArray();
         }
 
         /// <inheritdoc />

@@ -48,10 +48,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             // No need to keep track of IWebHookSecurityMetadata instances that do not request HTTP GET request
             // handling.
-            var codeVerifierMetadata = metadata
+            _getRequestMetadata = metadata
                 .OfType<IWebHookSecurityMetadata>()
-                .Where(item => item.ShortCircuitGetRequests);
-            _getRequestMetadata = new List<IWebHookSecurityMetadata>(codeVerifierMetadata);
+                .Where(item => item.ShortCircuitGetRequests)
+                .ToArray();
         }
 
         /// <summary>

@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
@@ -11,27 +13,24 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
     /// <summary>
-    /// An base class for <see cref="IActionConstraint"/> implementations which use
-    /// <see cref="IWebHookEventMetadata"/> to determine the event name for a WebHook request. This constraint
-    /// almost-always accepts all candidates.
+    /// An <see cref="IActionConstraint"/> implementation which uses <see cref="IWebHookEventMetadata"/> to determine
+    /// the event name for a WebHook request. This constraint almost-always accepts all candidates.
     /// </summary>
-    public abstract class WebHookEventMapperConstraint : IActionConstraint
+    public class WebHookEventMapperConstraint : IActionConstraint
     {
+        private readonly IReadOnlyList<IWebHookEventMetadata> _eventMetadata;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookEventMapperConstraint"/> instance with the given
-        /// <paramref name="loggerFactory"/>.
+        /// <paramref name="loggerFactory"/> and <paramref name="metadata"/>.
         /// </summary>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        protected WebHookEventMapperConstraint(ILoggerFactory loggerFactory)
+        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
+        public WebHookEventMapperConstraint(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
         {
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-
-            _logger = loggerFactory.CreateLogger(GetType());
+            _eventMetadata = metadata.OfType<IWebHookEventMetadata>().ToArray();
+            _logger = loggerFactory.CreateLogger<WebHookEventMapperConstraint>();
         }
 
         /// <summary>
@@ -45,7 +44,29 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         int IActionConstraint.Order => Order;
 
         /// <inheritdoc />
-        public abstract bool Accept(ActionConstraintContext context);
+        public bool Accept(ActionConstraintContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var routeContext = context.RouteContext;
+            if (routeContext.RouteData.TryGetWebHookReceiverName(out var receiverName))
+            {
+                var eventMetadata = _eventMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
+                if (eventMetadata != null)
+                {
+                    return Accept(eventMetadata, routeContext);
+                }
+
+                // This receiver does not have IWebHookEventMetadata and that's fine.
+                return true;
+            }
+
+            // ??? Should we throw if this is reached? Should be impossible given WebHookReceiverExistsConstraint.
+            return false;
+        }
 
         /// <summary>
         /// Gets an indication whether the expected event names are available in the request. Maps the event names into
@@ -56,7 +77,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         /// <returns>
         /// <see langword="true"/> if event names are available in the request; <see langword="false"/> otherwise.
         /// </returns>
-        protected bool Accept(IWebHookEventMetadata eventMetadata, RouteContext routeContext)
+        protected virtual bool Accept(IWebHookEventMetadata eventMetadata, RouteContext routeContext)
         {
             if (eventMetadata == null)
             {

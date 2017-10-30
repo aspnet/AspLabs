@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         // IWebHookBindingMetadata...
 
         /// <inheritdoc />
-        public IReadOnlyList<WebHookParameter> Parameters { get; } = new List<WebHookParameter>
+        public IReadOnlyList<WebHookParameter> Parameters { get; } = new WebHookParameter[]
         {
             new WebHookParameter(
                 BitbucketConstants.WebHookIdParameterName1,
