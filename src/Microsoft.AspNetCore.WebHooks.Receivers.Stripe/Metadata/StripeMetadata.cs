@@ -1,6 +1,11 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+using System.Globalization;
+using Microsoft.AspNetCore.WebHooks.Properties;
+using Microsoft.Extensions.Configuration;
+
 namespace Microsoft.AspNetCore.WebHooks.Metadata
 {
     /// <summary>
@@ -8,13 +13,18 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// </summary>
     public class StripeMetadata : WebHookMetadata, IWebHookRequestMetadataService, IWebHookSecurityMetadata
     {
+        private readonly IConfiguration _configuration;
+
         /// <summary>
         /// Instantiates a new <see cref="StripeMetadata"/> instance.
         /// </summary>
-        public StripeMetadata(IWebHookReceiverConfig receiverConfig)
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="VerifyCodeParameter"/>.
+        /// </param>
+        public StripeMetadata(IConfiguration configuration)
             : base(StripeConstants.ReceiverName)
         {
-            VerifyCodeParameter = receiverConfig.IsTrue(StripeConstants.DirectWebHookConfigurationKey);
+            _configuration = configuration;
         }
 
         // IWebHookRequestMetadataService...
@@ -28,7 +38,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         // IWebHookSecurityMetadata...
 
         /// <inheritdoc />
-        public bool VerifyCodeParameter { get; }
+        public bool VerifyCodeParameter => _configuration.IsTrue(StripeConstants.DirectWebHookConfigurationKey);
 
         /// <inheritdoc />
         public bool ShortCircuitGetRequests => false;

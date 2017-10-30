@@ -79,24 +79,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; WebHook request contained invalid XML..
-        /// </summary>
-        internal static string VerifyOrganization_BadXml {
-            get {
-                return ResourceManager.GetString("VerifyOrganization_BadXml", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No {0} available for &apos;{1}&apos;.  The `{2}` WebHook receiver requires the XML formatters to be enabled..
-        /// </summary>
-        internal static string VerifyOrganization_MissingFormatter {
-            get {
-                return ResourceManager.GetString("VerifyOrganization_MissingFormatter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property..
         /// </summary>
         internal static string VerifyOrganization_MissingValue {

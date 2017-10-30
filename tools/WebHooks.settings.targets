@@ -10,11 +10,11 @@
     <!-- Use CustomAfterMicrosoftCommonTargets property (defined in Microsoft.Common.targets) to
              inject post-Common targets files without requiring the inclusion -->
     <CustomAfterMicrosoftCommonTargets>$(WebHooksToolsPath)WebHooks.targets</CustomAfterMicrosoftCommonTargets>
-    
+
     <!-- Force rebuild if this file changes -->
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
-  
+
   <!-- Project Defaults -->
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>

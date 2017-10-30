@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // Apply to all requests matching an action with the WebHook route template.
-            if (context.RouteData.TryGetReceiverName(out var receiverName))
+            if (context.RouteData.TryGetWebHookReceiverName(out var receiverName))
             {
                 _logger.LogError(
                     0,

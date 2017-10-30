@@ -6,12 +6,12 @@ branches:
     - /^(.*\/)?ci-.*$/
     - /^rel\/.*/
 configuration:
-  CodeAnalysis
-  Release
+  - CodeAnalysis
+  - Release
 matrix:
   fast_finish: true
 build_script:
-  - cmd: .\build.cmd BuildPackages /P:Configuration=$(configuration)
+  - cmd: .\build.cmd BuildPackages /P:Configuration=%Configuration%
 clone_depth: 1
 test: off
 deploy: off

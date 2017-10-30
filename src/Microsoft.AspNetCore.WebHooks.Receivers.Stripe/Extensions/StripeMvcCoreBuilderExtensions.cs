@@ -37,8 +37,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder
                 .AddJsonFormatters()
                 .AddWebHooks(OptionsSetupAction)
-                .AddSingletonFilter<StripeTestEventResponseFilter>(StripeTestEventResponseFilter.Order)
-                .AddSingletonFilter<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
+                .AddWebHookSingletonFilter<StripeTestEventResponseFilter>(StripeTestEventResponseFilter.Order)
+                .AddWebHookSingletonFilter<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
         }
 
         /// <summary>

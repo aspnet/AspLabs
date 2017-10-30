@@ -59,9 +59,13 @@ goto BuildSuccess
 :BuildFail
 echo.
 echo *** BUILD FAILED ***
+popd
+endlocal
 exit /B 999
 
 :BuildSuccess
 echo.
 echo **** BUILD SUCCESSFUL ***
+popd
+endlocal
 exit /B 0

@@ -36,9 +36,6 @@ namespace Microsoft.AspNetCore.WebHooks
         /// Stripe WebHook endpoint.
         /// </para>
         /// <para>This constructor should usually be used at most once in a WebHook application.</para>
-        /// <para>
-        /// The default route <see cref="Mvc.Routing.IRouteTemplateProvider.Name"/> is <see langword="null"/>.
-        /// </para>
         /// </summary>
         public StripeWebHookAttribute()
             : base(StripeConstants.ReceiverName)

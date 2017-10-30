@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var request = context.HttpContext.Request;
-            if (context.RouteData.TryGetReceiverName(out var receiverName) &&
+            if (context.RouteData.TryGetWebHookReceiverName(out var receiverName) &&
                 (request.Body == null ||
                  !request.ContentLength.HasValue ||
                  request.ContentLength.Value == 0L ||

@@ -24,28 +24,12 @@ namespace Microsoft.AspNetCore.WebHooks
     {
         private string _id;
 
-        // TODO: Move attribute constructors' comments, especially the recommended action signatures, to class level.
-        // TODO:  Do the same for all subclasses. As-is important information is hard to find.
-        /// <summary>
-        /// <para>
-        /// Instantiates a new <see cref="WebHookAttribute"/> indicating the associated action is a WebHook
-        /// endpoint for all enabled receivers.
-        /// </para>
-        /// <para>The signature of the action should be:
-        /// <code>
-        /// Task{IActionResult} ActionName(string receiverName, string id, string[] events, TData data)
-        /// </code>
-        /// or the subset of parameters required. <c>TData</c> must be compatible with expected requests.
-        /// </para>
-        /// <para>This constructor should usually be used at most once in a WebHook application.</para>
-        /// <para>
-        /// The default route <see cref="Mvc.Routing.IRouteTemplateProvider.Name"/> is <see langword="null"/>.
-        /// </para>
-        /// </summary>
-        protected WebHookAttribute()
+        internal WebHookAttribute()
         {
         }
 
+        // TODO: Move attribute constructors' comments, especially the recommended action signatures, to class level.
+        // TODO:  Do the same for all subclasses. As-is important information is hard to find.
         /// <summary>
         /// <para>
         /// Instantiates a new <see cref="WebHookAttribute"/> indicating the associated action is a WebHook
@@ -60,9 +44,6 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <para>
         /// This constructor should usually be used at most once per <paramref name="receiverName"/> name in a WebHook
         /// application.
-        /// </para>
-        /// <para>
-        /// The default route <see cref="Mvc.Routing.IRouteTemplateProvider.Name"/> is <see langword="null"/>.
         /// </para>
         /// </summary>
         /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>

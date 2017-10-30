@@ -5,15 +5,17 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Internal;        // ??? IHttpRequestStreamReaderFactory is pub-Internal.
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -40,6 +42,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <summary>
         /// Instantiates a new <see cref="SalesforceVerifyOrganizationIdFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
@@ -48,19 +57,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="IOptions{MvcOptions}"/> accessor for <see cref="MvcOptions"/>.
         /// </param>
         /// <param name="readerFactory">The <see cref="IHttpRequestStreamReaderFactory"/>.</param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
         /// <param name="resultCreator">The <see cref="ISalesforceResultCreator"/>.</param>
         public SalesforceVerifyOrganizationIdFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             IModelMetadataProvider metadataProvider,
             IOptions<MvcOptions> optionsAccessor,
             IHttpRequestStreamReaderFactory readerFactory,
-            IWebHookReceiverConfig receiverConfig,
             ISalesforceResultCreator resultCreator)
-            : base(loggerFactory, receiverConfig)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
             var options = optionsAccessor.Value;
             _bodyModelBinder = new BodyModelBinder(options.InputFormatters, readerFactory, loggerFactory, options);
@@ -84,7 +90,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (!routeData.TryGetReceiverName(out var receiverName) || !IsApplicable(receiverName))
+            if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
                 await next();
                 return;
@@ -139,10 +145,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            var secret = await GetReceiverConfig(
-                request,
-                routeData,
+            var secret = GetSecretKey(
                 SalesforceConstants.ConfigurationName,
+                routeData,
                 SalesforceConstants.SecretKeyMinLength,
                 SalesforceConstants.SecretKeyMaxLength);
 

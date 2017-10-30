@@ -1,6 +1,8 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Configuration;
+
 namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
@@ -26,15 +28,17 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string DataDetailsPropertyName => "object";
 
         /// <summary>
-        /// Gets the key used to retrieve a configuration entry indicating the Stripe receiver should require a
-        /// <c>code</c> query parameter and verify the parameter's value against configured secret key. Configuration
-        /// value, if any, should parse as a <see cref="bool"/>. If that parsed configuration value is
-        /// <see langword="true"/>, the receiver will behave similarly to when
-        /// <see cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/> is <see langword="true"/>. Otherwise,
-        /// the receiver ignores all but the <c>id</c> property of the received event and instead calls back
-        /// into the Stripe API to retrieve event details.
+        /// Gets the key of a configuration value indicating the Stripe receiver should require a <c>code</c> query
+        /// parameter and verify the parameter's value against configured secret key. Configuration value, if any,
+        /// should parse as a <see cref="bool"/>. If that parsed configuration value is <see langword="true"/>, the
+        /// receiver will behave similarly to when <see cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/>
+        /// is <see langword="true"/>. Otherwise, the receiver ignores all but the <c>id</c> property of the received
+        /// event and instead calls back into the Stripe API to retrieve event details.
         /// </summary>
-        public static string DirectWebHookConfigurationKey => "MS_WebHookStripeDirect";
+        public static string DirectWebHookConfigurationKey { get; } = ConfigurationPath.Combine(
+            WebHookConstants.ReceiverConfigurationSectionKey,
+            ReceiverName,
+            "Direct");
 
         /// <summary>
         /// Gets the name of the JSON property in a Stripe WebHook request body containing a value somewhat
@@ -65,12 +69,15 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string LiveModePropertyName => "livemode";
 
         /// <summary>
-        /// Gets the key used to retrieve a configuration entry indicating the Stripe receiver should flow test events
-        /// to Stripe actions. Configuration value, if any, should parse as a <see cref="bool"/>. If that parsed
-        /// configuration value is <see langword="true"/>, the action will receive test events. Otherwise, the receiver
+        /// Gets the key of a configuration value indicating the Stripe receiver should flow test events to Stripe
+        /// actions. Configuration value, if any, should parse as a <see cref="bool"/>. If that parsed configuration
+        /// value is <see langword="true"/>, the action will receive test events. Otherwise, the receiver
         /// short-circuits test events.
         /// </summary>
-        public static string PassThroughTestEventsConfigurationKey => "MS_WebHookStripePassThroughTestEvents";
+        public static string PassThroughTestEventsConfigurationKey { get; } = ConfigurationPath.Combine(
+            WebHookConstants.ReceiverConfigurationSectionKey,
+            ReceiverName,
+            "PassThroughTestEvents");
 
         /// <summary>
         /// Gets the name of the Stripe WebHook receiver.

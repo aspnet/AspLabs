@@ -3,10 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
@@ -24,26 +24,30 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// the <c>code</c> query parameter is missing or does not match the receiver's configuration. Also confirms the
     /// request URI uses the <c>HTTPS</c> scheme.
     /// </summary>
-    public class WebHookVerifyCodeFilter : WebHookSecurityFilter, IAsyncResourceFilter
+    public class WebHookVerifyCodeFilter : WebHookSecurityFilter, IResourceFilter
     {
         private readonly IReadOnlyList<IWebHookSecurityMetadata> _codeVerifierMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
         public WebHookVerifyCodeFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
-            IEnumerable<IWebHookMetadata> metadata,
-            IWebHookReceiverConfig receiverConfig)
-            : base(loggerFactory, receiverConfig)
+            IEnumerable<IWebHookMetadata> metadata)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
             // No need to keep track of IWebHookSecurityMetadata instances that do not request code verification.
             var codeVerifierMetadata = metadata
@@ -53,30 +57,29 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <inheritdoc />
-        public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+        public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
 
             var routeData = context.RouteData;
-            if (routeData.TryGetReceiverName(out var receiverName) &&
+            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
                 _codeVerifierMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
             {
-                var result = await EnsureValidCode(context.HttpContext.Request, routeData, receiverName);
+                var result = EnsureValidCode(context.HttpContext.Request, routeData, receiverName);
                 if (result != null)
                 {
                     context.Result = result;
-                    return;
                 }
             }
+        }
 
-            await next();
+        /// <inheritdoc />
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+            // No-op
         }
 
         /// <summary>
@@ -93,12 +96,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </param>
         /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>
         /// <returns>
-        /// A <see cref="Task"/> that on completion provides <see langword="null"/> in the success case. When a check
-        /// fails, provides an <see cref="IActionResult"/> that when executed will produce a response containing
-        /// details about the problem.
+        /// <see langword="null"/> in the success case. When a check fails, an <see cref="IActionResult"/> that when
+        /// executed will produce a response containing details about the problem.
         /// </returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed by Web API.")]
-        protected virtual async Task<IActionResult> EnsureValidCode(
+        protected virtual IActionResult EnsureValidCode(
             HttpRequest request,
             RouteData routeData,
             string receiverName)
@@ -139,10 +140,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return noCode;
             }
 
-            var secretKey = await GetReceiverConfig(
-                request,
-                routeData,
+            var secretKey = GetSecretKey(
                 receiverName,
+                routeData,
                 WebHookConstants.CodeParameterMinLength,
                 WebHookConstants.CodeParameterMaxLength);
             if (secretKey == null)

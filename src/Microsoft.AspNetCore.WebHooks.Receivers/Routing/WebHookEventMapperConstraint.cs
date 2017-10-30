@@ -70,7 +70,6 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
 
             var request = routeContext.HttpContext.Request;
             var routeData = routeContext.RouteData;
-            var routeValues = routeData.Values;
             if (eventMetadata.HeaderName != null)
             {
                 var headers = request.Headers;
@@ -82,17 +81,18 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                     if (eventMetadata.ConstantValue == null && eventMetadata.QueryParameterName != null)
                     {
                         // An error because we have no fallback.
-                        routeData.TryGetReceiverName(out var receiverName);
+                        routeData.TryGetWebHookReceiverName(out var receiverName);
                         _logger.LogError(
                             500,
-                            "A {ReceiverName} WebHook request must contain a '{HeaderName}' HTTP header indicating the type of event.",
+                            "A {ReceiverName} WebHook request must contain a '{HeaderName}' HTTP header indicating " +
+                            "the type of event.",
                             receiverName,
                             eventMetadata.HeaderName);
                     }
                 }
                 else
                 {
-                    MapEventNames(routeValues, events);
+                    routeData.SetWebHookEventNames(events);
                     return true;
                 }
             }
@@ -106,44 +106,29 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                     if (eventMetadata.ConstantValue == null)
                     {
                         // An error because we have no fallback.
-                        routeData.TryGetReceiverName(out var receiverName);
+                        routeData.TryGetWebHookReceiverName(out var receiverName);
                         _logger.LogError(
                             501,
-                            "A {ReceiverName} WebHook request must contain a '{QueryParameterKey}' query parameter indicating the type of event.",
+                            "A {ReceiverName} WebHook request must contain a '{QueryParameterKey}' query parameter " +
+                            "indicating the type of event.",
                             receiverName,
                             eventMetadata.QueryParameterName);
                     }
                 }
                 else
                 {
-                    MapEventNames(routeValues, events);
+                    routeData.SetWebHookEventNames(events);
                     return true;
                 }
             }
 
             if (eventMetadata.ConstantValue != null)
             {
-                routeValues[WebHookConstants.EventKeyName] = eventMetadata.ConstantValue;
+                routeData.Values[WebHookConstants.EventKeyName] = eventMetadata.ConstantValue;
                 return true;
             }
 
             return false;
-        }
-
-        private void MapEventNames(RouteValueDictionary routeValues, string[] events)
-        {
-            if (events.Length == 1)
-            {
-                routeValues[WebHookConstants.EventKeyName] = events[0];
-            }
-            else
-            {
-                // ??? This repeatedly allocates the same strings. Might be good to cache the first 100 or so keys.
-                for (var i = 0; i < events.Length; i++)
-                {
-                    routeValues[$"{WebHookConstants.EventKeyName}[{i}]"] = events[i];
-                }
-            }
         }
     }
 }

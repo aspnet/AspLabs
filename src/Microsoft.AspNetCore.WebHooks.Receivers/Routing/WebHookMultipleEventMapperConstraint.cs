@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             }
 
             var routeContext = context.RouteContext;
-            if (routeContext.RouteData.TryGetReceiverName(out var receiverName))
+            if (routeContext.RouteData.TryGetWebHookReceiverName(out var receiverName))
             {
                 var eventMetadata = _eventMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
                 if (eventMetadata != null)

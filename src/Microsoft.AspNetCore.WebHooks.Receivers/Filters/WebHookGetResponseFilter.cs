@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -12,34 +12,39 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IAsyncResourceFilter"/> to short-circuit WebHook GET requests.
+    /// An <see cref="IResourceFilter"/> to short-circuit WebHook GET requests.
     /// </summary>
-    public class WebHookGetResponseFilter : WebHookSecurityFilter, IAsyncResourceFilter
+    public class WebHookGetResponseFilter : WebHookSecurityFilter, IResourceFilter
     {
         private readonly IReadOnlyList<IWebHookSecurityMetadata> _getRequestMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookGetResponseFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
         public WebHookGetResponseFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
-            IEnumerable<IWebHookMetadata> metadata,
-            IWebHookReceiverConfig receiverConfig)
-            : base(loggerFactory, receiverConfig)
+            IEnumerable<IWebHookMetadata> metadata)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
             // No need to keep track of IWebHookSecurityMetadata instances that do not request HTTP GET request
             // handling.
@@ -50,9 +55,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Gets the <see cref="Mvc.Filters.IOrderedFilter.Order"/> recommended for all
-        /// <see cref="WebHookSecurityFilter"/> instances. The recommended filter sequence is
-        /// <list type="number">
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookSecurityFilter"/>
+        /// instances. The recommended filter sequence is <list type="number">
         /// <item>
         /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
         /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
@@ -73,19 +77,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public new static int Order => WebHookVerifyRequiredValueFilter.Order + 10;
 
         /// <inheritdoc />
-        public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+        public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if (context == null)
             {
                 throw new System.ArgumentNullException(nameof(context));
             }
-            if (next == null)
-            {
-                throw new System.ArgumentNullException(nameof(next));
-            }
 
             var routeData = context.RouteData;
-            if (routeData.TryGetReceiverName(out var receiverName) &&
+            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
                 HttpMethods.IsGet(context.HttpContext.Request.Method))
             {
                 var getRequestMetadata = _getRequestMetadata
@@ -101,25 +101,27 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     }
 
                     var request = context.HttpContext.Request;
-                    context.Result = await GetChallengeResponse(getMetadata, receiverName, request, routeData);
-                    return;
+                    context.Result = GetChallengeResponse(getMetadata, receiverName, request, routeData);
                 }
             }
-
-            await next();
         }
 
-        private async Task<IActionResult> GetChallengeResponse(
+        /// <inheritdoc />
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+            // No-op
+        }
+
+        private IActionResult GetChallengeResponse(
             WebHookGetRequest getMetadata,
             string receiverName,
             HttpRequest request,
             RouteData routeData)
         {
             // 1. Verify that we have the secret as an app setting.
-            var secretKey = await GetReceiverConfig(
-                request,
-                routeData,
+            var secretKey = GetSecretKey(
                 receiverName,
+                routeData,
                 getMetadata.SecretKeyMinLength,
                 getMetadata.SecretKeyMaxLength);
             if (secretKey == null)

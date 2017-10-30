@@ -10,12 +10,14 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;       // ??? BufferingHelper is pub-Internal.
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
@@ -31,15 +33,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyBodyContentFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
-        protected WebHookVerifyBodyContentFilter(ILoggerFactory loggerFactory, IWebHookReceiverConfig receiverConfig)
-            : base(loggerFactory, receiverConfig)
+        protected WebHookVerifyBodyContentFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
         }
 

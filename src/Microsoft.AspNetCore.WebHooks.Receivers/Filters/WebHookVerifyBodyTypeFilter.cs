@@ -20,7 +20,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// Done as an <see cref="IResourceFilter"/> implementation and not an
     /// <see cref="Mvc.ActionConstraints.IActionConstraintMetadata"/> because receivers do not dynamically vary their
     /// <see cref="IWebHookRequestMetadata"/>. Use distinct <see cref="WebHookAttribute.Id"/> values if different
-    /// configurations are needed for one receiver.
+    /// configurations are needed for one receiver and the receiver's <see cref="WebHookAttribute"/> implements
+    /// <see cref="IWebHookRequestMetadata"/>.
     /// </remarks>
     public class WebHookVerifyBodyTypeFilter : IResourceFilter, IOrderedFilter
     {

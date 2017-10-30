@@ -58,7 +58,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            if (!context.RouteData.TryGetReceiverName(out var receiverName) || !IsApplicable(receiverName))
+            if (!context.RouteData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
                 await next();
                 return;

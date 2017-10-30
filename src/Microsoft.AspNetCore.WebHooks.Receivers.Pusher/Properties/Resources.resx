@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SignatureFilter_BadSecret" xml:space="preserve">
-    <value>Could not find a valid configuration for the '{0}' WebHook receiver and instance '{1}'. The configuration value must be a comma-separated list of segments, each of the form '&lt;appKey1&gt;_&lt;secretKey1&gt;; &lt;appKey2&gt;_&lt;secretKey2&gt;'.</value>
-  </data>
-  <data name="SignatureFilter_NoSecrets" xml:space="preserve">
-    <value>Could not find a valid configuration for the '{0}' WebHook receiver and instance '{1}'. To receive '{0}' WebHook requests for instance '{1}', please add a non-empty configuration value.</value>
-  </data>
   <data name="SignatureFilter_SecretNotFound" xml:space="preserve">
     <value>The '{0}' header value of '{1}' is not recognized as a valid application key. Please ensure the correct application key / secret key pairs have been configured.</value>
   </data>

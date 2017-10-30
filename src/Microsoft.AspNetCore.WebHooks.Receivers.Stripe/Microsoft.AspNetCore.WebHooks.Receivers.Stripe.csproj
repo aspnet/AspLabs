@@ -14,6 +14,7 @@
     <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Stripe\WebHooks\StripeRequestData.cs">
       <Link>StripeRequestData.cs</Link>
     </Compile>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.0.0" />
     <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
   </ItemGroup>
 </Project>

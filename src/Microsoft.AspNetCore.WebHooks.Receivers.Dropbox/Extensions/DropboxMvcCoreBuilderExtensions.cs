@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder
                 .AddJsonFormatters()
                 .AddWebHooks()
-                .AddSingletonFilter<DropboxVerifySignatureFilter>(WebHookSecurityFilter.Order);
+                .AddWebHookSingletonFilter<DropboxVerifySignatureFilter>(WebHookSecurityFilter.Order);
         }
 
         /// <summary>

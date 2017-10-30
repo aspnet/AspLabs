@@ -31,9 +31,6 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <see cref="Http.IFormCollection"/>.
         /// </para>
         /// <para>This constructor should usually be used at most once in a WebHook application.</para>
-        /// <para>
-        /// The default route <see cref="Mvc.Routing.IRouteTemplateProvider.Name"/> is <see langword="null"/>.
-        /// </para>
         /// </summary>
         public MailChimpWebHookAttribute()
             : base(MailChimpConstants.ReceiverName)

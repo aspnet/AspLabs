@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Extension methods for setting up WebHooks in an <see cref="IMvcCoreBuilder" />.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class WebHookMvcCoreBuilderExtensions
     {
         /// <summary>
@@ -42,17 +44,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<WebHookReceiverExistsConstraint>();
             services.TryAddSingleton<WebHookMultipleEventMapperConstraint>();
 
-            services.TryAddSingleton<IWebHookReceiverConfig, WebHookReceiverConfig>();
             services.TryAddSingleton<WebHookReceiverExistsFilter>();
 
             // ??? Does WebHookExceptionFilter need a non-default Order too?
             return builder
-                .AddSingletonFilter<WebHookExceptionFilter>()
-                .AddSingletonFilter<WebHookGetResponseFilter>(WebHookGetResponseFilter.Order)
-                .AddSingletonFilter<WebHookPingResponseFilter>(WebHookPingResponseFilter.Order)
-                .AddSingletonFilter<WebHookVerifyCodeFilter>(WebHookSecurityFilter.Order)
-                .AddSingletonFilter<WebHookVerifyMethodFilter>(WebHookVerifyMethodFilter.Order)
-                .AddSingletonFilter<WebHookVerifyRequiredValueFilter>(WebHookVerifyRequiredValueFilter.Order);
+                .AddWebHookSingletonFilter<WebHookExceptionFilter>()
+                .AddWebHookSingletonFilter<WebHookGetResponseFilter>(WebHookGetResponseFilter.Order)
+                .AddWebHookSingletonFilter<WebHookPingResponseFilter>(WebHookPingResponseFilter.Order)
+                .AddWebHookSingletonFilter<WebHookVerifyCodeFilter>(WebHookSecurityFilter.Order)
+                .AddWebHookSingletonFilter<WebHookVerifyMethodFilter>(WebHookVerifyMethodFilter.Order)
+                .AddWebHookSingletonFilter<WebHookVerifyRequiredValueFilter>(WebHookVerifyRequiredValueFilter.Order);
         }
 
         /// <summary>
@@ -82,13 +83,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Add <typeparamref name="TFilter"/> as a singleton filter. Register <typeparamref name="TFilter"/> as a
-        /// singleton service and add it to <see cref="AspNetCore.Mvc.MvcOptions.Filters"/>.
+        /// singleton service and add it to <see cref="MvcOptions.Filters"/>.
         /// </summary>
         /// <typeparam name="TFilter">The <see cref="IFilterMetadata"/> type to add.</typeparam>
         /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>
         /// <remarks>This method may be called multiple times for the same <typeparamref name="TFilter"/>.</remarks>
-        public static IMvcCoreBuilder AddSingletonFilter<TFilter>(this IMvcCoreBuilder builder)
+        public static IMvcCoreBuilder AddWebHookSingletonFilter<TFilter>(this IMvcCoreBuilder builder)
             where TFilter : class, IFilterMetadata
         {
             if (builder == null)
@@ -96,20 +97,19 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            return builder.AddSingletonFilter<TFilter>(order: 0);
+            return builder.AddWebHookSingletonFilter<TFilter>(order: 0);
         }
 
         /// <summary>
         /// Add <typeparamref name="TFilter"/> as a singleton filter with given <paramref name="order"/>. Register
-        /// <typeparamref name="TFilter"/> as a singleton service and add it to
-        /// <see cref="AspNetCore.Mvc.MvcOptions.Filters"/>.
+        /// <typeparamref name="TFilter"/> as a singleton service and add it to <see cref="MvcOptions.Filters"/>.
         /// </summary>
         /// <typeparam name="TFilter">The <see cref="IFilterMetadata"/> type to add.</typeparam>
         /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
         /// <param name="order">The <see cref="IOrderedFilter.Order"/> of the new filter.</param>
         /// <returns>The <paramref name="builder"/>.</returns>
         /// <remarks>This method may be called multiple times for the same <typeparamref name="TFilter"/>.</remarks>
-        public static IMvcCoreBuilder AddSingletonFilter<TFilter>(this IMvcCoreBuilder builder, int order)
+        public static IMvcCoreBuilder AddWebHookSingletonFilter<TFilter>(this IMvcCoreBuilder builder, int order)
             where TFilter : class, IFilterMetadata
         {
             if (builder == null)

@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder
                 .AddJsonFormatters()
                 .AddWebHooks(OptionsSetupAction)
-                .AddSingletonFilter<SlackVerifyTokenFilter>(WebHookSecurityFilter.Order);
+                .AddWebHookSingletonFilter<SlackVerifyTokenFilter>(WebHookSecurityFilter.Order);
         }
 
         /// <summary>

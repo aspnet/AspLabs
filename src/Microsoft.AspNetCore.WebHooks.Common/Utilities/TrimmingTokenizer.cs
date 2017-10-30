@@ -120,8 +120,6 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
             private StringTokenizer.Enumerator _enumerator;
             private StringSegment _remainder;
 
-            // ??? Should we instead pass the TrimmingTokenizer by ref? Current signature does not match
-            // ??? StringTokenizer.Enumerator's constructor. But, a change here may be a premature optimization.
             /// <summary>
             /// Instantiates a new <see cref="Enumerator"/> instance for <paramref name="tokenizer"/>.
             /// </summary>

@@ -38,9 +38,6 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <see cref="Newtonsoft.Json.Linq.JObject"/> or <see cref="PusherNotifications"/>.
         /// </para>
         /// <para>This constructor should usually be used at most once in a WebHook application.</para>
-        /// <para>
-        /// The default route <see cref="Mvc.Routing.IRouteTemplateProvider.Name"/> is <see langword="null"/>.
-        /// </para>
         /// </summary>
         public PusherWebHookAttribute()
             : base(PusherConstants.ReceiverName)

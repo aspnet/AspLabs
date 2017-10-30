@@ -2,10 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;          // ??? Will we run FxCop on the AspNetCore projects?
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -20,33 +19,43 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// Base class for <see cref="Mvc.Filters.IResourceFilter"/> or <see cref="Mvc.Filters.IAsyncResourceFilter"/>
     /// implementations that for example verify request signatures or <c>code</c> query parameters. Subclasses may
     /// also implement <see cref="IWebHookReceiver"/>. Subclasses should have an
-    /// <see cref="Mvc.Filters.IOrderedFilter.Order"/> less than <see cref="Order"/>.
+    /// <see cref="Mvc.Filters.IOrderedFilter.Order"/> equal to <see cref="Order"/>.
     /// </summary>
     public abstract class WebHookSecurityFilter
     {
         /// <summary>
         /// Instantiates a new <see cref="WebHookSecurityFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize <see cref="HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="Logger"/>.
         /// </param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize <see cref="Configuration"/> and
-        /// <see cref="ReceiverConfig"/>.
-        /// </param>
-        protected WebHookSecurityFilter(ILoggerFactory loggerFactory, IWebHookReceiverConfig receiverConfig)
+        protected WebHookSecurityFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory)
         {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+            if (hostingEnvironment == null)
+            {
+                throw new ArgumentNullException(nameof(hostingEnvironment));
+            }
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (receiverConfig == null)
-            {
-                throw new ArgumentNullException(nameof(receiverConfig));
-            }
 
+            Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
             Logger = loggerFactory.CreateLogger(GetType());
-            ReceiverConfig = receiverConfig;
         }
 
         /// <summary>
@@ -76,9 +85,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public static int Order => -500;
 
         /// <summary>
-        /// Gets the current <see cref="IConfiguration"/> for the application.
+        /// Gets the <see cref="IConfiguration"/> for the application.
         /// </summary>
-        protected IConfiguration Configuration => ReceiverConfig.Configuration;
+        protected IConfiguration Configuration;
+
+        /// <summary>
+        /// Gets the <see cref="IHostingEnvironment" />.
+        /// </summary>
+        protected IHostingEnvironment HostingEnvironment { get; }
 
         /// <summary>
         /// Gets an <see cref="ILogger"/> for use in this class and any subclasses.
@@ -89,11 +103,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </remarks>
         protected ILogger Logger { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IWebHookReceiverConfig"/> for WebHook receivers in this application.
-        /// </summary>
-        protected IWebHookReceiverConfig ReceiverConfig { get; }
-
         // ??? Why is this called so rarely? See Dropbox, GitHub and Pusher filters and corresponding old receivers.
         /// <summary>
         /// Some WebHooks rely on HTTPS for sending WebHook requests in a secure manner. A
@@ -101,14 +110,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// request is using HTTPS. If the request is not using HTTPS an error will be generated and the request will
         /// not be further processed.
         /// </summary>
-        /// <remarks>This method does allow local HTTP requests using <c>localhost</c>.</remarks>
+        /// <remarks>
+        /// This method allows HTTP requests while the application is in development or if the
+        /// <see cref="WebHookConstants.DisableHttpsCheckConfigurationKey"/> is <see langword="true"/>.
+        /// </remarks>
         /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>
         /// <param name="request">The current <see cref="HttpRequest"/>.</param>
         /// <returns>
         /// <see langword="null"/> in the success case. When a check fails, an <see cref="IActionResult"/> that when
         /// executed will produce a response containing details about the problem.
         /// </returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         protected virtual IActionResult EnsureSecureConnection(string receiverName, HttpRequest request)
         {
             if (request == null)
@@ -116,14 +127,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(request));
             }
 
-            // Check to see if we have been configured to ignore this check
-            if (ReceiverConfig.IsTrue(WebHookConstants.DisableHttpsCheckConfigurationKey))
+            // Check to see if we have been configured to ignore this check.
+            if (HostingEnvironment.IsDevelopment() ||
+                Configuration.IsTrue(WebHookConstants.DisableHttpsCheckConfigurationKey))
             {
                 return null;
             }
 
-            // Require HTTP unless request is local
-            if (!request.IsLocal() && !request.IsHttps)
+            // Require HTTPS.
+            if (!request.IsHttps)
             {
                 Logger.LogError(
                     500,
@@ -149,80 +161,124 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// Gets the locally configured WebHook secret key used to validate any signature header provided in a WebHook
         /// request.
         /// </summary>
-        /// <param name="request">The current <see cref="HttpRequest"/>.</param>
+        /// <param name="sectionKey">
+        /// The key (relative to <see cref="WebHookConstants.ReceiverConfigurationSectionKey"/>) of the
+        /// <see cref="IConfigurationSection"/> containing the receiver-specific
+        /// <see cref="WebHookConstants.SecretKeyConfigurationKeySectionKey"/> <see cref="IConfigurationSection"/>.
+        /// Typically this is the name of the receiver e.g. <c>github</c>.
+        /// </param>
         /// <param name="routeData">
         /// The <see cref="RouteData"/> for this request. A (potentially empty) ID value in this data allows a
         /// <see cref="WebHookSecurityFilter"/> subclass to support multiple senders with individual configurations.
         /// </param>
-        /// <param name="configurationName">
-        /// The name of the configuration to obtain. Typically this the name of the receiver, e.g. <c>github</c>.
-        /// </param>
         /// <param name="minLength">The minimum length of the key value.</param>
         /// <param name="maxLength">The maximum length of the key value.</param>
-        /// <returns>A <see cref="Task"/> that on completion provides the configured WebHook secret key.</returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
-        protected async virtual Task<string> GetReceiverConfig(
-            HttpRequest request,
+        /// <returns>
+        /// The configured WebHook secret key. <see langword="null"/> if the configuration value does not exist.
+        /// </returns>
+        protected virtual string GetSecretKey(
+            string sectionKey,
             RouteData routeData,
-            string configurationName,
             int minLength,
             int maxLength)
         {
-            if (request == null)
+            // Look up configuration for this receiver and instance.
+            var secrets = GetSecretKeys(sectionKey, routeData);
+            if (!secrets.Exists())
             {
-                throw new ArgumentNullException(nameof(request));
+                return null;
+            }
+
+            var secret = secrets.Value;
+            if (secret == null)
+            {
+                // Strange case: User incorrectly configured this id with sub-keys.
+                return null;
+            }
+
+            if (secret.Length < minLength || secret.Length > maxLength)
+            {
+                // Secrete key found but it does not meet the length requirements.
+                routeData.TryGetWebHookReceiverId(out var id);
+                Logger.LogCritical(
+                    501,
+                    "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver, instance " +
+                    "'{Id}'. The value must be between {MinLength} and {MaxLength} characters long.",
+                    sectionKey,
+                    id,
+                    minLength,
+                    maxLength);
+
+                var message = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.Security_BadSecret,
+                    sectionKey,
+                    id,
+                    minLength,
+                    maxLength);
+                throw new InvalidOperationException(message);
+            }
+
+            return secret;
+        }
+
+        /// <summary>
+        /// Gets the locally configured WebHook secret keys used to validate any signature header provided in a WebHook
+        /// request.
+        /// </summary>
+        /// <param name="sectionKey">
+        /// The key (relative to <see cref="WebHookConstants.ReceiverConfigurationSectionKey"/>) of the
+        /// <see cref="IConfigurationSection"/> containing the receiver-specific
+        /// <see cref="WebHookConstants.SecretKeyConfigurationKeySectionKey"/> <see cref="IConfigurationSection"/>.
+        /// Typically this is the name of the receiver e.g. <c>github</c>.
+        /// </param>
+        /// <param name="routeData">
+        /// The <see cref="RouteData"/> for this request. A (potentially empty) ID value in this data allows a
+        /// <see cref="WebHookSecurityFilter"/> subclass to support multiple senders with individual configurations.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IConfigurationSection"/> containing the configured WebHook secret keys.
+        /// <see langword="null"/> if the <see cref="IConfigurationSection"/> does not exist.
+        /// </returns>
+        protected virtual IConfigurationSection GetSecretKeys(string sectionKey, RouteData routeData)
+        {
+            if (sectionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sectionKey));
             }
             if (routeData == null)
             {
                 throw new ArgumentNullException(nameof(routeData));
             }
-            if (configurationName == null)
-            {
-                throw new ArgumentNullException(nameof(configurationName));
-            }
 
-            routeData.TryGetReceiverId(out var id);
+            routeData.TryGetWebHookReceiverId(out var id);
 
             // Look up configuration for this receiver and instance
-            var secret = await ReceiverConfig.GetReceiverConfigAsync(configurationName, id, minLength, maxLength);
-            if (secret == null)
+            var secrets = Configuration.GetWebHookSecretKeys(sectionKey, id);
+            if (!secrets.Exists())
             {
-                if (string.IsNullOrEmpty(id))
+                if (!Configuration.HasWebHookSecretKeys(sectionKey))
                 {
-                    // Either no configuration for this receiver at all or the key length is invalid.
+                    // No secret key configuration for this receiver at all.
                     Logger.LogCritical(
-                        501,
-                        "Could not find a valid configuration for WebHook receiver '{ReceiverName}'. The setting " +
-                        "must be set to a value between {MinLength} and {MaxLength} characters long.",
-                        configurationName,
-                        minLength,
-                        maxLength);
+                        502,
+                        "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver.",
+                        sectionKey);
 
-                    var message = string.Format(
-                        CultureInfo.CurrentCulture,
-                        Resources.Security_BadSecret,
-                        configurationName,
-                        id,
-                        minLength,
-                        maxLength);
+                    var message = string.Format(CultureInfo.CurrentCulture, Resources.Security_NoSecrets, sectionKey);
                     throw new InvalidOperationException(message);
                 }
-                else
-                {
-                    // ID was not configured. Caller should treat null return value with a Not Found response.
-                    Logger.LogError(
-                        502,
-                        "Could not find a valid configuration for WebHook receiver '{ReceiverName}' and instance " +
-                        "'{Id}'. The setting must be set to a value between {MinLength} and {MaxLength} characters " +
-                        "long.",
-                        configurationName,
-                        id,
-                        minLength,
-                        maxLength);
-                }
+
+                // ID was not configured or the key length is invalid. Caller should treat null return value with a
+                // Not Found response.
+                Logger.LogError(
+                    503,
+                    "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver, instance '{Id}'.",
+                    sectionKey,
+                    id);
             }
 
-            return secret;
+            return secrets;
         }
 
         /// <summary>

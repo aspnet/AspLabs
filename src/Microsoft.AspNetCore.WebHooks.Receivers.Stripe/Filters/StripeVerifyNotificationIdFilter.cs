@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -41,12 +43,17 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         private readonly IModelBinder _bodyModelBinder;
         private readonly HttpClient _httpClient;
         private readonly ModelMetadata _jObjectMetadata;
-        private readonly bool _passThroughTestEvents;
-        private readonly bool _useDirectWebHook;
 
         /// <summary>
         /// Instantiates a new <see cref="StripeVerifyNotificationIdFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
@@ -55,36 +62,39 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="IOptions{MvcOptions}"/> accessor for <see cref="MvcOptions"/>.
         /// </param>
         /// <param name="readerFactory">The <see cref="IHttpRequestStreamReaderFactory"/>.</param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
         public StripeVerifyNotificationIdFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             IModelMetadataProvider metadataProvider,
             IOptions<MvcOptions> optionsAccessor,
-            IHttpRequestStreamReaderFactory readerFactory,
-            IWebHookReceiverConfig receiverConfig)
-            : this(loggerFactory, metadataProvider, optionsAccessor, readerFactory, receiverConfig, httpClient: null)
+            IHttpRequestStreamReaderFactory readerFactory)
+            : this(
+                  configuration,
+                  hostingEnvironment,
+                  loggerFactory,
+                  metadataProvider,
+                  optionsAccessor,
+                  readerFactory,
+                  httpClient: null)
         {
         }
 
         // Allow tests to override the HttpClient.
         internal StripeVerifyNotificationIdFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             IModelMetadataProvider metadataProvider,
             IOptions<MvcOptions> optionsAccessor,
             IHttpRequestStreamReaderFactory readerFactory,
-            IWebHookReceiverConfig receiverConfig,
             HttpClient httpClient)
-            : base(loggerFactory, receiverConfig)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
             var options = optionsAccessor.Value;
             _bodyModelBinder = new BodyModelBinder(options.InputFormatters, readerFactory, loggerFactory, options);
             _httpClient = httpClient ?? new HttpClient();
             _jObjectMetadata = metadataProvider.GetMetadataForType(typeof(JObject));
-            _passThroughTestEvents = receiverConfig.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey);
-            _useDirectWebHook = receiverConfig.IsTrue(StripeConstants.DirectWebHookConfigurationKey);
         }
 
         /// <summary>
@@ -111,7 +121,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             // 1. Confirm this filter applies.
             var routeData = context.RouteData;
-            if (!routeData.TryGetReceiverName(out var receiverName) || !IsApplicable(receiverName))
+            if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
                 await next();
                 return;
@@ -155,8 +165,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // 4. Ensure the event name exists.
-            // ??? Should this be optional? It's optional in `StripeWebHookReceiver` but Stripe docs imply otherwise.
-            // ?? Should this be done later -- as in `StripeWebHookReceiver`? Seems useful even for test events.
             var eventName = data.Value<string>(StripeConstants.EventPropertyName);
             if (string.IsNullOrEmpty(eventName))
             {
@@ -175,16 +183,17 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // 5. Handle test events or get confirmed data.
-            // `WebHookVerifyCodeFilter` has already handled the _useDirectWebHook verification.
+            // `WebHookVerifyCodeFilter` has already handled the direct WebHook verification.
             if (IsTestEvent(notificationId))
             {
-                // Will short-circuit test events if !_passThroughTestEvents later, in StripeTestEventResponseFilter.
-                if (_passThroughTestEvents)
+                // Will short-circuit test events if PassThroughTestEventsConfigurationKey is not set later, in
+                // StripeTestEventResponseFilter.
+                if (Configuration.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey))
                 {
                     Logger.LogInformation(2, "Received a Stripe Test Event.");
                 }
             }
-            else if (!_useDirectWebHook)
+            else if (!Configuration.IsTrue(StripeConstants.DirectWebHookConfigurationKey))
             {
                 // Callback to get the real data.
                 data = await GetEventDataAsync(context.HttpContext.Request, routeData, notificationId);
@@ -238,9 +247,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // Create HTTP request for requesting authoritative event data from Stripe
-            var secretKey = await GetReceiverConfig(
-                request, routeData,
+            var secretKey = GetSecretKey(
                 ReceiverName,
+                routeData,
                 StripeConstants.SecretKeyMinLength,
                 StripeConstants.SecretKeyMaxLength);
             var address = string.Format(

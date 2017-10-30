@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Config_AddFailure" xml:space="preserve">
-    <value>Could not add configuration for the '{0}' WebHook receiver and instance '{1}'.</value>
-  </data>
-  <data name="Config_BadValue" xml:space="preserve">
-    <value>The '{0}' configuration value must have a comma-separated value of one or more secrets of the form &amp;lt;secret&amp;gt; or &amp;lt;id&amp;gt;=&amp;lt;secret&amp;gt;.</value>
-  </data>
   <data name="General_ArgumentCannotBeNullOrEmpty" xml:space="preserve">
     <value>Value cannot be null or empty.</value>
   </data>
@@ -157,10 +151,13 @@
     <value>The '{0}' header value is invalid. It must be a valid hex-encoded string.</value>
   </data>
   <data name="Security_BadSecret" xml:space="preserve">
-    <value>Could not find a valid configuration for the '{0}' WebHook receiver and instance '{1}'. The setting must be set to a value between {2} and {3} characters long.</value>
+    <value>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'.  The value must be between {2} and {3} characters long.</value>
   </data>
   <data name="Security_NoHttps" xml:space="preserve">
     <value>The '{0}' WebHook receiver requires HTTPS in order to be secure. Please register a WebHook URI of type '{1}'.</value>
+  </data>
+  <data name="Security_NoSecrets" xml:space="preserve">
+    <value>Could not find a valid configuration for the '{0}' WebHook receiver. Please configure secret keys for this receiver.</value>
   </data>
   <data name="VerifyBody_NoFormData" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as HTTP Post Form Data.</value>

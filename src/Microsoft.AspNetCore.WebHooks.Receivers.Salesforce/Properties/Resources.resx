@@ -123,12 +123,6 @@
   <data name="VerifyOrganization_BadValue" xml:space="preserve">
     <value>The '{0}' value provided in the HTTP request body did not match the expected value.</value>
   </data>
-  <data name="VerifyOrganization_BadXml" xml:space="preserve">
-    <value>The '{0}' WebHook request contained invalid XML.</value>
-  </data>
-  <data name="VerifyOrganization_MissingFormatter" xml:space="preserve">
-    <value>No {0} available for '{1}'.  The `{2}` WebHook receiver requires the XML formatters to be enabled.</value>
-  </data>
   <data name="VerifyOrganization_MissingValue" xml:space="preserve">
     <value>The HTTP request body did not contain a required '{0}' property.</value>
   </data>

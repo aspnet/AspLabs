@@ -61,24 +61,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not add configuration for the &apos;{0}&apos; WebHook receiver and instance &apos;{1}&apos;..
-        /// </summary>
-        internal static string Config_AddFailure {
-            get {
-                return ResourceManager.GetString("Config_AddFailure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; configuration value must have a comma-separated value of one or more secrets of the form &amp;lt;secret&amp;gt; or &amp;lt;id&amp;gt;=&amp;lt;secret&amp;gt;..
-        /// </summary>
-        internal static string Config_BadValue {
-            get {
-                return ResourceManager.GetString("Config_BadValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Value cannot be null or empty..
         /// </summary>
         internal static string General_ArgumentCannotBeNullOrEmpty {
@@ -178,7 +160,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver and instance &apos;{1}&apos;. The setting must be set to a value between {2} and {3} characters long..
+        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;.  The value must be between {2} and {3} characters long..
         /// </summary>
         internal static string Security_BadSecret {
             get {
@@ -192,6 +174,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         internal static string Security_NoHttps {
             get {
                 return ResourceManager.GetString("Security_NoHttps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver. Please configure secret keys for this receiver..
+        /// </summary>
+        internal static string Security_NoSecrets {
+            get {
+                return ResourceManager.GetString("Security_NoSecrets", resourceCulture);
             }
         }
         

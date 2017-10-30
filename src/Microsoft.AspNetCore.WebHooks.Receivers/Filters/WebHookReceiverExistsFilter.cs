@@ -64,9 +64,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.RouteData.TryGetReceiverName(out var receiverName))
+            if (context.RouteData.TryGetWebHookReceiverName(out var receiverName))
             {
-                if (!context.RouteData.GetReceiverExists())
+                if (!context.RouteData.GetWebHookReceiverExists())
                 {
                     _logger.LogCritical(
                         0,
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            context.RouteData.TryGetReceiverId(out var id);
+            context.RouteData.TryGetWebHookReceiverId(out var id);
             _logger.LogInformation(
                 3,
                 "Processing incoming WebHook request with receiver '{ReceiverName}' and id '{Id}'.",

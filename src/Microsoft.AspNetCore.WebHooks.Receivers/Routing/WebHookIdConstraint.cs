@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!context.RouteContext.RouteData.TryGetReceiverId(out var id))
+            if (!context.RouteContext.RouteData.TryGetWebHookReceiverId(out var id))
             {
                 return false;
             }

@@ -61,24 +61,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver and instance &apos;{1}&apos;. The configuration value must be a comma-separated list of segments, each of the form &apos;&lt;appKey1&gt;_&lt;secretKey1&gt;; &lt;appKey2&gt;_&lt;secretKey2&gt;&apos;..
-        /// </summary>
-        internal static string SignatureFilter_BadSecret {
-            get {
-                return ResourceManager.GetString("SignatureFilter_BadSecret", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver and instance &apos;{1}&apos;. To receive &apos;{0}&apos; WebHook requests for instance &apos;{1}&apos;, please add a non-empty configuration value..
-        /// </summary>
-        internal static string SignatureFilter_NoSecrets {
-            get {
-                return ResourceManager.GetString("SignatureFilter_NoSecrets", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; header value of &apos;{1}&apos; is not recognized as a valid application key. Please ensure the correct application key / secret key pairs have been configured..
         /// </summary>
         internal static string SignatureFilter_SecretNotFound {

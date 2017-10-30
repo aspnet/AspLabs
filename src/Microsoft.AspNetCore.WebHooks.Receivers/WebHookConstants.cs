@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.WebHooks.Routing;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.AspNetCore.WebHooks
 {
@@ -32,18 +33,19 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string CodeQueryParameterName => "code";
 
         /// <summary>
-        /// <para>
-        /// Gets the key used to retrieve a configuration entry indicating the
+        /// Gets the relative key name of the configuration value or (in a few cases)
+        /// <see cref="IConfigurationSection"/> containing a receiver's default secret key(s). This value or section is
+        /// an immediate child of the <see cref="SecretKeyConfigurationKeySectionKey"/> section for a receiver.
+        /// </summary>
+        public static string DefaultIdConfigurationKey => "default";
+
+        /// <summary>
+        /// Gets the key of a configuration value indicating the
         /// <see cref="Filters.WebHookSecurityFilter.EnsureSecureConnection"/> should not ensure a secure (HTTPS)
         /// connection with the sender. Configuration value, if any, should parse as a <see cref="bool"/>. If that
         /// parsed configuration value is <see langword="true"/>, the HTTPS check is disabled. Otherwise i.e. if the
         /// configuration value does not exist, cannot be parsed, or parses as <see langword="false"/>,
         /// <see cref="Filters.WebHookSecurityFilter.EnsureSecureConnection"/> performs the check.
-        /// </para>
-        /// <para>
-        /// Key corresponds to an <see cref="Extensions.Configuration.IConfiguration"/> entry in the default
-        /// <see cref="IWebHookReceiverConfig"/> implementation
-        /// </para>
         /// </summary>
         /// <remarks>
         /// Most, if not all, receiver configurations include
@@ -51,19 +53,27 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <see cref="Filters.WebHookVerifyCodeFilter"/> calls the method if
         /// <see cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/> is <see langword="true"/>.
         /// </remarks>
-        public static string DisableHttpsCheckConfigurationKey => "MS_WebHookDisableHttpsCheck";
+        public static string DisableHttpsCheckConfigurationKey { get; } = ConfigurationPath.Combine(
+            ReceiverConfigurationSectionKey,
+            "DisableHttpsCheck");
 
         /// <summary>
-        /// Gets the prefix of keys used to retrieve a per-receiver or per-id configuration string. Configuration value
-        /// often contains the receiver's secret key or keys. Key corresponds to an
-        /// <see cref="Extensions.Configuration.IConfiguration"/> entry in the default
-        /// <see cref="IWebHookReceiverConfig"/> implementation.
+        /// Gets the key of the <see cref="IConfigurationSection"/> containing all configuration values used in this
+        /// package. Immediate children include global configuration values and receiver-specific
+        /// <see cref="IConfigurationSection"/>s.
         /// </summary>
-        public static string ReceiverConfigurationKeyPrefix => "MS_WebHookReceiverSecret_";
+        public static string ReceiverConfigurationSectionKey => "WebHooks";
+
+        /// <summary>
+        /// Gets the relative key name of the <see cref="IConfigurationSection"/> containing secret keys. This section
+        /// is an immediate child of the receiver-specific <see cref="IConfigurationSection"/>. For most receivers,
+        /// immediate children of this section are id and secret key pairs.
+        /// </summary>
+        public static string SecretKeyConfigurationKeySectionKey => "SecretKey";
 
         /// <summary>
         /// Gets the name of the <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry containing the event name
-        /// for the current request.
+        /// for the current request when there is a single event name.
         /// </summary>
         /// <seealso cref="Metadata.IWebHookEventMetadata"/>
         public static string EventKeyName => "event";
@@ -87,11 +97,5 @@ namespace Microsoft.AspNetCore.WebHooks
         /// receiver.
         /// </summary>
         public static string ReceiverExistsKeyName => nameof(WebHookReceiverExistsConstraint);
-
-        // TODO: Remove or use. Was used as route name associated with the single action in the old world.
-        /// <summary>
-        /// Gets the name of the route for receiving generic WebHook requests.
-        /// </summary>
-        public static string ReceiverRouteName => "ReceiversAction";
     }
 }

@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 
 namespace DynamicsCRMCoreReceiver.Controllers
 {
-    // TODO: Test this sample more thoroughly.
     public class DynamicsCRMController : ControllerBase
     {
         private readonly ILogger _logger;

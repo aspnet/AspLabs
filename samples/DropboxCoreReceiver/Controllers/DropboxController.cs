@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 
 namespace DropboxCoreReceiver.Controllers
 {
-    // TODO: Test this sample more thoroughly.
     public class DropboxController : ControllerBase
     {
         [DropboxWebHook(Id = "It")]

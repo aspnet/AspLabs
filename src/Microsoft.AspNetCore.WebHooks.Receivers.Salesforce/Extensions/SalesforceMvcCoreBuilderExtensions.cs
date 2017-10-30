@@ -40,8 +40,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder
                 .AddXmlSerializerFormatters()
                 .AddWebHooks(OptionsSetupAction)
-                .AddSingletonFilter<SalesforceAcknowledgmentFilter>()
-                .AddSingletonFilter<SalesforceVerifyOrganizationIdFilter>(WebHookSecurityFilter.Order);
+                .AddWebHookSingletonFilter<SalesforceAcknowledgmentFilter>()
+                .AddWebHookSingletonFilter<SalesforceVerifyOrganizationIdFilter>(WebHookSecurityFilter.Order);
         }
 
         /// <summary>

@@ -5,20 +5,22 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IResourceFilter"/> that verifies the GitHub signature header. Confirms the header exists, reads
-    /// Body bytes, and compares the hashes.
+    /// An <see cref="IAsyncResourceFilter"/> that verifies the GitHub signature header. Confirms the header exists,
+    /// reads Body bytes, and compares the hashes.
     /// </summary>
     public class GitHubVerifySignatureFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
     {
@@ -28,15 +30,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <summary>
         /// Instantiates a new <see cref="GitHubVerifySignatureFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// <param name="receiverConfig">
-        /// The <see cref="IWebHookReceiverConfig"/> used to initialize
-        /// <see cref="WebHookSecurityFilter.Configuration"/> and <see cref="WebHookSecurityFilter.ReceiverConfig"/>.
-        /// </param>
-        public GitHubVerifySignatureFilter(ILoggerFactory loggerFactory, IWebHookReceiverConfig receiverConfig)
-            : base(loggerFactory, receiverConfig)
+        public GitHubVerifySignatureFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory)
+            : base(configuration, hostingEnvironment, loggerFactory)
         {
         }
 
@@ -57,7 +65,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             var routeData = context.RouteData;
             var request = context.HttpContext.Request;
-            if (routeData.TryGetReceiverName(out var receiverName) &&
+            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
                 IsApplicable(receiverName) &&
                 HttpMethods.IsPost(request.Method))
             {
@@ -108,10 +116,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // 2. Get the configured secret key.
-                var secretKey = await GetReceiverConfig(
-                    request,
-                    routeData,
+                var secretKey = GetSecretKey(
                     ReceiverName,
+                    routeData,
                     GitHubConstants.SecretKeyMinLength,
                     GitHubConstants.SecretKeyMaxLength);
                 if (secretKey == null)

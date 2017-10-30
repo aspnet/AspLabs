@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
@@ -18,18 +19,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// <remarks>Somewhat similar to the <see cref="WebHookPingResponseFilter"/>.</remarks>
     public class StripeTestEventResponseFilter : IResourceFilter, IWebHookReceiver
     {
+        private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
-        private readonly bool _passThroughTestEvents;
 
         /// <summary>
         /// Instantiates a new <see cref="StripeTestEventResponseFilter"/> instance.
         /// </summary>
+        /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="receiverConfig">The <see cref="IWebHookReceiverConfig"/>.</param>
-        public StripeTestEventResponseFilter(ILoggerFactory loggerFactory, IWebHookReceiverConfig receiverConfig)
+        public StripeTestEventResponseFilter(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
+            _configuration = configuration;
             _logger = loggerFactory.CreateLogger<StripeTestEventResponseFilter>();
-            _passThroughTestEvents = receiverConfig.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey);
         }
 
         /// <inheritdoc />
@@ -62,9 +63,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (!routeData.TryGetReceiverName(out var receiverName) ||
+            if (!routeData.TryGetWebHookReceiverName(out var receiverName) ||
                 !IsApplicable(receiverName) ||
-                _passThroughTestEvents)
+                _configuration.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey))
             {
                 return;
             }

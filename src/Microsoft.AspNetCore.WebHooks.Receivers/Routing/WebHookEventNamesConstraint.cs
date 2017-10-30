@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.RouteContext.RouteData.TryGetEventNames(out var eventNames))
+            if (context.RouteContext.RouteData.TryGetWebHookEventNames(out var eventNames))
             {
                 if (eventNames.Any(name => string.Equals(eventName, name, StringComparison.OrdinalIgnoreCase)))
                 {
