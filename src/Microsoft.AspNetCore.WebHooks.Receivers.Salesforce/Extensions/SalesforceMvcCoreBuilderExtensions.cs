@@ -5,8 +5,8 @@ using System;
 using System.ComponentModel;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.Filters;
+using Microsoft.AspNetCore.WebHooks.Internal;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.AspNetCore.WebHooks.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection

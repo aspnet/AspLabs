@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.AspNetCore.WebHooks.Services
+namespace Microsoft.AspNetCore.WebHooks.Internal
 {
     /// <summary>
     /// The default <see cref="ISalesforceResultCreator"/> implementation.

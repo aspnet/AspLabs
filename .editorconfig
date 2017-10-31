@@ -1,12 +1,18 @@
 # EditorConfig is awesome:http://EditorConfig.org
 
-# not always the top-most EditorConfig file
-root = false
+# top-most EditorConfig file
+root = true
 
 # Don't use tabs for indentation.
 [*]
 indent_style = space
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
+
+# Where supported (e.g. in VS Code but not VS), add a final newline to files.
+insert_final_newline = true
+
+# Where supported, trim trailing whitespace on all lines.
+trim_trailing_whitespace = true
 
 # Code files
 [*.{cs,csx,vb,vbx}]
