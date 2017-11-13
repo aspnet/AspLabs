@@ -5,7 +5,6 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.AspNetCore.WebHooks.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -13,15 +12,15 @@ using Microsoft.Extensions.Options;
 namespace Microsoft.AspNetCore.WebHooks.Internal
 {
     /// <summary>
-    /// Methods to add services for the Salesforce receiver.
+    /// Methods to add services for the GitHub receiver.
     /// </summary>
-    public static class SalesforceServiceCollectionSetup
+    public static class GitHubServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Salesforce receiver.
+        /// Add services for the GitHub receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddSalesforceServices(IServiceCollection services)
+        public static void AddGitHubServices(IServiceCollection services)
         {
             if (services == null)
             {
@@ -29,11 +28,9 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             }
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, SalesforceMetadata>());
-            services.TryAddSingleton<ISalesforceResultCreator, SalesforceResultCreator>();
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, GitHubMetadata>());
 
-            services.TryAddSingleton<SalesforceAcknowledgmentFilter>();
-            services.TryAddSingleton<SalesforceVerifyOrganizationIdFilter>();
+            services.TryAddSingleton<GitHubVerifySignatureFilter>();
         }
 
         private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
@@ -46,13 +43,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
                     throw new ArgumentNullException(nameof(options));
                 }
 
-                // Ensure this binder is placed before the BodyModelBinderProvider, the most likely provider to match
-                // the XElement type.
-                options.ModelBinderProviders.Insert(0, new SalesforceNotificationsModelBinderProvider());
-
-                // ??? Does SalesforceAcknowledgmentFilter need a non-default Order too?
-                options.Filters.AddService<SalesforceAcknowledgmentFilter>();
-                options.Filters.AddService<SalesforceVerifyOrganizationIdFilter>(WebHookSecurityFilter.Order);
+                options.Filters.AddService<GitHubVerifySignatureFilter>(WebHookSecurityFilter.Order);
             }
         }
     }

@@ -3,17 +3,10 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.WebHooks.ApplicationModels;
-using Microsoft.AspNetCore.WebHooks.Filters;
-using Microsoft.AspNetCore.WebHooks.Routing;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.WebHooks.Internal;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    // TODO: Add IMvcBuilder variant of this class. Do the same for all receiver-specific extension methods too.
     /// <summary>
     /// Extension methods for setting up WebHooks in an <see cref="IMvcCoreBuilder" />.
     /// </summary>
@@ -32,107 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            var services = builder.Services;
-            services
-                .TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, WebHookMetadataProvider>());
-            services
-                .TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, WebHookModelBindingProvider>());
-            services
-                .TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, WebHookRoutingProvider>());
-
-            services.TryAddSingleton<WebHookEventMapperConstraint>();
-            services.TryAddSingleton<WebHookReceiverExistsConstraint>();
-
-            services.TryAddSingleton<WebHookReceiverExistsFilter>();
-
-            // ??? Does WebHookExceptionFilter need a non-default Order too?
-            return builder
-                .AddWebHookSingletonFilter<WebHookExceptionFilter>()
-                .AddWebHookSingletonFilter<WebHookGetResponseFilter>(WebHookGetResponseFilter.Order)
-                .AddWebHookSingletonFilter<WebHookPingResponseFilter>(WebHookPingResponseFilter.Order)
-                .AddWebHookSingletonFilter<WebHookVerifyCodeFilter>(WebHookSecurityFilter.Order)
-                .AddWebHookSingletonFilter<WebHookVerifyMethodFilter>(WebHookVerifyMethodFilter.Order)
-                .AddWebHookSingletonFilter<WebHookVerifyRequiredValueFilter>(WebHookVerifyRequiredValueFilter.Order);
-        }
-
-        /// <summary>
-        /// Add <typeparamref name="TFilter"/> as a singleton filter. Register <typeparamref name="TFilter"/> as a
-        /// singleton service and add it to <see cref="MvcOptions.Filters"/>.
-        /// </summary>
-        /// <typeparam name="TFilter">The <see cref="IFilterMetadata"/> type to add.</typeparam>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
-        /// <returns>The <paramref name="builder"/>.</returns>
-        /// <remarks>This method may be called multiple times for the same <typeparamref name="TFilter"/>.</remarks>
-        public static IMvcCoreBuilder AddWebHookSingletonFilter<TFilter>(this IMvcCoreBuilder builder)
-            where TFilter : class, IFilterMetadata
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            return builder.AddWebHookSingletonFilter<TFilter>(order: 0);
-        }
-
-        /// <summary>
-        /// Add <typeparamref name="TFilter"/> as a singleton filter with given <paramref name="order"/>. Register
-        /// <typeparamref name="TFilter"/> as a singleton service and add it to <see cref="MvcOptions.Filters"/>.
-        /// </summary>
-        /// <typeparam name="TFilter">The <see cref="IFilterMetadata"/> type to add.</typeparam>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
-        /// <param name="order">The <see cref="IOrderedFilter.Order"/> of the new filter.</param>
-        /// <returns>The <paramref name="builder"/>.</returns>
-        /// <remarks>This method may be called multiple times for the same <typeparamref name="TFilter"/>.</remarks>
-        public static IMvcCoreBuilder AddWebHookSingletonFilter<TFilter>(this IMvcCoreBuilder builder, int order)
-            where TFilter : class, IFilterMetadata
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            var services = builder.Services;
-            services.TryAddSingleton<TFilter>();
-
-            // Ensure the filter is available globally. Filter should no-op for non-WebHook requests.
-            builder.AddMvcOptions(options =>
-            {
-                var filters = options.Filters;
-
-                // Remove existing registration of this type if it has a different Order. IsReusable should always be
-                // false (deferring lifetime choices to DI).
-                var i = 0;
-                var found = false;
-                while (i < filters.Count)
-                {
-                    var filter = filters[i];
-                    if (filter is ServiceFilterAttribute serviceFilter)
-                    {
-                        if (serviceFilter.ServiceType == typeof(TFilter))
-                        {
-                            if (!serviceFilter.IsReusable && serviceFilter.Order == order)
-                            {
-                                // Ignore odd cases where collection already contains duplicates.
-                                found = true;
-                                break;
-                            }
-                            else
-                            {
-                                // Replace existing registration with correct Order and IsReusable. Do not increment i.
-                                filters.RemoveAt(i);
-                                continue;
-                            }
-                        }
-                    }
-
-                    i++;
-                }
-
-                if (!found)
-                {
-                    filters.AddService<TFilter>(order);
-                }
-            });
+            WebHookServiceCollectionSetup.AddWebHookServices(builder.Services);
 
             return builder;
         }

@@ -3,9 +3,7 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.AspNetCore.WebHooks.Filters;
-using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.WebHooks.Internal;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -27,12 +25,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, GitHubMetadata>());
+            GitHubServiceCollectionSetup.AddGitHubServices(builder.Services);
 
             return builder
                 .AddJsonFormatters()
-                .AddWebHooks()
-                .AddWebHookSingletonFilter<GitHubVerifySignatureFilter>(WebHookSecurityFilter.Order);
+                .AddWebHooks();
         }
     }
 }

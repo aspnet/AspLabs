@@ -8,28 +8,26 @@ using Microsoft.AspNetCore.WebHooks.Internal;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Extension methods for setting up Salesforce WebHooks in an <see cref="IMvcCoreBuilder" />.
+    /// Extension methods for setting up Pusher WebHooks in an <see cref="IMvcBuilder" />.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class SalesforceMvcCoreBuilderExtensions
+    public static class PusherMvcBuilderExtensions
     {
         /// <summary>
-        /// Add Salesforce WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// Add Pusher WebHook configuration and services to the specified <paramref name="builder"/>.
         /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
+        /// <param name="builder">The <see cref="IMvcBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>
-        public static IMvcCoreBuilder AddSalesforceWebHooks(this IMvcCoreBuilder builder)
+        public static IMvcBuilder AddPusherWebHooks(this IMvcBuilder builder)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            SalesforceServiceCollectionSetup.AddSalesforceServices(builder.Services);
+            PusherServiceCollectionSetup.AddPusherServices(builder.Services);
 
-            return builder
-                .AddXmlSerializerFormatters()
-                .AddWebHooks();
+            return builder.AddWebHooks();
         }
     }
 }

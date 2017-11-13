@@ -3,9 +3,7 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.AspNetCore.WebHooks.Filters;
-using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.WebHooks.Internal;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -27,13 +25,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            var services = builder.Services;
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, SlackMetadata>());
+            SlackServiceCollectionSetup.AddSlackServices(builder.Services);
 
             // While requests contain HTTP form data, responses are JSON.
             return builder
                 .AddJsonFormatters()
-                .AddWebHookSingletonFilter<SlackVerifyTokenFilter>(WebHookSecurityFilter.Order);
+                .AddWebHooks();
         }
     }
 }

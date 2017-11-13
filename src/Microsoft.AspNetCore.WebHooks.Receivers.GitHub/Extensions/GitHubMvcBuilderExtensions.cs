@@ -8,28 +8,26 @@ using Microsoft.AspNetCore.WebHooks.Internal;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Extension methods for setting up Salesforce WebHooks in an <see cref="IMvcCoreBuilder" />.
+    /// Extension methods for setting up GitHub WebHooks in an <see cref="IMvcBuilder" />.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class SalesforceMvcCoreBuilderExtensions
+    public static class GitHubMvcBuilderExtensions
     {
         /// <summary>
-        /// Add Salesforce WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// Add GitHub WebHook configuration and services to the specified <paramref name="builder"/>.
         /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
+        /// <param name="builder">The <see cref="IMvcBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>
-        public static IMvcCoreBuilder AddSalesforceWebHooks(this IMvcCoreBuilder builder)
+        public static IMvcBuilder AddGitHubWebHooks(this IMvcBuilder builder)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            SalesforceServiceCollectionSetup.AddSalesforceServices(builder.Services);
+            GitHubServiceCollectionSetup.AddGitHubServices(builder.Services);
 
-            return builder
-                .AddXmlSerializerFormatters()
-                .AddWebHooks();
+            return builder.AddWebHooks();
         }
     }
 }
