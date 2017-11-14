@@ -301,7 +301,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 !request.ContentLength.HasValue ||
                 request.ContentLength.Value == 0L ||
                 !HttpMethods.IsPost(request.Method) ||
-                !request.IsJson())
+                !WebHookHttpRequestUtilities.IsJson(request))
             {
                 // Other filters will log and return errors about these conditions.
                 return null;

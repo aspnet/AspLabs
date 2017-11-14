@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.WebHooks.Properties;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Microsoft.AspNetCore.WebHooks.Serialization
+namespace Microsoft.AspNetCore.WebHooks.ModelBinding
 {
     /// <summary>
     /// Converts a Unix time stamp to and from a <see cref="DateTime"/>.

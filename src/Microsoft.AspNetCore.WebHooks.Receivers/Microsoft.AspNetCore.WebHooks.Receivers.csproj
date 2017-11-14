@@ -6,6 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
-    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Common\Microsoft.AspNetCore.WebHooks.Common.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 </Project>

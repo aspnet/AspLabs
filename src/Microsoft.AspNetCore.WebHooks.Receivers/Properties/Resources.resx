@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DateTime_BadFormat" xml:space="preserve">
+    <value>Cannot read value '{0}' as type '{1}'.</value>
+  </data>
+  <data name="DateTime_NullError" xml:space="preserve">
+    <value>Cannot convert null value to type '{0}'.</value>
+  </data>
+  <data name="EncodingUtils_InvalidHexValue" xml:space="preserve">
+    <value>Input is not a valid hex-encoded string: '{0}'. Please provide a valid hex-encoded string.</value>
+  </data>
   <data name="General_ArgumentCannotBeNullOrEmpty" xml:space="preserve">
     <value>Value cannot be null or empty.</value>
   </data>

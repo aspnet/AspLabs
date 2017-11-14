@@ -3,7 +3,7 @@
 
 using System;
 #if NETSTANDARD2_0
-using Microsoft.AspNetCore.WebHooks.Serialization;
+using Microsoft.AspNetCore.WebHooks.ModelBinding;
 #else
 using Microsoft.AspNet.WebHooks.Serialization;
 #endif

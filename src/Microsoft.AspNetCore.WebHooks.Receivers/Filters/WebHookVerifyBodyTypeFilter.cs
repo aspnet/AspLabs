@@ -98,14 +98,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     break;
 
                 case WebHookBodyType.Json:
-                    if (!request.IsJson())
+                    if (!WebHookHttpRequestUtilities.IsJson(request))
                     {
                         context.Result = CreateUnsupportedMediaTypeResult(Resources.VerifyBody_NoJson);
                     }
                     break;
 
                 case WebHookBodyType.Xml:
-                    if (!request.IsXml())
+                    if (!WebHookHttpRequestUtilities.IsXml(request))
                     {
                         context.Result = CreateUnsupportedMediaTypeResult(Resources.VerifyBody_NoXml);
                     }
