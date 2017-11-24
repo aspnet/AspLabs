@@ -132,4 +132,7 @@
   <data name="SqlStore_SqlOperationFailed" xml:space="preserve">
     <value>Operation '{0}' failed with error: '{1}'.</value>
   </data>
+  <data name="SqlStore_EmptyString" xml:space="preserve">
+    <value>Argument {0} must not be the empty string or null.</value>
+  </data>
 </root>

@@ -48,6 +48,19 @@ namespace Microsoft.AspNet.WebHooks
             Assert.IsType<SqlWebHookStore>(actual);
         }
 
+        [Fact]
+        public void CreateStore_WithCustomSettings_Succeeds()
+        {
+            // Arrange
+            ILogger logger = new Mock<ILogger>().Object;
+
+            // Act
+            IWebHookStore actual = SqlWebHookStore.CreateStore(logger, true, WebHookStoreContext.ConnectionStringName, "WebHooks", "WebHooks");
+
+            // Assert
+            Assert.IsType<SqlWebHookStore>(actual);
+        }
+
         [Theory]
         [MemberData(nameof(ConnectionSettingsData))]
         public void CheckSqlStorageConnectionString_Throws_IfNullOrEmptyConnectionString(ConnectionSettings connectionSettings)

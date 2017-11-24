@@ -22,5 +22,40 @@ namespace Microsoft.AspNet.WebHooks
             // Assert
             Assert.IsType<SqlWebHookStore>(actual);
         }
+
+        [Theory]
+        [InlineData("Default")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Initialize_SetsStore_WithCustomConnectionString(string nameOrConnectionString)
+        {
+            // Arrange
+            HttpConfiguration config = new HttpConfiguration();
+
+            // Act
+            config.InitializeCustomWebHooksSqlStorage(true, nameOrConnectionString);
+            IWebHookStore actual = CustomServices.GetStore();
+
+            // Assert
+            Assert.IsType<SqlWebHookStore>(actual);
+        }
+
+        [Theory]
+        [InlineData("Default", "dbo", "WebHooksTable")]
+        [InlineData("Default", null, null)]
+        [InlineData("", "", "")]
+        [InlineData(null, null, null)]
+        public void Initialize_SetsStore_WithCustomSettings(string nameOrConnectionString, string schemaName, string tableName)
+        {
+            // Arrange
+            HttpConfiguration config = new HttpConfiguration();
+
+            // Act
+            config.InitializeCustomWebHooksSqlStorage(true, nameOrConnectionString, schemaName, tableName);
+            IWebHookStore actual = CustomServices.GetStore();
+
+            // Assert
+            Assert.IsType<SqlWebHookStore>(actual);
+        }
     }
 }

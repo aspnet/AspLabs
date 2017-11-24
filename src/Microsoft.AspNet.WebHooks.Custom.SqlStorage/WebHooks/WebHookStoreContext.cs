@@ -3,6 +3,9 @@
 
 using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
+using System.Globalization;
+using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
 
 namespace Microsoft.AspNet.WebHooks
@@ -14,13 +17,58 @@ namespace Microsoft.AspNet.WebHooks
     {
         internal const string ConnectionStringName = "MS_SqlStoreConnectionString";
         private const string ConnectionStringNameParameter = "name=" + ConnectionStringName;
+        private readonly string _tableName;
+        private readonly string _schemaName = "WebHooks";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebHookStoreContext"/> class.
         /// </summary>
         public WebHookStoreContext() : base(ConnectionStringNameParameter)
         {
+            NameOrConnectionString = ConnectionStringNameParameter;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebHookStoreContext"/> class using the given string
+        /// as the name or connection string for the database to which a connection will be made.
+        /// </summary>
+        /// <param name="nameOrConnectionString">Either the database name or a connection string.</param>
+        public WebHookStoreContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+            NameOrConnectionString = nameOrConnectionString;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebHookStoreContext"/> class using the given parameters
+        /// as the name or connection string for the database to which a connection will be made.
+        /// And configures the database schema name and table name.
+        /// </summary>
+        /// <param name="nameOrConnectionString">Either the database name or a connection string.</param>
+        /// <param name="schemaName">Either the schema name.</param>
+        /// <param name="tableName">Either the table name.</param>
+        public WebHookStoreContext(string nameOrConnectionString, string schemaName, string tableName)
+            : this(nameOrConnectionString)
+        {
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                var msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(schemaName));
+                throw new ArgumentException(msg);
+            }
+
+            if (string.IsNullOrEmpty(tableName))
+            {
+                var msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(tableName));
+                throw new ArgumentException(msg);
+            }
+
+            _schemaName = schemaName;
+            _tableName = tableName;
+        }
+
+        /// <summary>
+        /// Gets the database name or a connection string.
+        /// </summary>
+        public string NameOrConnectionString { get; }
 
         /// <summary>
         /// Gets or sets the current collection of <see cref="Registration"/> instances.
@@ -35,7 +83,13 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(modelBuilder));
             }
 
-            modelBuilder.HasDefaultSchema("WebHooks");
+            modelBuilder.HasDefaultSchema(_schemaName);
+
+            if (!string.IsNullOrEmpty(_tableName))
+            {
+                var registrationConfiguration = modelBuilder.Entity<Registration>();
+                registrationConfiguration.ToTable(_tableName);
+            }
         }
     }
 }

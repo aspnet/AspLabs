@@ -79,6 +79,15 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Argument {0} must not be the empty string or null..
+        /// </summary>
+        internal static string SqlStore_EmptyString {
+            get {
+                return ResourceManager.GetString("SqlStore_EmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please provide a SQL connection string with name &apos;{0}&apos; in the configuration string section of the &apos;Web.Config&apos; file..
         /// </summary>
         internal static string SqlStore_NoConnectionString {

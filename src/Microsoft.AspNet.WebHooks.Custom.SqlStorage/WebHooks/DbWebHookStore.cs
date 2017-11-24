@@ -78,7 +78,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registrations = await context.Set<TRegistration>().Where(r => r.User == user).ToArrayAsync();
                     ICollection<WebHook> result = registrations.Select(r => ConvertToWebHook(r))
@@ -109,7 +109,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registrations = await context.Set<TRegistration>().Where(r => r.User == user).ToArrayAsync();
                     ICollection<WebHook> matches = registrations.Select(r => ConvertToWebHook(r))
@@ -143,7 +143,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registration = await context.Set<TRegistration>().Where(r => r.User == user && r.Id == id).FirstOrDefaultAsync();
                     if (registration != null)
@@ -177,7 +177,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registration = ConvertFromWebHook(user, webHook);
                     context.Set<TRegistration>().Attach(registration);
@@ -235,7 +235,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registration = await context.Set<TRegistration>().Where(r => r.User == user && r.Id == webHook.Id).FirstOrDefaultAsync();
                     if (registration == null)
@@ -290,7 +290,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var match = await context.Set<TRegistration>().Where(r => r.User == user && r.Id == id).FirstOrDefaultAsync();
                     if (match == null)
@@ -340,7 +340,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var matches = await context.Set<TRegistration>().Where(r => r.User == user).ToArrayAsync();
                     foreach (var m in matches)
@@ -370,7 +370,7 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                using (var context = new TContext())
+                using (var context = GetContext())
                 {
                     var registrations = await context.Set<TRegistration>().ToArrayAsync();
                     var matches = new List<WebHook>();
@@ -469,6 +469,14 @@ namespace Microsoft.AspNet.WebHooks
             string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
             string protectedData = _protector != null ? _protector.Protect(content) : content;
             registration.ProtectedData = protectedData;
+        }
+
+        /// <summary>
+        /// Constructs a new context instance
+        /// </summary>
+        protected virtual TContext GetContext()
+        {
+            return new TContext();
         }
 
         private static bool DefaultPredicate(WebHook webHook, string user)
