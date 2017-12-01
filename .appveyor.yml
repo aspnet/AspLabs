@@ -10,6 +10,8 @@ configuration:
   - Release
 matrix:
   fast_finish: true
+before_build:
+  - cmd: .\build.cmd EnableSkipStrongNames
 build_script:
   - cmd: .\build.cmd BuildPackages /P:Configuration=%Configuration%
 clone_depth: 1
