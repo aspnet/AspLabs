@@ -47,7 +47,7 @@ if not exist %StorageEmulator% (
 
 if "%1" == "" goto BuildDefaults
 
-%MSBuild% WebHooks.msbuild /m /nr:false /t:%* /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal
+%MSBuild% WebHooks.msbuild /m /nr:false /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal /t:%*
 if %ERRORLEVEL% neq 0 goto BuildFail
 goto BuildSuccess
 

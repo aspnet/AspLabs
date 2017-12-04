@@ -16,14 +16,27 @@
     <SkipStrongNamesExe>$(MSBuildThisFileDirectory)packages\Microsoft.Web.SkipStrongNames.1.0.0\tools\SkipStrongNames.exe</SkipStrongNamesExe>
     <SkipStrongNamesXml>$(MSBuildThisFileDirectory)tools\SkipStrongNames.xml</SkipStrongNamesXml>
     <NuGetExe>.nuget\NuGet.exe</NuGetExe>
+
+    <!-- Give all assemblies the same revision. -->
+    <_TwoDigitYear>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), 2000))</_TwoDigitYear>
+    <_ThreeDigitDayOfYear>$([System.DateTime]::UtcNow.DayOfYear.ToString().PadLeft(3, '0'))</_ThreeDigitDayOfYear>
+    <AssemblyRevision>$(_TwoDigitYear)$(_ThreeDigitDayOfYear)</AssemblyRevision>
   </PropertyGroup>
 
   <ItemGroup>
     <SolutionsToBuild Include="WebHooks.sln">
       <BuildInParallel>$(BuildInParallel)</BuildInParallel>
     </SolutionsToBuild>
-    <NugetsToBuild Include="**\*.nuspec"/>
   </ItemGroup>
+
+  <Target Name="GetBuildNumber">
+    <!-- Create second-based build number for local builds. 635556672000000000 is Jan 1, 2015. -->
+    <PropertyGroup>
+      <_SecondBasedTimeStamp>$([System.DateTime]::UtcNow.Subtract($([System.DateTime]::FromBinary(635556672000000000))).TotalSeconds.ToString("F0"))</_SecondBasedTimeStamp>
+      <_SecondBasedTimeStamp>t$([System.Int64]::Parse($(_SecondBasedTimeStamp)).ToString("x9"))</_SecondBasedTimeStamp>
+    </PropertyGroup>
+    <Message Text="/p:BuildNumber=$(_SecondBasedTimeStamp)" Importance="High" />
+  </Target>
 
   <Target Name="EnableSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">
     <Exec Command='"$(SkipStrongNamesExe)" -e "$(SkipStrongNamesXml)"' />
@@ -62,25 +75,26 @@
 
   <Target Name="RestorePackages" DependsOnTargets="DownloadNuGet">
     <Message Text="Restoring NuGet packages..." Importance="High" />
-    <Exec Command='"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
-    <!-- Pick the right Microsoft.Web.FxCop package to use and copy it to a standard location. -->
+    <Exec Command='SET BuildNumber=$(BuildNumber)
+"$(NuGetExe)" restore "%(SolutionsToBuild.Identity)" -PackagesDirectory packages -NonInteractive -Verbosity quiet -ConfigFile "$(MsBuildThisFileDirectory)\.nuget\NuGet.Config"' />
   </Target>
 
   <Target Name="BuildPackages" DependsOnTargets="UnitTest">
     <Message Text='Building NuGet packages...' Importance="High" />
     <MSBuild Projects="src\Packages\Packages.proj"
              Targets="Build"
-             Properties="Configuration=$(Configuration);VisualStudioVersion=$(VisualStudioVersion)" />
+             Properties="BuildInParallel=$(BuildInParallel);Configuration=$(Configuration);VisualStudioVersion=$(VisualStudioVersion)" />
   </Target>
 
   <Target Name="BuildTools">
+    <!-- Pick the right Microsoft.Web.FxCop package to use and copy it to a standard location. -->
     <PropertyGroup>
         <FxCopProjectLocation>$(MsBuildThisFileDirectory)tools\src\Microsoft.Web.FxCop\</FxCopProjectLocation>
         <CustomFxCopRulesPath>$(MsBuildThisFileDirectory)packages\CustomFxCopRules</CustomFxCopRulesPath>
     </PropertyGroup>
-    <MsBuild 
+    <MsBuild
           Condition=" '$(CodeAnalysis)' == 'true' "
-          Projects="$(FxCopProjectLocation)\Microsoft.Web.FxCop.csproj" 
+          Projects="$(FxCopProjectLocation)\Microsoft.Web.FxCop.csproj"
           Properties="Configuration=Release;OutputPath=$(CustomFxCopRulesPath)" />
   </Target>
 
@@ -93,7 +107,7 @@
           BuildInParallel="%(SolutionsToBuild.BuildInParallel)"
           Targets="Build"
           Condition=" '%(SolutionsToBuild.Portable)' != 'true' or '$(BuildPortable)' == 'true' "
-          Properties="Configuration=$(Configuration);CodeAnalysis=$(CodeAnalysis);StyleCopEnabled=$(StyleCopEnabled);VisualStudioVersion=$(VisualStudioVersion)" />
+          Properties="AssemblyRevision=$(AssemblyRevision);Configuration=$(Configuration);CodeAnalysis=$(CodeAnalysis);StyleCopEnabled=$(StyleCopEnabled);VisualStudioVersion=$(VisualStudioVersion)" />
   </Target>
 
   <Target Name="UnitTest" DependsOnTargets="CheckSkipStrongNames;Build">

@@ -8,8 +8,5 @@
 
   <PropertyGroup Condition="$(_ImportParentFile)">
     <IsPackable>false</IsPackable>
-
-    <!-- ??? Required if we revisit $(OutputPath) decision in parent Directory.Build.props file. -->
-    <!-- OutputPath>bin\</OutputPath -->
   </PropertyGroup>
 </Project>

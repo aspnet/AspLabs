@@ -11,12 +11,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Microsoft.AspNetCore.WebHooks</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
-
-    <!--
-      ??? Is this required if we revisit $(OutputPath) decision in parent Directory.Build.props file? Note
-      ??? $(MSBuildProjectName) is not necessarily the same as $(AssemblyName) and $(AssemblyName) isn't set yet.
-    -->
-    <!-- DocumentationFile>$(OutputPath)$(MSBuildProjectName).xml</DocumentationFile -->
   </PropertyGroup>
 
   <ItemGroup Condition="$(_ImportParentFile)">

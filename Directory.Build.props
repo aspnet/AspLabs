@@ -1,13 +1,13 @@
 ﻿<Project>
   <!-- Imported only from .NET Core and .NET Standard projects. See conditions in lower-level Directory.Build.props files -->
 
-  <Import Project="version.xml" />
+  <Import Project="version.props" />
 
-  <!-- Ensure changes to this file and version.xml cause project rebuilds. -->
+  <!-- Ensure changes to this file and version.props cause project rebuilds. -->
   <PropertyGroup>
     <RepositoryRoot Condition=" '$(RepositoryRoot)' == '' ">$([System.IO.Path]::GetFullPath( '$(MSBuildThisFileDirectory)' ))</RepositoryRoot>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(RepositoryRoot)version.xml</MSBuildAllProjects>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(RepositoryRoot)version.props</MSBuildAllProjects>
   </PropertyGroup>
 
   <!-- Common package options. -->
@@ -21,6 +21,9 @@
     <!-- Work around https://github.com/NuGet/Home/issues/4726 -->
     <IncludeSymbols Condition=" '$(NuspecFile)' != '' ">false</IncludeSymbols>
 
+    <!-- Let the new SDKs know about CodeAnalysis. -->
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
+
     <LangVersion>7.1</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -30,19 +33,11 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
-  <!-- Build numbers -->
-  <!-- TODO: Update solution build to use a unique $(BuildNumber) per build (same for all projects). -->
+  <!-- Default $(AssemblyRevision) when manually building an individual project. -->
   <PropertyGroup>
     <_TwoDigitYear>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), 2000))</_TwoDigitYear>
     <_ThreeDigitDayOfYear>$([System.DateTime]::UtcNow.DayOfYear.ToString().PadLeft(3, '0'))</_ThreeDigitDayOfYear>
-    <AssemblyRevision>$(_TwoDigitYear)$(_ThreeDigitDayOfYear)</AssemblyRevision>
-
-    <!-- TeamCity CI sets the $BUILD_NUMBER environment variable. But, fall back when building locally. -->
-    <!-- Use constant value to work around https://github.com/NuGet/Home/issues/5500 -->
-    <BuildNumber Condition=" '$(BuildNumber)' == '' AND '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BuildNumber)' == '' ">t000</BuildNumber>
-
-    <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
+    <AssemblyRevision Condition=" '$(AssemblyRevision)' == '' ">$(_TwoDigitYear)$(_ThreeDigitDayOfYear)</AssemblyRevision>
   </PropertyGroup>
 
   <!-- Additional specifics of this repository. -->
@@ -57,14 +52,7 @@
     <SignAssembly>true</SignAssembly>
 
     <!-- Must delay-sign the assemblies because 35MSSharedLib1024.snk contains no private key. -->
-    <!-- ??? Does $(DelaySign) conflict with $(PublicSign)? -->
     <DelaySign>true</DelaySign>
-
-    <!--
-      ??? Not grouping all src and test output as rest of WebHooks does. Should we revisit? Note $(Configuration) isn't
-      ??? set yet. Would need to approximate logic to choose default $(Configuration) for this to work somewhat correctly.
-    -->
-    <!-- OutputPath Condition=" '$(OutputPath)' == '' ">$(RepositoryRoot)bin\$(Configuration)\</OutputPath -->
   </PropertyGroup>
 
   <ItemGroup>

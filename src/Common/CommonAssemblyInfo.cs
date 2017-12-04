@@ -26,8 +26,8 @@ using System.Runtime.InteropServices;
 
 #if ASPNETWEBHOOKS
 #if !BUILD_GENERATED_VERSION
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 #endif
 [assembly: AssemblyProduct("Microsoft ASP.NET WebHooks")]
 #else
