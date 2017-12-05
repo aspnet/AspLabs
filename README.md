@@ -11,16 +11,33 @@ Please see the initial [documentation](http://go.microsoft.com/fwlink/?LinkId=69
 
 ### Samples
 - [All Samples](/samples/)
+
+#### ASP.NET
 - [Azure](/samples/AzureReceivers)
 - [Bitbucket](/samples/BitbucketReceiver)
 - [Dropbox](/samples/DropboxReceiver)
 - [GitHub](/samples/GitHubReceiver)
 - [Instagram](/samples/InstagramReceiver)
+- [MailChimp](/samples/MailChimpReceiver.Selfhost)
 - [MyGet](/samples/MyGetReceiver)
+- [SalesForce](/samples/SalesforceReceiver)
 - [Slack](/samples/SlackReceiver)
 - [Stripe](/samples/StripeReceiver)
 - [VSTS](/samples/VstsReceiver)
 - [Zendesk](/samples/ZendeskReceiver)
+
+#### ASP.NET Core
+- [Azure](/samples/AzureAlertCoreReceiver)
+- [Bitbucket](/samples/BitbucketCoreReceiver)
+- [Dropbox](/samples/DropboxCoreReceiver)
+- [DynamicCRM](/samples/DynamicsCRMCoreReceiver)
+- [GitHub](/samples/GitHubCoreReceiver)
+- [Kudu](/samples/KuduCoreReceiver)
+- [MailChimp](/samples/MailChimpCoreReceiver)
+- [Pusher](/samples/PusherCoreReceiver)
+- [SalesForce](/samples/SalesforceCoreReceiver)
+- [Slack](/samples/SlackCoreReceiver)
+- [Stripe](/samples/StripeCoreReceiver)
 
 ### Resources
 * Overview
