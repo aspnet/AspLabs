@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Salesforce WebHooks infrastructure. Contains the SalesforceWebHookAttribute class and AddSalesforceWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;salesforce</PackageTags>
   </PropertyGroup>

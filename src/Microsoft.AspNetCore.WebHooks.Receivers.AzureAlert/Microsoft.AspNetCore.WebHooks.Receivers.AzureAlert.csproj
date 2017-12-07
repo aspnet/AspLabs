@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Azure Alert WebHooks infrastructure. Contains the AzureAlertWebHookAttribute class and AddAzureAlertWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;azurealert</PackageTags>
   </PropertyGroup>

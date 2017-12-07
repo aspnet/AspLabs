@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core MailChimp WebHooks infrastructure. Contains the MailChimpWebHookAttribute class and AddMailChimpWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;mailchimp</PackageTags>
   </PropertyGroup>

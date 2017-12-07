@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Dynamics CRM WebHooks infrastructure. Contains the DynamicsCRMWebHookAttribute class and AddDynamicsCRMWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;dynamicscrm</PackageTags>
   </PropertyGroup>

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Trello WebHooks infrastructure. Contains the TrelloWebHookAttribute class and AddTrelloWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;trello</PackageTags>
   </PropertyGroup>

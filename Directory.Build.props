@@ -21,9 +21,6 @@
     <!-- Work around https://github.com/NuGet/Home/issues/4726 -->
     <IncludeSymbols Condition=" '$(NuspecFile)' != '' ">false</IncludeSymbols>
 
-    <!-- Let the new SDKs know about CodeAnalysis. -->
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
-
     <LangVersion>7.1</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <NoPackageAnalysis>true</NoPackageAnalysis>

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Kudu WebHooks infrastructure. Contains the KuduWebHookAttribute class and AddKuduWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;kudu</PackageTags>
   </PropertyGroup>
