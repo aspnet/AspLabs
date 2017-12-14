@@ -85,7 +85,8 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Gets or sets the geographic location of the resource.
         /// </summary>
-        [JsonProperty("resourceRegion", Required = Required.Always)]
+        /// <remarks>Set in Metric alerts but not Availability (Web Test) alerts.</remarks>
+        [JsonProperty("resourceRegion")]
         public string ResourceRegion { get; set; }
 
         /// <summary>

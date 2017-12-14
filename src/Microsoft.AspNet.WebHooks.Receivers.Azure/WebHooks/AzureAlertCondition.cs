@@ -59,5 +59,19 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         [JsonProperty("operator")]
         public string Operator { get; set; }
+
+        /// <summary>
+        /// Gets or sets details of an Availability (Web Test) failure.
+        /// </summary>
+        /// <remarks>Set in Availability (Web Test) alerts but not Metric alerts.</remarks>
+        [JsonProperty("failureDetails")]
+        public string FailureDetails { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of an Availability (Web Test) alert.
+        /// </summary>
+        /// <remarks>Set in Availability (Web Test) alerts but not Metric alerts.</remarks>
+        [JsonProperty("webTestName")]
+        public string WebTestName { get; set; }
     }
 }

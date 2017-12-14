@@ -3,7 +3,6 @@
 
 using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNet.WebHooks
@@ -24,8 +23,8 @@ namespace Microsoft.AspNet.WebHooks
         public void AlertNotification_Roundtrips()
         {
             // Arrange
-            JObject data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.AlertMessage2.json");
-            AzureAlertNotification expected = new AzureAlertNotification
+            var data = EmbeddedResource.ReadAsJObject("Microsoft.AspNet.WebHooks.Messages.AlertMessage2.json");
+            var expected = new AzureAlertNotification
             {
                 Status = "Activated",
                 Context = new AzureAlertContext
@@ -58,11 +57,11 @@ namespace Microsoft.AspNet.WebHooks
             expected.Properties.Add("prop2", 12345.00);
 
             // Act
-            AzureAlertNotification actual = data.ToObject<AzureAlertNotification>();
+            var actual = data.ToObject<AzureAlertNotification>();
 
             // Assert
-            string expectedJson = JsonConvert.SerializeObject(expected, _serializerSettings);
-            string actualJson = JsonConvert.SerializeObject(actual, _serializerSettings);
+            var expectedJson = JsonConvert.SerializeObject(expected, _serializerSettings);
+            var actualJson = JsonConvert.SerializeObject(actual, _serializerSettings);
             Assert.Equal(expectedJson, actualJson);
         }
 
@@ -70,14 +69,15 @@ namespace Microsoft.AspNet.WebHooks
         [InlineData("AlertMessage1.json", "Activated")]
         [InlineData("AlertMessage2.json", "Activated")]
         [InlineData("AlertMessage3.json", "Activated")]
+        [InlineData("AzureAlert.WebTest.json", "Resolved")]
         public void AlertContext_ParsesMessages(string fileName, string expected)
         {
             // Arrange
-            string filePath = "Microsoft.AspNet.WebHooks.Messages." + fileName;
-            JObject data = EmbeddedResource.ReadAsJObject(filePath);
+            var filePath = "Microsoft.AspNet.WebHooks.Messages." + fileName;
+            var data = EmbeddedResource.ReadAsJObject(filePath);
 
             // Act
-            AzureAlertNotification actual = data.ToObject<AzureAlertNotification>();
+            var actual = data.ToObject<AzureAlertNotification>();
 
             // Assert
             Assert.Equal(expected, actual.Status);

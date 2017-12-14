@@ -72,10 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
-    <EmbeddedResource Include="Messages\KuduMessage.json" />
-    <EmbeddedResource Include="Messages\AlertMessage2.json" />
     <EmbeddedResource Include="Messages\AlertMessage1.json" />
+    <EmbeddedResource Include="Messages\AlertMessage2.json" />
     <EmbeddedResource Include="Messages\AlertMessage3.json" />
+    <EmbeddedResource Include="Messages\AzureAlert.WebTest.json" />
+    <EmbeddedResource Include="Messages\KuduMessage.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -119,11 +120,4 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.0.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.0.1\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Import Project="..\..\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\..\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.Targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
