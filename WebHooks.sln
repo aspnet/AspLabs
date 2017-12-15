@@ -238,6 +238,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlackCoreReceiver", "sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StripeCoreReceiver", "samples\StripeCoreReceiver\StripeCoreReceiver.csproj", "{693E5E07-5A05-4569-8373-369D4F918BEF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test", "test\Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test\Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test.csproj", "{79247F99-4829-4FB4-8412-0ECF39FF7E37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -827,6 +829,12 @@ Global
 		{693E5E07-5A05-4569-8373-369D4F918BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{693E5E07-5A05-4569-8373-369D4F918BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{693E5E07-5A05-4569-8373-369D4F918BEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -935,9 +943,10 @@ Global
 		{3762D23D-A7BF-499A-BF33-AFAF4647358E} = {5759F48E-0D9E-457F-A93D-40FBC422B0CE}
 		{D3A8D951-D55A-414E-8A5D-F8A8AF1F61FA} = {5759F48E-0D9E-457F-A93D-40FBC422B0CE}
 		{693E5E07-5A05-4569-8373-369D4F918BEF} = {5759F48E-0D9E-457F-A93D-40FBC422B0CE}
+		{79247F99-4829-4FB4-8412-0ECF39FF7E37} = {554337F5-F56F-4F93-9AE7-78F9EBCECC20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
 	EndGlobalSection
 EndGlobal

@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
@@ -250,7 +251,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 modelName: ModelStateRootKey);
 
             // Read request body.
-            await _bodyModelBinder.BindModelAsync(bindingContext);
+            try
+            {
+                await _bodyModelBinder.BindModelAsync(bindingContext);
+            }
+            finally
+            {
+                request.Body.Seek(0L, SeekOrigin.Begin);
+            }
+
             if (!bindingContext.ModelState.IsValid)
             {
                 return null;

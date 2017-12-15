@@ -115,18 +115,31 @@
   </Target>
 
   <Target Name="RunTests" DependsOnTargets="CheckSkipStrongNames">
+    <PropertyGroup>
+      <_Platform Condition="'$(Platform)' == '' OR '$(Platform)' == 'Any Cpu'">AnyCpu</_Platform>
+    </PropertyGroup>
     <ItemGroup>
-      <TestDLLsXunit Include="bin\Test\$(Configuration)\*.Test.dll;bin\Test\$(Configuration)\*.Test.*.dll;bin\Test\$(Configuration)\NetCore\*.Test.dll" />
-      <XunitProject Include="tools\WebHooks.xunit.targets">
-        <Properties>TestAssembly=%(TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(TestDLLsXunit.FileName)-XunitResults.xml</Properties>
-      </XunitProject>
+      <_TestDLLsXunit Include="bin\Test\$(Configuration)\*.Test.dll" />
+      <_TestDLLsXunit Include="bin\Test\$(Configuration)\*.Test.*.dll" />
+      <_TestDLLsXunit Include="bin\Test\$(Configuration)\NetCore\*.Test.dll" Condition="'$(BuildPortable)' == 'true'" />
+      <_XunitProject Include="tools\WebHooks.xunit.targets">
+        <Properties>TestAssembly=%(_TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(_TestDLLsXunit.FileName)-XunitResults.xml</Properties>
+      </_XunitProject>
+      <_DirectTestProjects Include="test\Microsoft.AspNetCore.*\*.csproj" />
     </ItemGroup>
 
-    <!-- Re-create the test results directory so that print summary doesn't run on old test results -->
+    <!-- Recreate the test results directory so that print summary doesn't run on old test results. -->
     <RemoveDir Directories="$(TestResultsDirectory)" />
     <MakeDir Directories="$(TestResultsDirectory)" />
 
-    <MSBuild Projects="@(XunitProject)" BuildInParallel="$(TestInParallel)" Targets="Xunit" />
+    <MSBuild Projects="@(_XunitProject)" BuildInParallel="$(TestInParallel)" Targets="Xunit" />
+
+    <!-- Failures in these projects will fail build. But, results will not be included in test run summary. -->
+    <MSBuild
+      BuildInParallel="$(TestInParallel)"
+      Properties="Configuration=$(Configuration);Platform=$(_Platform)"
+      Projects="@(_DirectTestProjects)"
+      Targets="Test" />
   </Target>
 
   <Target Name="CheckSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">

@@ -1,0 +1,33 @@
+<Project>
+  <Import Project="..\Directory.Build.targets" />
+  <Import Project="..\packages\**\xunit.runner.msbuild.props" />
+
+  <Target Name="Test" DependsOnTargets="_TestWithVSTest;_TestWithDotnetTest;_TestWithRunner" />
+
+  <!-- Building with `dotnet msbuild`: Use VSTest target. -->
+  <Target
+    Name="_TestWithVSTest"
+    Condition="$(IsTestProject) and '$(MSBuildRuntimeType)' == 'Core'">
+
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="VSTest" Properties="VSTestNoBuild=true" />
+  </Target>
+
+  <!-- Building with `msbuild` and in outer build or building .NET Core: Use `dotnet test`. -->
+  <Target
+    Name="_TestWithDotnetTest"
+    Condition="$(IsTestProject) and '$(MSBuildRuntimeType)' != 'Core' and '$(TargetFrameworkIdentifier)' != '.NETFramework'">
+
+    <Exec Command='dotnet test --no-restore --no-build --verbosity minimal --configuration $(Configuration) "$(MSBuildProjectFullPath)"'/>
+  </Target>
+
+  <!-- Building with `msbuild`, in inner build, and building .NET Framework: Use xUnit MSBuild runner. -->
+  <Target
+    Name="_TestWithRunner"
+    Condition="$(IsTestProject) and '$(MSBuildRuntimeType)' != 'Core' and '$(TargetFrameworkIdentifier)' == '.NETFramework'">
+
+    <ItemGroup Condition=" '@(TestAssembly)' == '' ">
+      <TestAssembly Include="$(TargetPath)" />
+    </ItemGroup>
+    <xunit Assemblies="@(TestAssembly)" />
+  </Target>
+</Project>

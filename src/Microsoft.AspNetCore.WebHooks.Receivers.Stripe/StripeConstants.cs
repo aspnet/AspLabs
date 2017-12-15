@@ -28,37 +28,17 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string DataDetailsPropertyName => "object";
 
         /// <summary>
-        /// Gets the key of a configuration value indicating the Stripe receiver should require a <c>code</c> query
-        /// parameter and verify the parameter's value against configured secret key. Configuration value, if any,
-        /// should parse as a <see cref="bool"/>. If that parsed configuration value is <see langword="true"/>, the
-        /// receiver will behave similarly to when <see cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/>
-        /// is <see langword="true"/>. Otherwise, the receiver ignores all but the <c>id</c> property of the received
-        /// event and instead calls back into the Stripe API to retrieve event details.
-        /// </summary>
-        public static string DirectWebHookConfigurationKey { get; } = ConfigurationPath.Combine(
-            WebHookConstants.ReceiverConfigurationSectionKey,
-            ReceiverName,
-            "Direct");
-
-        /// <summary>
         /// Gets the name of the JSON property in a Stripe WebHook request body containing a value somewhat
         /// analogous to an event name.
         /// </summary>
         public static string EventPropertyName => "type";
 
         /// <summary>
-        /// Gets the format string (see <see href="https://msdn.microsoft.com/en-us/library/txafckwd.aspx"/>) used to
-        /// create callback URIs when retrieving event details. Single parameter to the format string is the
-        /// notification identifier of the event to retrieve.
-        /// </summary>
-        public static string EventUriTemplate => "https://api.stripe.com/v1/events/{0}";
-
-        /// <summary>
         /// Gets the name of the <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry containing the Stripe
         /// notification identifier for the current request.
         /// </summary>
         /// <seealso cref="NotificationIdPropertyName"/>
-        public static string NotificationIdKeyName = "notificationId";
+        public static string NotificationIdKeyName => "notificationId";
 
         /// <summary>
         /// Gets the name of a parameter bound to the Stripe notification identifier for the current request.
@@ -108,6 +88,18 @@ namespace Microsoft.AspNetCore.WebHooks
         public static int SecretKeyMaxLength => 128;
 
         /// <summary>
+        /// Gets the name of the HTTP header that contains the timestamp and signature of the request. See
+        /// <see href="https://stripe.com/docs/webhooks#replay-attacks"/> and
+        /// <see href="https://stripe.com/docs/webhooks#verify-manually"/> for more information about this header.
+        /// </summary>
+        public static string SignatureHeaderName => "Stripe-Signature";
+
+        /// <summary>
+        /// Gets the key of the signature value(s) in the <see cref="SignatureHeaderName"/>.
+        /// </summary>
+        public static string SignatureKey => "v1";
+
+        /// <summary>
         /// Gets the notification identifier used in test Stripe WebHook requests.
         /// </summary>
         /// <remarks>
@@ -115,5 +107,10 @@ namespace Microsoft.AspNetCore.WebHooks
         /// </remarks>
         /// <seealso cref="LiveModePropertyName"/>
         public static string TestNotificationId => "evt_00000000000000";
+
+        /// <summary>
+        /// Gets the key of the timestamp value in the <see cref="SignatureHeaderName"/>.
+        /// </summary>
+        public static string TimestampKey => "t";
     }
 }

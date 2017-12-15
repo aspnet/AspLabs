@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="SignatureFilter_HeaderMissingValue" xml:space="preserve">
+    <value>The '{0}' header value is invalid. It must contain timestamp ('{1}') and signature ('{2}') values.</value>
+  </data>
+  <data name="SignatureFilter_InvalidHeaderFormat" xml:space="preserve">
+    <value>The '{0}' header value is invalid. It must be formatted as key=value pairs separated by commas.</value>
+  </data>
   <data name="TestEvent_MissingItem" xml:space="preserve">
     <value>Unable to retrieve '{0}' request data from '{1}.{2}'.</value>
   </data>

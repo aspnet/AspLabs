@@ -25,10 +25,8 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
         /// <param name="value">The <see cref="string"/> to split and trim.</param>
         /// <param name="separators">The collection of separator <see cref="char"/>s controlling the split.</param>
         public TrimmingTokenizer(string value, char[] separators)
+            : this(value, separators, maxCount: int.MaxValue)
         {
-            _maxCount = int.MaxValue;
-            _originalString = new StringSegment(value);
-            _tokenizer = new StringTokenizer(value, separators);
         }
 
         /// <summary>
@@ -39,10 +37,8 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
         /// <param name="separators">The collection of separator <see cref="char"/>s controlling the split.</param>
         /// <param name="maxCount">The maximum number of <see cref="StringSegment"/>s to return.</param>
         public TrimmingTokenizer(string value, char[] separators, int maxCount)
+            : this(new StringSegment(value), separators, maxCount)
         {
-            _maxCount = maxCount;
-            _originalString = new StringSegment(value);
-            _tokenizer = new StringTokenizer(value, separators);
         }
 
         /// <summary>
@@ -52,10 +48,8 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
         /// <param name="value">The <see cref="StringSegment"/> to split and trim.</param>
         /// <param name="separators">The collection of separator <see cref="char"/>s controlling the split.</param>
         public TrimmingTokenizer(StringSegment value, char[] separators)
+            : this(value, separators, maxCount: int.MaxValue)
         {
-            _maxCount = int.MaxValue;
-            _originalString = value;
-            _tokenizer = new StringTokenizer(value, separators);
         }
 
         /// <summary>
@@ -171,7 +165,7 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
                         if (_count + 1 >= _tokenizer._maxCount)
                         {
                             _remainder = _tokenizer._originalString
-                                .Subsegment(Current.Offset)
+                                .Subsegment(Current.Offset - _tokenizer._originalString.Offset)
                                 .Trim();
                         }
 

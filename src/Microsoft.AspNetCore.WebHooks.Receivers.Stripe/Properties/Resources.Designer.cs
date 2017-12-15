@@ -61,6 +61,24 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must contain timestamp (&apos;{1}&apos;) and signature (&apos;{2}&apos;) values..
+        /// </summary>
+        internal static string SignatureFilter_HeaderMissingValue {
+            get {
+                return ResourceManager.GetString("SignatureFilter_HeaderMissingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must be formatted as key=value pairs separated by commas..
+        /// </summary>
+        internal static string SignatureFilter_InvalidHeaderFormat {
+            get {
+                return ResourceManager.GetString("SignatureFilter_InvalidHeaderFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to retrieve &apos;{0}&apos; request data from &apos;{1}.{2}&apos;..
         /// </summary>
         internal static string TestEvent_MissingItem {

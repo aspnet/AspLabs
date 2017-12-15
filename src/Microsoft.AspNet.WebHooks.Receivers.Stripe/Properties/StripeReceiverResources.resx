@@ -120,8 +120,14 @@
   <data name="Receiver_BadBody" xml:space="preserve">
     <value>The HTTP request body did not contain a required '{0}' property.</value>
   </data>
-  <data name="Receiver_BadId" xml:space="preserve">
-    <value>The ID '{0}' could not be resolved for an actual event.</value>
+  <data name="Receiver_BadSignatureEncoding" xml:space="preserve">
+    <value>The '{0}' header value is invalid. It must contain a valid hex-encoded signature ('{1}') value.</value>
+  </data>
+  <data name="Receiver_HeaderMissingValue" xml:space="preserve">
+    <value>The '{0}' header value is invalid. It must contain timestamp ('{1}') and signature ('{2}') values.</value>
+  </data>
+  <data name="Receiver_InvalidHeaderFormat" xml:space="preserve">
+    <value>The '{0}' header value is invalid. It must be formatted as key=value pairs separated by commas.</value>
   </data>
   <data name="Receiver_TestEvent" xml:space="preserve">
     <value>Received a Stripe Test Event -- ignoring.</value>

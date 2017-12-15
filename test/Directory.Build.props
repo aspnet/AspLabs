@@ -7,7 +7,9 @@
   <Import Project="..\Directory.Build.props" Condition="$(_ImportParentFile)" />
 
   <PropertyGroup Condition="$(_ImportParentFile)">
+    <DefineConstants>$(DefineConstants);ASPNETWEBHOOKS</DefineConstants>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RootNamespace>Microsoft.AspNetCore.WebHooks</RootNamespace>
   </PropertyGroup>
 </Project>

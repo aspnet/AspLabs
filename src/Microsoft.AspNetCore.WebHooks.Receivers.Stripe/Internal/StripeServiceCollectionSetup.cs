@@ -32,6 +32,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
 
             services.TryAddSingleton<StripeTestEventResponseFilter>();
             services.TryAddSingleton<StripeVerifyNotificationIdFilter>();
+            services.TryAddSingleton<StripeVerifySignatureFilter>();
         }
 
         private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
@@ -44,8 +45,10 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
                     throw new ArgumentNullException(nameof(options));
                 }
 
-                options.Filters.AddService<StripeTestEventResponseFilter>(StripeTestEventResponseFilter.Order);
-                options.Filters.AddService<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
+                var filters = options.Filters;
+                filters.AddService<StripeTestEventResponseFilter>(StripeTestEventResponseFilter.Order);
+                filters.AddService<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
+                filters.AddService<StripeVerifySignatureFilter>(WebHookSecurityFilter.Order);
             }
         }
     }

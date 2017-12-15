@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -251,7 +252,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 modelName: ModelStateRootKey);
 
             // Read request body.
-            await _formModelBinder.BindModelAsync(bindingContext);
+            try
+            {
+                await _formModelBinder.BindModelAsync(bindingContext);
+            }
+            finally
+            {
+                request.Body.Seek(0L, SeekOrigin.Begin);
+            }
 
             // FormCollectionModelBinder cannot fail, even when !HasFormContentType (which isn't possible here).
             Debug.Assert(bindingContext.ModelState.IsValid);

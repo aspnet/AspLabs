@@ -19,7 +19,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class StripeReceiverResources {
@@ -70,11 +70,29 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ID &apos;{0}&apos; could not be resolved for an actual event..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must contain a valid hex-encoded signature (&apos;{1}&apos;) value..
         /// </summary>
-        internal static string Receiver_BadId {
+        internal static string Receiver_BadSignatureEncoding {
             get {
-                return ResourceManager.GetString("Receiver_BadId", resourceCulture);
+                return ResourceManager.GetString("Receiver_BadSignatureEncoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must contain timestamp (&apos;{1}&apos;) and signature (&apos;{2}&apos;) values..
+        /// </summary>
+        internal static string Receiver_HeaderMissingValue {
+            get {
+                return ResourceManager.GetString("Receiver_HeaderMissingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must be formatted as key=value pairs separated by commas..
+        /// </summary>
+        internal static string Receiver_InvalidHeaderFormat {
+            get {
+                return ResourceManager.GetString("Receiver_InvalidHeaderFormat", resourceCulture);
             }
         }
         

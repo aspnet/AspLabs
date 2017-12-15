@@ -202,7 +202,26 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA256 HMAC of
         /// the <paramref name="request"/>'s body.
         /// </returns>
-        protected virtual async Task<byte[]> GetRequestBodyHash_SHA256(HttpRequest request, byte[] secret)
+        protected Task<byte[]> GetRequestBodyHash_SHA256(HttpRequest request, byte[] secret)
+        {
+            return GetRequestBodyHash_SHA256(request, secret, prefix: null);
+        }
+
+        /// <summary>
+        /// Returns the SHA256 HMAC of the given <paramref name="prefix"/> (if non-<see langword="null"/>) followed by
+        /// the given <paramref name="request"/>'s body.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequest"/>.</param>
+        /// <param name="secret">The key data used to initialize the <see cref="HMACSHA256"/>.</param>
+        /// <param name="prefix">If non-<see langword="null"/>, additional <c>byte</c>s to include in the hash.</param>
+        /// <returns>
+        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA256 HMAC of
+        /// the <paramref name="prefix"/> followed by the <paramref name="request"/>'s body.
+        /// </returns>
+        protected virtual async Task<byte[]> GetRequestBodyHash_SHA256(
+            HttpRequest request,
+            byte[] secret,
+            byte[] prefix)
         {
             await PrepareRequestBody(request);
 
@@ -210,6 +229,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 try
                 {
+                    if (prefix != null && prefix.Length > 0)
+                    {
+                        hasher.TransformBlock(
+                            inputBuffer: prefix,
+                            inputOffset: 0,
+                            inputCount: prefix.Length,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
                     var hash = hasher.ComputeHash(request.Body);
                     return hash;
                 }

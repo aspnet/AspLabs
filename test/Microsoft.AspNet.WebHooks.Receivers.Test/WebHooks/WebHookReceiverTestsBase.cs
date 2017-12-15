@@ -67,19 +67,22 @@ namespace Microsoft.AspNet.WebHooks
             {
                 ReceiverMock = new Mock<T> { CallBase = true };
             }
-            Receiver = ReceiverMock.Object;
-            name = name ?? Receiver.Name; 
 
+            Receiver = ReceiverMock.Object;
             Logger = new Mock<ILogger>().Object;
-            Settings = new SettingsDictionary();
-            Settings[SecretPrefix + name] = config;
+
+            name = name ?? Receiver.Name;
+            Settings = new SettingsDictionary
+            {
+                [SecretPrefix + name] = config,
+            };
 
             ReceiverConfig = new WebHookReceiverConfig(Settings, Logger);
 
             HttpConfig = HttpConfigurationMock.Create(new Dictionary<Type, object>
             {
                 { typeof(IWebHookReceiverConfig), ReceiverConfig },
-                { typeof(SettingsDictionary), Settings }
+                { typeof(SettingsDictionary), Settings },
             });
 
             RequestContext = new HttpRequestContext { Configuration = HttpConfig };

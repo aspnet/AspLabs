@@ -11,7 +11,9 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IResourceFilter"/> that short-circuits Stripe test events.
+    /// An <see cref="IResourceFilter"/> that logs about and optionally short-circuits Stripe test events. Does not
+    /// short-circuit test events when the <c>WebHooks:Stripe:PassThroughTestEvents</c> configuration value is
+    /// <c>true</c>.
     /// </summary>
     /// <remarks>Somewhat similar to the <see cref="WebHookPingResponseFilter"/>.</remarks>
     public class StripeTestEventResponseFilter : IResourceFilter, IWebHookReceiver
@@ -34,9 +36,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public string ReceiverName => StripeConstants.ReceiverName;
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all
-        /// <see cref="StripeTestEventResponseFilter"/> instances. This filter should execute after all other
-        /// applicable built-in WebHook filters.
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="StripeTestEventResponseFilter"/>
+        /// instances. This filter should execute in the same slot as <see cref="WebHookPingResponseFilter"/>.
+        /// <see cref="WebHookPingResponseFilter"/> does not apply for this receiver.
         /// </summary>
         public static int Order => WebHookPingResponseFilter.Order;
 
@@ -60,19 +62,24 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName) ||
-                !IsApplicable(receiverName) ||
-                _configuration.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey))
+            if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
                 return;
             }
 
             var notificationId = (string)routeData.Values[StripeConstants.NotificationIdKeyName];
-            if (StripeVerifyNotificationIdFilter.IsTestEvent(notificationId))
+            if (IsTestEvent(notificationId))
             {
-                // Short-circuit this test event.
-                _logger.LogInformation(1, "Ignoring a Stripe Test Event.");
-                context.Result = new OkResult();
+                // Log about and optionally short-circuit this test event.
+                if (_configuration.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey))
+                {
+                    _logger.LogInformation(0, "Received a Stripe Test Event.");
+                }
+                else
+                {
+                    _logger.LogInformation(1, "Ignoring a Stripe Test Event.");
+                    context.Result = new OkResult();
+                }
             }
         }
 
@@ -80,6 +87,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public void OnResourceExecuted(ResourceExecutedContext context)
         {
             // No-op
+        }
+
+        internal static bool IsTestEvent(string notificationId)
+        {
+            return string.Equals(
+                StripeConstants.TestNotificationId,
+                notificationId,
+                StringComparison.OrdinalIgnoreCase);
         }
     }
 }
