@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Proxy
 {
     internal static class ProxyAdvancedExtentions
     {
-        private static readonly string[] NotForwardedWebSocketHeaders = new[] { "Connection", "Host", "Upgrade", "Sec-WebSocket-Key", "Sec-WebSocket-Version" };
+        private static readonly string[] NotForwardedWebSocketHeaders = new[] { "Connection", "Host", "Upgrade", "Sec-WebSocket-Accept", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version", "Sec-WebSocket-Extensions" };
         private const int DefaultWebSocketBufferSize = 4096;
         private const int StreamCopyBufferSize = 81920;
 
@@ -88,6 +88,11 @@ namespace Microsoft.AspNetCore.Proxy
 
             using (var client = new ClientWebSocket())
             {
+                foreach (var protocol in context.WebSockets.WebSocketRequestedProtocols)
+                {
+                    client.Options.AddSubProtocol(protocol);
+                }
+                
                 foreach (var headerEntry in context.Request.Headers)
                 {
                     if (!NotForwardedWebSocketHeaders.Contains(headerEntry.Key, StringComparer.OrdinalIgnoreCase))
