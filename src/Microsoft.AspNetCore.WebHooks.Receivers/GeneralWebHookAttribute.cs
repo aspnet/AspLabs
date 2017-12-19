@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <remarks>
     /// This attribute should usually be used at most once in a WebHook application.
     /// </remarks>
-    public class GeneralWebHookAttribute : WebHookAttribute, IWebHookRequestMetadata, IWebHookEventSelectorMetadata
+    public class GeneralWebHookAttribute : WebHookAttribute, IWebHookBodyTypeMetadata, IWebHookEventSelectorMetadata
     {
         private WebHookBodyType _bodyType = WebHookBodyType.Json;
         private string _eventName;

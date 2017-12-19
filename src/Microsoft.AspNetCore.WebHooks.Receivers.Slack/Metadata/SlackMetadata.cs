@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Slack receiver.
     /// </summary>
-    public class SlackMetadata : WebHookMetadata, IWebHookBindingMetadata, IWebHookRequestMetadataService
+    public class SlackMetadata : WebHookMetadata, IWebHookBindingMetadata, IWebHookBodyTypeMetadataService
     {
         /// <summary>
         /// Instantiates a new <see cref="SlackMetadata"/> instance.
@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
                 isRequired: false),
         };
 
-        // IWebHookRequestMetadataService...
+        // IWebHookBodyTypeMetadataService...
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Form;

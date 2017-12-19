@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// token matches the configured secret key. Adds a <see cref="SlackConstants.SubtextRequestKeyName"/> entry to the
     /// <see cref="RouteValueDictionary"/> in most cases.
     /// </summary>
-    public class SlackVerifyTokenFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
+    public class SlackVerifyTokenFilter : WebHookSecurityFilter, IAsyncResourceFilter, IWebHookReceiver
     {
         private readonly ModelMetadata _formCollectionMetadata;
         private readonly IModelBinder _formModelBinder;
@@ -56,7 +56,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <inheritdoc />
-        public override string ReceiverName => SlackConstants.ReceiverName;
+        public string ReceiverName => SlackConstants.ReceiverName;
+
+        /// <inheritdoc />
+        public bool IsApplicable(string receiverName)
+        {
+            if (receiverName == null)
+            {
+                throw new ArgumentNullException(nameof(receiverName));
+            }
+
+            return string.Equals(ReceiverName, receiverName, StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <inheritdoc />
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)

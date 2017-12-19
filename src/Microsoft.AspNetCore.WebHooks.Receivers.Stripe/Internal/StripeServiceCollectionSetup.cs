@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, StripeMetadata>());
 
-            services.TryAddSingleton<StripeTestEventResponseFilter>();
+            services.TryAddSingleton<StripeTestEventRequestFilter>();
             services.TryAddSingleton<StripeVerifyNotificationIdFilter>();
             services.TryAddSingleton<StripeVerifySignatureFilter>();
         }
@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
                 }
 
                 var filters = options.Filters;
-                filters.AddService<StripeTestEventResponseFilter>(StripeTestEventResponseFilter.Order);
+                filters.AddService<StripeTestEventRequestFilter>(StripeTestEventRequestFilter.Order);
                 filters.AddService<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
                 filters.AddService<StripeVerifySignatureFilter>(WebHookSecurityFilter.Order);
             }

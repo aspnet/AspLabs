@@ -53,22 +53,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookVerifyRequiredValueFilter"/> instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
         /// this filter).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetResponseFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetResponseFilter"/> for this receiver (in
-        /// <see cref="WebHookPingResponseFilter"/>).
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
@@ -153,12 +152,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             _logger.LogError(
                 500,
-                "A {ReceiverName} WebHook request must contain a '{KeyName}' value in the route data.",
+                "A '{ReceiverName}' WebHook request must contain a '{KeyName}' value in the route data.",
                 receiverName,
                 keyName);
             message = string.Format(
                 CultureInfo.CurrentCulture,
-                Resources.VerifyRequiredValue_NoHeader,
+                Resources.VerifyRequiredValue_NoRouteValue,
                 receiverName,
                 keyName);
 
@@ -179,7 +178,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             _logger.LogError(
                 501,
-                "A {ReceiverName} WebHook request must contain a '{HeaderName}' HTTP header.",
+                "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header.",
                 receiverName,
                 headerName);
             message = string.Format(
@@ -205,12 +204,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             _logger.LogError(
                 502,
-                "A {ReceiverName} WebHook request must contain a '{QueryParameterName}' query parameter.",
+                "A '{ReceiverName}' WebHook request must contain a '{QueryParameterName}' query parameter.",
                 receiverName,
                 parameterName);
             message = string.Format(
                 CultureInfo.CurrentCulture,
-                Resources.VerifyRequiredValue_NoQueryParameter,
+                Resources.General_NoQueryParameter,
                 receiverName,
                 parameterName);
 

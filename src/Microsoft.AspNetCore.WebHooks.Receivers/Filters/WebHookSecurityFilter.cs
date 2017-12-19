@@ -62,22 +62,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookSecurityFilter"/> instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
         /// <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetResponseFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetResponseFilter"/> for this receiver (in
-        /// <see cref="WebHookPingResponseFilter"/>).
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
@@ -137,15 +136,17 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 Logger.LogError(
                     500,
-                    "The '{ReceiverName}' WebHook receiver requires HTTPS in order to be secure. " +
+                    "The '{ReceiverName}' WebHook receiver requires {UpperSchemeName} in order to be secure. " +
                     "Please register a WebHook URI of type '{SchemeName}'.",
                     receiverName,
+                    Uri.UriSchemeHttps.ToUpper(),
                     Uri.UriSchemeHttps);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.Security_NoHttps,
                     receiverName,
+                    Uri.UriSchemeHttps.ToUpper(),
                     Uri.UriSchemeHttps);
                 var noHttps = new BadRequestObjectResult(message);
 
@@ -180,6 +181,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             int minLength,
             int maxLength)
         {
+            if (sectionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sectionKey));
+            }
+            if (routeData == null)
+            {
+                throw new ArgumentNullException(nameof(routeData));
+            }
+
             // Look up configuration for this receiver and instance.
             var secrets = GetSecretKeys(sectionKey, routeData);
             if (!secrets.Exists())

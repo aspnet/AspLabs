@@ -11,13 +11,15 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <see cref="IWebHookMetadata"/> service for receivers that support additional action parameters.
     /// </para>
     /// <para>
-    /// Metadata is used for model binding and, if <see cref="WebHookParameter.IsRequired"/> is <see langword="true"/>,
-    /// incoming request validation.
+    /// <see cref="ApplicationModels.WebHookModelBindingProvider"/> sets <see cref="Mvc.ModelBinding.BindingInfo"/>
+    /// properties based on this metadata and <see cref="IWebHookBodyTypeMetadata"/>.
+    /// <see cref="Filters.WebHookVerifyRequiredValueFilter"/> performs request validation based on this metadata,
+    /// <see cref="WebHookParameter.IsRequired"/> in particular.
     /// </para>
     /// </summary>
     /// <remarks>
     /// Separate from <see cref="IWebHookEventMetadata"/> because these bindings do not support constant values or
-    /// fall backs. Separate from <see cref="IWebHookRequestMetadata"/> because the information cannot be changed on a
+    /// fall backs. Separate from <see cref="IWebHookBodyTypeMetadata"/> because the information cannot be changed on a
     /// per-action basis; a service must provide this metadata.
     /// </remarks>
     public interface IWebHookBindingMetadata : IWebHookMetadata, IWebHookReceiver
@@ -25,6 +27,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <summary>
         /// Gets the collection of <see cref="WebHookParameter"/>s.
         /// </summary>
+        /// <value>Should not return <see langword="null"/>.</value>
         IReadOnlyList<WebHookParameter> Parameters { get; }
     }
 }

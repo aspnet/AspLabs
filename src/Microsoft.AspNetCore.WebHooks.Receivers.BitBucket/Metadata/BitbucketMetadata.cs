@@ -11,9 +11,9 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     public class BitbucketMetadata :
         WebHookMetadata,
         IWebHookBindingMetadata,
+        IWebHookBodyTypeMetadataService,
         IWebHookEventMetadata,
-        IWebHookRequestMetadataService,
-        IWebHookSecurityMetadata
+        IWebHookVerifyCodeMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="BitbucketMetadata"/> instance.
@@ -40,6 +40,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
                 isRequired: true),
         };
 
+        // IWebHookBodyTypeMetadataService...
+
+        /// <inheritdoc />
+        public WebHookBodyType BodyType => WebHookBodyType.Json;
+
         // IWebHookEventMetadata...
 
         /// <inheritdoc />
@@ -49,25 +54,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         public string HeaderName => BitbucketConstants.EventHeaderName;
 
         /// <inheritdoc />
-        public string PingEventName => null;
-
-        /// <inheritdoc />
         public string QueryParameterName => null;
-
-        // IWebHookRequestMetadataService...
-
-        /// <inheritdoc />
-        public WebHookBodyType BodyType => WebHookBodyType.Json;
-
-        // IWebHookSecurityMetadata...
-
-        /// <inheritdoc />
-        public bool VerifyCodeParameter => true;
-
-        /// <inheritdoc />
-        public bool ShortCircuitGetRequests => false;
-
-        /// <inheritdoc />
-        public WebHookGetRequest WebHookGetRequest => null;
     }
 }

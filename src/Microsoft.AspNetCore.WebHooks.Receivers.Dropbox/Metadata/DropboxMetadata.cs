@@ -8,9 +8,9 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// </summary>
     public class DropboxMetadata :
         WebHookMetadata,
+        IWebHookBodyTypeMetadataService,
         IWebHookEventMetadata,
-        IWebHookRequestMetadataService,
-        IWebHookSecurityMetadata
+        IWebHookGetRequestMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="DropboxMetadata"/> instance.
@@ -19,6 +19,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
             : base(DropboxConstants.ReceiverName)
         {
         }
+
+        // IWebHookBodyTypeMetadataService...
+
+        /// <inheritdoc />
+        public WebHookBodyType BodyType => WebHookBodyType.Json;
 
         // IWebHookEventMetadata...
 
@@ -29,28 +34,17 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         public string HeaderName => null;
 
         /// <inheritdoc />
-        public string PingEventName => null;
-
-        /// <inheritdoc />
         public string QueryParameterName => null;
 
-        // IWebHookRequestMetadataService...
+        // IWebHookGetRequestMetadata...
 
         /// <inheritdoc />
-        public WebHookBodyType BodyType => WebHookBodyType.Json;
-
-        // IWebHookSecurityMetadata...
+        public string ChallengeQueryParameterName => DropboxConstants.ChallengeQueryParameterName;
 
         /// <inheritdoc />
-        public bool VerifyCodeParameter => false;
+        public int SecretKeyMinLength => DropboxConstants.SecretKeyMinLength;
 
         /// <inheritdoc />
-        public bool ShortCircuitGetRequests => true;
-
-        /// <inheritdoc />
-        public WebHookGetRequest WebHookGetRequest { get; } = new WebHookGetRequest(
-            DropboxConstants.ChallengeQueryParameterName,
-            DropboxConstants.SecretKeyMinLength,
-            DropboxConstants.SecretKeyMaxLength);
+        public int SecretKeyMaxLength => DropboxConstants.SecretKeyMaxLength;
     }
 }

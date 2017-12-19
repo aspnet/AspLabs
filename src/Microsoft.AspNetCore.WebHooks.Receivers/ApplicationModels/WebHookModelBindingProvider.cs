@@ -46,13 +46,13 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     }
 
                     action.Properties.TryGetValue(typeof(IWebHookBindingMetadata), out var bindingMetadata);
-                    action.Properties.TryGetValue(typeof(IWebHookRequestMetadata), out var requestMetadata);
+                    action.Properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out var bodyTypeMetadata);
                     for (var k = 0; k < action.Parameters.Count; k++)
                     {
                         var parameter = action.Parameters[k];
                         Apply(
                             (IWebHookBindingMetadata)bindingMetadata,
-                            (IWebHookRequestMetadata)requestMetadata,
+                            (IWebHookBodyTypeMetadata)bodyTypeMetadata,
                             parameter);
                     }
                 }
@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
         private void Apply(
             IWebHookBindingMetadata bindingMetadata,
-            IWebHookRequestMetadata requestMetadata,
+            IWebHookBodyTypeMetadata bodyTypeMetadata,
             ParameterModel parameter)
         {
             var bindingInfo = parameter.BindingInfo;
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     break;
 
                 case "DATA":
-                    SourceData(bindingInfo, requestMetadata);
+                    SourceData(bindingInfo, bodyTypeMetadata);
                     break;
 
                 case "EVENT":
@@ -133,20 +133,20 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                          typeof(JContainer).IsAssignableFrom(parameterType) ||
                          typeof(XElement).IsAssignableFrom(parameterType)))
                     {
-                        SourceData(bindingInfo, requestMetadata);
+                        SourceData(bindingInfo, bodyTypeMetadata);
                     }
                     break;
             }
         }
 
-        private void SourceData(BindingInfo bindingInfo, IWebHookRequestMetadata requestMetadata)
+        private void SourceData(BindingInfo bindingInfo, IWebHookBodyTypeMetadata bodyTypeMetadata)
         {
-            if (requestMetadata == null)
+            if (bodyTypeMetadata == null)
             {
                 return;
             }
 
-            if (requestMetadata.BodyType == WebHookBodyType.Form)
+            if (bodyTypeMetadata.BodyType == WebHookBodyType.Form)
             {
                 bindingInfo.BinderModelName = WebHookConstants.ModelStateBodyModelName;
                 bindingInfo.BindingSource = BindingSource.Form;

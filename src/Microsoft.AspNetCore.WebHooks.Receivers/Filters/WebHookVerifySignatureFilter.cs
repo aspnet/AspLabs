@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -28,10 +27,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// that verify signatures of request body content. Subclasses should have an
     /// <see cref="Mvc.Filters.IOrderedFilter.Order"/> equal to <see cref="WebHookSecurityFilter.Order"/>.
     /// </summary>
-    public abstract class WebHookVerifyBodyContentFilter : WebHookSecurityFilter, IWebHookReceiver
+    public abstract class WebHookVerifySignatureFilter : WebHookSecurityFilter, IWebHookReceiver
     {
         /// <summary>
-        /// Instantiates a new <see cref="WebHookVerifyBodyContentFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookVerifySignatureFilter"/> instance.
         /// </summary>
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
@@ -43,7 +42,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        protected WebHookVerifyBodyContentFilter(
+        protected WebHookVerifySignatureFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory)
@@ -66,13 +65,57 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
+        /// Converts a hex-encoded string to a <see cref="T:byte[]"/>.
+        /// </summary>
+        /// <param name="content">THe hex-encoded string to convert.</param>
+        /// <returns>The converted <see cref="T:byte[]"/>.</returns>
+        protected static byte[] FromHex(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                return Array.Empty<byte>();
+            }
+
+            byte[] data = null;
+            try
+            {
+                data = new byte[content.Length / 2];
+                var input = 0;
+                for (var output = 0; output < data.Length; output++)
+                {
+                    data[output] = Convert.ToByte(new string(new char[2] { content[input++], content[input++] }), 16);
+                }
+
+                if (input != content.Length)
+                {
+                    data = null;
+                }
+            }
+            catch
+            {
+                data = null;
+            }
+
+            if (data == null)
+            {
+                var message = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.VerifySignature_InvalidHexValue,
+                    content);
+                throw new InvalidOperationException(message);
+            }
+
+            return data;
+        }
+
+        /// <summary>
         /// Provides a time consistent comparison of two secrets in the form of two byte arrays.
         /// </summary>
         /// <param name="inputA">The first secret to compare.</param>
         /// <param name="inputB">The second secret to compare.</param>
         /// <returns><see langword="true"/> if the two secrets are equal; <see langword="false"/> otherwise.</returns>
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        protected internal static bool SecretEqual(byte[] inputA, byte[] inputB)
+        protected static bool SecretEqual(byte[] inputA, byte[] inputB)
         {
             if (ReferenceEquals(inputA, inputB))
             {
@@ -272,7 +315,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             try
             {
-                var decodedHash = EncodingUtilities.FromHex(hexEncodedValue);
+                var decodedHash = FromHex(hexEncodedValue);
                 errorResult = null;
 
                 return decodedHash;
@@ -288,7 +331,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             var message = string.Format(
                 CultureInfo.CurrentCulture,
-                Resources.Security_BadHeaderEncoding,
+                Resources.VerifySignature_BadHeaderEncoding,
                 signatureHeaderName);
             errorResult = new BadRequestObjectResult(message);
 

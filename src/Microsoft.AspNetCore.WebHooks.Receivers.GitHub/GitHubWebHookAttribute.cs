@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <see href="https://developer.github.com/webhooks/"/> for additional details about GitHub WebHook requests.
     /// </para>
     /// </summary>
-    public class GitHubWebHookAttribute : WebHookAttribute, IWebHookRequestMetadata, IWebHookEventSelectorMetadata
+    public class GitHubWebHookAttribute : WebHookAttribute, IWebHookBodyTypeMetadata, IWebHookEventSelectorMetadata
     {
         private string _eventName;
 
@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <inheritdoc />
-        WebHookBodyType IWebHookRequestMetadata.BodyType => AcceptFormData ?
+        WebHookBodyType IWebHookBodyTypeMetadata.BodyType => AcceptFormData ?
             WebHookBodyType.Form :
             WebHookBodyType.Json;
     }

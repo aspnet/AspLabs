@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class WebHookVerifyCodeFilter : WebHookSecurityFilter, IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookSecurityMetadata> _codeVerifierMetadata;
+        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _codeVerifierMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance.
@@ -48,11 +48,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             IEnumerable<IWebHookMetadata> metadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            // No need to keep track of IWebHookSecurityMetadata instances that do not request code verification.
-            _codeVerifierMetadata = metadata
-                .OfType<IWebHookSecurityMetadata>()
-                .Where(item => item.VerifyCodeParameter)
-                .ToArray();
+            _codeVerifierMetadata = metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray();
         }
 
         /// <inheritdoc />
@@ -132,7 +128,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.General_MissingQueryParameter,
+                    Resources.General_NoQueryParameter,
+                    receiverName,
                     WebHookConstants.CodeQueryParameterName);
                 var noCode = new BadRequestObjectResult(message);
 

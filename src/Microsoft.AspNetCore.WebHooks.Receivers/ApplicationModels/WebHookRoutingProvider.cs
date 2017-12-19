@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
@@ -103,11 +104,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             AddConstraints(attribute, selectors);
             AddConstraints(action.Properties, selectors);
 
-            if (action.Properties.TryGetValue(typeof(IWebHookRequestMetadata), out var requestMetadata))
+            if (action.Properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out var bodyTypeMetadata))
             {
                 action.Filters.Add(new WebHookVerifyBodyTypeFilter(
-                    _loggerFactory,
-                    (IWebHookRequestMetadata)requestMetadata));
+                    (IWebHookBodyTypeMetadata)bodyTypeMetadata,
+                    _loggerFactory));
             }
         }
 
@@ -182,22 +183,23 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 var eventName = ((IWebHookEventSelectorMetadata)eventSourceMetadata).EventName;
                 if (eventName != null)
                 {
+                    // IWebHookEventMetadata is mandatory when performing action selection using event names.
+                    Debug.Assert(eventMetadata != null);
+                    properties.TryGetValue(typeof(IWebHookPingRequestMetadata), out var pingMetadata);
+
+                    // Use eventMetadata to choose constraint type because IWebHookPingRequestMetadata is optional.
                     IActionConstraintMetadata constraint;
-                    if (eventMetadata == null)
-                    {
-                        constraint = new WebHookSingleEventNamesConstraint(eventName, pingEventName: null);
-                    }
-                    else if (eventMetadata is IWebHookEventMetadata singleEventMetadata)
+                    if (eventMetadata is IWebHookEventMetadata)
                     {
                         constraint = new WebHookSingleEventNamesConstraint(
                             eventName,
-                            singleEventMetadata.PingEventName);
+                            ((IWebHookPingRequestMetadata)pingMetadata)?.PingEventName);
                     }
                     else
                     {
                         constraint = new WebHookMultipleEventNamesConstraint(
                             eventName,
-                            (IEnumerable<IWebHookEventMetadata>)eventMetadata);
+                            (IReadOnlyList<IWebHookPingRequestMetadata>)pingMetadata);
                     }
 
                     AddConstraint(constraint, selectors);

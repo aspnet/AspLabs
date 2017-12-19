@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// An <see cref="IAsyncResourceFilter"/> that verifies the GitHub signature header. Confirms the header exists,
     /// reads Body bytes, and compares the hashes.
     /// </summary>
-    public class GitHubVerifySignatureFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
+    public class GitHubVerifySignatureFilter : WebHookVerifySignatureFilter, IAsyncResourceFilter
     {
         // Character that appears between the key and value in the signature header.
         private static readonly char[] PairSeparators = new[] { '=' };

@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Pusher receiver.
     /// </summary>
-    public class PusherMetadata : WebHookMetadata, IWebHookRequestMetadataService
+    public class PusherMetadata : WebHookMetadata, IWebHookBodyTypeMetadataService
     {
         /// <summary>
         /// Instantiates a new <see cref="PusherMetadata"/> instance.
@@ -15,6 +15,8 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
             : base(PusherConstants.ReceiverName)
         {
         }
+
+        // IWebHookBodyTypeMetadataService...
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;

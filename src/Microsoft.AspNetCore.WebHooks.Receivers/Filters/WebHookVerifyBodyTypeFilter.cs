@@ -15,39 +15,38 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IResourceFilter"/> to allow only WebHook requests with a <c>Content-Type</c> matching
-    /// <see cref="IWebHookRequestMetadata.BodyType"/>.
+    /// <see cref="IWebHookBodyTypeMetadata.BodyType"/>.
     /// </summary>
     /// <remarks>
     /// Done as an <see cref="IResourceFilter"/> implementation and not an
     /// <see cref="Mvc.ActionConstraints.IActionConstraintMetadata"/> because receivers do not dynamically vary their
-    /// <see cref="IWebHookRequestMetadata"/>. Use distinct <see cref="WebHookAttribute.Id"/> values if different
+    /// <see cref="IWebHookBodyTypeMetadata"/>. Use distinct <see cref="WebHookAttribute.Id"/> values if different
     /// configurations are needed for one receiver and the receiver's <see cref="WebHookAttribute"/> implements
-    /// <see cref="IWebHookRequestMetadata"/>.
+    /// <see cref="IWebHookBodyTypeMetadata"/>.
     /// </remarks>
     public class WebHookVerifyBodyTypeFilter : IResourceFilter, IOrderedFilter
     {
+        private readonly IWebHookBodyTypeMetadata _bodyTypeMetadata;
         private readonly ILogger _logger;
-        private readonly IWebHookRequestMetadata _requestMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyMethodFilter"/> instance.
         /// </summary>
+        /// <param name="bodyTypeMetadata">The <see cref="IWebHookBodyTypeMetadata"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="requestMetadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookVerifyBodyTypeFilter(ILoggerFactory loggerFactory, IWebHookRequestMetadata requestMetadata)
+        public WebHookVerifyBodyTypeFilter(IWebHookBodyTypeMetadata bodyTypeMetadata, ILoggerFactory loggerFactory)
         {
+            if (bodyTypeMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(bodyTypeMetadata));
+            }
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            if (requestMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(requestMetadata));
-            }
-
+            _bodyTypeMetadata = bodyTypeMetadata;
             _logger = loggerFactory.CreateLogger<WebHookVerifyBodyTypeFilter>();
-            _requestMetadata = requestMetadata;
         }
 
         /// <summary>
@@ -55,22 +54,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="AspNetCore.Routing.RouteValueDictionary"/> entries and query
         /// parameters are provided (in <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetResponseFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in this filter).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetResponseFilter"/> for this receiver (in
-        /// <see cref="WebHookPingResponseFilter"/>).
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
@@ -88,7 +86,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var request = context.HttpContext.Request;
-            switch (_requestMetadata.BodyType)
+            switch (_bodyTypeMetadata.BodyType)
             {
                 case WebHookBodyType.Form:
                     if (!request.HasFormContentType)
@@ -116,7 +114,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         CultureInfo.CurrentCulture,
                         Resources.General_InvalidEnumValue,
                         nameof(WebHookBodyType),
-                        _requestMetadata.BodyType);
+                        _bodyTypeMetadata.BodyType);
                     throw new InvalidOperationException(message);
             }
         }

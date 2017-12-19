@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all
         /// <see cref="StripeVerifyNotificationIdFilter"/> instances. This filter should execute in the same slot as
         /// <see cref="WebHookVerifyRequiredValueFilter"/>, after <see cref="StripeVerifySignatureFilter"/> and before
-        /// <see cref="StripeTestEventResponseFilter"/>. <see cref="WebHookVerifyRequiredValueFilter"/> does not apply
+        /// <see cref="StripeTestEventRequestFilter"/>. <see cref="WebHookVerifyRequiredValueFilter"/> does not apply
         /// for this receiver; required parameters are enforced in this filter.
         /// </summary>
         public static int Order => WebHookVerifyRequiredValueFilter.Order;

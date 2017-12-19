@@ -15,42 +15,41 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// <summary>
     /// An <see cref="IResourceFilter"/> to short-circuit ping WebHook requests.
     /// </summary>
-    public class WebHookPingResponseFilter : IResourceFilter
+    public class WebHookPingRequestFilter : IResourceFilter
     {
         private readonly ILogger _logger;
-        private readonly IReadOnlyList<IWebHookEventMetadata> _eventMetadata;
+        private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookPingResponseFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookPingRequestFilter"/> instance.
         /// </summary>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookPingResponseFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
+        public WebHookPingRequestFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
         {
-            _logger = loggerFactory.CreateLogger<WebHookPingResponseFilter>();
-            _eventMetadata = metadata.OfType<IWebHookEventMetadata>().ToArray();
+            _logger = loggerFactory.CreateLogger<WebHookPingRequestFilter>();
+            _pingMetadata = metadata.OfType<IWebHookPingRequestMetadata>().ToArray();
         }
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookPingResponseFilter"/>
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookPingRequestFilter"/>
         /// instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
         /// <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetResponseFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetResponseFilter"/> for this receiver (in
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
         /// this filter).
         /// </item>
         /// </list>
@@ -66,20 +65,23 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (routeData.TryGetWebHookEventName(out var eventName) &&
-                routeData.TryGetWebHookReceiverName(out var receiverName))
+            if (routeData.TryGetWebHookReceiverName(out var receiverName))
             {
-                var eventMetadata = _eventMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-                var pingEventName = eventMetadata?.PingEventName;
-
-                // If this is a ping request, short-circuit further processing.
-                if (pingEventName != null &&
-                    string.Equals(eventName, pingEventName, StringComparison.OrdinalIgnoreCase))
+                var pingMetadata = _pingMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
+                if (pingMetadata != null &&
+                    routeData.TryGetWebHookEventName(out var eventName))
                 {
-                    _logger.LogInformation(0, "Received a {ReceiverName} Ping Event -- ignoring.", receiverName);
+                    // If this is a ping request, short-circuit further processing.
+                    if (string.Equals(eventName, pingMetadata.PingEventName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.LogInformation(
+                            0,
+                            "Received a Ping Event for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                            receiverName);
 
-                    context.Result = new OkResult();
-                    return;
+                        context.Result = new OkResult();
+                        return;
+                    }
                 }
             }
         }

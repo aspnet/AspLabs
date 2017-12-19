@@ -6,7 +6,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the MailChimp receiver.
     /// </summary>
-    public class MailChimpMetadata : WebHookMetadata, IWebHookRequestMetadataService, IWebHookSecurityMetadata
+    public class MailChimpMetadata :
+        WebHookMetadata,
+        IWebHookBodyTypeMetadataService,
+        IWebHookGetRequestMetadata,
+        IWebHookVerifyCodeMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="MailChimpMetadata"/> instance.
@@ -16,20 +20,20 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         {
         }
 
-        // IWebHookRequestMetadataService...
+        // IWebHookBodyTypeMetadataService...
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Form;
 
-        // IWebHookSecurityMetadata...
+        // IWebHookGetRequestMetadata...
 
         /// <inheritdoc />
-        public bool VerifyCodeParameter => true;
+        public string ChallengeQueryParameterName => null;
 
         /// <inheritdoc />
-        public bool ShortCircuitGetRequests => true;
+        public int SecretKeyMinLength => WebHookConstants.CodeParameterMinLength;
 
         /// <inheritdoc />
-        public WebHookGetRequest WebHookGetRequest => null;
+        public int SecretKeyMaxLength => WebHookConstants.CodeParameterMaxLength;
     }
 }

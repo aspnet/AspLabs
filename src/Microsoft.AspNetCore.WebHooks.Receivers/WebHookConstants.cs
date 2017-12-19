@@ -15,21 +15,21 @@ namespace Microsoft.AspNetCore.WebHooks
         /// Gets the minimum length of the <see cref="CodeQueryParameterName"/> query parameter value and secret key
         /// for receivers using such a query parameter.
         /// </summary>
-        /// <seealso cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/>
+        /// <seealso cref="Metadata.IWebHookVerifyCodeMetadata"/>
         public static int CodeParameterMinLength => 32;
 
         /// <summary>
         /// Gets the maximum length of the <see cref="CodeQueryParameterName"/> query parameter value and secret key
         /// for receivers using such a query parameter.
         /// </summary>
-        /// <seealso cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/>
+        /// <seealso cref="Metadata.IWebHookVerifyCodeMetadata"/>
         public static int CodeParameterMaxLength => 128;
 
         /// <summary>
         /// Gets the name of a query parameter containing the secret key used to verify some WebHook receivers'
         /// requests.
         /// </summary>
-        /// <seealso cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/>
+        /// <seealso cref="Metadata.IWebHookVerifyCodeMetadata"/>
         public static string CodeQueryParameterName => "code";
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <see cref="Filters.WebHookSecurityFilter.EnsureSecureConnection"/> performs the check.
         /// </summary>
         /// <remarks>
-        /// Most, if not all, receiver configurations include
+        /// All receiver configurations should include
         /// <see cref="Filters.WebHookSecurityFilter.EnsureSecureConnection"/> calls. For example,
-        /// <see cref="Filters.WebHookVerifyCodeFilter"/> calls the method if
-        /// <see cref="Metadata.IWebHookSecurityMetadata.VerifyCodeParameter"/> is <see langword="true"/>.
+        /// <see cref="Filters.WebHookVerifyCodeFilter"/> calls the method if the receiver implements
+        /// <see cref="Metadata.IWebHookVerifyCodeMetadata"/> in its metadata service.
         /// </remarks>
         public static string DisableHttpsCheckConfigurationKey { get; } = ConfigurationPath.Combine(
             ReceiverConfigurationSectionKey,

@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Salesforce receiver.
     /// </summary>
-    public class SalesforceMetadata : WebHookMetadata, IWebHookRequestMetadataService
+    public class SalesforceMetadata : WebHookMetadata, IWebHookBodyTypeMetadataService
     {
         /// <summary>
         /// Instantiates a new <see cref="SalesforceMetadata"/> instance.

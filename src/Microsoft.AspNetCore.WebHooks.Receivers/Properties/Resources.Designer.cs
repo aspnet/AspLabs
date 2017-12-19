@@ -61,15 +61,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Input is not a valid hex-encoded string: &apos;{0}&apos;. Please provide a valid hex-encoded string..
-        /// </summary>
-        internal static string EncodingUtils_InvalidHexValue {
-            get {
-                return ResourceManager.GetString("EncodingUtils_InvalidHexValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Value cannot be null or empty..
         /// </summary>
         internal static string General_ArgumentCannotBeNullOrEmpty {
@@ -88,11 +79,20 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook verification request must contain a &apos;{0}&apos; query parameter..
+        ///   Looks up a localized string similar to A &apos;{0}&apos; WebHook request must contain a &apos;{1}&apos; query parameter..
         /// </summary>
-        internal static string General_MissingQueryParameter {
+        internal static string General_NoQueryParameter {
             get {
-                return ResourceManager.GetString("General_MissingQueryParameter", resourceCulture);
+                return ResourceManager.GetString("General_NoQueryParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A &apos;{0}&apos; WebHook verification request must contain a &apos;{1}&apos; query parameter..
+        /// </summary>
+        internal static string GetRequest_NoQueryParameter {
+            get {
+                return ResourceManager.GetString("GetRequest_NoQueryParameter", resourceCulture);
             }
         }
         
@@ -115,11 +115,20 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No &apos;{0}&apos; implementation found for the &apos;{1}&apos; receiver..
+        ///   Looks up a localized string similar to No &apos;{0}&apos; implementation found for the &apos;{1}&apos; WebHook receiver..
         /// </summary>
         internal static string MetadataProvider_MissingMetadata {
             get {
                 return ResourceManager.GetString("MetadataProvider_MissingMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid metadata services found for the &apos;{0}&apos; WebHook receiver. Receivers with attributes implementing &apos;{1}&apos; must also provide a &apos;{2}&apos; service..
+        /// </summary>
+        internal static string MetadataProvider_MissingMetadataServicesForReceiver {
+            get {
+                return ResourceManager.GetString("MetadataProvider_MissingMetadataServicesForReceiver", resourceCulture);
             }
         }
         
@@ -142,15 +151,6 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must be a valid hex-encoded string..
-        /// </summary>
-        internal static string Security_BadHeaderEncoding {
-            get {
-                return ResourceManager.GetString("Security_BadHeaderEncoding", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;.  The value must be between {2} and {3} characters long..
         /// </summary>
         internal static string Security_BadSecret {
@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; WebHook receiver requires HTTPS in order to be secure. Please register a WebHook URI of type &apos;{1}&apos;..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; WebHook receiver requires {1} in order to be secure. Please register a WebHook URI of type &apos;{2}&apos;..
         /// </summary>
         internal static string Security_NoHttps {
             get {
@@ -232,11 +232,11 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A &apos;{0}&apos; WebHook request must contain a &apos;{1}&apos; query parameter..
+        ///   Looks up a localized string similar to A &apos;{0}&apos; WebHook request must contain a &apos;{1}&apos; value in the route data..
         /// </summary>
-        internal static string VerifyRequiredValue_NoQueryParameter {
+        internal static string VerifyRequiredValue_NoRouteValue {
             get {
-                return ResourceManager.GetString("VerifyRequiredValue_NoQueryParameter", resourceCulture);
+                return ResourceManager.GetString("VerifyRequiredValue_NoRouteValue", resourceCulture);
             }
         }
         
@@ -250,11 +250,29 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must be a valid hex-encoded string..
+        /// </summary>
+        internal static string VerifySignature_BadHeaderEncoding {
+            get {
+                return ResourceManager.GetString("VerifySignature_BadHeaderEncoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The signature provided by the &apos;{0}&apos; header field does not match the value expected by the &apos;{1}&apos; WebHook receiver. WebHook request is invalid..
         /// </summary>
         internal static string VerifySignature_BadSignature {
             get {
                 return ResourceManager.GetString("VerifySignature_BadSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input is not a valid hex-encoded string: &apos;{0}&apos;. Please provide a valid hex-encoded string..
+        /// </summary>
+        internal static string VerifySignature_InvalidHexValue {
+            get {
+                return ResourceManager.GetString("VerifySignature_InvalidHexValue", resourceCulture);
             }
         }
     }

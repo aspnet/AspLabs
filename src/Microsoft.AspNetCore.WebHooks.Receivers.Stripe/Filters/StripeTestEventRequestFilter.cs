@@ -15,32 +15,32 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// short-circuit test events when the <c>WebHooks:Stripe:PassThroughTestEvents</c> configuration value is
     /// <c>true</c>.
     /// </summary>
-    /// <remarks>Somewhat similar to the <see cref="WebHookPingResponseFilter"/>.</remarks>
-    public class StripeTestEventResponseFilter : IResourceFilter, IWebHookReceiver
+    /// <remarks>Somewhat similar to the <see cref="WebHookPingRequestFilter"/>.</remarks>
+    public class StripeTestEventRequestFilter : IResourceFilter, IWebHookReceiver
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Instantiates a new <see cref="StripeTestEventResponseFilter"/> instance.
+        /// Instantiates a new <see cref="StripeTestEventRequestFilter"/> instance.
         /// </summary>
         /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public StripeTestEventResponseFilter(IConfiguration configuration, ILoggerFactory loggerFactory)
+        public StripeTestEventRequestFilter(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
-            _logger = loggerFactory.CreateLogger<StripeTestEventResponseFilter>();
+            _logger = loggerFactory.CreateLogger<StripeTestEventRequestFilter>();
         }
 
         /// <inheritdoc />
         public string ReceiverName => StripeConstants.ReceiverName;
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="StripeTestEventResponseFilter"/>
-        /// instances. This filter should execute in the same slot as <see cref="WebHookPingResponseFilter"/>.
-        /// <see cref="WebHookPingResponseFilter"/> does not apply for this receiver.
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="StripeTestEventRequestFilter"/>
+        /// instances. This filter should execute in the same slot as <see cref="WebHookPingRequestFilter"/>.
+        /// <see cref="WebHookPingRequestFilter"/> does not apply for this receiver.
         /// </summary>
-        public static int Order => WebHookPingResponseFilter.Order;
+        public static int Order => WebHookPingRequestFilter.Order;
 
         /// <inheritdoc />
         public bool IsApplicable(string receiverName)

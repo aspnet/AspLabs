@@ -17,12 +17,12 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
     /// <summary>
     /// Methods to add services for WebHook receivers.
     /// </summary>
-    public class WebHookServiceCollectionSetup
+    public static class WebHookServiceCollectionSetup
     {
         private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
         {
-                { typeof(WebHookGetResponseFilter), WebHookGetResponseFilter.Order },
-                { typeof(WebHookPingResponseFilter), WebHookPingResponseFilter.Order },
+                { typeof(WebHookGetRequestFilter), WebHookGetRequestFilter.Order },
+                { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
                 { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },
                 { typeof(WebHookVerifyMethodFilter), WebHookVerifyMethodFilter.Order },
                 { typeof(WebHookVerifyRequiredValueFilter), WebHookVerifyRequiredValueFilter.Order },

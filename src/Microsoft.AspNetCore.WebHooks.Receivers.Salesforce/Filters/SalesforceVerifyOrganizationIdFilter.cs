@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// confirms the organization id and event name is present and that the organization id matches the configured
     /// secret key.
     /// </summary>
-    public class SalesforceVerifyOrganizationIdFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
+    public class SalesforceVerifyOrganizationIdFilter : WebHookSecurityFilter, IAsyncResourceFilter, IWebHookReceiver
     {
         private readonly IModelBinder _bodyModelBinder;
         private readonly ISalesforceResultCreator _resultCreator;
@@ -72,7 +72,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <inheritdoc />
-        public override string ReceiverName => SalesforceConstants.ReceiverName;
+        public string ReceiverName => SalesforceConstants.ReceiverName;
+
+        /// <inheritdoc />
+        public bool IsApplicable(string receiverName)
+        {
+            if (receiverName == null)
+            {
+                throw new ArgumentNullException(nameof(receiverName));
+            }
+
+            return string.Equals(ReceiverName, receiverName, StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <inheritdoc />
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)

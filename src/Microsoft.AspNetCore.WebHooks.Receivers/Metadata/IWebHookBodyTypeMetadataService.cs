@@ -6,9 +6,9 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// Metadata describing the request body type an action expects. <see cref="IWebHookMetadata"/> service
     /// implementations that contain this information must implement this interface and not just
-    /// <see cref="IWebHookRequestMetadata"/>.
+    /// <see cref="IWebHookBodyTypeMetadata"/>.
     /// </summary>
-    public interface IWebHookRequestMetadataService : IWebHookRequestMetadata, IWebHookReceiver
+    public interface IWebHookBodyTypeMetadataService : IWebHookBodyTypeMetadata, IWebHookReceiver
     {
     }
 }

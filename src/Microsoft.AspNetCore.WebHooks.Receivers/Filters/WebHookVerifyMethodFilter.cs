@@ -14,8 +14,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IResourceFilter"/> to allow only POST WebHook requests with a non-empty request body. To support
-    /// GET or HEAD requests the receiver project should set
-    /// <see cref="Metadata.IWebHookSecurityMetadata.ShortCircuitGetRequests"/> in its metadata service.
+    /// GET or HEAD requests the receiver project should implement <see cref="Metadata.IWebHookGetRequestMetadata"/>
+    /// in its metadata service.
     /// </summary>
     /// <remarks>
     /// Done as an <see cref="IResourceFilter"/> implementation and not an
@@ -40,26 +40,25 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
         /// <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetResponseFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in this filter).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetResponseFilter"/> for this receiver (in
-        /// <see cref="WebHookPingResponseFilter"/>).
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookGetResponseFilter.Order + 10;
+        public static int Order => WebHookGetRequestFilter.Order + 10;
 
         /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)

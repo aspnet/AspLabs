@@ -18,14 +18,14 @@ using Microsoft.Extensions.Primitives;
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IResourceFilter"/> to short-circuit WebHook GET requests.
+    /// An <see cref="IResourceFilter"/> to verify secret keys and short-circuit WebHook GET requests.
     /// </summary>
-    public class WebHookGetResponseFilter : WebHookSecurityFilter, IResourceFilter
+    public class WebHookGetRequestFilter : WebHookSecurityFilter, IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookSecurityMetadata> _getRequestMetadata;
+        private readonly IReadOnlyList<IWebHookGetRequestMetadata> _getRequestMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookGetResponseFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookGetRequestFilter"/> instance.
         /// </summary>
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
@@ -38,27 +38,23 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookGetResponseFilter(
+        public WebHookGetRequestFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             IEnumerable<IWebHookMetadata> metadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            // No need to keep track of IWebHookSecurityMetadata instances that do not request HTTP GET request
-            // handling.
-            _getRequestMetadata = metadata
-                .OfType<IWebHookSecurityMetadata>()
-                .Where(item => item.ShortCircuitGetRequests)
-                .ToArray();
+            _getRequestMetadata = metadata.OfType<IWebHookGetRequestMetadata>().ToArray();
         }
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookSecurityFilter"/>
-        /// instances. The recommended filter sequence is <list type="number">
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookGetRequestFilter"/>
+        /// instances. The recommended filter sequence is
+        /// <list type="number">
         /// <item>
-        /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
-        /// <see cref="WebHookVerifyBodyContentFilter"/> subclass).
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
         /// <item>
         /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
@@ -69,7 +65,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
         /// Short-circuit ping requests, if not done in this filter for this receiver (in
-        /// <see cref="WebHookPingResponseFilter"/>).
+        /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
@@ -91,16 +87,30 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
                 if (getRequestMetadata != null)
                 {
-                    var getMetadata = getRequestMetadata.WebHookGetRequest;
-                    if (getMetadata == null)
+                    // First verify that we have the secret key configuration value. This may be redundant if the
+                    // receiver also implements IWebHookVerifyCodeMetadata in its metadata. However this verification
+                    // is necessary for some receivers because signature verification (for example) is not possible
+                    // without a body.
+                    var secretKey = GetSecretKey(
+                        receiverName,
+                        routeData,
+                        getRequestMetadata.SecretKeyMinLength,
+                        getRequestMetadata.SecretKeyMaxLength);
+                    if (secretKey == null)
                     {
-                        // Simple case. Earlier filters likely did all necessary verification.
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
+                    if (getRequestMetadata.ChallengeQueryParameterName == null)
+                    {
+                        // Simple case. Have done all necessary verification.
                         context.Result = new OkResult();
                         return;
                     }
 
                     var request = context.HttpContext.Request;
-                    context.Result = GetChallengeResponse(getMetadata, receiverName, request, routeData);
+                    context.Result = GetChallengeResponse(getRequestMetadata, receiverName, request, routeData);
                 }
             }
         }
@@ -112,41 +122,33 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         private IActionResult GetChallengeResponse(
-            WebHookGetRequest getMetadata,
+            IWebHookGetRequestMetadata getRequestMetadata,
             string receiverName,
             HttpRequest request,
             RouteData routeData)
         {
-            // 1. Verify that we have the secret as an app setting.
-            var secretKey = GetSecretKey(
-                receiverName,
-                routeData,
-                getMetadata.SecretKeyMinLength,
-                getMetadata.SecretKeyMaxLength);
-            if (secretKey == null)
-            {
-                return new NotFoundResult();
-            }
-
-            // 2. Get the 'challenge' parameter from the request URI.
-            var challenge = request.Query[getMetadata.ChallengeQueryParameterName];
+            // Get the 'challenge' parameter from the request URI.
+            var challenge = request.Query[getRequestMetadata.ChallengeQueryParameterName];
             if (StringValues.IsNullOrEmpty(challenge))
             {
                 Logger.LogError(
                     400,
-                    "The WebHook verification request must contain a '{ParameterName}' query parameter.",
-                    getMetadata.ChallengeQueryParameterName);
+                    "A '{ReceiverName}' WebHook verification request must contain a '{ParameterName}' query " +
+                    "parameter.",
+                    receiverName,
+                    getRequestMetadata.ChallengeQueryParameterName);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.General_MissingQueryParameter,
-                    getMetadata.ChallengeQueryParameterName);
+                    Resources.GetRequest_NoQueryParameter,
+                    receiverName,
+                    getRequestMetadata.ChallengeQueryParameterName);
                 var noChallenge = new BadRequestObjectResult(message);
 
                 return noChallenge;
             }
 
-            // 3. Echo the challenge back to the caller.
+            // Echo the challenge back to the caller.
             return new ContentResult
             {
                 Content = challenge,

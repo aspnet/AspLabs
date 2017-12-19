@@ -16,16 +16,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IResourceFilter"/> that confirms the <see cref="Routing.WebHookReceiverExistsConstraint"/> is
-    /// configured and ran successfully for this request. Also confirms either
-    /// <see cref="IWebHookSecurityMetadata.VerifyCodeParameter"/> is <see langword="true"/> or at least one
-    /// <see cref="IWebHookReceiver"/> filter is configured to handle this request. The minimal configuration for a
-    /// receiver without <see cref="IWebHookSecurityMetadata.VerifyCodeParameter"/> <see langword="true"/> includes a
-    /// <see cref="WebHookVerifyBodyContentFilter"/> subclass to verify signatures.
+    /// configured and ran successfully for this request. Also confirms either <see cref="IWebHookVerifyCodeMetadata"/>
+    /// is applicable or at least one <see cref="IWebHookReceiver"/> filter is configured to handle this request.
+    /// The minimal configuration for a receiver without <see cref="IWebHookVerifyCodeMetadata"/> includes a
+    /// <see cref="WebHookSecurityFilter"/> subclass to verify signatures or otherwise check secret keys.
     /// </summary>
     public class WebHookReceiverExistsFilter : IResourceFilter
     {
+        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _codeVerifierMetadata;
         private readonly ILogger _logger;
-        private readonly IReadOnlyList<IWebHookSecurityMetadata> _codeVerifierMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookReceiverExistsFilter"/> with the given
@@ -35,13 +34,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         public WebHookReceiverExistsFilter(IEnumerable<IWebHookMetadata> metadata, ILoggerFactory loggerFactory)
         {
+            _codeVerifierMetadata = metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray();
             _logger = loggerFactory.CreateLogger<WebHookReceiverExistsFilter>();
-
-            // No need to keep track of IWebHookSecurityMetadata instances that do not request code verification.
-            _codeVerifierMetadata = metadata
-                .OfType<IWebHookSecurityMetadata>()
-                .Where(item => item.VerifyCodeParameter)
-                .ToArray();
         }
 
         /// <summary>
@@ -70,11 +64,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 {
                     _logger.LogCritical(
                         0,
-                        "Unable to find WebHook routing constraints for {ReceiverName}. Please add the required " +
-                        "configuration by calling a receiver-specific method that calls " +
-                        "'{CoreInterfaceName}.{MethodName}' in the application startup code. For example, call " +
-                        "'{GitHubCoreInterfaceName}.{GitHubMethodName}' to configure the GitHub receiver.",
+                        "Unable to find WebHook routing constraints for the '{ReceiverName}' receiver. Please add " +
+                        "the required configuration by calling a receiver-specific method that calls " +
+                        "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
+                        "application startup code. For example, call " +
+                        "'{GitHubBuilderInterface}.{GitHubBuilderMethod}' to configure a minimal GitHub receiver.",
                         receiverName,
+                        nameof(IMvcBuilder),
+                        nameof(WebHookMvcBuilderExtensions.AddWebHooks),
                         nameof(IMvcCoreBuilder),
                         nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
                         nameof(IMvcCoreBuilder),
@@ -103,11 +100,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         // This case is actually more likely a gap in the receiver-specific configuration method.
                         _logger.LogCritical(
                             1,
-                            "Unable to find WebHook filters for {ReceiverName}. Please add the required " +
-                            "configuration by calling a receiver-specific method that calls " +
-                            "'{CoreInterfaceName}.{MethodName}' in the application startup code. For example, call " +
-                            "'{GitHubCoreInterfaceName}.{GitHubMethodName}' to configure the GitHub receiver.",
+                            "Unable to find WebHook filters for the '{ReceiverName}' receiver. Please add the " +
+                            "required configuration by calling a receiver-specific method that calls " +
+                            "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
+                            "application startup code. For example, call " +
+                            "'{GitHubBuilderInterface}.{GitHubBuilderMethod}' to configure a minimal GitHub receiver.",
                             receiverName,
+                            nameof(IMvcBuilder),
+                            nameof(WebHookMvcBuilderExtensions.AddWebHooks),
                             nameof(IMvcCoreBuilder),
                             nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
                             nameof(IMvcCoreBuilder),
@@ -125,8 +125,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     2,
                     "Unable to find WebHook routing information in the request. Please add the required " +
                     "configuration by calling a receiver-specific method that calls " +
-                    "'{CoreInterfaceName}.{MethodName}' in the application startup code. For example, call " +
-                    "'{GitHubCoreInterfaceName}.{GitHubMethodName}' to configure the GitHub receiver.",
+                    "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
+                    "application startup code. For example, call '{GitHubBuilderInterface}.{GitHubBuilderMethod}' " +
+                    "to configure a minimal GitHub receiver.",
+                    nameof(IMvcBuilder),
+                    nameof(WebHookMvcBuilderExtensions.AddWebHooks),
                     nameof(IMvcCoreBuilder),
                     nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
                     nameof(IMvcCoreBuilder),

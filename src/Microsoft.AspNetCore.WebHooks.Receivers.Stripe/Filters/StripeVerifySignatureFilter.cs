@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// An <see cref="IAsyncResourceFilter"/> that verifies the Stripe signature header. Confirms the header exists,
     /// parses the header, reads Body bytes, and compares the hashes.
     /// </summary>
-    public class StripeVerifySignatureFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
+    public class StripeVerifySignatureFilter : WebHookVerifySignatureFilter, IAsyncResourceFilter
     {
         private static readonly char[] CommaSeparator = new[] { ',' };
         private static readonly char[] EqualSeparator = new[] { '=' };

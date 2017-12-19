@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Stripe receiver.
     /// </summary>
-    public class StripeMetadata : WebHookMetadata, IWebHookBindingMetadata, IWebHookRequestMetadataService
+    public class StripeMetadata : WebHookMetadata, IWebHookBindingMetadata, IWebHookBodyTypeMetadataService
     {
         /// <summary>
         /// Instantiates a new <see cref="StripeMetadata"/> instance.
@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
                 isRequired: false),
         };
 
-        // IWebHookRequestMetadataService...
+        // IWebHookBodyTypeMetadataService...
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;

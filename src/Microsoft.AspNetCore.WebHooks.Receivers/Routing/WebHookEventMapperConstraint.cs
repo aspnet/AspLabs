@@ -14,7 +14,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
 {
     /// <summary>
     /// An <see cref="IActionConstraint"/> implementation which uses <see cref="IWebHookEventMetadata"/> to determine
-    /// the event name for a WebHook request. This constraint almost-always accepts all candidates.
+    /// the event name(s) for a WebHook request. This constraint accepts all candidates for receivers lacking
+    /// <see cref="IWebHookEventMetadata"/> or with <see cref="IWebHookEventMetadata.ConstantValue"/>
+    /// non-<see langword="null"/>. Otherwise, the request must contain one or more event names.
     /// </summary>
     public class WebHookEventMapperConstraint : IActionConstraint
     {
@@ -105,8 +107,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                         routeData.TryGetWebHookReceiverName(out var receiverName);
                         _logger.LogError(
                             500,
-                            "A {ReceiverName} WebHook request must contain a '{HeaderName}' HTTP header indicating " +
-                            "the type of event.",
+                            "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header " +
+                            "indicating the type of event.",
                             receiverName,
                             eventMetadata.HeaderName);
                     }
@@ -130,8 +132,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                         routeData.TryGetWebHookReceiverName(out var receiverName);
                         _logger.LogError(
                             501,
-                            "A {ReceiverName} WebHook request must contain a '{QueryParameterKey}' query parameter " +
-                            "indicating the type of event.",
+                            "A '{ReceiverName}' WebHook request must contain a '{QueryParameterKey}' query " +
+                            "parameter indicating the type of event.",
                             receiverName,
                             eventMetadata.QueryParameterName);
                     }
