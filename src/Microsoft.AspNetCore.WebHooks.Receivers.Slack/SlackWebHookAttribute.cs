@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Microsoft.AspNetCore.WebHooks
 {
-    // ??? Need IApiResponseMetadataProvider? Old world controller had [ApiExplorerSettings(IgnoreApi = true)].
     /// <summary>
     /// <para>
     /// An <see cref="Attribute"/> indicating the associated action is a Slack WebHook endpoint. Specifies the optional

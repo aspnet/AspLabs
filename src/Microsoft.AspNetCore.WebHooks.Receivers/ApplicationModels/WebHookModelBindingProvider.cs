@@ -129,8 +129,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     // check is about model binding system support, not an actual assignment to the parameter.
                     if (!TrySourceAdditionalParameter(bindingInfo, bindingMetadata, parameterName) &&
                         (typeof(IFormCollection).IsAssignableFrom(parameterType) ||
-                         // ??? Any need to support simple JToken's? JContainer is the base for JArray and JObject.
-                         typeof(JContainer).IsAssignableFrom(parameterType) ||
+                         typeof(JToken).IsAssignableFrom(parameterType) ||
                          typeof(XElement).IsAssignableFrom(parameterType)))
                     {
                         SourceData(bindingInfo, bodyTypeMetadata);
@@ -164,7 +163,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             if (typeof(string) != parameterType &&
                 !typeof(IEnumerable<string>).IsAssignableFrom(parameterType))
             {
-                // ??? Do we need logging about these strange cases?
                 // Unexpected / unsupported type. Do nothing.
                 return;
             }

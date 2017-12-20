@@ -61,6 +61,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid WebHook constraint configuration encountered. &apos;{0}&apos; executed though &apos;{1}&apos; should have disallowed the request..
+        /// </summary>
+        internal static string EventConstraints_NoReceiverName {
+            get {
+                return ResourceManager.GetString("EventConstraints_NoReceiverName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value cannot be null or empty..
         /// </summary>
         internal static string General_ArgumentCannotBeNullOrEmpty {
@@ -144,9 +153,9 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         /// <summary>
         ///   Looks up a localized string similar to {0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template..
         /// </summary>
-        internal static string RoutingConvention_MixedRouteWithWebHookAttribute {
+        internal static string RoutingProvider_MixedRouteWithWebHookAttribute {
             get {
-                return ResourceManager.GetString("RoutingConvention_MixedRouteWithWebHookAttribute", resourceCulture);
+                return ResourceManager.GetString("RoutingProvider_MixedRouteWithWebHookAttribute", resourceCulture);
             }
         }
         

@@ -71,7 +71,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             if (IsTestEvent(notificationId))
             {
                 // Log about and optionally short-circuit this test event.
-                if (_configuration.IsTrue(StripeConstants.PassThroughTestEventsConfigurationKey))
+                var passThroughString = _configuration[StripeConstants.PassThroughTestEventsConfigurationKey];
+                if (bool.TryParse(passThroughString, out var passThrough) && passThrough)
                 {
                     _logger.LogInformation(0, "Received a Stripe Test Event.");
                 }

@@ -26,7 +26,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         private readonly WebHookEventMapperConstraint _eventMapperConstraint;
         private readonly ILoggerFactory _loggerFactory;
 
-        // ??? Should we use constraint factories to let DI choose the constraint lifetimes?
         /// <summary>
         /// Instantiates a new <see cref="WebHookRoutingProvider"/> with the given
         /// <paramref name="existsConstraint"/>, <paramref name="eventMapperConstraint"/> and
@@ -131,7 +130,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             {
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.RoutingConvention_MixedRouteWithWebHookAttribute,
+                    Resources.RoutingProvider_MixedRouteWithWebHookAttribute,
                     attribute.GetType().Name,
                     selector.AttributeRouteModel.Attribute?.GetType().Name);
                 throw new InvalidOperationException(message);

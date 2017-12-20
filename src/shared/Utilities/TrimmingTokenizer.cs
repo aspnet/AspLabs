@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
     /// Splits a <see cref="string"/> or <see cref="StringSegment"/> into trimmed <see cref="StringSegment"/>s. Also
     /// skips empty <see cref="StringSegment"/>s.
     /// </summary>
-    public struct TrimmingTokenizer : IEnumerable<StringSegment>
+    internal struct TrimmingTokenizer : IEnumerable<StringSegment>
     {
         private readonly int _maxCount;
         private readonly StringSegment _originalString;

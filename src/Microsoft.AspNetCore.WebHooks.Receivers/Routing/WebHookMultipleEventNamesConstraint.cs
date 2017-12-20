@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
+using Microsoft.AspNetCore.WebHooks.Properties;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
@@ -57,9 +59,12 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 return Accept(context, _eventName, pingMetadata?.PingEventName);
             }
 
-
-            // ??? Should we throw if this is reached? Should be impossible given WebHookReceiverExistsConstraint.
-            return false;
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                Resources.EventConstraints_NoReceiverName,
+                typeof(WebHookMultipleEventNamesConstraint),
+                typeof(WebHookReceiverExistsConstraint));
+            throw new InvalidOperationException(message);
         }
     }
 }

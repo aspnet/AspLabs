@@ -2,20 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -137,26 +134,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Ensure we can read the <paramref name="request"/> body without messing up JSON etc. deserialization. Body
-        /// will be read at least twice in most receivers.
-        /// </summary>
-        /// <param name="request">The <see cref="HttpRequest"/> to prepare.</param>
-        /// <returns>A <see cref="Task"/> that on completion will have prepared the request body.</returns>
-        public async Task PrepareRequestBody(HttpRequest request)
-        {
-            if (!request.Body.CanSeek)
-            {
-                BufferingHelper.EnableRewind(request);
-                Debug.Assert(request.Body.CanSeek);
-
-                await request.Body.DrainAsync(CancellationToken.None);
-            }
-
-            // Always start at the beginning.
-            request.Body.Seek(0L, SeekOrigin.Begin);
-        }
-
-        /// <summary>
         /// Gets the value of a given HTTP request <paramref name="headerName"/>. If the field is either not present in
         /// the <paramref name="request"/> or has more than one value then an error is generated and returned in
         /// <paramref name="errorResult"/>.
@@ -219,7 +196,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </returns>
         protected virtual async Task<byte[]> GetRequestBodyHash_SHA1(HttpRequest request, byte[] secret)
         {
-            await PrepareRequestBody(request);
+            await WebHookHttpRequestUtilities.PrepareRequestBody(request);
 
             using (var hasher = new HMACSHA1(secret))
             {
@@ -266,7 +243,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             byte[] secret,
             byte[] prefix)
         {
-            await PrepareRequestBody(request);
+            await WebHookHttpRequestUtilities.PrepareRequestBody(request);
 
             using (var hasher = new HMACSHA256(secret))
             {

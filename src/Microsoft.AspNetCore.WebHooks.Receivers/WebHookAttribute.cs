@@ -10,10 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.WebHooks
 {
-    // ??? Should this also implement IAntiforgeryPolicy to disable antiforgery token verification? Requires a
-    // ??? Microsoft.AspNetCore.Mvc.ViewFeatures reference.
-    // ??? Should this also implement IDisableCorsAttribute to disable CORS? Requires a Microsoft.AspNetCore.Cors
-    // ??? reference.
     /// <summary>
     /// Base for <see cref="Attribute"/>s indicating the associated action is a WebHook endpoint. Specifies the
     /// required (in most cases) <see cref="ReceiverName"/> and optional <see cref="Id"/>. Also adds a

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EventConstraints_NoReceiverName" xml:space="preserve">
+    <value>Invalid WebHook constraint configuration encountered. '{0}' executed though '{1}' should have disallowed the request.</value>
+  </data>
   <data name="General_ArgumentCannotBeNullOrEmpty" xml:space="preserve">
     <value>Value cannot be null or empty.</value>
   </data>
@@ -144,7 +147,7 @@
   <data name="MetadataProvider_WrongInterface" xml:space="preserve">
     <value>Invalid metadata services found. Metadata services implementing '{0}' must implement '{1}'.</value>
   </data>
-  <data name="RoutingConvention_MixedRouteWithWebHookAttribute" xml:space="preserve">
+  <data name="RoutingProvider_MixedRouteWithWebHookAttribute" xml:space="preserve">
     <value>{0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template.</value>
   </data>
   <data name="Security_BadSecret" xml:space="preserve">

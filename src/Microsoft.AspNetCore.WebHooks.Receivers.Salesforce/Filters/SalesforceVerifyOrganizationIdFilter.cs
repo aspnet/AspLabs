@@ -234,8 +234,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             if (request.Body == null ||
                 !request.ContentLength.HasValue ||
                 request.ContentLength.Value == 0L ||
-                !HttpMethods.IsPost(request.Method) ||
-                !WebHookHttpRequestUtilities.IsXml(request))
+                !HttpMethods.IsPost(request.Method))
             {
                 // Other filters will log and return errors about these conditions.
                 return null;

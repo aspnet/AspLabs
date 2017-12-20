@@ -125,8 +125,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // Check to see if we have been configured to ignore this check.
+            var disableHttpsCheckString = Configuration[WebHookConstants.DisableHttpsCheckConfigurationKey];
             if (HostingEnvironment.IsDevelopment() ||
-                Configuration.IsTrue(WebHookConstants.DisableHttpsCheckConfigurationKey))
+                (bool.TryParse(disableHttpsCheckString, out var disableHttpsCheck) && disableHttpsCheck))
             {
                 return null;
             }
@@ -262,10 +263,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             routeData.TryGetWebHookReceiverId(out var id);
 
             // Look up configuration for this receiver and instance
-            var secrets = Configuration.GetWebHookSecretKeys(sectionKey, id);
+            var secrets = GetSecretKeys(Configuration, sectionKey, id);
             if (!secrets.Exists())
             {
-                if (!Configuration.HasWebHookSecretKeys(sectionKey))
+                if (!HasSecretKeys(Configuration, sectionKey))
                 {
                     // No secret key configuration for this receiver at all.
                     Logger.LogCritical(
@@ -317,6 +318,33 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             return areSame;
+        }
+
+        private static IConfigurationSection GetSecretKeys(IConfiguration configuration, string sectionKey, string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                id = WebHookConstants.DefaultIdConfigurationKey;
+            }
+
+            // Look up configuration value for these keys.
+            var key = ConfigurationPath.Combine(
+                WebHookConstants.ReceiverConfigurationSectionKey,
+                sectionKey,
+                WebHookConstants.SecretKeyConfigurationKeySectionKey,
+                id);
+
+            return configuration.GetSection(key);
+        }
+
+        private static bool HasSecretKeys(IConfiguration configuration, string sectionKey)
+        {
+            var key = ConfigurationPath.Combine(
+                WebHookConstants.ReceiverConfigurationSectionKey,
+                sectionKey,
+                WebHookConstants.SecretKeyConfigurationKeySectionKey);
+
+            return configuration.GetSection(key).Exists();
         }
     }
 }

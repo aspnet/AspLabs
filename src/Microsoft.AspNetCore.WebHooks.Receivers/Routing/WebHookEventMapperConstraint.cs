@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
+using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
@@ -66,8 +68,12 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 return true;
             }
 
-            // ??? Should we throw if this is reached? Should be impossible given WebHookReceiverExistsConstraint.
-            return false;
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                Resources.EventConstraints_NoReceiverName,
+                typeof(WebHookEventMapperConstraint),
+                typeof(WebHookReceiverExistsConstraint));
+            throw new InvalidOperationException(message);
         }
 
         /// <summary>
@@ -97,23 +103,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             {
                 var headers = request.Headers;
 
-                // ??? Is GetCommaSeparatedValues() overkill?
                 var events = headers.GetCommaSeparatedValues(eventMetadata.HeaderName);
-                if (events.Length == 0)
-                {
-                    if (eventMetadata.ConstantValue == null && eventMetadata.QueryParameterName != null)
-                    {
-                        // An error because we have no fallback.
-                        routeData.TryGetWebHookReceiverName(out var receiverName);
-                        _logger.LogError(
-                            500,
-                            "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header " +
-                            "indicating the type of event.",
-                            receiverName,
-                            eventMetadata.HeaderName);
-                    }
-                }
-                else
+                if (events.Length > 0)
                 {
                     routeData.SetWebHookEventNames(events);
                     return true;
@@ -123,22 +114,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             if (eventMetadata.QueryParameterName != null)
             {
                 var query = request.Query;
-                if (!query.TryGetValue(eventMetadata.QueryParameterName, out var events) ||
-                    events.Count == 0)
-                {
-                    if (eventMetadata.ConstantValue == null)
-                    {
-                        // An error because we have no fallback.
-                        routeData.TryGetWebHookReceiverName(out var receiverName);
-                        _logger.LogError(
-                            501,
-                            "A '{ReceiverName}' WebHook request must contain a '{QueryParameterKey}' query " +
-                            "parameter indicating the type of event.",
-                            receiverName,
-                            eventMetadata.QueryParameterName);
-                    }
-                }
-                else
+                if (query.TryGetValue(eventMetadata.QueryParameterName, out var events) &&
+                    events.Count > 0)
                 {
                     routeData.SetWebHookEventNames(events);
                     return true;
@@ -149,6 +126,36 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             {
                 routeData.Values[WebHookConstants.EventKeyName] = eventMetadata.ConstantValue;
                 return true;
+            }
+
+            routeData.TryGetWebHookReceiverName(out var receiverName);
+            if (eventMetadata.QueryParameterName == null)
+            {
+                _logger.LogError(
+                    500,
+                    "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header " +
+                    "indicating the type of event.",
+                    receiverName,
+                    eventMetadata.HeaderName);
+            }
+            else if (eventMetadata.HeaderName == null)
+            {
+                _logger.LogError(
+                    501,
+                    "A '{ReceiverName}' WebHook request must contain a '{QueryParameterKey}' query " +
+                    "parameter indicating the type of event.",
+                    receiverName,
+                    eventMetadata.QueryParameterName);
+            }
+            else
+            {
+                _logger.LogError(
+                    502,
+                    "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header or a " +
+                    "'{QueryParameterKey}' query parameter indicating the type of event.",
+                    receiverName,
+                    eventMetadata.HeaderName,
+                    eventMetadata.QueryParameterName);
             }
 
             return false;

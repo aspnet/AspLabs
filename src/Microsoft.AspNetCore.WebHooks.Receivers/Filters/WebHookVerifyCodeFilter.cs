@@ -123,7 +123,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 Logger.LogError(
                     400,
-                    "The WebHook verification request must contain a '{ParameterName}' query parameter.",
+                    "A '{ReceiverName}' WebHook verification request must contain a '{ParameterName}' query " +
+                    "parameter.",
+                    receiverName,
                     WebHookConstants.CodeQueryParameterName);
 
                 var message = string.Format(
