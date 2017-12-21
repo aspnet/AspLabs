@@ -9,15 +9,17 @@ namespace Microsoft.AspNetCore.WebHooks
     /// the optional <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/>
     /// for the action.
     /// </para>
-    /// <para>The signature of the action should be:
+    /// <para>
+    /// The signature of the action should be:
     /// <code>
-    /// Task{IActionResult} ActionName(string id, string @event, TData data)
+    /// Task{IActionResult} ActionName(string id, string @event, TData data, [FromServices] ISalesforceResultCreator resultCreator)
     /// </code>
     /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
-    /// <see cref="System.Xml.Linq.XElement"/> or <see cref="SalesforceNotifications"/>.
+    /// <see cref="System.Xml.Linq.XElement"/> or <see cref="SalesforceNotifications"/>. The
+    /// <see cref="ISalesforceResultCreator"/> helps to create SOAP responses.
     /// </para>
     /// <para>
-    /// An example Salesforce WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/salesforce/{id}</c>'.
+    /// An example Salesforce WebHook URI is '<c>https://{host}/api/webhooks/incoming/salesforce/{id}</c>'.
     /// See <see href="https://go.microsoft.com/fwlink/?linkid=838587"/> for additional details about Salesforce
     /// WebHook requests.
     /// </para>

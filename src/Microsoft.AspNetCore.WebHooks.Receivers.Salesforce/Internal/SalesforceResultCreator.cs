@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
         {
             var resource = await GetResourceAsync("Microsoft.AspNetCore.WebHooks.Messages.NotificationResponse.xml");
 
-            return GetXmlResult(resource, StatusCodes.Status400BadRequest);
+            return GetXmlResult(resource, StatusCodes.Status200OK);
         }
 
         /// <summary>

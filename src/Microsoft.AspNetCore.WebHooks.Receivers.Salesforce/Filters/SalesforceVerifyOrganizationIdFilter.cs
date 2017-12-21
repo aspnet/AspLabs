@@ -193,7 +193,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// Gets the shortened version of <paramref name="fullOrganizationId"/>.
         /// </summary>
         /// <param name="fullOrganizationId">The full organization name.</param>
-        /// <returns></returns>
+        /// <returns>The shortened version of <paramref name="fullOrganizationId"/>.</returns>
         protected static string GetShortOrganizationId(string fullOrganizationId)
         {
             if (fullOrganizationId?.Length == 18)

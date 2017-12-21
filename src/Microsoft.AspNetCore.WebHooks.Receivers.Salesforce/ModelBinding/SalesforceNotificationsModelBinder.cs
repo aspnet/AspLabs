@@ -13,27 +13,20 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
     /// </summary>
     public class SalesforceNotificationsModelBinder : IModelBinder
     {
-        private readonly IModelBinder _xElementBinder;
-        private readonly ModelMetadata _xElementMetadata;
+        private readonly IModelBinder _bodyModelBinder;
 
         /// <summary>
         /// Instantiates a new <see cref="SalesforceNotificationsModelBinder"/> instance.
         /// </summary>
-        /// <param name="xElementBinder">An <see cref="IModelBinder"/> for the <see cref="XElement"/> type.</param>
-        /// <param name="xElementMetadata">The <see cref="ModelMetadata"/> for the <see cref="XElement"/> type.</param>
-        public SalesforceNotificationsModelBinder(IModelBinder xElementBinder, ModelMetadata xElementMetadata)
+        /// <param name="bodyModelBinder">The <see cref="IModelBinder"/> to bind models from the request body.</param>
+        public SalesforceNotificationsModelBinder(IModelBinder bodyModelBinder)
         {
-            if (xElementBinder == null)
+            if (bodyModelBinder == null)
             {
-                throw new ArgumentNullException(nameof(xElementBinder));
-            }
-            if (xElementMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(xElementMetadata));
+                throw new ArgumentNullException(nameof(bodyModelBinder));
             }
 
-            _xElementBinder = xElementBinder;
-            _xElementMetadata = xElementMetadata;
+            _bodyModelBinder = bodyModelBinder;
         }
 
         /// <inheritdoc />
@@ -46,13 +39,14 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
 
             // Try to get the XElement.
             ModelBindingResult result;
+            var xElementMetadata = bindingContext.ModelMetadata.GetMetadataForType(typeof(XElement));
             using (var innerContext = bindingContext.EnterNestedScope(
-                _xElementMetadata,
+                xElementMetadata,
                 bindingContext.FieldName,
                 bindingContext.ModelName,
                 bindingContext.Model))
             {
-                await _xElementBinder.BindModelAsync(bindingContext);
+                await _bodyModelBinder.BindModelAsync(bindingContext);
                 result = bindingContext.Result;
             }
 

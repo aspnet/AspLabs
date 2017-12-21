@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
@@ -9,29 +10,31 @@ namespace SalesforceCoreReceiver.Controllers
     public class SalesforceController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly ISalesforceResultCreator _resultCreator;
 
-        public SalesforceController(ILoggerFactory loggerFactory)
+        public SalesforceController(ILoggerFactory loggerFactory, ISalesforceResultCreator resultCreator)
         {
             _logger = loggerFactory.CreateLogger<SalesforceController>();
+            _resultCreator = resultCreator;
         }
 
         [SalesforceWebHook(Id = "It")]
-        public IActionResult SalesforceForIt(string @event, XElement data)
+        public async Task<IActionResult> SalesforceForIt(string @event, XElement data)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return await _resultCreator.GetFailedResultAsync("Model binding failed.");
             }
 
-            return Ok();
+            return await _resultCreator.GetSuccessResultAsync();
         }
 
         [SalesforceWebHook]
-        public IActionResult Salesforce(string id, string @event, SalesforceNotifications data)
+        public async Task<IActionResult> Salesforce(string id, string @event, SalesforceNotifications data)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return await _resultCreator.GetFailedResultAsync("Model binding failed.");
             }
 
             _logger.LogInformation(
@@ -65,7 +68,7 @@ namespace SalesforceCoreReceiver.Controllers
                 index++;
             }
 
-            return Ok();
+            return await _resultCreator.GetSuccessResultAsync();
         }
     }
 }

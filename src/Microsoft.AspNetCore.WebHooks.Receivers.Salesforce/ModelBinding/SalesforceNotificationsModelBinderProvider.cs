@@ -2,8 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.ModelBinding
 {
@@ -12,6 +15,22 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
     /// </summary>
     public class SalesforceNotificationsModelBinderProvider : IModelBinderProvider
     {
+        private readonly IModelBinder _bodyModelBinder;
+
+        /// <summary>
+        /// Instantiates a new <see cref="SalesforceNotificationsModelBinderProvider"/> instance.
+        /// </summary>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="options">The <see cref="MvcOptions"/>.</param>
+        /// <param name="readerFactory">The <see cref="IHttpRequestStreamReaderFactory"/>.</param>
+        public SalesforceNotificationsModelBinderProvider(
+            ILoggerFactory loggerFactory,
+            MvcOptions options,
+            IHttpRequestStreamReaderFactory readerFactory)
+        {
+            _bodyModelBinder = new BodyModelBinder(options.InputFormatters, readerFactory, loggerFactory, options);
+        }
+
         /// <inheritdoc />
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
@@ -22,9 +41,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
 
             if (context.Metadata.ModelType == typeof(SalesforceNotifications))
             {
-                var xElementMetadata = context.Metadata.GetMetadataForType(typeof(XElement));
-                var xElementBinder = context.CreateBinder(xElementMetadata);
-                return new SalesforceNotificationsModelBinder(xElementBinder, xElementMetadata);
+                return new SalesforceNotificationsModelBinder(_bodyModelBinder);
             }
 
             return null;

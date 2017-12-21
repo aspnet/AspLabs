@@ -3,11 +3,13 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.WebHooks.Internal
@@ -32,13 +34,20 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, SalesforceMetadata>());
             services.TryAddSingleton<ISalesforceResultCreator, SalesforceResultCreator>();
 
-            services.TryAddSingleton<SalesforceAcknowledgmentFilter>();
             services.TryAddSingleton<SalesforceVerifyOrganizationIdFilter>();
         }
 
         private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
         {
-            /// <inheritdoc />
+            private readonly ILoggerFactory _loggerFactory;
+            private readonly IHttpRequestStreamReaderFactory _readerFactory;
+
+            public MvcOptionsSetup(ILoggerFactory loggerFactory, IHttpRequestStreamReaderFactory readerFactory)
+            {
+                _loggerFactory = loggerFactory;
+                _readerFactory = readerFactory;
+            }
+
             public void Configure(MvcOptions options)
             {
                 if (options == null)
@@ -48,10 +57,9 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
 
                 // Ensure this binder is placed before the BodyModelBinderProvider, the most likely provider to match
                 // the XElement type.
-                options.ModelBinderProviders.Insert(0, new SalesforceNotificationsModelBinderProvider());
+                var provider = new SalesforceNotificationsModelBinderProvider(_loggerFactory, options, _readerFactory);
+                options.ModelBinderProviders.Insert(0, provider);
 
-                // ??? Does SalesforceAcknowledgmentFilter need a non-default Order too?
-                options.Filters.AddService<SalesforceAcknowledgmentFilter>();
                 options.Filters.AddService<SalesforceVerifyOrganizationIdFilter>(WebHookSecurityFilter.Order);
             }
         }
