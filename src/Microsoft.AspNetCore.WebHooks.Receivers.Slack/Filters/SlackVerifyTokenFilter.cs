@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -28,10 +27,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class SlackVerifyTokenFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
     {
-        // Serialize ModelState errors, especially top-level model binding issues, similarly to
-        // CreateErrorResult(..., message, ...).
-        private static readonly string ModelStateRootKey = WebHookErrorKeys.MessageKey;
-
         private readonly ModelMetadata _formCollectionMetadata;
         private readonly IModelBinder _formModelBinder;
 
@@ -114,7 +109,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.VerifyToken_MissingValue,
                     SlackConstants.TokenRequestFieldName);
-                context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                context.Result = new BadRequestObjectResult(message);
 
                 return;
             }
@@ -136,7 +131,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.VerifyToken_BadValue,
                     SlackConstants.TokenRequestFieldName);
-                context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                context.Result = new BadRequestObjectResult(message);
 
                 return;
             }
@@ -176,7 +171,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     SlackConstants.TriggerRequestFieldName,
                     SlackConstants.CommandRequestFieldName,
                     SlackConstants.TextRequestFieldName);
-                context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                context.Result = new BadRequestObjectResult(message);
 
                 return;
             }
@@ -249,7 +244,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 valueProvider,
                 _formCollectionMetadata,
                 bindingInfo: null,
-                modelName: ModelStateRootKey);
+                modelName: WebHookConstants.ModelStateBodyModelName);
 
             // Read request body.
             try

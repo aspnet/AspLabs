@@ -19,10 +19,8 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
     /// </summary>
     public class WebHookServiceCollectionSetup
     {
-        // ??? Does WebHookExceptionFilter need a non-default Order too?
         private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
         {
-                { typeof(WebHookExceptionFilter), 0 },
                 { typeof(WebHookGetResponseFilter), WebHookGetResponseFilter.Order },
                 { typeof(WebHookPingResponseFilter), WebHookPingResponseFilter.Order },
                 { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },

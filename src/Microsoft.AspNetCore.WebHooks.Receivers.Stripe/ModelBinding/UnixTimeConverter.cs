@@ -10,7 +10,8 @@ using Newtonsoft.Json.Converters;
 namespace Microsoft.AspNetCore.WebHooks.ModelBinding
 {
     /// <summary>
-    /// Converts a Unix time stamp to and from a <see cref="DateTime"/>.
+    /// Converts a Unix time stamp string or integer value to and from a <see cref="DateTime"/>. By default, the
+    /// <see cref="DateTime"/> gets serialized to an integer.
     /// </summary>
     public class UnixTimeConverter : DateTimeConverterBase
     {
@@ -18,8 +19,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
         private readonly bool _stringConverter;
 
         /// <summary>
-        /// Converts string or integer values to a <see cref="DateTime"/>. By default the
-        /// <see cref="DateTime"/> gets serialized to an integer.
+        /// Instantiates a new <see cref="UnixTimeConverter"/> instance.
         /// </summary>
         public UnixTimeConverter()
             : this(false)
@@ -27,8 +27,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
         }
 
         /// <summary>
-        /// Converts string values to a <see cref="DateTime"/>. By default the
-        /// <see cref="DateTime"/> gets serialized to an integer.
+        /// Instantiates a new <see cref="UnixTimeConverter"/> instance.
         /// </summary>
         /// <param name="stringConverter">
         /// When <see langword="true"/> only deserializes string values and serializes to a string value;

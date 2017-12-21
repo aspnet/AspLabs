@@ -131,9 +131,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             _logger.LogInformation(0, message);
 
-            // ??? Should we instead provide CreateErrorResult(...) overloads with `int statusCode` parameters?
-            var badMethod = WebHookResultUtilities.CreateErrorResult(message);
-            badMethod.StatusCode = StatusCodes.Status415UnsupportedMediaType;
+            var badMethod = new BadRequestObjectResult(message)
+            {
+                StatusCode = StatusCodes.Status415UnsupportedMediaType
+            };
 
             return badMethod;
         }

@@ -129,11 +129,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var expectedMessage = $"Expecting exactly one '{StripeConstants.SignatureHeaderName}' header field in " +
                 "the WebHook request but found 0. Please ensure the request contains exactly one " +
                 $"'{StripeConstants.SignatureHeaderName}' header field.";
-            var expectedResultValue = new SerializableError
-            {
-                { WebHookErrorKeys.MessageKey, expectedMessage },
-            };
-
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
 
@@ -143,7 +138,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Assert
             var result = Assert.IsType<BadRequestObjectResult>(context.Result);
             Assert.Equal(400, result.StatusCode);
-            Assert.Equal(expectedResultValue, result.Value);
+            Assert.Equal(expectedMessage, result.Value);
         }
 
         [Fact]
@@ -153,11 +148,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var expectedMessage = $"Expecting exactly one '{StripeConstants.SignatureHeaderName}' header field in " +
                 "the WebHook request but found 2. Please ensure the request contains exactly one " +
                 $"'{StripeConstants.SignatureHeaderName}' header field.";
-            var expectedResultValue = new SerializableError
-            {
-                { WebHookErrorKeys.MessageKey, expectedMessage },
-            };
-
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
             context.HttpContext.Request.Headers.Add(StripeConstants.SignatureHeaderName, "value1");
@@ -169,7 +159,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Assert
             var result = Assert.IsType<BadRequestObjectResult>(context.Result);
             Assert.Equal(400, result.StatusCode);
-            Assert.Equal(expectedResultValue, result.Value);
+            Assert.Equal(expectedMessage, result.Value);
         }
 
         [Theory]
@@ -222,11 +212,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Arrange
             var expectedMessage = $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. It must be " +
                 "a valid hex-encoded string.";
-            var expectedResultValue = new SerializableError
-            {
-                { WebHookErrorKeys.MessageKey, expectedMessage },
-            };
-
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
             var header = $"{StripeConstants.TimestampKey}={TestTimestamp}, " +
@@ -239,7 +224,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Assert
             var result = Assert.IsType<BadRequestObjectResult>(context.Result);
             Assert.Equal(400, result.StatusCode);
-            Assert.Equal(expectedResultValue, result.Value);
+            Assert.Equal(expectedMessage, result.Value);
         }
 
         [Fact]
@@ -249,11 +234,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var expectedMessage = $"The signature provided by the '{StripeConstants.SignatureHeaderName}' header " +
                 $"field does not match the value expected by the '{StripeConstants.ReceiverName}' WebHook receiver. " +
                 "WebHook request is invalid.";
-            var expectedResultValue = new SerializableError
-            {
-                { WebHookErrorKeys.MessageKey, expectedMessage },
-            };
-
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
             var header = $"{StripeConstants.TimestampKey}={TestTimestamp}, {ExtraHeaderContent}";
@@ -265,7 +245,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Assert
             var result = Assert.IsType<BadRequestObjectResult>(context.Result);
             Assert.Equal(400, result.StatusCode);
-            Assert.Equal(expectedResultValue, result.Value);
+            Assert.Equal(expectedMessage, result.Value);
         }
 
         [Fact]

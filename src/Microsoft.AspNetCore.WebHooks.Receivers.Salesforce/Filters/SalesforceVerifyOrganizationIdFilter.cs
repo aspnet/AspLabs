@@ -32,10 +32,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class SalesforceVerifyOrganizationIdFilter : WebHookVerifyBodyContentFilter, IAsyncResourceFilter
     {
-        // Serialize ModelState errors, especially top-level input formatter issues, similarly to
-        // CreateErrorResult(..., message, ...).
-        private static readonly string ModelStateRootKey = WebHookErrorKeys.MessageKey;
-
         private readonly IModelBinder _bodyModelBinder;
         private readonly ISalesforceResultCreator _resultCreator;
         private readonly ModelMetadata _xElementMetadata;
@@ -119,7 +115,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
                 else
                 {
-                    context.Result = WebHookResultUtilities.CreateErrorResult(modelState);
+                    context.Result = new BadRequestObjectResult(modelState);
                 }
 
                 return;
@@ -248,7 +244,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 valueProvider,
                 _xElementMetadata,
                 bindingInfo: null,
-                modelName: ModelStateRootKey);
+                modelName: WebHookConstants.ModelStateBodyModelName);
 
             // Read request body.
             try

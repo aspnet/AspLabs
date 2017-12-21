@@ -148,12 +148,12 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
             if (requestMetadata.BodyType == WebHookBodyType.Form)
             {
-                bindingInfo.BinderModelName = WebHookErrorKeys.MessageKey;
+                bindingInfo.BinderModelName = WebHookConstants.ModelStateBodyModelName;
                 bindingInfo.BindingSource = BindingSource.Form;
                 return;
             }
 
-            bindingInfo.BinderModelName = WebHookErrorKeys.MessageKey;
+            bindingInfo.BinderModelName = WebHookConstants.ModelStateBodyModelName;
             bindingInfo.BindingSource = BindingSource.Body;
         }
 

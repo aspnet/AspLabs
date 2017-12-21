@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -148,7 +147,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     Resources.Security_NoHttps,
                     receiverName,
                     Uri.UriSchemeHttps);
-                var noHttps = WebHookResultUtilities.CreateErrorResult(message);
+                var noHttps = new BadRequestObjectResult(message);
 
                 return noHttps;
             }

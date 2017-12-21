@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         GitHubConstants.SignatureHeaderName,
                         GitHubConstants.SignatureHeaderKey,
                         "<value>");
-                    errorResult = WebHookResultUtilities.CreateErrorResult(message);
+                    errorResult = new BadRequestObjectResult(message);
 
                     context.Result = errorResult;
                     return;

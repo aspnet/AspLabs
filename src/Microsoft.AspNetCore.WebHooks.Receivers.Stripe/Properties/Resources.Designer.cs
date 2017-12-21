@@ -61,6 +61,24 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot read value &apos;{0}&apos; as type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DateTime_BadFormat {
+            get {
+                return ResourceManager.GetString("DateTime_BadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot convert null value to type &apos;{0}&apos;..
+        /// </summary>
+        internal static string DateTime_NullError {
+            get {
+                return ResourceManager.GetString("DateTime_NullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; header value is invalid. It must contain timestamp (&apos;{1}&apos;) and signature (&apos;{2}&apos;) values..
         /// </summary>
         internal static string SignatureFilter_HeaderMissingValue {

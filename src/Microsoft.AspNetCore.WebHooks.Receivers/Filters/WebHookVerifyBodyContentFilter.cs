@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     Resources.VerifySignature_BadHeader,
                     headerName,
                     headersCount);
-                errorResult = WebHookResultUtilities.CreateErrorResult(message);
+                errorResult = new BadRequestObjectResult(message);
 
                 return null;
             }
@@ -290,7 +290,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 CultureInfo.CurrentCulture,
                 Resources.Security_BadHeaderEncoding,
                 signatureHeaderName);
-            errorResult = WebHookResultUtilities.CreateErrorResult(message);
+            errorResult = new BadRequestObjectResult(message);
 
             return null;
         }
@@ -320,7 +320,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 Resources.VerifySignature_BadSignature,
                 signatureHeaderName,
                 receiverName);
-            var badSignature = WebHookResultUtilities.CreateErrorResult(message);
+            var badSignature = new BadRequestObjectResult(message);
 
             return badSignature;
         }

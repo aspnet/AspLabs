@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
@@ -102,9 +101,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 methodName,
                 receiverName);
 
-            // ??? Should we instead provide CreateErrorResult(...) overloads with `int statusCode` parameters?
-            var badMethod = WebHookResultUtilities.CreateErrorResult(message);
-            badMethod.StatusCode = StatusCodes.Status405MethodNotAllowed;
+            var badMethod = new BadRequestObjectResult(message)
+            {
+                StatusCode = StatusCodes.Status405MethodNotAllowed
+            };
 
             return badMethod;
         }

@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -135,7 +134,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.General_MissingQueryParameter,
                     WebHookConstants.CodeQueryParameterName);
-                var noCode = WebHookResultUtilities.CreateErrorResult(message);
+                var noCode = new BadRequestObjectResult(message);
 
                 return noCode;
             }
@@ -162,7 +161,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.VerifyCode_BadCode,
                     WebHookConstants.CodeQueryParameterName);
-                var invalidCode = WebHookResultUtilities.CreateErrorResult(message);
+                var invalidCode = new BadRequestObjectResult(message);
 
                 return invalidCode;
             }

@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -142,7 +141,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.General_MissingQueryParameter,
                     getMetadata.ChallengeQueryParameterName);
-                var noChallenge = WebHookResultUtilities.CreateErrorResult(message);
+                var noChallenge = new BadRequestObjectResult(message);
 
                 return noChallenge;
             }

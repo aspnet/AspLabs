@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DateTime_BadFormat" xml:space="preserve">
-    <value>Cannot read value '{0}' as type '{1}'.</value>
-  </data>
-  <data name="DateTime_NullError" xml:space="preserve">
-    <value>Cannot convert null value to type '{0}'.</value>
-  </data>
   <data name="EncodingUtils_InvalidHexValue" xml:space="preserve">
     <value>Input is not a valid hex-encoded string: '{0}'. Please provide a valid hex-encoded string.</value>
   </data>
@@ -146,9 +140,6 @@
   </data>
   <data name="MetadataProvider_WrongInterface" xml:space="preserve">
     <value>Invalid metadata services found. Metadata services implementing '{0}' must implement '{1}'.</value>
-  </data>
-  <data name="ResultUtilities_GenericError" xml:space="preserve">
-    <value>An error has occurred.</value>
   </data>
   <data name="RoutingConvention_MixedRouteWithWebHookAttribute" xml:space="preserve">
     <value>{0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template.</value>

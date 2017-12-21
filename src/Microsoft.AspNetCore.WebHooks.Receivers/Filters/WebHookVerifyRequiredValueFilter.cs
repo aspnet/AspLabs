@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     if (!found)
                     {
                         // Do not return after first error. Instead log about all issues.
-                        context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                        context.Result = new BadRequestObjectResult(message);
                     }
                 }
             }

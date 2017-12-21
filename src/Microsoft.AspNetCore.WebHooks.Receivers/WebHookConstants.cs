@@ -58,6 +58,13 @@ namespace Microsoft.AspNetCore.WebHooks
             "DisableHttpsCheck");
 
         /// <summary>
+        /// Gets the model name for the root of body-bound objects. Places errors for <c>data</c> parameters in
+        /// consistent <see cref="Mvc.ModelBinding.ModelStateDictionary"/> entries, separate from entries for (for
+        /// example) parameters bound to route values.
+        /// </summary>
+        public static string ModelStateBodyModelName => "$body";
+
+        /// <summary>
         /// Gets the key of the <see cref="IConfigurationSection"/> containing all configuration values used in this
         /// package. Immediate children include global configuration values and receiver-specific
         /// <see cref="IConfigurationSection"/>s.

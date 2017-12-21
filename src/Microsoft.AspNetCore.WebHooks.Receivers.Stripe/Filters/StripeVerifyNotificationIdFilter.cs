@@ -27,10 +27,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class StripeVerifyNotificationIdFilter : IAsyncResourceFilter, IWebHookReceiver
     {
-        // Serialize ModelState errors, especially top-level model binding issues, similarly to
-        // CreateErrorResult(..., message, ...).
-        private static readonly string ModelStateRootKey = WebHookErrorKeys.MessageKey;
-
         private readonly IModelBinder _bodyModelBinder;
         private readonly ILogger _logger;
         private readonly ModelMetadata _jObjectMetadata;
@@ -112,7 +108,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
                 else
                 {
-                    context.Result = WebHookResultUtilities.CreateErrorResult(modelState);
+                    context.Result = new BadRequestObjectResult(modelState);
                 }
 
                 return;
@@ -131,7 +127,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.VerifyNotification_MissingValue,
                     StripeConstants.NotificationIdPropertyName);
-                context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                context.Result = new BadRequestObjectResult(message);
 
                 return;
             }
@@ -149,7 +145,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     CultureInfo.CurrentCulture,
                     Resources.VerifyNotification_MissingValue,
                     StripeConstants.EventPropertyName);
-                context.Result = WebHookResultUtilities.CreateErrorResult(message);
+                context.Result = new BadRequestObjectResult(message);
 
                 return;
             }
@@ -201,7 +197,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 valueProvider,
                 _jObjectMetadata,
                 bindingInfo: null,
-                modelName: ModelStateRootKey);
+                modelName: WebHookConstants.ModelStateBodyModelName);
 
             // Read request body.
             try

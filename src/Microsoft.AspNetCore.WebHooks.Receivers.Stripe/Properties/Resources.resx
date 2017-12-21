@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DateTime_BadFormat" xml:space="preserve">
+    <value>Cannot read value '{0}' as type '{1}'.</value>
+  </data>
+  <data name="DateTime_NullError" xml:space="preserve">
+    <value>Cannot convert null value to type '{0}'.</value>
+  </data>
   <data name="SignatureFilter_HeaderMissingValue" xml:space="preserve">
     <value>The '{0}' header value is invalid. It must contain timestamp ('{1}') and signature ('{2}') values.</value>
   </data>
