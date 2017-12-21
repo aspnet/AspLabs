@@ -103,7 +103,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </remarks>
         protected ILogger Logger { get; }
 
-        // ??? Why is this called so rarely? See Dropbox, GitHub and Pusher filters and corresponding old receivers.
         /// <summary>
         /// Some WebHooks rely on HTTPS for sending WebHook requests in a secure manner. A
         /// <see cref="WebHookSecurityFilter"/> subclass can call this method to ensure that the incoming WebHook

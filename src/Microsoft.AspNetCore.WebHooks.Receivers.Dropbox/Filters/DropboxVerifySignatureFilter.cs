@@ -62,8 +62,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 IsApplicable(receiverName) &&
                 HttpMethods.IsPost(request.Method))
             {
-                // 1. Get the expected hash from the signature header.
-                var header = GetRequestHeader(request, DropboxConstants.SignatureHeaderName, out var errorResult);
+                // 1. Confirm a secure connection.
+                var errorResult = EnsureSecureConnection(ReceiverName, context.HttpContext.Request);
+                if (errorResult != null)
+                {
+                    context.Result = errorResult;
+                    return;
+                }
+
+                // 2. Get the expected hash from the signature header.
+                var header = GetRequestHeader(request, DropboxConstants.SignatureHeaderName, out errorResult);
                 if (errorResult != null)
                 {
                     context.Result = errorResult;
@@ -77,7 +85,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     return;
                 }
 
-                // 2. Get the configured secret key.
+                // 3. Get the configured secret key.
                 var secretKey = GetSecretKey(
                     ReceiverName,
                     routeData,
@@ -91,10 +99,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
                 var secret = Encoding.UTF8.GetBytes(secretKey);
 
-                // 3. Get the actual hash of the request body.
+                // 4. Get the actual hash of the request body.
                 var actualHash = await GetRequestBodyHash_SHA256(request, secret);
 
-                // 4. Verify that the actual hash matches the expected hash.
+                // 5. Verify that the actual hash matches the expected hash.
                 if (!SecretEqual(expectedHash, actualHash))
                 {
                     // Log about the issue and short-circuit remainder of the pipeline.
