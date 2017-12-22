@@ -10,20 +10,34 @@ namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// <para>
-    /// An <see cref="Attribute"/> indicating the associated action is a WebHook endpoint for all enabled
-    /// receivers. Specifies the expected <see cref="BodyType"/>, optional <see cref="EventName"/>, and optional
-    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for
-    /// the action.
+    /// An <see cref="Attribute"/> indicating the associated action is a WebHook endpoint for all enabled receivers.
+    /// Specifies the expected <see cref="BodyType"/>, optional <see cref="EventName"/>, and optional
+    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
+    /// action.
     /// </para>
-    /// <para>The signature of the action should be:
+    /// <para>
+    /// The signature of the action should be:
     /// <code>
     /// Task{IActionResult} ActionName(string receiverName, string id, string[] events, TData data)
     /// </code>
     /// or the subset of parameters required. <c>TData</c> must be compatible with expected requests.
     /// </para>
+    /// <para>
+    /// An example WebHook URI is '<c>https://{host}/api/webhooks/incoming/{receiver name}/{id}</c>' or
+    /// '<c>https://{host}/api/webhooks/incoming/{receiver name}/{id}?code=94c0c780e49a5c72972590571fd8</c>'.
+    /// </para>
     /// </summary>
     /// <remarks>
-    /// This attribute should usually be used at most once in a WebHook application.
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// <see cref="GeneralWebHookAttribute"/> should be used at most once per <see cref="WebHookAttribute.Id"/> and
+    /// <see cref="EventName"/> in a WebHook application.
+    /// </para>
     /// </remarks>
     public class GeneralWebHookAttribute : WebHookAttribute, IWebHookBodyTypeMetadata, IWebHookEventSelectorMetadata
     {

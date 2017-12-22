@@ -14,7 +14,17 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class MailChimpMvcBuilderExtensions
     {
         /// <summary>
-        /// Add MailChimp WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// <para>
+        /// Add MailChimp WebHook configuration and services to the specified <paramref name="builder"/>. See
+        /// <see href="https://developer.mailchimp.com/documentation/mailchimp/guides/about-webhooks/"/> for additional
+        /// details about MailChimp WebHook requests.
+        /// </para>
+        /// <para>
+        /// The '<c>WebHooks:MailChimp:SecretKey:default</c>' configuration value contains the secret key for MailChimp
+        /// WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/mailchimp?code={secret key}</c>'.
+        /// '<c>WebHooks:MailChimp:SecretKey:{id}</c>' configuration values contain secret keys for MailChimp WebHook
+        /// URIs of the form '<c>https://{host}/api/webhooks/incoming/mailchimp/{id}?code={secret key}</c>'.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="IMvcBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>

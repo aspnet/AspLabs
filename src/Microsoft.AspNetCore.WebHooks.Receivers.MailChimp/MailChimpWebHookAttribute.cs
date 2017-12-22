@@ -10,27 +10,37 @@ namespace Microsoft.AspNetCore.WebHooks
     /// for the action.
     /// </para>
     /// <para>
+    /// The signature of the action should be:
+    /// <code>
+    /// Task{IActionResult} ActionName(string id, string @event, TData data)
+    /// </code>
+    /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
+    /// <see cref="Http.IFormCollection"/>.
+    /// </para>
+    /// <para>
     /// An example MailChimp WebHook URI is
-    /// '<c>https://&lt;host&gt;/api/webhooks/incoming/mailchimp/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
-    /// See <see href="http://developer.mailchimp.com/documentation/mailchimp/guides/about-webhooks/"/> for additional
+    /// '<c>https://{host}/api/webhooks/incoming/mailchimp/{id}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
+    /// See <see href="https://developer.mailchimp.com/documentation/mailchimp/guides/about-webhooks/"/> for additional
     /// details about MailChimp WebHook requests.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// <see cref="MailChimpWebHookAttribute"/> should be used at most once per <see cref="WebHookAttribute.Id"/> in a
+    /// WebHook application.
+    /// </para>
+    /// </remarks>
     public class MailChimpWebHookAttribute : WebHookAttribute
     {
         /// <summary>
-        /// <para>
         /// Instantiates a new <see cref="MailChimpWebHookAttribute"/> indicating the associated action is a MailChimp
         /// WebHook endpoint.
-        /// </para>
-        /// <para>The signature of the action should be:
-        /// <code>
-        /// Task{IActionResult} ActionName(string id, TData data)
-        /// </code>
-        /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
-        /// <see cref="Http.IFormCollection"/>.
-        /// </para>
-        /// <para>This constructor should usually be used at most once in a WebHook application.</para>
         /// </summary>
         public MailChimpWebHookAttribute()
             : base(MailChimpConstants.ReceiverName)

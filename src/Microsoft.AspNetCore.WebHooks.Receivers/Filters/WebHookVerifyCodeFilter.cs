@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// For WebHook providers with insufficient security considerations, the receiver can require that the WebHook
         /// URI must be an <c>https</c> URI and contain a 'code' query parameter with a value configured for that
         /// particular <c>id</c>. A sample WebHook URI is
-        /// '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
+        /// '<c>https://{host}/api/webhooks/incoming/{receiver name}?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
         /// The 'code' parameter must be between 32 and 128 characters long.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequest"/>.</param>

@@ -14,7 +14,17 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class PusherMvcBuilderExtensions
     {
         /// <summary>
-        /// Add Pusher WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// <para>
+        /// Add Pusher WebHook configuration and services to the specified <paramref name="builder"/>. See
+        /// <see href="https://pusher.com/docs/webhooks"/> for additional details about Pusher WebHook requests.
+        /// </para>
+        /// <para>
+        /// '<c>WebHooks:Pusher:SecretKey:default:{application key}</c>' configuration values contain secret keys for
+        /// Pusher WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/pusher</c>'.
+        /// '<c>WebHooks:Pusher:SecretKey:{id}:{application key}</c>' configuration values contain secret keys for
+        /// Pusher WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/pusher/{id}</c>'. Users optionally
+        /// provide <c>{id}</c> values while Pusher defines the <c>{application key}</c> / secret key pairs.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="IMvcBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>

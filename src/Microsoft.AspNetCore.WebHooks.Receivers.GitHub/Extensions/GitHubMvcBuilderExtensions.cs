@@ -14,7 +14,16 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class GitHubMvcBuilderExtensions
     {
         /// <summary>
-        /// Add GitHub WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// <para>
+        /// Add GitHub WebHook configuration and services to the specified <paramref name="builder"/>. See
+        /// <see href="https://developer.github.com/webhooks/"/> for additional details about GitHub WebHook requests.
+        /// </para>
+        /// <para>
+        /// The '<c>WebHooks:GitHub:SecretKey:default</c>' configuration value contains the secret key for GitHub
+        /// WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/github</c>'.
+        /// '<c>WebHooks:GitHub:SecretKey:{id}</c>' configuration values contain secret keys for GitHub WebHook URIs of
+        /// the form '<c>https://{host}/api/webhooks/incoming/github/{id}</c>'.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="IMvcBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>

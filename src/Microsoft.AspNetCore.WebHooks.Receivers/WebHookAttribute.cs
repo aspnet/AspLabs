@@ -15,6 +15,18 @@ namespace Microsoft.AspNetCore.WebHooks
     /// required (in most cases) <see cref="ReceiverName"/> and optional <see cref="Id"/>. Also adds a
     /// <see cref="WebHookReceiverExistsFilter"/> for the action.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// Subclasses of <see cref="WebHookAttribute"/> should be used at most once per <see cref="ReceiverName"/> and
+    /// <see cref="Id"/> in a WebHook application. Some subclasses support additional uniqueness constraints.
+    /// </para>
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public abstract class WebHookAttribute : Attribute, IAllowAnonymous, IFilterFactory
     {
@@ -24,23 +36,9 @@ namespace Microsoft.AspNetCore.WebHooks
         {
         }
 
-        // TODO: Move attribute constructors' comments, especially the recommended action signatures, to class level.
-        // TODO:  Do the same for all subclasses. As-is important information is hard to find.
         /// <summary>
-        /// <para>
-        /// Instantiates a new <see cref="WebHookAttribute"/> indicating the associated action is a WebHook
-        /// endpoint for the given <paramref name="receiverName"/>.
-        /// </para>
-        /// <para>The signature of the action should be:
-        /// <code>
-        /// Task{IActionResult} ActionName(string id, string[] events, TData data)
-        /// </code>
-        /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests.
-        /// </para>
-        /// <para>
-        /// This constructor should usually be used at most once per <paramref name="receiverName"/> name in a WebHook
-        /// application.
-        /// </para>
+        /// Instantiates a new <see cref="WebHookAttribute"/> indicating the associated action is a WebHook endpoint
+        /// for the given <paramref name="receiverName"/>.
         /// </summary>
         /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>
         protected WebHookAttribute(string receiverName)

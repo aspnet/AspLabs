@@ -13,10 +13,11 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <para>
     /// An <see cref="Attribute"/> indicating the associated action is a Slack WebHook endpoint. Specifies the optional
     /// <see cref="WebHookAttribute.Id"/>.  Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
-    /// action and delegates its <see cref="IResultFilter"/> implementation to a <see cref="ProducesAttribute"/>,
-    /// indicating the action produces JSON-formatted responses.
+    /// action and delegates its <see cref="IResultFilter"/> <see cref="IApiResponseMetadataProvider"/> implementations
+    /// to a <see cref="ProducesAttribute"/>, indicating the action produces JSON-formatted responses.
     /// </para>
-    /// <para>The signature of the action should be:
+    /// <para>
+    /// The signature of the action should be:
     /// <code>
     /// Task{TResult} ActionName(string id, string @event, string subtext, TData data)
     /// </code>
@@ -25,24 +26,34 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <see cref="SlackSlashResponse"/>, or an <see cref="IActionResult"/> implementation.
     /// </para>
     /// <para>
-    /// The '<c>MS_WebHookReceiverSecret_Slack</c>' configuration value contains Slack shared-private security tokens.
-    /// </para>
-    /// <para>
-    /// An example Slack WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/slack/{id}</c>'.
+    /// An example Slack WebHook URI is '<c>https://{host}/api/webhooks/incoming/slack/{id}</c>'.
     /// See <see href="https://api.slack.com/custom-integrations/outgoing-webhooks"/> for additional details about
     /// Slack WebHook requests.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// <see cref="SlackWebHookAttribute"/> should be used at most once per <see cref="WebHookAttribute.Id"/> in a
+    /// WebHook application.
+    /// </para>
+    /// <para>
+    /// Implements <see cref="IApiResponseMetadataProvider"/> to provide information to a <see cref="FormatFilter"/>.
+    /// Implements <see cref="IResultFilter"/> for the odd case where no <see cref="FormatFilter"/> applies.
+    /// </para>
+    /// </remarks>
     public class SlackWebHookAttribute : WebHookAttribute, IResultFilter, IApiResponseMetadataProvider
     {
         private static readonly ProducesAttribute Produces = new ProducesAttribute("application/json");
 
         /// <summary>
-        /// <para>
-        /// Instantiates a new <see cref="SlackWebHookAttribute"/> indicating the associated action is a
-        /// Slack WebHook endpoint.
-        /// </para>
-        /// <para>This constructor should usually be used at most once in a WebHook application.</para>
+        /// Instantiates a new <see cref="SlackWebHookAttribute"/> indicating the associated action is a Slack WebHook
+        /// endpoint.
         /// </summary>
         public SlackWebHookAttribute()
             : base(SlackConstants.ReceiverName)

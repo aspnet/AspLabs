@@ -24,14 +24,23 @@ namespace Microsoft.AspNetCore.WebHooks
     /// WebHook requests.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// <see cref="SalesforceWebHookAttribute"/> should be used at most once per <see cref="WebHookAttribute.Id"/> in a
+    /// WebHook application.
+    /// </para>
+    /// </remarks>
     public class SalesforceWebHookAttribute : WebHookAttribute
     {
         /// <summary>
-        /// <para>
         /// Instantiates a new <see cref="SalesforceWebHookAttribute"/> indicating the associated action is a
         /// Salesforce WebHook endpoint.
-        /// </para>
-        /// <para>This constructor should usually be used at most once in a WebHook application.</para>
         /// </summary>
         public SalesforceWebHookAttribute()
             : base(SalesforceConstants.ReceiverName)

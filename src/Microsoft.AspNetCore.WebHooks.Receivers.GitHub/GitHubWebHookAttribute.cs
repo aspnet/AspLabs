@@ -10,32 +10,41 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <summary>
     /// <para>
     /// An <see cref="Attribute"/> indicating the associated action is a GitHub WebHook endpoint. Specifies whether
-    /// the action <see cref="AcceptFormData"/>, optional <see cref="EventName"/>, and optional
-    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for
-    /// the action.
+    /// the action should <see cref="AcceptFormData"/>, optional <see cref="EventName"/>, and optional
+    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
+    /// action.
     /// </para>
     /// <para>
-    /// An example GitHub WebHook URI is
-    /// '<c>https://&lt;host&gt;/api/webhooks/incoming/github/{id}</c>'. See
+    /// The signature of the action should be:
+    /// <code>
+    /// Task{IActionResult} ActionName(string id, string @event, TData data)
+    /// </code>
+    /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests.
+    /// </para>
+    /// <para>
+    /// An example GitHub WebHook URI is '<c>https://{host}/api/webhooks/incoming/github/{id}</c>'. See
     /// <see href="https://developer.github.com/webhooks/"/> for additional details about GitHub WebHook requests.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the application enables CORS in general (see the <c>Microsoft.AspNetCore.Cors</c> package), apply
+    /// <c>DisableCorsAttribute</c> to this action. If the application depends on the
+    /// <c>Microsoft.AspNetCore.Mvc.ViewFeatures</c> package, apply <c>IgnoreAntiforgeryTokenAttribute</c> to this
+    /// action.
+    /// </para>
+    /// <para>
+    /// <see cref="GitHubWebHookAttribute"/> should be used at most once per <see cref="WebHookAttribute.Id"/> and
+    /// <see cref="EventName"/> in a WebHook application.
+    /// </para>
+    /// </remarks>
     public class GitHubWebHookAttribute : WebHookAttribute, IWebHookBodyTypeMetadata, IWebHookEventSelectorMetadata
     {
         private string _eventName;
 
         /// <summary>
-        /// <para>
         /// Instantiates a new <see cref="GitHubWebHookAttribute"/> indicating the associated action is a GitHub
         /// WebHook endpoint.
-        /// </para>
-        /// <para>The signature of the action should be:
-        /// <code>
-        /// Task{IActionResult} ActionName(string id, string @event, TData data)
-        /// </code>
-        /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests.
-        /// </para>
-        /// <para>This constructor should usually be used at most once in a WebHook application.</para>
         /// </summary>
         public GitHubWebHookAttribute()
             : base(GitHubConstants.ReceiverName)

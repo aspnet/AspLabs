@@ -14,7 +14,17 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class BitbucketMvcCoreBuilderExtensions
     {
         /// <summary>
-        /// Add Bitbucket WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// <para>
+        /// Add Bitbucket WebHook configuration and services to the specified <paramref name="builder"/>. See
+        /// <see href="https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html"/> for additional
+        /// details about Bitbucket WebHook requests.
+        /// </para>
+        /// <para>
+        /// The '<c>WebHooks:Bitbucket:SecretKey:default</c>' configuration value contains the secret key for Bitbucket
+        /// WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/bitbucket?code={secret key}</c>'.
+        /// '<c>WebHooks:Bitbucket:SecretKey:{id}</c>' configuration values contain secret keys for Bitbucket WebHook
+        /// URIs of the form '<c>https://{host}/api/webhooks/incoming/bitbucket/{id}?code={secret key}</c>'.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>

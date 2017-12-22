@@ -14,7 +14,18 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class AzureAlertMvcCoreBuilderExtensions
     {
         /// <summary>
-        /// Add Azure Alert WebHook configuration and services to the specified <paramref name="builder"/>.
+        /// <para>
+        /// Add Azure Alert WebHook configuration and services to the specified <paramref name="builder"/>. See
+        /// <see href="https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/insights-webhooks-alerts"/>
+        /// for additional details about Azure Alert WebHook requests.
+        /// </para>
+        /// <para>
+        /// The '<c>WebHooks:AzureAlert:SecretKey:default</c>' configuration value contains the secret key for Azure
+        /// Alert WebHook URIs of the form '<c>https://{host}/api/webhooks/incoming/azurealert?code={secret key}</c>'.
+        /// '<c>WebHooks:AzureAlert:SecretKey:{id}</c>' configuration values contain secret keys for
+        /// Azure Alert WebHook URIs of the form
+        /// '<c>https://{host}/api/webhooks/incoming/azurealert/{id}?code={secret key}</c>'.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to configure.</param>
         /// <returns>The <paramref name="builder"/>.</returns>

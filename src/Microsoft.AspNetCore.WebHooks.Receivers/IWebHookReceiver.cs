@@ -17,10 +17,10 @@ namespace Microsoft.AspNetCore.WebHooks
         /// </para>
         /// <para>
         /// The name provided here will map to a URI of the form
-        /// '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;name&gt;</c>'.
+        /// '<c>https://{host}/api/webhooks/incoming/{ReceiverName}</c>'.
         /// </para>
         /// </summary>
-        /// <value>Must not return an empty string.</value>
+        /// <value>Should not return an empty string.</value>
         string ReceiverName { get; }
 
         /// <summary>
