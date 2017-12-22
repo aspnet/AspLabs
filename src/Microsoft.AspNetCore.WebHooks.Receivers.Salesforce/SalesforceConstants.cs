@@ -9,10 +9,17 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class SalesforceConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a Salesforce WebHook request body containing a value somewhat
-        /// analogous to an event name.
+        /// Gets the XPath of the element in a Salesforce WebHook request body containing the event name.
         /// </summary>
-        public static string EventRequestPropertyName => "status";
+        public static string EventNamePath =>
+            "/*[local-name()='Body']/*[local-name()='notifications']/*[local-name()='ActionId']";
+
+        /// <summary>
+        /// Gets the XPath of the element in an Salesforce WebHook request body containing the Salesforce organization
+        /// identifier.
+        /// </summary>
+        public static string OrganizationIdPath =>
+            "/*[local-name()='Body']/*[local-name()='notifications']/*[local-name()='OrganizationId']";
 
         /// <summary>
         /// Gets the name of the Salesforce WebHook receiver.

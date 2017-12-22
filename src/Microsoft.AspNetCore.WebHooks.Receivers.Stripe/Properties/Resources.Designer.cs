@@ -97,38 +97,11 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to retrieve &apos;{0}&apos; request data from &apos;{1}.{2}&apos;..
-        /// </summary>
-        internal static string TestEvent_MissingItem {
-            get {
-                return ResourceManager.GetString("TestEvent_MissingItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The notification identifier &apos;{0}&apos; could not be resolved for an actual event..
-        /// </summary>
-        internal static string VerifyNotification_BadId {
-            get {
-                return ResourceManager.GetString("VerifyNotification_BadId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property..
         /// </summary>
         internal static string VerifyNotification_MissingValue {
             get {
                 return ResourceManager.GetString("VerifyNotification_MissingValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The MVC model binding system failed. Model state is valid but model was not set..
-        /// </summary>
-        internal static string VerifyNotification_ModelBindingFailed {
-            get {
-                return ResourceManager.GetString("VerifyNotification_ModelBindingFailed", resourceCulture);
             }
         }
     }

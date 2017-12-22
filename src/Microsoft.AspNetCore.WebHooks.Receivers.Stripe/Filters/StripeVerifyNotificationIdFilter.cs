@@ -3,19 +3,12 @@
 
 using System;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
@@ -27,29 +20,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class StripeVerifyNotificationIdFilter : IAsyncResourceFilter, IWebHookReceiver
     {
-        private readonly IModelBinder _bodyModelBinder;
         private readonly ILogger _logger;
-        private readonly ModelMetadata _jObjectMetadata;
+        private readonly IWebHookRequestReader _requestReader;
 
         /// <summary>
         /// Instantiates a new <see cref="StripeVerifyNotificationIdFilter"/> instance.
         /// </summary>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// /// <param name="metadataProvider">The <see cref="IModelMetadataProvider"/>.</param>
-        /// <param name="optionsAccessor">
-        /// The <see cref="IOptions{MvcOptions}"/> accessor for <see cref="MvcOptions"/>.
-        /// </param>
-        /// <param name="readerFactory">The <see cref="IHttpRequestStreamReaderFactory"/>.</param>
-        public StripeVerifyNotificationIdFilter(
-            ILoggerFactory loggerFactory,
-            IModelMetadataProvider metadataProvider,
-            IOptions<MvcOptions> optionsAccessor,
-            IHttpRequestStreamReaderFactory readerFactory)
+        /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
+        public StripeVerifyNotificationIdFilter(ILoggerFactory loggerFactory, IWebHookRequestReader requestReader)
         {
-            var options = optionsAccessor.Value;
-            _bodyModelBinder = new BodyModelBinder(options.InputFormatters, readerFactory, loggerFactory, options);
             _logger = loggerFactory.CreateLogger<StripeVerifyNotificationIdFilter>();
-            _jObjectMetadata = metadataProvider.GetMetadataForType(typeof(JObject));
+            _requestReader = requestReader;
         }
 
         /// <summary>
@@ -96,13 +78,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // 2. Get JObject from the request body.
-            var data = await ReadAsJsonAsync(context);
+            var data = await _requestReader.ReadBodyAsync<JObject>(context);
             if (data == null)
             {
                 var modelState = context.ModelState;
                 if (modelState.IsValid)
                 {
-                    // ReadAsJsonAsync returns null when model state is valid only when other filters will log and
+                    // ReadAsJObjectAsync returns null when model state is valid only when other filters will log and
                     // return errors about the same conditions. Let those filters run.
                     await next();
                 }
@@ -155,71 +137,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             routeData.Values[StripeConstants.NotificationIdKeyName] = notificationId;
 
             await next();
-        }
-
-        /// <summary>
-        /// Reads the JSON HTTP request entity body.
-        /// </summary>
-        /// <param name="context">The <see cref="ResourceExecutingContext"/>.</param>
-        /// <returns>
-        /// A <see cref="Task"/> that on completion provides a <see cref="JObject"/> containing the HTTP request entity
-        /// body.
-        /// </returns>
-        protected virtual async Task<JObject> ReadAsJsonAsync(ResourceExecutingContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var request = context.HttpContext.Request;
-            if (request.Body == null ||
-                !request.ContentLength.HasValue ||
-                request.ContentLength.Value == 0L ||
-                !HttpMethods.IsPost(request.Method))
-            {
-                // Other filters will log and return errors about these conditions.
-                return null;
-            }
-
-            var modelState = context.ModelState;
-            var actionContext = new ActionContext(
-                context.HttpContext,
-                context.RouteData,
-                context.ActionDescriptor,
-                modelState);
-
-            var valueProviderFactories = context.ValueProviderFactories;
-            var valueProvider = await CompositeValueProvider.CreateAsync(actionContext, valueProviderFactories);
-            var bindingContext = DefaultModelBindingContext.CreateBindingContext(
-                actionContext,
-                valueProvider,
-                _jObjectMetadata,
-                bindingInfo: null,
-                modelName: WebHookConstants.ModelStateBodyModelName);
-
-            // Read request body.
-            try
-            {
-                await _bodyModelBinder.BindModelAsync(bindingContext);
-            }
-            finally
-            {
-                request.Body.Seek(0L, SeekOrigin.Begin);
-            }
-
-            if (!bindingContext.ModelState.IsValid)
-            {
-                return null;
-            }
-
-            if (!bindingContext.Result.IsModelSet)
-            {
-                throw new InvalidOperationException(Resources.VerifyNotification_ModelBindingFailed);
-            }
-
-            // Success
-            return (JObject)bindingContext.Result.Model;
         }
     }
 }

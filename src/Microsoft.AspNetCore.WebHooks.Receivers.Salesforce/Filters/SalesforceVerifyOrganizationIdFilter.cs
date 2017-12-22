@@ -3,22 +3,17 @@
 
 using System;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
@@ -32,9 +27,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class SalesforceVerifyOrganizationIdFilter : WebHookSecurityFilter, IAsyncResourceFilter, IWebHookReceiver
     {
-        private readonly IModelBinder _bodyModelBinder;
         private readonly ISalesforceResultCreator _resultCreator;
-        private readonly ModelMetadata _xElementMetadata;
+        private readonly IWebHookRequestReader _requestReader;
 
         /// <summary>
         /// Instantiates a new <see cref="SalesforceVerifyOrganizationIdFilter"/> instance.
@@ -49,26 +43,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// /// <param name="metadataProvider">The <see cref="IModelMetadataProvider"/>.</param>
-        /// <param name="optionsAccessor">
-        /// The <see cref="IOptions{MvcOptions}"/> accessor for <see cref="MvcOptions"/>.
-        /// </param>
-        /// <param name="readerFactory">The <see cref="IHttpRequestStreamReaderFactory"/>.</param>
         /// <param name="resultCreator">The <see cref="ISalesforceResultCreator"/>.</param>
+        /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
         public SalesforceVerifyOrganizationIdFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
-            IModelMetadataProvider metadataProvider,
-            IOptions<MvcOptions> optionsAccessor,
-            IHttpRequestStreamReaderFactory readerFactory,
-            ISalesforceResultCreator resultCreator)
+            ISalesforceResultCreator resultCreator,
+            IWebHookRequestReader requestReader)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            var options = optionsAccessor.Value;
-            _bodyModelBinder = new BodyModelBinder(options.InputFormatters, readerFactory, loggerFactory, options);
             _resultCreator = resultCreator;
-            _xElementMetadata = metadataProvider.GetMetadataForType(typeof(XElement));
+            _requestReader = requestReader;
         }
 
         /// <inheritdoc />
@@ -97,6 +83,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
+            // 1. Confirm this filter applies.
             var routeData = context.RouteData;
             if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
@@ -104,7 +91,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 1. Confirm we were reached using HTTPS.
+            // 2. Confirm we were reached using HTTPS.
             var request = context.HttpContext.Request;
             var errorResult = EnsureSecureConnection(receiverName, request);
             if (errorResult != null)
@@ -113,8 +100,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 2. Get XElement and SalesforceNotifications from the request body.
-            var data = await ReadAsXmlAsync(context);
+            // 3. Get XElement from the request body.
+            var data = await _requestReader.ReadBodyAsync<XElement>(context);
             if (data == null)
             {
                 var modelState = context.ModelState;
@@ -132,22 +119,19 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // Got a valid XML body. From this point on, all responses should contain XML.
-            var notifications = new SalesforceNotifications(data);
-
-            // 3. Ensure that the organization ID exists and matches the expected value.
-            var organizationId = GetShortOrganizationId(notifications.OrganizationId);
-            if (string.IsNullOrEmpty(organizationId))
+            // 4. Ensure the organization ID exists and matches the expected value.
+            var organizationIds = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.OrganizationIdPath);
+            if (StringValues.IsNullOrEmpty(organizationIds))
             {
                 Logger.LogError(
                     0,
-                    "The HTTP request body did not contain a required '{PropertyName}' property.",
-                    nameof(notifications.OrganizationId));
+                    "The HTTP request body did not contain a required '{XPath}' element.",
+                    SalesforceConstants.OrganizationIdPath);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.VerifyOrganization_MissingValue,
-                    nameof(notifications.OrganizationId));
+                    SalesforceConstants.OrganizationIdPath);
                 context.Result = await _resultCreator.GetFailedResultAsync(message);
 
                 return;
@@ -159,43 +143,44 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 SalesforceConstants.SecretKeyMinLength,
                 SalesforceConstants.SecretKeyMaxLength);
 
+            var organizationId = GetShortOrganizationId(organizationIds[0]);
             var secretKey = GetShortOrganizationId(secret);
             if (!SecretEqual(organizationId, secretKey))
             {
                 Logger.LogError(
                     1,
-                    "The '{PropertyName}' value provided in the HTTP request body did not match the expected value.",
-                    nameof(notifications.OrganizationId));
+                    "The '{XPath}' value provided in the HTTP request body did not match the expected value.",
+                    SalesforceConstants.OrganizationIdPath);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.VerifyOrganization_BadValue,
-                    nameof(notifications.OrganizationId));
+                    SalesforceConstants.OrganizationIdPath);
                 context.Result = await _resultCreator.GetFailedResultAsync(message);
 
                 return;
             }
 
-            // 4. Get the event name.
-            var eventName = notifications.ActionId;
-            if (string.IsNullOrEmpty(eventName))
+            // 5. Get the event name.
+            var eventNames = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.EventNamePath);
+            if (StringValues.IsNullOrEmpty(eventNames))
             {
                 Logger.LogError(
                     2,
-                    "The HTTP request body did not contain a required '{PropertyName}' property.",
-                    nameof(notifications.ActionId));
+                    "The HTTP request body did not contain a required '{XPath}' element.",
+                    SalesforceConstants.EventNamePath);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.VerifyOrganization_MissingValue,
-                    nameof(notifications.ActionId));
+                    SalesforceConstants.EventNamePath);
                 context.Result = await _resultCreator.GetFailedResultAsync(message);
 
                 return;
             }
 
-            // 5. Success. Provide event name for model binding.
-            routeData.Values[WebHookConstants.EventKeyName] = eventName;
+            // 6. Success. Provide event name for model binding.
+            routeData.SetWebHookEventNames(eventNames);
 
             await next();
         }
@@ -213,71 +198,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             return fullOrganizationId;
-        }
-
-        /// <summary>
-        /// Reads the XML HTTP request entity body.
-        /// </summary>
-        /// <param name="context">The <see cref="ResourceExecutingContext"/>.</param>
-        /// <returns>
-        /// A <see cref="Task"/> that on completion provides a <see cref="XElement"/> containing the HTTP request
-        /// entity body.
-        /// </returns>
-        protected virtual async Task<XElement> ReadAsXmlAsync(ResourceExecutingContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var request = context.HttpContext.Request;
-            if (request.Body == null ||
-                !request.ContentLength.HasValue ||
-                request.ContentLength.Value == 0L ||
-                !HttpMethods.IsPost(request.Method))
-            {
-                // Other filters will log and return errors about these conditions.
-                return null;
-            }
-
-            var modelState = context.ModelState;
-            var actionContext = new ActionContext(
-                context.HttpContext,
-                context.RouteData,
-                context.ActionDescriptor,
-                modelState);
-
-            var valueProviderFactories = context.ValueProviderFactories;
-            var valueProvider = await CompositeValueProvider.CreateAsync(actionContext, valueProviderFactories);
-            var bindingContext = DefaultModelBindingContext.CreateBindingContext(
-                actionContext,
-                valueProvider,
-                _xElementMetadata,
-                bindingInfo: null,
-                modelName: WebHookConstants.ModelStateBodyModelName);
-
-            // Read request body.
-            try
-            {
-                await _bodyModelBinder.BindModelAsync(bindingContext);
-            }
-            finally
-            {
-                request.Body.Seek(0L, SeekOrigin.Begin);
-            }
-
-            if (!bindingContext.ModelState.IsValid)
-            {
-                return null;
-            }
-
-            if (!bindingContext.Result.IsModelSet)
-            {
-                throw new InvalidOperationException(Resources.VerifyOrganization_ModelBindingFailed);
-            }
-
-            // Success
-            return (XElement)bindingContext.Result.Model;
         }
     }
 }

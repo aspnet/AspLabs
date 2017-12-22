@@ -11,25 +11,25 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class StripeConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe WebHook request body containing its Unix creation timestamp.
+        /// Gets the name of the JSON property in a Stripe WebHook request body containing its Unix creation
+        /// timestamp.
         /// </summary>
         public static string CreatedPropertyName => "created";
 
 
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe request body containing the
+        /// Gets the name of the JSON property in a Stripe WebHook request body containing the
         /// <see cref="DataDetailsPropertyName"/>.
         /// </summary>
         public static string DataPropertyName => "data";
 
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe request body containing the event details.
+        /// Gets the name of the JSON property in a Stripe WebHook request body containing the event details.
         /// </summary>
         public static string DataDetailsPropertyName => "object";
 
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe WebHook request body containing a value somewhat
-        /// analogous to an event name.
+        /// Gets the name of the JSON property in a Stripe WebHook request body containing the event name.
         /// </summary>
         public static string EventPropertyName => "type";
 
@@ -47,12 +47,14 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string NotificationIdParameterName => "notificationId";
 
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe request body containing the notification identifier.
+        /// Gets the name of the JSON property in a Stripe WebHook request body containing the notification
+        /// identifier.
         /// </summary>
         public static string NotificationIdPropertyName => "id";
 
         /// <summary>
-        /// Gets the name of the JSON property in a Stripe request indicating it carries a live mode event.
+        /// Gets the name of the JSON property in a Stripe WebHook request body indicating it carries a live mode
+        /// event.
         /// </summary>
         /// <value><see langword="true"/> if this is a live mode event; otherwise, this is a test mode event.</value>
         /// <remarks>
@@ -105,7 +107,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <remarks>
         /// Stripe does not use this notification identifier when for example sending an event about a test payment.
         /// </remarks>
-        /// <seealso cref="LiveModePropertyName"/>
+        /// <seealso cref="NotificationIdPropertyName"/>
         public static string TestNotificationId => "evt_00000000000000";
 
         /// <summary>

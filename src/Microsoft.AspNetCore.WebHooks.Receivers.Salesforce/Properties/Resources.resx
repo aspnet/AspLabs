@@ -124,9 +124,6 @@
     <value>The '{0}' value provided in the HTTP request body did not match the expected value.</value>
   </data>
   <data name="VerifyOrganization_MissingValue" xml:space="preserve">
-    <value>The HTTP request body did not contain a required '{0}' property.</value>
-  </data>
-  <data name="VerifyOrganization_ModelBindingFailed" xml:space="preserve">
-    <value>The MVC model binding system failed. Model state is valid but model was not set.</value>
+    <value>The HTTP request body did not contain a required '{0}' element.</value>
   </data>
 </root>

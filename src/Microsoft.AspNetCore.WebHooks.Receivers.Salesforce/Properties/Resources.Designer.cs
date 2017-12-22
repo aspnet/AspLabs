@@ -79,20 +79,11 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; property..
+        ///   Looks up a localized string similar to The HTTP request body did not contain a required &apos;{0}&apos; element..
         /// </summary>
         internal static string VerifyOrganization_MissingValue {
             get {
                 return ResourceManager.GetString("VerifyOrganization_MissingValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The MVC model binding system failed. Model state is valid but model was not set..
-        /// </summary>
-        internal static string VerifyOrganization_ModelBindingFailed {
-            get {
-                return ResourceManager.GetString("VerifyOrganization_ModelBindingFailed", resourceCulture);
             }
         }
     }

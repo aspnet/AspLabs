@@ -14,8 +14,8 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string ChannelRequestFieldName => "channel_name";
 
         /// <summary>
-        /// Gets the name of the posted value in a Slack WebHook request body containing the command name. This value
-        /// is somewhat analogous to an event name but it is optional in a request.
+        /// Gets the name of the posted value in a Slack WebHook request body containing the command name. Value is
+        /// used as the event name when included in a request and <see cref="TriggerRequestFieldName"/> is not.
         /// </summary>
         public static string CommandRequestFieldName => "command";
 
@@ -52,8 +52,8 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string SubtextParameterName => "subtext";
 
         /// <summary>
-        /// Gets the name of the posted value in a Slack WebHook request body containing the text of the event. This is
-        /// used as a fallback event name when neither <see cref="CommandRequestFieldName"/> nor
+        /// Gets the name of the posted value in a Slack WebHook request body containing the text of the event. Value
+        /// is used as the event name when neither <see cref="CommandRequestFieldName"/> nor
         /// <see cref="TriggerRequestFieldName"/> is included in a request.
         /// </summary>
         public static string TextRequestFieldName => "text";
@@ -66,8 +66,7 @@ namespace Microsoft.AspNetCore.WebHooks
 
         /// <summary>
         /// Gets the name of the posted value in a Slack WebHook request body containing the trigger word which caused
-        /// this event, if any. This value is somewhat analogous to an event name and it is used when
-        /// <see cref="CommandRequestFieldName"/> is not included in a request. It too is optional.
+        /// this event, if any. Value is used as the event name when included in a request.
         /// </summary>
         public static string TriggerRequestFieldName => "trigger_word";
     }

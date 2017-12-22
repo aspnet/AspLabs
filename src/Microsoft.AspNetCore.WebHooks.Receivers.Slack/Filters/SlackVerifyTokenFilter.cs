@@ -2,16 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Configuration;
@@ -27,8 +23,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class SlackVerifyTokenFilter : WebHookSecurityFilter, IAsyncResourceFilter, IWebHookReceiver
     {
-        private readonly ModelMetadata _formCollectionMetadata;
-        private readonly IModelBinder _formModelBinder;
+        private readonly IWebHookRequestReader _requestReader;
 
         /// <summary>
         /// Instantiates a new <see cref="SlackVerifyTokenFilter"/> instance.
@@ -43,16 +38,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// /// <param name="metadataProvider">The <see cref="IModelMetadataProvider"/>.</param>
+        /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
         public SlackVerifyTokenFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
-            IModelMetadataProvider metadataProvider)
+            IWebHookRequestReader requestReader)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _formCollectionMetadata = metadataProvider.GetMetadataForType(typeof(IFormCollection));
-            _formModelBinder = new FormCollectionModelBinder();
+            _requestReader = requestReader;
         }
 
         /// <inheritdoc />
@@ -81,6 +75,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
+            // 1. Confirm this filter applies.
             var routeData = context.RouteData;
             if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
             {
@@ -88,7 +83,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 1. Confirm we were reached using HTTPS.
+            // 2. Confirm we were reached using HTTPS.
             var request = context.HttpContext.Request;
             var errorResult = EnsureSecureConnection(receiverName, request);
             if (errorResult != null)
@@ -97,8 +92,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 2. Get IFormCollection from the request body.
-            var data = await ReadAsFormDataAsync(context);
+            // 3. Get IFormCollection from the request body.
+            var data = await _requestReader.ReadAsFormDataAsync(context);
             if (data == null)
             {
                 // ReadAsFormDataAsync returns null only when other filters will log and return errors about the same
@@ -107,7 +102,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 3. Ensure that the token exists and matches the expected value.
+            // 4. Ensure the token exists and matches the expected value.
             string token = data[SlackConstants.TokenRequestFieldName];
             if (string.IsNullOrEmpty(token))
             {
@@ -147,7 +142,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 4. Get the event name and subtext.
+            // 5. Get the event name and subtext.
             string eventName = data[SlackConstants.TriggerRequestFieldName];
             if (eventName != null)
             {
@@ -187,7 +182,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 5. Success. Provide event name for model binding.
+            // 6. Success. Provide event name for model binding.
             routeData.Values[WebHookConstants.EventKeyName] = eventName;
 
             await next();
@@ -213,66 +208,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             return text;
-        }
-
-        /// <summary>
-        /// Reads the HTML form URL-encoded data request entity body.
-        /// </summary>
-        /// <param name="context">The <see cref="ResourceExecutingContext"/>.</param>
-        /// <returns>
-        /// A <see cref="Task"/> that on completion provides a <see cref="IFormCollection"/> containing data from
-        /// the HTTP request entity body.
-        /// </returns>
-        protected virtual async Task<IFormCollection> ReadAsFormDataAsync(ResourceExecutingContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var request = context.HttpContext.Request;
-            if (request.Body == null ||
-                !request.ContentLength.HasValue ||
-                request.ContentLength.Value == 0L ||
-                !HttpMethods.IsPost(request.Method) ||
-                !request.HasFormContentType)
-            {
-                // Other filters will log and return errors about these conditions.
-                return null;
-            }
-
-            var modelState = context.ModelState;
-            var actionContext = new ActionContext(
-                context.HttpContext,
-                context.RouteData,
-                context.ActionDescriptor,
-                modelState);
-
-            var valueProviderFactories = context.ValueProviderFactories;
-            var valueProvider = await CompositeValueProvider.CreateAsync(actionContext, valueProviderFactories);
-            var bindingContext = DefaultModelBindingContext.CreateBindingContext(
-                actionContext,
-                valueProvider,
-                _formCollectionMetadata,
-                bindingInfo: null,
-                modelName: WebHookConstants.ModelStateBodyModelName);
-
-            // Read request body.
-            try
-            {
-                await _formModelBinder.BindModelAsync(bindingContext);
-            }
-            finally
-            {
-                request.Body.Seek(0L, SeekOrigin.Begin);
-            }
-
-            // FormCollectionModelBinder cannot fail, even when !HasFormContentType (which isn't possible here).
-            Debug.Assert(bindingContext.ModelState.IsValid);
-            Debug.Assert(bindingContext.Result.IsModelSet);
-
-            // Success
-            return (IFormCollection)bindingContext.Result.Model;
         }
     }
 }

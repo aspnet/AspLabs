@@ -53,6 +53,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             services.TryAddSingleton<WebHookReceiverExistsConstraint>();
 
             services.TryAddSingleton<WebHookReceiverExistsFilter>();
+            services.TryAddSingleton<IWebHookRequestReader, WebHookRequestReader>();
 
             foreach (var keyValuePair in SingletonFilters)
             {

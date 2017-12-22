@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.Routing;
+using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.Routing
 {
@@ -178,24 +179,20 @@ namespace Microsoft.AspNetCore.Routing
         /// </summary>
         /// <param name="routeData">The <see cref="RouteData"/> for the current request.</param>
         /// <param name="eventNames">The event names found in the request.</param>
-        public static void SetWebHookEventNames(this RouteData routeData, string[] eventNames)
+        public static void SetWebHookEventNames(this RouteData routeData, StringValues eventNames)
         {
             if (routeData == null)
             {
                 throw new ArgumentNullException(nameof(routeData));
             }
-            if (eventNames == null)
-            {
-                throw new ArgumentNullException(nameof(eventNames));
-            }
 
-            if (eventNames.Length == 1)
+            if (eventNames.Count == 1)
             {
                 routeData.Values[WebHookConstants.EventKeyName] = eventNames[0];
             }
-            else if (eventNames.Length > 1)
+            else if (eventNames.Count > 1)
             {
-                for (var i = 0; i < eventNames.Length && i < EventKeyNames.Length; i++)
+                for (var i = 0; i < eventNames.Count && i < EventKeyNames.Length; i++)
                 {
                     routeData.Values[EventKeyNames[i]] = eventNames[i];
                 }

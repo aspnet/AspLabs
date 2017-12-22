@@ -129,16 +129,7 @@
   <data name="SignatureFilter_InvalidHeaderFormat" xml:space="preserve">
     <value>The '{0}' header value is invalid. It must be formatted as key=value pairs separated by commas.</value>
   </data>
-  <data name="TestEvent_MissingItem" xml:space="preserve">
-    <value>Unable to retrieve '{0}' request data from '{1}.{2}'.</value>
-  </data>
-  <data name="VerifyNotification_BadId" xml:space="preserve">
-    <value>The notification identifier '{0}' could not be resolved for an actual event.</value>
-  </data>
   <data name="VerifyNotification_MissingValue" xml:space="preserve">
     <value>The HTTP request body did not contain a required '{0}' property.</value>
-  </data>
-  <data name="VerifyNotification_ModelBindingFailed" xml:space="preserve">
-    <value>The MVC model binding system failed. Model state is valid but model was not set.</value>
   </data>
 </root>

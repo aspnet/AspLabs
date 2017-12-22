@@ -147,6 +147,12 @@
   <data name="MetadataProvider_WrongInterface" xml:space="preserve">
     <value>Invalid metadata services found. Metadata services implementing '{0}' must implement '{1}'.</value>
   </data>
+  <data name="RequestReader_ModelBindingFailed" xml:space="preserve">
+    <value>The MVC model binding system failed. Model state is valid but model was not set.</value>
+  </data>
+  <data name="RequestReader_ModelBindingUnexpectedlyInvalid" xml:space="preserve">
+    <value>The MVC model binding system unexpectedly failed. Binding the {0} type should never add {1} errors.</value>
+  </data>
   <data name="RoutingProvider_MixedRouteWithWebHookAttribute" xml:space="preserve">
     <value>{0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template.</value>
   </data>

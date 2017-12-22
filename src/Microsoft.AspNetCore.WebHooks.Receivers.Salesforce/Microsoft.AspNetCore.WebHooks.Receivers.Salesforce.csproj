@@ -18,6 +18,9 @@
     <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Salesforce\WebHooks\SalesforceNotifications.cs">
       <Link>SalesforceNotifications.cs</Link>
     </Compile>
+    <Compile Include="..\shared\Utilities\ObjectPathUtilities.cs">
+      <Link>Utilities\ObjectPathUtilities.cs</Link>
+    </Compile>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="2.0.0" />
     <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
   </ItemGroup>

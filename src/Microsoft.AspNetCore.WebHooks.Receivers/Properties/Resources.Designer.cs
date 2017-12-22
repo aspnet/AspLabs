@@ -151,6 +151,24 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The MVC model binding system failed. Model state is valid but model was not set..
+        /// </summary>
+        internal static string RequestReader_ModelBindingFailed {
+            get {
+                return ResourceManager.GetString("RequestReader_ModelBindingFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MVC model binding system unexpectedly failed. Binding the {0} type should never add {1} errors..
+        /// </summary>
+        internal static string RequestReader_ModelBindingUnexpectedlyInvalid {
+            get {
+                return ResourceManager.GetString("RequestReader_ModelBindingUnexpectedlyInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template..
         /// </summary>
         internal static string RoutingProvider_MixedRouteWithWebHookAttribute {
