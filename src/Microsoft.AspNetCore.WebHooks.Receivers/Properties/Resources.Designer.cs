@@ -178,7 +178,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as HTTP Post Form Data..
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as HTML form URL-encoded data..
         /// </summary>
         internal static string VerifyBody_NoFormData {
             get {

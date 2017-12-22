@@ -13,16 +13,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Dependencies;
 using System.Xml.Linq;
-using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Properties;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides an abstract <see cref="IWebHookReceiver"/> implementation which can be used to base other implementations on. 
+    /// Provides an abstract <see cref="IWebHookReceiver"/> implementation which can be used to base other implementations on.
     /// </summary>
     public abstract class WebHookReceiver : IWebHookReceiver
     {
@@ -55,37 +53,37 @@ namespace Microsoft.AspNet.WebHooks
         internal static async Task<T> ReadAsJsonAsync<T>(HttpRequestMessage request)
             where T : JToken
         {
-            HttpConfiguration config = request.GetConfiguration();
+            var config = request.GetConfiguration();
 
             // Check that there is a request body
             if (request.Content == null)
             {
-                string msg = ReceiverResources.Receiver_NoBody;
+                var msg = ReceiverResources.Receiver_NoBody;
                 config.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is JSON
             if (!request.Content.IsJson())
             {
-                string msg = ReceiverResources.Receiver_NoJson;
+                var msg = ReceiverResources.Receiver_NoJson;
                 config.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
                 throw new HttpResponseException(noJson);
             }
 
             try
             {
                 // Read request body
-                T result = await request.Content.ReadAsAsync<T>(config.Formatters);
+                var result = await request.Content.ReadAsAsync<T>(config.Formatters);
                 return result;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
                 config.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
@@ -109,8 +107,8 @@ namespace Microsoft.AspNet.WebHooks
                 return false;
             }
 
-            bool areSame = true;
-            for (int i = 0; i < inputA.Length; i++)
+            var areSame = true;
+            for (var i = 0; i < inputA.Length; i++)
             {
                 areSame &= inputA[i] == inputB[i];
             }
@@ -136,8 +134,8 @@ namespace Microsoft.AspNet.WebHooks
                 return false;
             }
 
-            bool areSame = true;
-            for (int i = 0; i < inputA.Length; i++)
+            var areSame = true;
+            for (var i = 0; i < inputA.Length; i++)
             {
                 areSame &= inputA[i] == inputB[i];
             }
@@ -159,13 +157,13 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            IDependencyResolver resolver = request.GetConfiguration().DependencyResolver;
+            var resolver = request.GetConfiguration().DependencyResolver;
 
             // Check to see if we have been configured to ignore this check
-            SettingsDictionary settings = resolver.GetSettings();
-            string disableHttpsCheckValue = settings.GetValueOrDefault(DisableHttpsCheckKey);
-            bool disableHttpsCheck;
-            if (bool.TryParse(disableHttpsCheckValue, out disableHttpsCheck) && disableHttpsCheck == true)
+            var settings = resolver.GetSettings();
+            var disableHttpsCheckValue = settings.GetValueOrDefault(DisableHttpsCheckKey);
+            if (bool.TryParse(disableHttpsCheckValue, out var disableHttpsCheck) &&
+                disableHttpsCheck == true)
             {
                 return;
             }
@@ -173,15 +171,15 @@ namespace Microsoft.AspNet.WebHooks
             // Require HTTP unless request is local
             if (!request.IsLocal() && !request.RequestUri.IsHttps())
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoHttps, GetType().Name, Uri.UriSchemeHttps);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoHttps, GetType().Name, Uri.UriSchemeHttps);
                 resolver.GetLogger().Error(msg);
-                HttpResponseMessage noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noHttps);
             }
         }
 
         /// <summary>
-        /// For WebHooks providers with insufficient security considerations, the receiver can require that the WebHook URI must 
+        /// For WebHooks providers with insufficient security considerations, the receiver can require that the WebHook URI must
         /// be an <c>https</c> URI and contain a 'code' query parameter with a value configured for that particular <paramref name="id"/>.
         /// A sample WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/&lt;receiver&gt;?code=83699ec7c1d794c0c780e49a5c72972590571fd8</c>'.
         /// The 'code' parameter must be between 32 and 128 characters long.
@@ -199,22 +197,22 @@ namespace Microsoft.AspNet.WebHooks
 
             EnsureSecureConnection(request);
 
-            NameValueCollection queryParameters = request.RequestUri.ParseQueryString();
-            string code = queryParameters[CodeQueryParameter];
+            var queryParameters = request.RequestUri.ParseQueryString();
+            var code = queryParameters[CodeQueryParameter];
             if (string.IsNullOrEmpty(code))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoCode, CodeQueryParameter);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoCode, CodeQueryParameter);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-                HttpResponseMessage noCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noCode);
             }
 
-            string secretKey = await this.GetReceiverConfig(request, Name, id, CodeMinLength, CodeMaxLength);
+            var secretKey = await GetReceiverConfig(request, Name, id, CodeMinLength, CodeMaxLength);
             if (!WebHookReceiver.SecretEqual(code, secretKey))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-                HttpResponseMessage invalidCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var invalidCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(invalidCode);
             }
         }
@@ -241,14 +239,14 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             // Look up configuration for this receiver and instance
-            HttpConfiguration httpConfig = request.GetConfiguration();
-            IWebHookReceiverConfig receiverConfig = httpConfig.DependencyResolver.GetReceiverConfig();
-            string secret = await receiverConfig.GetReceiverConfigAsync(name, id, minLength, maxLength);
+            var httpConfig = request.GetConfiguration();
+            var receiverConfig = httpConfig.DependencyResolver.GetReceiverConfig();
+            var secret = await receiverConfig.GetReceiverConfigAsync(name, id, minLength, maxLength);
             if (secret == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
                 httpConfig.DependencyResolver.GetLogger().Error(msg);
-                HttpResponseMessage noSecret = request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg);
+                var noSecret = request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg);
                 throw new HttpResponseException(noSecret);
             }
             return secret;
@@ -269,13 +267,12 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            IEnumerable<string> headers;
-            if (!request.Headers.TryGetValues(requestHeaderName, out headers) || headers.Count() != 1)
+            if (!request.Headers.TryGetValues(requestHeaderName, out var headers) || headers.Count() != 1)
             {
-                int headersCount = headers != null ? headers.Count() : 0;
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadHeader, requestHeaderName, headersCount);
+                var headersCount = headers != null ? headers.Count() : 0;
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadHeader, requestHeaderName, headersCount);
                 request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noHeader = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noHeader = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noHeader);
             }
 
@@ -319,43 +316,43 @@ namespace Microsoft.AspNet.WebHooks
         /// <returns>A <see cref="JObject"/> containing the HTTP request entity body.</returns>
         protected virtual async Task<XElement> ReadAsXmlAsync(HttpRequestMessage request)
         {
-            HttpConfiguration config = request.GetConfiguration();
+            var config = request.GetConfiguration();
 
             // Check that there is a request body
             if (request.Content == null)
             {
-                string msg = ReceiverResources.Receiver_NoBody;
+                var msg = ReceiverResources.Receiver_NoBody;
                 config.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is XML
             if (!request.Content.IsXml())
             {
-                string msg = ReceiverResources.Receiver_NoXml;
+                var msg = ReceiverResources.Receiver_NoXml;
                 config.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
                 throw new HttpResponseException(noXml);
             }
 
             try
             {
                 // Read request body
-                XElement result = await request.Content.ReadAsAsync<XElement>(config.Formatters);
+                var result = await request.Content.ReadAsAsync<XElement>(config.Formatters);
                 return result;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
                 config.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
 
         /// <summary>
-        /// Reads the HTML Form Data HTTP request entity body.
+        /// Reads the HTML form URL-encoded data HTTP request entity body.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
         /// <returns>A <see cref="NameValueCollection"/> containing the HTTP request entity body.</returns>
@@ -364,38 +361,38 @@ namespace Microsoft.AspNet.WebHooks
             // Check that there is a request body
             if (request.Content == null)
             {
-                string msg = ReceiverResources.Receiver_NoBody;
+                var msg = ReceiverResources.Receiver_NoBody;
                 request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is form data
             if (!request.Content.IsFormData())
             {
-                string msg = ReceiverResources.Receiver_NoFormData;
+                var msg = ReceiverResources.Receiver_NoFormData;
                 request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
                 throw new HttpResponseException(noJson);
             }
 
             try
             {
                 // Read request body
-                NameValueCollection result = await request.Content.ReadAsFormDataAsync();
+                var result = await request.Content.ReadAsFormDataAsync();
                 return result;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadFormData, ex.Message);
+                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadFormData, ex.Message);
                 request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
 
         /// <summary>
-        ///  Creates a 405 "Method Not Allowed" response which a receiver can use to indicate that a request with a 
+        ///  Creates a 405 "Method Not Allowed" response which a receiver can use to indicate that a request with a
         ///  non-support HTTP method could not be processed.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
@@ -408,14 +405,14 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadMethod, request.Method, GetType().Name);
+            var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadMethod, request.Method, GetType().Name);
             request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-            HttpResponseMessage badMethod = request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, msg);
+            var badMethod = request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, msg);
             return badMethod;
         }
 
         /// <summary>
-        ///  Creates a 400 "Bad Request" response which a receiver can use to indicate that a request had an invalid signature 
+        ///  Creates a 400 "Bad Request" response which a receiver can use to indicate that a request had an invalid signature
         ///  and as a result could not be processed.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequestMessage"/>.</param>
@@ -429,14 +426,14 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSignature, signatureHeaderName, GetType().Name);
+            var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSignature, signatureHeaderName, GetType().Name);
             request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-            HttpResponseMessage badSignature = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+            var badSignature = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
             return badSignature;
         }
 
         /// <summary>
-        /// Processes the WebHook request by calling all registered <see cref="IWebHookHandler"/> instances. 
+        /// Processes the WebHook request by calling all registered <see cref="IWebHookHandler"/> instances.
         /// </summary>
         /// <param name="id">A (potentially empty) ID of a particular configuration for this <see cref="IWebHookReceiver"/>. This
         /// allows an <see cref="IWebHookReceiver"/> to support multiple WebHooks with individual configurations.</param>
@@ -466,11 +463,11 @@ namespace Microsoft.AspNet.WebHooks
             // Execute handlers. Note that we wait for them to complete before
             // we return. This means that we don't send back the final response
             // before all handlers have executed. As a result we expect handlers
-            // to be fairly quick in what they process. If a handler sets the 
-            // Response property on the context then the execution is stopped 
+            // to be fairly quick in what they process. If a handler sets the
+            // Response property on the context then the execution is stopped
             // and that response returned. If a handler throws an exception then
             // the execution of handlers is also stopped.
-            WebHookHandlerContext handlerContext = new WebHookHandlerContext(actions)
+            var handlerContext = new WebHookHandlerContext(actions)
             {
                 Id = id,
                 Data = data,
@@ -478,8 +475,8 @@ namespace Microsoft.AspNet.WebHooks
                 RequestContext = context,
             };
 
-            IEnumerable<IWebHookHandler> handlers = context.Configuration.DependencyResolver.GetHandlers();
-            foreach (IWebHookHandler handler in handlers)
+            var handlers = context.Configuration.DependencyResolver.GetHandlers();
+            foreach (var handler in handlers)
             {
                 // Only call handlers with matching receiver name (or no receiver name in which case they support all receivers)
                 if (handler.Receiver != null && !string.Equals(Name, handler.Receiver, StringComparison.OrdinalIgnoreCase))

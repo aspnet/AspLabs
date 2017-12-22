@@ -205,7 +205,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Reads the HTTP form data request entity body.
+        /// Reads the HTML form URL-encoded data request entity body.
         /// </summary>
         /// <param name="context">The <see cref="ResourceExecutingContext"/>.</param>
         /// <returns>

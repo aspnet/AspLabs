@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             SlackServiceCollectionSetup.AddSlackServices(builder.Services);
 
-            // While requests contain HTTP form data, responses are JSON.
+            // While requests contain HTML form URL-encoded data, responses are JSON.
             return builder
                 .AddJsonFormatters()
                 .AddWebHooks();

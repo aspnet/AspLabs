@@ -157,7 +157,7 @@
     <value>Could not find a valid configuration for the '{0}' WebHook receiver. Please configure secret keys for this receiver.</value>
   </data>
   <data name="VerifyBody_NoFormData" xml:space="preserve">
-    <value>The WebHook request must contain an entity body formatted as HTTP Post Form Data.</value>
+    <value>The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</value>
   </data>
   <data name="VerifyBody_NoJson" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as JSON.</value>

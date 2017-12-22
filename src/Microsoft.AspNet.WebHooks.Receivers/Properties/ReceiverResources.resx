@@ -151,7 +151,7 @@
     <value>The '{0}' query parameter provided in the HTTP request did not match the expected value.</value>
   </data>
   <data name="Receiver_BadFormData" xml:space="preserve">
-    <value>The WebHook request contained invalid HTML Form Data: '{0}'.</value>
+    <value>The WebHook request contained invalid HTML form URL-encoded data: '{0}'.</value>
   </data>
   <data name="Receiver_BadHeader" xml:space="preserve">
     <value>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Please ensure that the request contains exactly one '{0}' header field.</value>
@@ -178,7 +178,7 @@
     <value>The WebHook verification request must contain a '{0}' query parameter.</value>
   </data>
   <data name="Receiver_NoFormData" xml:space="preserve">
-    <value>The WebHook request must contain an entity body formatted as HTML Form Data.</value>
+    <value>The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</value>
   </data>
   <data name="Receiver_NoHttps" xml:space="preserve">
     <value>The WebHook receiver '{0}' requires HTTPS in order to be secure. Please register a WebHook URI of type '{1}'.</value>

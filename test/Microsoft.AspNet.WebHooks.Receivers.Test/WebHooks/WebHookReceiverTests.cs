@@ -3,14 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Mocks;
@@ -149,10 +147,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook receiver 'WebHookReceiverMock' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
         }
 
@@ -165,10 +163,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.RequestUri = new Uri("https://some.no.ssl.host?" + query);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, TestId));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
         }
 
@@ -181,10 +179,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, id));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.EnsureValidCode(_request, id));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
         }
 
@@ -211,11 +209,11 @@ namespace Microsoft.AspNet.WebHooks
             _request.RequestUri = new Uri(address);
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureSecureConnection(_request));
+            var ex = Assert.Throws<HttpResponseException>(() => _receiverMock.EnsureSecureConnection(_request));
 
             // Assert
-            string expected = string.Format("The WebHook receiver 'WebHookReceiverMock' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.");
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var expected = string.Format("The WebHook receiver 'WebHookReceiverMock' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.");
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal(expected, error.Message);
         }
 
@@ -259,11 +257,11 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(secret);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.GetReceiverConfig(_request, _receiverMock.Name, TestId, minLength, maxLength));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.GetReceiverConfig(_request, _receiverMock.Name, TestId, minLength, maxLength));
 
             // Assert
-            string expected = string.Format("Could not find a valid configuration for WebHook receiver 'MockReceiver' and instance '{0}'. The setting must be set to a value between {1} and {2} characters long.", TestId, minLength, maxLength);
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var expected = string.Format("Could not find a valid configuration for WebHook receiver 'MockReceiver' and instance '{0}'. The setting must be set to a value between {1} and {2} characters long.", TestId, minLength, maxLength);
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal(expected, error.Message);
         }
 
@@ -275,7 +273,7 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(name, id, secret);
 
             // Act
-            string actual = await _receiverMock.GetReceiverConfig(_request, name, id, minLength, maxLength);
+            var actual = await _receiverMock.GetReceiverConfig(_request, name, id, minLength, maxLength);
 
             // Assert
             Assert.Equal(secret, actual);
@@ -289,18 +287,18 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(TestSecret);
-            string name = "signature";
-            for (int cnt = 0; cnt < headers; cnt++)
+            var name = "signature";
+            for (var cnt = 0; cnt < headers; cnt++)
             {
                 _request.Headers.Add(name, "value");
             }
 
             // Act
-            HttpResponseException ex = Assert.Throws<HttpResponseException>(() => _receiverMock.GetRequestHeader(_request, name));
+            var ex = Assert.Throws<HttpResponseException>(() => _receiverMock.GetRequestHeader(_request, name));
 
             // Assert
-            string expected = string.Format("Expecting exactly one 'signature' header field in the WebHook request but found {0}. Please ensure that the request contains exactly one 'signature' header field.", headers);
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var expected = string.Format("Expecting exactly one 'signature' header field in the WebHook request but found {0}. Please ensure that the request contains exactly one 'signature' header field.", headers);
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal(expected, error.Message);
         }
 
@@ -309,12 +307,12 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(TestSecret);
-            string expected = "value";
-            string name = "signature";
+            var expected = "value";
+            var name = "signature";
             _request.Headers.Add(name, expected);
 
             // Act
-            string actual = _receiverMock.GetRequestHeader(_request, name);
+            var actual = _receiverMock.GetRequestHeader(_request, name);
 
             // Assert
             Assert.Equal(expected, actual);
@@ -327,10 +325,10 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
         }
 
@@ -342,10 +340,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as JSON.", error.Message);
         }
 
@@ -357,10 +355,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("I n v a l i d  J S O N", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request contained invalid JSON: 'Error parsing positive infinity value. Path '', line 0, position 0.'.", error.Message);
         }
 
@@ -368,13 +366,13 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsJsonAsync_Handles_UtcDateTime()
         {
             // Arrange
-            DateTime expectedDateTime = DateTime.Parse("2015-09-26T04:26:55.6393049Z").ToUniversalTime();
+            var expectedDateTime = DateTime.Parse("2015-09-26T04:26:55.6393049Z").ToUniversalTime();
             Initialize(TestSecret);
             _request.Content = new StringContent("{ \"datetime\": \"2015-09-26T04:26:55.6393049Z\" }", Encoding.UTF8, "application/json");
 
             // Act
-            JObject actual = await _receiverMock.ReadAsJsonAsync(_request);
-            DateTime actualDateTime = actual["datetime"].ToObject<DateTime>();
+            var actual = await _receiverMock.ReadAsJsonAsync(_request);
+            var actualDateTime = actual["datetime"].ToObject<DateTime>();
 
             // Assert
             Assert.Equal(expectedDateTime, actualDateTime);
@@ -388,7 +386,7 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("{ \"k\": \"v\" }", Encoding.UTF8, "application/json");
 
             // Act
-            JObject actual = await _receiverMock.ReadAsJsonAsync(_request);
+            var actual = await _receiverMock.ReadAsJsonAsync(_request);
 
             // Assert
             Assert.Equal("v", actual["k"]);
@@ -401,10 +399,10 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
         }
 
@@ -416,10 +414,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as JSON.", error.Message);
         }
 
@@ -431,10 +429,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("I n v a l i d  J S O N", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsJsonTokenAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request contained invalid JSON: 'Error parsing positive infinity value. Path '', line 0, position 0.'.", error.Message);
         }
 
@@ -442,13 +440,13 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ReadAsJsonTokenAsync_Handles_UtcDateTime()
         {
             // Arrange
-            DateTime expectedDateTime = DateTime.Parse("2015-09-26T04:26:55.6393049Z").ToUniversalTime();
+            var expectedDateTime = DateTime.Parse("2015-09-26T04:26:55.6393049Z").ToUniversalTime();
             Initialize(TestSecret);
             _request.Content = new StringContent("{ \"datetime\": \"2015-09-26T04:26:55.6393049Z\" }", Encoding.UTF8, "application/json");
 
             // Act
-            JToken actual = await _receiverMock.ReadAsJsonTokenAsync(_request);
-            DateTime actualDateTime = actual["datetime"].ToObject<DateTime>();
+            var actual = await _receiverMock.ReadAsJsonTokenAsync(_request);
+            var actualDateTime = actual["datetime"].ToObject<DateTime>();
 
             // Assert
             Assert.Equal(expectedDateTime, actualDateTime);
@@ -463,7 +461,7 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent(content, Encoding.UTF8, "application/json");
 
             // Act
-            JToken actual = await _receiverMock.ReadAsJsonTokenAsync(_request);
+            var actual = await _receiverMock.ReadAsJsonTokenAsync(_request);
 
             // Assert
             Assert.IsType(expectedType, actual);
@@ -477,10 +475,10 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
         }
 
@@ -492,10 +490,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as XML.", error.Message);
         }
 
@@ -507,10 +505,10 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("I n v a l i d  X M L", Encoding.UTF8, "application/xml");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsXmlAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request contained invalid XML: 'There was an error deserializing the object of type System.Xml.Linq.XElement. The data at the root level is invalid. Line 1, position 1.'.", error.Message);
         }
 
@@ -522,7 +520,7 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("<root><k>v</k></root>", Encoding.UTF8, "application/xml");
 
             // Act
-            XElement actual = await _receiverMock.ReadAsXmlAsync(_request);
+            var actual = await _receiverMock.ReadAsXmlAsync(_request);
 
             // Assert
             Assert.Equal("v", actual.Element("k").Value);
@@ -535,10 +533,10 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsFormDataAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsFormDataAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request entity body cannot be empty.", error.Message);
         }
 
@@ -550,11 +548,11 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("Hello World", Encoding.UTF8, "text/plain");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsFormDataAsync(_request));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _receiverMock.ReadAsFormDataAsync(_request));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The WebHook request must contain an entity body formatted as HTML Form Data.", error.Message);
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook request must contain an entity body formatted as HTML form URL-encoded data.", error.Message);
         }
 
         [Fact]
@@ -565,7 +563,7 @@ namespace Microsoft.AspNet.WebHooks
             _request.Content = new StringContent("k=v", Encoding.UTF8, "application/x-www-form-urlencoded");
 
             // Act
-            NameValueCollection actual = await _receiverMock.ReadAsFormDataAsync(_request);
+            var actual = await _receiverMock.ReadAsFormDataAsync(_request);
 
             // Assert
             Assert.Equal("v", actual["k"]);
@@ -578,11 +576,11 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseMessage actual = _receiverMock.CreateBadMethodResponse(_request);
+            var actual = _receiverMock.CreateBadMethodResponse(_request);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
-            HttpError error = await actual.Content.ReadAsAsync<HttpError>();
+            var error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The HTTP 'GET' method is not supported by the 'WebHookReceiverMock' WebHook receiver.", error.Message);
         }
 
@@ -593,11 +591,11 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            HttpResponseMessage actual = _receiverMock.CreateBadSignatureResponse(_request, "Header");
+            var actual = _receiverMock.CreateBadSignatureResponse(_request, "Header");
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, actual.StatusCode);
-            HttpError error = await actual.Content.ReadAsAsync<HttpError>();
+            var error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook signature provided by the 'Header' header field does not match the value expected by the 'WebHookReceiverMock' receiver. WebHook request is invalid.", error.Message);
         }
 
@@ -605,7 +603,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ExecuteWebHookAsync_StopsOnFirstResponse()
         {
             // Arrange
-            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
+            var handlers = new KeyValuePair<Type, object>[]
             {
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 10, }),
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 20, }),
@@ -613,10 +611,10 @@ namespace Microsoft.AspNet.WebHooks
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 40, }),
             };
             Initialize(TestSecret, handlers);
-            object data = new object();
+            var data = new object();
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
+            var actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
 
             // Assert
             Assert.Equal("Order: 30", actual.ReasonPhrase);
@@ -630,7 +628,7 @@ namespace Microsoft.AspNet.WebHooks
         public async Task ExecuteWebHookAsync_FindsMatchingHandlers()
         {
             // Arrange
-            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
+            var handlers = new KeyValuePair<Type, object>[]
             {
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 10, Receiver = "other" }),
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 20, Receiver = "MockReceiver" }),
@@ -639,10 +637,10 @@ namespace Microsoft.AspNet.WebHooks
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), new TestHandler { Order = 50, Receiver = "something" }),
             };
             Initialize(TestSecret, handlers);
-            object data = new object();
+            var data = new object();
 
             // Act
-            HttpResponseMessage actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
+            var actual = await _receiverMock.ExecuteWebHookAsync(TestId, _context, _request, new[] { "action" }, data);
 
             // Assert
             Assert.Equal("OK", actual.ReasonPhrase);
@@ -658,18 +656,18 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             WebHookHandlerContext actual = null;
-            Mock<IWebHookHandler> handlerMock = new Mock<IWebHookHandler>();
+            var handlerMock = new Mock<IWebHookHandler>();
             handlerMock.Setup<Task>(h => h.ExecuteAsync(WebHookReceiverMock.ReceiverName, It.IsAny<WebHookHandlerContext>()))
                 .Callback<string, WebHookHandlerContext>((rec, con) => actual = con)
                 .Returns(Task.FromResult(true))
                 .Verifiable();
 
-            KeyValuePair<Type, object>[] handlers = new KeyValuePair<Type, object>[]
+            var handlers = new KeyValuePair<Type, object>[]
             {
                 new KeyValuePair<Type, object>(typeof(IWebHookHandler), handlerMock.Object),
             };
             Initialize(TestSecret, handlers);
-            object data = new object();
+            var data = new object();
             IEnumerable<string> actions = new[] { "action" };
 
             // Act
@@ -692,7 +690,7 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
+            var actual = WebHookReceiver.SecretEqual(inputA, inputB);
 
             // Assert
             Assert.Equal(expected, actual);
@@ -706,7 +704,7 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(TestSecret);
 
             // Act
-            bool actual = WebHookReceiver.SecretEqual(inputA, inputB);
+            var actual = WebHookReceiver.SecretEqual(inputA, inputB);
 
             // Assert
             Assert.Equal(expected, actual);
@@ -720,12 +718,14 @@ namespace Microsoft.AspNet.WebHooks
         public void Initialize(string name, string id, string config, params KeyValuePair<Type, object>[] dependencies)
         {
             _logger = new Mock<ILogger>().Object;
-            _settings = new SettingsDictionary();
-            _settings[SecretPrefix + name] = GetConfigValue(id, config);
+            _settings = new SettingsDictionary
+            {
+                [SecretPrefix + name] = GetConfigValue(id, config)
+            };
 
             _config = new WebHookReceiverConfig(_settings, _logger);
 
-            List<KeyValuePair<Type, object>> deps = new List<KeyValuePair<Type, object>>()
+            var deps = new List<KeyValuePair<Type, object>>()
             {
                 new KeyValuePair<Type, object>(typeof(IWebHookReceiverConfig), _config),
                 new KeyValuePair<Type, object>(typeof(SettingsDictionary), _settings)
@@ -761,8 +761,10 @@ namespace Microsoft.AspNet.WebHooks
                 IsCalled = true;
                 if (SetResponse)
                 {
-                    context.Response = new HttpResponseMessage();
-                    context.Response.ReasonPhrase = "Order: " + Order;
+                    context.Response = new HttpResponseMessage
+                    {
+                        ReasonPhrase = "Order: " + Order
+                    };
                 }
                 return Task.FromResult(true);
             }

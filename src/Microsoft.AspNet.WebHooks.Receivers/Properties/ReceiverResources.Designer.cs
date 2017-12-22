@@ -19,7 +19,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ReceiverResources {
@@ -151,7 +151,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request contained invalid HTML Form Data: &apos;{0}&apos;..
+        ///   Looks up a localized string similar to The WebHook request contained invalid HTML form URL-encoded data: &apos;{0}&apos;..
         /// </summary>
         internal static string Receiver_BadFormData {
             get {
@@ -232,7 +232,7 @@ namespace Microsoft.AspNet.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as HTML Form Data..
+        ///   Looks up a localized string similar to The WebHook request must contain an entity body formatted as HTML form URL-encoded data..
         /// </summary>
         internal static string Receiver_NoFormData {
             get {

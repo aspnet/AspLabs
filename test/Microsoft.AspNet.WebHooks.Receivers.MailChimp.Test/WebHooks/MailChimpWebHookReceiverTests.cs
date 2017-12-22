@@ -46,11 +46,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             IWebHookReceiver rec = new MailChimpWebHookReceiver();
-            string expected = "mailchimp";
+            var expected = "mailchimp";
 
             // Act
-            string actual1 = rec.Name;
-            string actual2 = MailChimpWebHookReceiver.ReceiverName;
+            var actual1 = rec.Name;
+            var actual2 = MailChimpWebHookReceiver.ReceiverName;
 
             // Assert
             Assert.Equal(expected, actual1);
@@ -65,10 +65,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook receiver 'MailChimpWebHookReceiverProxy' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -83,10 +83,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.RequestUri = new Uri("https://some.no.ssl.host?" + query);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -100,10 +100,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -117,11 +117,11 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent("{ }", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
-            Assert.Equal("The WebHook request must contain an entity body formatted as HTML Form Data.", error.Message);
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            Assert.Equal("The WebHook request must contain an entity body formatted as HTML form URL-encoded data.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
@@ -134,10 +134,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent("k=v", Encoding.UTF8, "application/x-www-form-urlencoded");
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+            var actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            HttpError error = await actual.Content.ReadAsAsync<HttpError>();
+            var error = await actual.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The HTTP request body did not contain a required 'type' property.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -149,7 +149,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(GetConfigValue(id, TestSecret));
-            List<string> actions = new List<string> { "hello" };
+            var actions = new List<string> { "hello" };
             ReceiverMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
@@ -170,10 +170,10 @@ namespace Microsoft.AspNet.WebHooks
             _getRequest.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook receiver 'MailChimpWebHookReceiverProxy' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _getRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -188,10 +188,10 @@ namespace Microsoft.AspNet.WebHooks
             _getRequest.RequestUri = new Uri("https://some.no.ssl.host?" + query);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook verification request must contain a 'code' query parameter.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _getRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -205,10 +205,10 @@ namespace Microsoft.AspNet.WebHooks
             _getRequest.RequestUri = new Uri("https://some.no.ssl.host?code=invalid");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _getRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'code' query parameter provided in the HTTP request did not match the expected value.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _getRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -222,7 +222,7 @@ namespace Microsoft.AspNet.WebHooks
             Initialize(GetConfigValue(id, TestSecret));
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _getRequest);
+            var actual = await ReceiverMock.Object.ReceiveAsync(id, RequestContext, _getRequest);
 
             // Assert
             Assert.Equal(actual.StatusCode, HttpStatusCode.OK);
@@ -239,11 +239,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(TestSecret);
-            HttpRequestMessage req = new HttpRequestMessage { Method = new HttpMethod(method) };
+            var req = new HttpRequestMessage { Method = new HttpMethod(method) };
             req.SetRequestContext(RequestContext);
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
+            var actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);

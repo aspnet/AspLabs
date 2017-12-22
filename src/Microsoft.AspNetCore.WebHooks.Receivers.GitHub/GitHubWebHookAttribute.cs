@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets an indication this action expects form data.
+        /// Gets or sets an indication this action expects HTML form URL-encoded data.
         /// </summary>
         /// <value>Defaults to <see langword="false"/>, indicating this action expects JSON data.</value>
         public bool AcceptFormData { get; set; }
