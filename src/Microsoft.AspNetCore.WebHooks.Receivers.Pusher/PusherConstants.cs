@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <summary>
         /// Gets the name of the Pusher WebHook receiver.
         /// </summary>
-        public static string ReceiverName => "Pusher";
+        public static string ReceiverName => "pusher";
 
         /// <summary>
         /// Gets the minimum length of the secret key configured for this receiver.

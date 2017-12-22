@@ -17,12 +17,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <see cref="System.Xml.Linq.XElement"/> or <see cref="SalesforceNotifications"/>.
     /// </para>
     /// <para>
-    /// The '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>' configuration value contains Salesforce Organization IDs.
-    /// The Organizational IDs can be found at <see href="http://www.salesforce.com"/> under
-    /// <c>Setup | Company Profile | Company Information</c>.
-    /// </para>
-    /// <para>
-    /// An example Salesforce WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/sfsoap/{id}</c>'.
+    /// An example Salesforce WebHook URI is '<c>https://&lt;host&gt;/api/webhooks/incoming/salesforce/{id}</c>'.
     /// See <see href="https://go.microsoft.com/fwlink/?linkid=838587"/> for additional details about Salesforce
     /// WebHook requests.
     /// </para>

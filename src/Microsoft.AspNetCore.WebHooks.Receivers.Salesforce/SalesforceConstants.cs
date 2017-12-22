@@ -9,11 +9,6 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class SalesforceConstants
     {
         /// <summary>
-        /// Gets the name of the configuration for the Salesforce WebHook receiver.
-        /// </summary>
-        public static string ConfigurationName => "SalesforceSoap";
-
-        /// <summary>
         /// Gets the name of the JSON property in a Salesforce WebHook request body containing a value somewhat
         /// analogous to an event name.
         /// </summary>
@@ -22,7 +17,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <summary>
         /// Gets the name of the Salesforce WebHook receiver.
         /// </summary>
-        public static string ReceiverName => "sfsoap";
+        public static string ReceiverName => "salesforce";
 
         /// <summary>
         /// Gets the minimum length of the secret key configured for this receiver.
