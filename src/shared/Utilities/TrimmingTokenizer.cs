@@ -61,6 +61,20 @@ namespace Microsoft.AspNetCore.WebHooks.Utilities
         /// <param name="maxCount">The maximum number of <see cref="StringSegment"/>s to return.</param>
         public TrimmingTokenizer(StringSegment value, char[] separators, int maxCount)
         {
+            // !HasValue matches odd-looking (for a struct) value==null check in StringTokenizer(...).
+            if (!value.HasValue)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            if (separators == null)
+            {
+                throw new ArgumentNullException(nameof(separators));
+            }
+            if (maxCount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxCount));
+            }
+
             _maxCount = maxCount;
             _originalString = value;
             _tokenizer = new StringTokenizer(value, separators);
