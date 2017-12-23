@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.WebHooks.Config;
 using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Mocks;
 using Microsoft.AspNet.WebHooks.Storage;
@@ -82,7 +81,7 @@ namespace Microsoft.AspNet.WebHooks
             _dequeueManager = new AzureWebHookDequeueManagerMock(this);
 
             // Act
-            Task actual = _dequeueManager.Start(_tokenSource.Token);
+            var actual = _dequeueManager.Start(_tokenSource.Token);
             await Task.Delay(millisecondDelay);
             _dequeueManager.Dispose();
             await actual;
@@ -96,10 +95,10 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             _dequeueManager = new AzureWebHookDequeueManagerMock(this);
-            Task start = _dequeueManager.Start(_tokenSource.Token);
+            var start = _dequeueManager.Start(_tokenSource.Token);
 
             // Act
-            InvalidOperationException ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _dequeueManager.Start(_tokenSource.Token));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _dequeueManager.Start(_tokenSource.Token));
 
             // Assert
             Assert.Contains("This 'AzureWebHookDequeueManagerMock' instance has already been started. It can only be started once.", ex.Message);
@@ -107,24 +106,24 @@ namespace Microsoft.AspNet.WebHooks
 
         [Theory]
         [MemberData(nameof(DequeueData))]
-        public async Task DequeueAndSendWebHooks_GetsMessagesAndSubmitsToSender(int[] count)
+        public async Task DequeueAndSendWebHooks_GetsMessagesAndSubmitsToSender(int[] data)
         {
             // Arrange
-            int index = 0;
+            var index = 0;
             _storageMock.Setup(s => s.GetMessagesAsync(StorageManagerMock.CloudQueue, AzureWebHookDequeueManager.MaxDequeuedMessages, _messageTimeout))
                 .Returns(() =>
                 {
-                    int cnt = index > count.Length ? 0 : count[index++];
-                    if (cnt < 0)
+                    var count = index > data.Length ? 0 : data[index++];
+                    if (count < 0)
                     {
                         throw new Exception("Catch this!");
                     }
-                    var result = StorageManagerMock.CreateQueueMessages(cnt);
+                    var result = StorageManagerMock.CreateQueueMessages(count);
                     return Task.FromResult(result);
                 })
                 .Callback(() =>
                 {
-                    if (index > count.Length)
+                    if (index > data.Length)
                     {
                         _tokenSource.Cancel();
                     }
@@ -136,7 +135,7 @@ namespace Microsoft.AspNet.WebHooks
             await _dequeueManager.DequeueAndSendWebHooks(_tokenSource.Token);
 
             // Assert
-            int expected = count.Where(i => i > 0).Count();
+            var expected = data.Where(i => i > 0).Count();
             _senderMock.Verify(s => s.SendWebHookWorkItemsAsync(It.IsAny<IEnumerable<WebHookWorkItem>>()), Times.Exactly(expected));
         }
 
@@ -151,12 +150,12 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     throw new Exception("Catch this!");
                 }
-                HttpResponseMessage response = req.CreateResponse((HttpStatusCode)statusCodes[index]);
+                var response = req.CreateResponse((HttpStatusCode)statusCodes[index]);
                 return Task.FromResult(response);
             };
-            HttpClient client = new HttpClient(_handlerMock);
+            var client = new HttpClient(_handlerMock);
             _dequeueManager = new AzureWebHookDequeueManagerMock(this, storageManager: _storageMock.Object, httpClient: client);
-            IEnumerable<WebHookWorkItem> workItems = StorageManagerMock.CreateWorkItems(statusCodes.Length);
+            var workItems = StorageManagerMock.CreateWorkItems(statusCodes.Length);
 
             // Act
             await _dequeueManager.WebHookSender.SendWebHookWorkItemsAsync(workItems);
@@ -176,18 +175,18 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     throw new Exception("Catch this!");
                 }
-                HttpResponseMessage response = req.CreateResponse((HttpStatusCode)statusCodes[index]);
+                var response = req.CreateResponse((HttpStatusCode)statusCodes[index]);
                 return Task.FromResult(response);
             };
-            HttpClient client = new HttpClient(_handlerMock);
+            var client = new HttpClient(_handlerMock);
             _dequeueManager = new AzureWebHookDequeueManagerMock(this, maxAttempts: 1, storageManager: _storageMock.Object, httpClient: client);
-            IEnumerable<WebHookWorkItem> workItems = StorageManagerMock.CreateWorkItems(statusCodes.Length);
+            var workItems = StorageManagerMock.CreateWorkItems(statusCodes.Length);
 
             // Act
             await _dequeueManager.WebHookSender.SendWebHookWorkItemsAsync(workItems);
 
             // Assert
-            int expected = statusCodes.Where(i => (i >= 200 && i <= 299) || i == 410).Count();
+            var expected = statusCodes.Where(i => (i >= 200 && i <= 299) || i == 410).Count();
             _storageMock.Verify(s => s.DeleteMessagesAsync(StorageManagerMock.CloudQueue, It.Is<IEnumerable<CloudQueueMessage>>(m => m.Count() == expected)), Times.Once());
         }
 

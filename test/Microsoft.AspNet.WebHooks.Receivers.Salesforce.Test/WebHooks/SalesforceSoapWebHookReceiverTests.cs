@@ -31,11 +31,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             IWebHookReceiver rec = new SalesforceSoapWebHookReceiver();
-            string expected = "sfsoap";
+            var expected = "sfsoap";
 
             // Act
-            string actual1 = rec.Name;
-            string actual2 = SalesforceSoapWebHookReceiver.ReceiverName;
+            var actual1 = rec.Name;
+            var actual2 = SalesforceSoapWebHookReceiver.ReceiverName;
 
             // Assert
             Assert.Equal(expected, actual1);
@@ -50,10 +50,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.RequestUri = new Uri("http://some.no.ssl.host");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook receiver 'SalesforceSoapWebHookReceiverProxy' requires HTTPS in order to be secure. Please register a WebHook URI of type 'https'.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -67,10 +67,10 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent("{ }", Encoding.UTF8, "application/json");
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest));
 
             // Assert
-            HttpError error = await ex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await ex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The WebHook request must contain an entity body formatted as XML.", error.Message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
@@ -84,15 +84,15 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent("<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/'><soapenv:Body><notifications xmlns='http://soap.sforce.com/2005/09/outbound'><OrganizationId>Invalid</OrganizationId></notifications></soapenv:Body></soapenv:Envelope>", Encoding.UTF8, "application/xml");
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+            var actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            XElement error = await actual.Content.ReadAsAsync<XElement>();
-            string msg = error
+            var error = await actual.Content.ReadAsAsync<XElement>();
+            var message = error
                 .Element(Soap + "Body")
                 .Element(Soap + "Fault")
                 .Element("faultstring").Value;
-            Assert.Equal("The 'OrganizationId' parameter provided in the HTTP request did not match the expected value.", msg);
+            Assert.Equal("The 'OrganizationId' parameter provided in the HTTP request did not match the expected value.", message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
@@ -105,15 +105,15 @@ namespace Microsoft.AspNet.WebHooks
             _postRequest.Content = new StringContent("<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/'><soapenv:Body><notifications xmlns='http://soap.sforce.com/2005/09/outbound'><OrganizationId>123456789012345</OrganizationId></notifications></soapenv:Body></soapenv:Envelope>", Encoding.UTF8, "application/xml");
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
+            var actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, _postRequest);
 
             // Assert
-            XElement error = await actual.Content.ReadAsAsync<XElement>();
-            string msg = error
+            var error = await actual.Content.ReadAsAsync<XElement>();
+            var message = error
                 .Element(Soap + "Body")
                 .Element(Soap + "Fault")
                 .Element("faultstring").Value;
-            Assert.Equal("The HTTP request body did not contain a required 'ActionId' property.", msg);
+            Assert.Equal("The HTTP request body did not contain a required 'ActionId' property.", message);
             ReceiverMock.Protected()
                 .Verify<Task<HttpResponseMessage>>("ExecuteWebHookAsync", Times.Never(), TestId, RequestContext, _postRequest, ItExpr.IsAny<IEnumerable<string>>(), ItExpr.IsAny<object>());
         }
@@ -124,7 +124,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(GetConfigValue(id, TestSecret));
-            List<string> actions = new List<string> { "abcde" };
+            var actions = new List<string> { "abcde" };
             ReceiverMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("ExecuteWebHookAsync", id, RequestContext, _postRequest, actions, ItExpr.IsAny<object>())
                 .ReturnsAsync(new HttpResponseMessage())
@@ -147,11 +147,11 @@ namespace Microsoft.AspNet.WebHooks
         {
             // Arrange
             Initialize(TestSecret);
-            HttpRequestMessage req = new HttpRequestMessage { Method = new HttpMethod(method) };
+            var req = new HttpRequestMessage { Method = new HttpMethod(method) };
             req.SetRequestContext(RequestContext);
 
             // Act
-            HttpResponseMessage actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
+            var actual = await ReceiverMock.Object.ReceiveAsync(TestId, RequestContext, req);
 
             // Assert
             Assert.Equal(HttpStatusCode.MethodNotAllowed, actual.StatusCode);
@@ -169,7 +169,7 @@ namespace Microsoft.AspNet.WebHooks
         public void GetShortOrgId_HandlesIds(string id, string expected)
         {
             // Act
-            string actual = SalesforceSoapWebHookReceiver.GetShortOrgId(id);
+            var actual = SalesforceSoapWebHookReceiver.GetShortOrgId(id);
 
             // Assert
             Assert.Equal(expected, actual);

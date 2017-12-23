@@ -58,18 +58,18 @@ namespace Microsoft.AspNet.WebHooks
             // Check that there is a request body
             if (request.Content == null)
             {
-                var msg = ReceiverResources.Receiver_NoBody;
-                config.DependencyResolver.GetLogger().Info(msg);
-                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = ReceiverResources.Receiver_NoBody;
+                config.DependencyResolver.GetLogger().Info(message);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is JSON
             if (!request.Content.IsJson())
             {
-                var msg = ReceiverResources.Receiver_NoJson;
-                config.DependencyResolver.GetLogger().Info(msg);
-                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var message = ReceiverResources.Receiver_NoJson;
+                config.DependencyResolver.GetLogger().Info(message);
+                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, message);
                 throw new HttpResponseException(noJson);
             }
 
@@ -81,9 +81,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
-                config.DependencyResolver.GetLogger().Error(msg, ex);
-                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadJson, ex.Message);
+                config.DependencyResolver.GetLogger().Error(message, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
@@ -171,9 +171,9 @@ namespace Microsoft.AspNet.WebHooks
             // Require HTTP unless request is local
             if (!request.IsLocal() && !request.RequestUri.IsHttps())
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoHttps, GetType().Name, Uri.UriSchemeHttps);
-                resolver.GetLogger().Error(msg);
-                var noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoHttps, GetType().Name, Uri.UriSchemeHttps);
+                resolver.GetLogger().Error(message);
+                var noHttps = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noHttps);
             }
         }
@@ -201,18 +201,18 @@ namespace Microsoft.AspNet.WebHooks
             var code = queryParameters[CodeQueryParameter];
             if (string.IsNullOrEmpty(code))
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoCode, CodeQueryParameter);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-                var noCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_NoCode, CodeQueryParameter);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(message);
+                var noCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noCode);
             }
 
             var secretKey = await GetReceiverConfig(request, Name, id, CodeMinLength, CodeMaxLength);
             if (!WebHookReceiver.SecretEqual(code, secretKey))
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-                var invalidCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadCode, CodeQueryParameter);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(message);
+                var invalidCode = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(invalidCode);
             }
         }
@@ -244,9 +244,9 @@ namespace Microsoft.AspNet.WebHooks
             var secret = await receiverConfig.GetReceiverConfigAsync(name, id, minLength, maxLength);
             if (secret == null)
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
-                httpConfig.DependencyResolver.GetLogger().Error(msg);
-                var noSecret = request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSecret, name, id, minLength, maxLength);
+                httpConfig.DependencyResolver.GetLogger().Error(message);
+                var noSecret = request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
                 throw new HttpResponseException(noSecret);
             }
             return secret;
@@ -270,9 +270,9 @@ namespace Microsoft.AspNet.WebHooks
             if (!request.Headers.TryGetValues(requestHeaderName, out var headers) || headers.Count() != 1)
             {
                 var headersCount = headers != null ? headers.Count() : 0;
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadHeader, requestHeaderName, headersCount);
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                var noHeader = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadHeader, requestHeaderName, headersCount);
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(message);
+                var noHeader = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noHeader);
             }
 
@@ -321,18 +321,18 @@ namespace Microsoft.AspNet.WebHooks
             // Check that there is a request body
             if (request.Content == null)
             {
-                var msg = ReceiverResources.Receiver_NoBody;
-                config.DependencyResolver.GetLogger().Info(msg);
-                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = ReceiverResources.Receiver_NoBody;
+                config.DependencyResolver.GetLogger().Info(message);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is XML
             if (!request.Content.IsXml())
             {
-                var msg = ReceiverResources.Receiver_NoXml;
-                config.DependencyResolver.GetLogger().Info(msg);
-                var noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var message = ReceiverResources.Receiver_NoXml;
+                config.DependencyResolver.GetLogger().Info(message);
+                var noXml = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, message);
                 throw new HttpResponseException(noXml);
             }
 
@@ -344,9 +344,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
-                config.DependencyResolver.GetLogger().Error(msg, ex);
-                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadXml, ex.Message);
+                config.DependencyResolver.GetLogger().Error(message, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
@@ -361,18 +361,18 @@ namespace Microsoft.AspNet.WebHooks
             // Check that there is a request body
             if (request.Content == null)
             {
-                var msg = ReceiverResources.Receiver_NoBody;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = ReceiverResources.Receiver_NoBody;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(message);
+                var noBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 throw new HttpResponseException(noBody);
             }
 
             // Check that the request body is form data
             if (!request.Content.IsFormData())
             {
-                var msg = ReceiverResources.Receiver_NoFormData;
-                request.GetConfiguration().DependencyResolver.GetLogger().Info(msg);
-                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, msg);
+                var message = ReceiverResources.Receiver_NoFormData;
+                request.GetConfiguration().DependencyResolver.GetLogger().Info(message);
+                var noJson = request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, message);
                 throw new HttpResponseException(noJson);
             }
 
@@ -384,9 +384,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadFormData, ex.Message);
-                request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
-                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadFormData, ex.Message);
+                request.GetConfiguration().DependencyResolver.GetLogger().Error(message, ex);
+                var invalidBody = request.CreateErrorResponse(HttpStatusCode.BadRequest, message, ex);
                 throw new HttpResponseException(invalidBody);
             }
         }
@@ -405,9 +405,9 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadMethod, request.Method, GetType().Name);
-            request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-            var badMethod = request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, msg);
+            var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadMethod, request.Method, GetType().Name);
+            request.GetConfiguration().DependencyResolver.GetLogger().Error(message);
+            var badMethod = request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, message);
             return badMethod;
         }
 
@@ -426,9 +426,9 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSignature, signatureHeaderName, GetType().Name);
-            request.GetConfiguration().DependencyResolver.GetLogger().Error(msg);
-            var badSignature = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+            var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Receiver_BadSignature, signatureHeaderName, GetType().Name);
+            request.GetConfiguration().DependencyResolver.GetLogger().Error(message);
+            var badSignature = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
             return badSignature;
         }
 

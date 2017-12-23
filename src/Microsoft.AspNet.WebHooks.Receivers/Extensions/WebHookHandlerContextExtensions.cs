@@ -16,7 +16,7 @@ namespace Microsoft.AspNet.WebHooks
     public static class WebHookHandlerContextExtensions
     {
         /// <summary>
-        /// Gets the <see cref="WebHookHandlerContext.Data"/> property as type <typeparamref name="T"/>. If the 
+        /// Gets the <see cref="WebHookHandlerContext.Data"/> property as type <typeparamref name="T"/>. If the
         /// contents is not of type <typeparamref name="T"/> then <c>null</c> is returned.
         /// </summary>
         /// <typeparam name="T">The type to convert <see cref="WebHookHandlerContext.Data"/> to.</typeparam>
@@ -34,13 +34,13 @@ namespace Microsoft.AspNet.WebHooks
             {
                 try
                 {
-                    T data = ((JToken)context.Data).ToObject<T>();
+                    var data = ((JToken)context.Data).ToObject<T>();
                     return data;
                 }
                 catch (Exception ex)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.GetDataOrDefault_Failure, context.Data.GetType(), typeof(T), ex.Message);
-                    context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(msg, ex);
+                    var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.GetDataOrDefault_Failure, context.Data.GetType(), typeof(T), ex.Message);
+                    context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(message, ex);
                     return default(T);
                 }
             }

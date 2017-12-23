@@ -29,7 +29,7 @@ namespace Microsoft.AspNet.WebHooks.Mocks
 
         public static Mock<IStorageManager> Create()
         {
-            Mock<IStorageManager> storageMock = new Mock<IStorageManager>();
+            var storageMock = new Mock<IStorageManager>();
 
             storageMock.Setup(s => s.GetAzureStorageConnectionString(It.IsAny<SettingsDictionary>()))
                 .Returns(ConnectionString)
@@ -42,18 +42,18 @@ namespace Microsoft.AspNet.WebHooks.Mocks
 
         public static IEnumerable<WebHookWorkItem> CreateWorkItems(int count)
         {
-            WebHookWorkItem[] workItems = new WebHookWorkItem[count];
-            for (int cnt = 0; cnt < count; cnt++)
+            var workItems = new WebHookWorkItem[count];
+            for (var i = 0; i < count; i++)
             {
-                WebHook webHook = new WebHook
+                var webHook = new WebHook
                 {
                     WebHookUri = new Uri("http://localhost/path/" + count),
                     Secret = "0123456789012345678901234567890123456789" + count
                 };
-                NotificationDictionary notification = new NotificationDictionary("a" + cnt, cnt);
-                WebHookWorkItem workItem = new WebHookWorkItem(webHook, new[] { notification });
+                var notification = new NotificationDictionary("a" + i, i);
+                var workItem = new WebHookWorkItem(webHook, new[] { notification });
                 workItem.Properties[AzureWebHookDequeueManager.QueueMessageKey] = new CloudQueueMessage("content");
-                workItems[cnt] = workItem;
+                workItems[i] = workItem;
             }
             return workItems;
         }
@@ -62,8 +62,8 @@ namespace Microsoft.AspNet.WebHooks.Mocks
         {
             return CreateWorkItems(count).Select(item =>
             {
-                string content = JsonConvert.SerializeObject(item, SerializerSettings);
-                CloudQueueMessage message = new CloudQueueMessage(content);
+                var content = JsonConvert.SerializeObject(item, SerializerSettings);
+                var message = new CloudQueueMessage(content);
                 return message;
             }).ToArray();
         }

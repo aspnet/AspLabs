@@ -24,7 +24,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>
-        /// and <paramref name="logger"/>. 
+        /// and <paramref name="logger"/>.
         /// Using this constructor, the data will not be encrypted while persisted to the database.
         /// </summary>
         public SqlWebHookStore(SettingsDictionary settings, ILogger logger)
@@ -39,7 +39,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>
-        /// <paramref name="logger"/>, <paramref name="nameOrConnectionString"/>, <paramref name="schemaName"/> and <paramref name="tableName"/>. 
+        /// <paramref name="logger"/>, <paramref name="nameOrConnectionString"/>, <paramref name="schemaName"/> and <paramref name="tableName"/>.
         /// Using this constructor, the data will not be encrypted while persisted to the database.
         /// </summary>
         public SqlWebHookStore(SettingsDictionary settings, ILogger logger, string nameOrConnectionString, string schemaName, string tableName)
@@ -62,7 +62,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>,
-        /// <paramref name="protector"/>, and <paramref name="logger"/>. 
+        /// <paramref name="protector"/>, and <paramref name="logger"/>.
         /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
         /// </summary>
         public SqlWebHookStore(SettingsDictionary settings, IDataProtector protector, ILogger logger)
@@ -77,7 +77,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlWebHookStore"/> class with the given <paramref name="settings"/>,
-        /// <paramref name="protector"/>, <paramref name="logger"/>, <paramref name="nameOrConnectionString"/>, <paramref name="schemaName"/> and <paramref name="tableName"/>. 
+        /// <paramref name="protector"/>, <paramref name="logger"/>, <paramref name="nameOrConnectionString"/>, <paramref name="schemaName"/> and <paramref name="tableName"/>.
         /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
         /// </summary>
         public SqlWebHookStore(
@@ -141,11 +141,11 @@ namespace Microsoft.AspNet.WebHooks
             string schemaName,
             string tableName)
         {
-            SettingsDictionary settings = CommonServices.GetSettings();
+            var settings = CommonServices.GetSettings();
             IWebHookStore store;
             if (encryptData)
             {
-                IDataProtector protector = DataSecurity.GetDataProtector();
+                var protector = DataSecurity.GetDataProtector();
                 store = new SqlWebHookStore(settings, protector, logger, nameOrConnectionString, schemaName, tableName);
             }
             else
@@ -162,11 +162,12 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            ConnectionSettings connection;
-            if (!settings.Connections.TryGetValue(WebHookStoreContext.ConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
+            if (!settings.Connections.TryGetValue(WebHookStoreContext.ConnectionStringName, out var connection) ||
+                connection == null ||
+                string.IsNullOrEmpty(connection.ConnectionString))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_NoConnectionString, WebHookStoreContext.ConnectionStringName);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_NoConnectionString, WebHookStoreContext.ConnectionStringName);
+                throw new InvalidOperationException(message);
             }
             return connection.ConnectionString;
         }

@@ -25,10 +25,10 @@ namespace Microsoft.AspNet.WebHooks
                 return string.Empty;
             }
 
-            char[] content = new char[data.Length * 2];
-            int output = 0;
+            var content = new char[data.Length * 2];
+            var output = 0;
             byte d;
-            for (int input = 0; input < data.Length; input++)
+            for (var input = 0; input < data.Length; input++)
             {
                 d = data[input];
                 content[output++] = HexLookup[d / 0x10];
@@ -51,8 +51,8 @@ namespace Microsoft.AspNet.WebHooks
             try
             {
                 data = new byte[content.Length / 2];
-                int input = 0;
-                for (int output = 0; output < data.Length; output++)
+                var input = 0;
+                for (var output = 0; output < data.Length; output++)
                 {
                     data[output] = Convert.ToByte(new string(new char[2] { content[input++], content[input++] }), 16);
                 }
@@ -69,8 +69,8 @@ namespace Microsoft.AspNet.WebHooks
 
             if (data == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.EncodingUtils_InvalidHexValue, content);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CommonResources.EncodingUtils_InvalidHexValue, content);
+                throw new InvalidOperationException(message);
             }
 
             return data;
@@ -88,7 +88,7 @@ namespace Microsoft.AspNet.WebHooks
                 return string.Empty;
             }
 
-            string content = Convert.ToBase64String(data);
+            var content = Convert.ToBase64String(data);
             return uriSafe ? content.TrimEnd(Base64Padding).Replace('+', '-').Replace('/', '_') : content;
         }
 
@@ -103,7 +103,7 @@ namespace Microsoft.AspNet.WebHooks
                 return new byte[0];
             }
 
-            string base64 = content.Replace('_', '/').Replace('-', '+');
+            var base64 = content.Replace('_', '/').Replace('-', '+');
             switch (content.Length % 4)
             {
                 case 2:
@@ -114,7 +114,7 @@ namespace Microsoft.AspNet.WebHooks
                     base64 += "=";
                     break;
             }
-            byte[] data = Convert.FromBase64String(base64);
+            var data = Convert.FromBase64String(base64);
             return data;
         }
     }

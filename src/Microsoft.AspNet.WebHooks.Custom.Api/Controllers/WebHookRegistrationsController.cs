@@ -36,13 +36,13 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             try
             {
-                IEnumerable<WebHook> webHooks = await _registrationsManager.GetWebHooksAsync(User, RemovePrivateFilters);
+                var webHooks = await _registrationsManager.GetWebHooksAsync(User, RemovePrivateFilters);
                 return webHooks;
             }
             catch (Exception ex)
             {
                 Configuration.DependencyResolver.GetLogger().Error(ex.Message, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
                 throw new HttpResponseException(error);
             }
         }
@@ -58,7 +58,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             try
             {
-                WebHook webHook = await _registrationsManager.LookupWebHookAsync(User, id, RemovePrivateFilters);
+                var webHook = await _registrationsManager.LookupWebHookAsync(User, id, RemovePrivateFilters);
                 if (webHook != null)
                 {
                     return Ok(webHook);
@@ -68,7 +68,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             catch (Exception ex)
             {
                 Configuration.DependencyResolver.GetLogger().Error(ex.Message, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message, ex);
                 throw new HttpResponseException(error);
             }
         }
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             try
             {
                 // Validate the provided WebHook ID (or force one to be created on server side)
-                IWebHookIdValidator idValidator = Configuration.DependencyResolver.GetIdValidator();
+                var idValidator = Configuration.DependencyResolver.GetIdValidator();
                 await idValidator.ValidateIdAsync(Request, webHook);
 
                 // Validate other parts of WebHook
@@ -100,16 +100,16 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Info(message);
+                var error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, message, ex);
                 return ResponseMessage(error);
             }
 
             try
             {
                 // Add WebHook for this user.
-                StoreResult result = await _registrationsManager.AddWebHookAsync(User, webHook, AddPrivateFilters);
+                var result = await _registrationsManager.AddWebHookAsync(User, webHook, AddPrivateFilters);
                 if (result == StoreResult.Success)
                 {
                     return CreatedAtRoute(WebHookRouteNames.RegistrationLookupAction, new { id = webHook.Id }, webHook);
@@ -118,9 +118,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message, ex);
                 return ResponseMessage(error);
             }
         }
@@ -152,23 +152,23 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrationFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Info(message);
+                var error = Request.CreateErrorResponse(HttpStatusCode.BadRequest, message, ex);
                 return ResponseMessage(error);
             }
 
             try
             {
                 // Update WebHook for this user
-                StoreResult result = await _registrationsManager.UpdateWebHookAsync(User, webHook, AddPrivateFilters);
+                var result = await _registrationsManager.UpdateWebHookAsync(User, webHook, AddPrivateFilters);
                 return CreateHttpResult(result);
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_UpdateFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_UpdateFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message, ex);
                 return ResponseMessage(error);
             }
         }
@@ -182,14 +182,14 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             try
             {
-                StoreResult result = await _registrationsManager.DeleteWebHookAsync(User, id);
+                var result = await _registrationsManager.DeleteWebHookAsync(User, id);
                 return CreateHttpResult(result);
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message, ex);
                 return ResponseMessage(error);
             }
         }
@@ -207,9 +207,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteAllFailure, ex.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                HttpResponseMessage error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_DeleteAllFailure, ex.Message);
+                Configuration.DependencyResolver.GetLogger().Error(message, ex);
+                var error = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message, ex);
                 return ResponseMessage(error);
             }
         }
@@ -233,7 +233,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
 
             var filters = webHook.Filters.Where(f => f.StartsWith(WebHookRegistrar.PrivateFilterPrefix, StringComparison.OrdinalIgnoreCase)).ToArray();
-            foreach (string filter in filters)
+            foreach (var filter in filters)
             {
                 webHook.Filters.Remove(filter);
             }
@@ -242,13 +242,13 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
         /// <summary>
         /// Executes all <see cref="IWebHookRegistrar"/> instances for server side manipulation, inspection, or
-        /// rejection of registrations. This can for example be used to add server side only filters that 
+        /// rejection of registrations. This can for example be used to add server side only filters that
         /// are not governed by <see cref="IWebHookFilterManager"/>.
         /// </summary>
         protected virtual async Task AddPrivateFilters(string user, WebHook webHook)
         {
-            IEnumerable<IWebHookRegistrar> registrars = Configuration.DependencyResolver.GetRegistrars();
-            foreach (IWebHookRegistrar registrar in registrars)
+            var registrars = Configuration.DependencyResolver.GetRegistrars();
+            foreach (var registrar in registrars)
             {
                 try
                 {
@@ -256,15 +256,15 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 }
                 catch (HttpResponseException rex)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarStatusCode, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, rex.Response.StatusCode);
-                    Configuration.DependencyResolver.GetLogger().Info(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarStatusCode, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, rex.Response.StatusCode);
+                    Configuration.DependencyResolver.GetLogger().Info(message);
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarException, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, ex.Message);
-                    Configuration.DependencyResolver.GetLogger().Error(msg, ex);
-                    HttpResponseMessage response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CustomApiResources.RegistrationController_RegistrarException, registrar.GetType().Name, typeof(IWebHookRegistrar).Name, ex.Message);
+                    Configuration.DependencyResolver.GetLogger().Error(message, ex);
+                    var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                     throw new HttpResponseException(response);
                 }
             }

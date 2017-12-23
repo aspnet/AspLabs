@@ -93,12 +93,12 @@ namespace Microsoft.AspNet.WebHooks
         /// <returns>An initialized <see cref="AzureWebHookStore"/> instance.</returns>
         public static IWebHookStore CreateStore(ILogger logger, bool encryptData)
         {
-            SettingsDictionary settings = CommonServices.GetSettings();
+            var settings = CommonServices.GetSettings();
             IWebHookStore store;
-            IStorageManager storageManager = StorageManager.GetInstance(logger);
+            var storageManager = StorageManager.GetInstance(logger);
             if (encryptData)
             {
-                IDataProtector protector = DataSecurity.GetDataProtector();
+                var protector = DataSecurity.GetDataProtector();
                 store = new AzureWebHookStore(storageManager, settings, protector, logger);
             }
             else
@@ -118,11 +118,11 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            TableQuery query = new TableQuery();
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var query = new TableQuery();
             _manager.AddPartitionKeyConstraint(query, user);
 
-            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            var entities = await _manager.ExecuteQueryAsync(table, query);
             ICollection<WebHook> result = entities.Select(e => ConvertToWebHook(e))
                 .Where(w => w != null)
                 .ToArray();
@@ -145,11 +145,11 @@ namespace Microsoft.AspNet.WebHooks
 
             predicate = predicate ?? DefaultPredicate;
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            TableQuery query = new TableQuery();
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var query = new TableQuery();
             _manager.AddPartitionKeyConstraint(query, user);
 
-            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            var entities = await _manager.ExecuteQueryAsync(table, query);
             ICollection<WebHook> matches = entities.Select(e => ConvertToWebHook(e))
                 .Where(w => MatchesAnyAction(w, actions) && predicate(w, user))
                 .ToArray();
@@ -171,16 +171,16 @@ namespace Microsoft.AspNet.WebHooks
             user = NormalizeKey(user);
             id = NormalizeKey(id);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            TableResult result = await _manager.ExecuteRetrievalAsync(table, user, id);
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var result = await _manager.ExecuteRetrievalAsync(table, user, id);
             if (!result.IsSuccess())
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NotFound, user, id);
-                _logger.Info(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NotFound, user, id);
+                _logger.Info(message);
                 return null;
             }
 
-            DynamicTableEntity entity = result.Result as DynamicTableEntity;
+            var entity = result.Result as DynamicTableEntity;
             return ConvertToWebHook(entity);
         }
 
@@ -197,18 +197,18 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             user = NormalizeKey(user);
-            string id = NormalizeKey(webHook.Id);
+            var id = NormalizeKey(webHook.Id);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            DynamicTableEntity tableEntity = ConvertFromWebHook(user, id, webHook);
-            TableOperation operation = TableOperation.Insert(tableEntity, echoContent: false);
-            TableResult tableResult = await _manager.ExecuteAsync(table, operation);
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var tableEntity = ConvertFromWebHook(user, id, webHook);
+            var operation = TableOperation.Insert(tableEntity, echoContent: false);
+            var tableResult = await _manager.ExecuteAsync(table, operation);
 
-            StoreResult result = GetStoreResult(tableResult);
+            var result = GetStoreResult(tableResult);
             if (result != StoreResult.Success)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_CreateFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_CreateFailed, table.Name, tableResult.HttpStatusCode);
+                _logger.Error(message);
             }
             return result;
         }
@@ -226,18 +226,18 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             user = NormalizeKey(user);
-            string id = NormalizeKey(webHook.Id);
+            var id = NormalizeKey(webHook.Id);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            DynamicTableEntity tableEntity = ConvertFromWebHook(user, id, webHook);
-            TableOperation operation = TableOperation.Replace(tableEntity);
-            TableResult tableResult = await _manager.ExecuteAsync(table, operation);
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var tableEntity = ConvertFromWebHook(user, id, webHook);
+            var operation = TableOperation.Replace(tableEntity);
+            var tableResult = await _manager.ExecuteAsync(table, operation);
 
-            StoreResult result = GetStoreResult(tableResult);
+            var result = GetStoreResult(tableResult);
             if (result != StoreResult.Success)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
+                _logger.Error(message);
             }
             return result;
         }
@@ -257,18 +257,20 @@ namespace Microsoft.AspNet.WebHooks
             user = NormalizeKey(user);
             id = NormalizeKey(id);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            TableEntity tableEntity = new TableEntity(user, id);
-            tableEntity.ETag = "*";
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var tableEntity = new TableEntity(user, id)
+            {
+                ETag = "*"
+            };
 
-            TableOperation operation = TableOperation.Delete(tableEntity);
-            TableResult tableResult = await _manager.ExecuteAsync(table, operation);
+            var operation = TableOperation.Delete(tableEntity);
+            var tableResult = await _manager.ExecuteAsync(table, operation);
 
-            StoreResult result = GetStoreResult(tableResult);
+            var result = GetStoreResult(tableResult);
             if (result != StoreResult.Success)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
-                _logger.Error(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, table.Name, tableResult.HttpStatusCode);
+                _logger.Error(message);
             }
             return result;
         }
@@ -283,7 +285,7 @@ namespace Microsoft.AspNet.WebHooks
 
             user = NormalizeKey(user);
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
             await _manager.ExecuteDeleteAllAsync(table, user, filter: null);
         }
 
@@ -295,16 +297,16 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(actions));
             }
 
-            CloudTable table = _manager.GetCloudTable(_connectionString, WebHookTable);
-            TableQuery query = new TableQuery();
+            var table = _manager.GetCloudTable(_connectionString, WebHookTable);
+            var query = new TableQuery();
 
             predicate = predicate ?? DefaultPredicate;
 
-            IEnumerable<DynamicTableEntity> entities = await _manager.ExecuteQueryAsync(table, query);
+            var entities = await _manager.ExecuteQueryAsync(table, query);
             var matches = new List<WebHook>();
             foreach (var entity in entities)
             {
-                WebHook webHook = ConvertToWebHook(entity);
+                var webHook = ConvertToWebHook(entity);
                 if (MatchesAnyAction(webHook, actions) && predicate(webHook, entity.PartitionKey))
                 {
                     matches.Add(webHook);
@@ -341,39 +343,40 @@ namespace Microsoft.AspNet.WebHooks
 
         private WebHook ConvertToWebHook(DynamicTableEntity entity)
         {
-            EntityProperty property;
-            if (entity == null || !entity.Properties.TryGetValue(WebHookDataColumn, out property))
+            if (entity == null || !entity.Properties.TryGetValue(WebHookDataColumn, out var property))
             {
                 return null;
             }
 
             try
             {
-                string encryptedContent = property.StringValue;
+                var encryptedContent = property.StringValue;
                 if (encryptedContent != null)
                 {
-                    string content = _protector != null ? _protector.Unprotect(encryptedContent) : encryptedContent;
-                    WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
+                    var content = _protector != null ? _protector.Unprotect(encryptedContent) : encryptedContent;
+                    var webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
                     return webHook;
                 }
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_BadWebHook, typeof(WebHook).Name, ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_BadWebHook, typeof(WebHook).Name, ex.Message);
+                _logger.Error(message, ex);
             }
             return null;
         }
 
         private DynamicTableEntity ConvertFromWebHook(string partitionKey, string rowKey, WebHook webHook)
         {
-            DynamicTableEntity entity = new DynamicTableEntity(partitionKey, rowKey);
-            entity.ETag = "*";
+            var entity = new DynamicTableEntity(partitionKey, rowKey)
+            {
+                ETag = "*"
+            };
 
             // Set data column with encrypted serialization of WebHook
-            string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string encryptedContent = _protector != null ? _protector.Protect(content) : content;
-            EntityProperty property = EntityProperty.GeneratePropertyForString(encryptedContent);
+            var content = JsonConvert.SerializeObject(webHook, _serializerSettings);
+            var encryptedContent = _protector != null ? _protector.Protect(content) : content;
+            var property = EntityProperty.GeneratePropertyForString(encryptedContent);
             entity.Properties.Add(WebHookDataColumn, property);
 
             return entity;

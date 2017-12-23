@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
-using System.Xml.Linq;
 using Microsoft.AspNet.WebHooks.Properties;
 
 namespace Microsoft.AspNet.WebHooks
@@ -19,10 +18,10 @@ namespace Microsoft.AspNet.WebHooks
     /// <summary>
     /// Provides an <see cref="IWebHookReceiver"/> implementation which supports Salesforce SOAP-based Outbound Messages as a WebHook.
     /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/sfsoap/{id}</c>'.
-    /// For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>' 
-    /// application setting must be configured to the Salesforce Organization IDs. The Organizational IDs can be found at 
+    /// For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>'
+    /// application setting must be configured to the Salesforce Organization IDs. The Organizational IDs can be found at
     /// <c>http://www.salesforce.com</c> under <c>Setup | Company Profile | Company Information</c>.
-    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>. 
+    /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>.
     /// </summary>
     public class SalesforceSoapWebHookReceiver : WebHookReceiver
     {
@@ -64,41 +63,41 @@ namespace Microsoft.AspNet.WebHooks
                 EnsureSecureConnection(request);
 
                 // Read the request entity body
-                XElement data = await ReadAsXmlAsync(request);
-                SalesforceNotifications notifications = new SalesforceNotifications(data);
+                var data = await ReadAsXmlAsync(request);
+                var notifications = new SalesforceNotifications(data);
 
                 // Ensure that the organization ID matches the expected value.
-                string orgId = GetShortOrgId(notifications.OrganizationId);
-                string secret = await GetReceiverConfig(request, ReceiverConfigName, id, 15, 18);
-                string secretKey = GetShortOrgId(secret);
+                var orgId = GetShortOrgId(notifications.OrganizationId);
+                var secret = await GetReceiverConfig(request, ReceiverConfigName, id, 15, 18);
+                var secretKey = GetShortOrgId(secret);
                 if (!WebHookReceiver.SecretEqual(orgId, secretKey))
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadValue, "OrganizationId");
-                    context.Configuration.DependencyResolver.GetLogger().Error(msg);
-                    string fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), msg);
-                    HttpResponseMessage invalidId = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
+                    var message = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadValue, "OrganizationId");
+                    context.Configuration.DependencyResolver.GetLogger().Error(message);
+                    var fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), message);
+                    var invalidId = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
                     return invalidId;
                 }
 
                 // Get the action
-                string action = notifications.ActionId;
+                var action = notifications.ActionId;
                 if (string.IsNullOrEmpty(action))
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadBody, "ActionId");
-                    context.Configuration.DependencyResolver.GetLogger().Error(msg);
-                    string fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), msg);
-                    HttpResponseMessage badType = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
+                    var message = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.Receiver_BadBody, "ActionId");
+                    context.Configuration.DependencyResolver.GetLogger().Error(message);
+                    var fault = string.Format(CultureInfo.InvariantCulture, ReadResource("Microsoft.AspNet.WebHooks.Messages.FaultResponse.xml"), message);
+                    var badType = GetXmlResponse(request, HttpStatusCode.BadRequest, fault);
                     return badType;
                 }
 
                 // Call registered handlers
-                HttpResponseMessage response = await ExecuteWebHookAsync(id, context, request, new string[] { action }, notifications);
+                var response = await ExecuteWebHookAsync(id, context, request, new string[] { action }, notifications);
 
                 // Add SOAP response if not already present
                 if (response == null || response.Content == null || !response.Content.IsXml())
                 {
-                    string ack = ReadResource("Microsoft.AspNet.WebHooks.Messages.NotificationResponse.xml");
-                    response = GetXmlResponse(request, HttpStatusCode.OK, ack);
+                    var success = ReadResource("Microsoft.AspNet.WebHooks.Messages.NotificationResponse.xml");
+                    response = GetXmlResponse(request, HttpStatusCode.OK, success);
                 }
                 return response;
             }
@@ -118,24 +117,24 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
-        internal static HttpResponseMessage GetXmlResponse(HttpRequestMessage request, HttpStatusCode statusCode, string msg)
+        internal static HttpResponseMessage GetXmlResponse(HttpRequestMessage request, HttpStatusCode statusCode, string message)
         {
-            HttpResponseMessage response = request.CreateResponse(statusCode);
-            response.Content = new StringContent(msg, Encoding.UTF8, "application/xml");
+            var response = request.CreateResponse(statusCode);
+            response.Content = new StringContent(message, Encoding.UTF8, "application/xml");
             return response;
         }
 
         internal static string ReadResource(string name)
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = assembly.GetManifestResourceStream(name);
             if (content == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.EmbeddedResources_Unknown, name);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, SalesforceReceiverResources.EmbeddedResources_Unknown, name);
+                throw new InvalidOperationException(message);
             }
 
-            using (StreamReader reader = new StreamReader(content))
+            using (var reader = new StreamReader(content))
             {
                 return reader.ReadToEnd();
             }

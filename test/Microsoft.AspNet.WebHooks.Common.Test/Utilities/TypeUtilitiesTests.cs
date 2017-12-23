@@ -42,11 +42,11 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void IsType_DetectsTypes(Type testType, Type type, bool expected)
         {
             // Arrange
-            MethodInfo genericIsTypeMethod = typeof(TypeUtilities).GetMethod("IsType");
-            MethodInfo isTypeMethod = genericIsTypeMethod.MakeGenericMethod(testType);
+            var genericIsTypeMethod = typeof(TypeUtilities).GetMethod("IsType");
+            var isTypeMethod = genericIsTypeMethod.MakeGenericMethod(testType);
 
             // Act
-            bool actual = (bool)isTypeMethod.Invoke(null, new[] { type });
+            var actual = (bool)isTypeMethod.Invoke(null, new[] { type });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -56,10 +56,10 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void GetTypes_ReturnsExpectedTypes()
         {
             // Arrange
-            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             // Act
-            ICollection<Type> actual = TypeUtilities.GetTypes(asms, t => TypeUtilities.IsType<ITestType>(t));
+            var actual = TypeUtilities.GetTypes(assemblies, t => TypeUtilities.IsType<ITestType>(t));
 
             // Assert
             Assert.Equal(1, actual.Count);
@@ -70,10 +70,10 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void GetTypes_ReturnsEmptyIfNoneFound()
         {
             // Arrange
-            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             // Act
-            ICollection<Type> actual = TypeUtilities.GetTypes(asms, t => TypeUtilities.IsType<INotImplementedTestType>(t));
+            var actual = TypeUtilities.GetTypes(assemblies, t => TypeUtilities.IsType<INotImplementedTestType>(t));
 
             // Assert
             Assert.Empty(actual);
@@ -83,7 +83,7 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void GetTypes_ReturnsEmptyListIfNullAssemblies()
         {
             // Act
-            ICollection<Type> actual = TypeUtilities.GetTypes(null, t => TypeUtilities.IsType<INotImplementedTestType>(t));
+            var actual = TypeUtilities.GetTypes(null, t => TypeUtilities.IsType<INotImplementedTestType>(t));
 
             // Assert
             Assert.Empty(actual);
@@ -93,10 +93,10 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void GetTypes_ReturnsEmptyListIfNullAssemblyEntries()
         {
             // Arrange
-            Assembly[] asms = new Assembly[4];
+            var assemblies = new Assembly[4];
 
             // Act
-            ICollection<Type> actual = TypeUtilities.GetTypes(asms, t => TypeUtilities.IsType<INotImplementedTestType>(t));
+            var actual = TypeUtilities.GetTypes(assemblies, t => TypeUtilities.IsType<INotImplementedTestType>(t));
 
             // Assert
             Assert.Empty(actual);
@@ -106,10 +106,10 @@ namespace Microsoft.AspNet.WebHooks.Utilities
         public void GetInstances_CreatesExpectedInstances()
         {
             // Arrange
-            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             // Act
-            ICollection<ITestType> actual = TypeUtilities.GetInstances<ITestType>(asms, t => TypeUtilities.IsType<ITestType>(t));
+            var actual = TypeUtilities.GetInstances<ITestType>(assemblies, t => TypeUtilities.IsType<ITestType>(t));
 
             // Assert
             Assert.Equal(1, actual.Count);

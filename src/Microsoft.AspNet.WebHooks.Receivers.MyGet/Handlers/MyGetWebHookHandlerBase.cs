@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides a base <see cref="IWebHookHandler" /> implementation which can be used to for handling MyGet WebHook using strongly-typed 
+    /// Provides a base <see cref="IWebHookHandler" /> implementation which can be used to for handling MyGet WebHook using strongly-typed
     /// payloads. For details about MyGet WebHooks, see <c>http://docs.myget.org/docs/reference/webhooks</c>.
     /// </summary>
     public abstract class MyGetWebHookHandlerBase : WebHookHandler
@@ -26,7 +26,7 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         protected MyGetWebHookHandlerBase()
         {
-            this.Receiver = MyGetWebHookReceiver.ReceiverName;
+            Receiver = MyGetWebHookReceiver.ReceiverName;
         }
 
         /// <inheritdoc />
@@ -37,16 +37,15 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(context));
             }
 
-            string action = context.Actions.First();
-            JObject data = context.GetDataOrDefault<JObject>();
+            var action = context.Actions.First();
+            var data = context.GetDataOrDefault<JObject>();
 
             // Check if a payload is available
-            JToken payload;
-            if (data == null || !data.TryGetValue(PayloadPropertyName, out payload))
+            if (data == null || !data.TryGetValue(PayloadPropertyName, out var payload))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, MyGetReceiverResources.Receiver_NoPayload, PayloadPropertyName);
-                context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(msg);
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, MyGetReceiverResources.Receiver_NoPayload, PayloadPropertyName);
+                context.RequestContext.Configuration.DependencyResolver.GetLogger().Error(message);
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 return Task.FromResult(true);
             }
 

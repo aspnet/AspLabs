@@ -48,8 +48,7 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             string id = null;
-            ClaimsPrincipal principal = user as ClaimsPrincipal;
-            if (principal != null)
+            if (user is ClaimsPrincipal principal)
             {
                 id = GetClaim(principal, _claimsType);
                 if (id == null)
@@ -66,8 +65,8 @@ namespace Microsoft.AspNet.WebHooks
 
             if (id == null)
             {
-                string msg = CustomResources.Manager_NoUser;
-                throw new InvalidOperationException(msg);
+                var message = CustomResources.Manager_NoUser;
+                throw new InvalidOperationException(message);
             }
 
             return Task.FromResult(id);
@@ -79,8 +78,8 @@ namespace Microsoft.AspNet.WebHooks
         /// <returns>The value of the claim or <c>null</c> if not found.</returns>
         internal static string GetClaim(ClaimsPrincipal principal, string claimsType)
         {
-            Claim claim = principal != null ? principal.FindFirst(claimsType) : null;
-            return claim != null ? claim.Value : null;
+            var claim = principal?.FindFirst(claimsType);
+            return claim?.Value;
         }
 
         /// <summary>

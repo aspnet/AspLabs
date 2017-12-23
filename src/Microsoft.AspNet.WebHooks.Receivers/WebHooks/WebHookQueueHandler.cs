@@ -11,9 +11,9 @@ using Microsoft.AspNet.WebHooks.Properties;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides an abstract <see cref="IWebHookHandler" /> implementation which can be used to enqueue 
-    /// WebHooks for processing outside their immediate HTTP request/response context. This can for example 
-    /// be used to process WebHooks by a separate agent or at another time. It can also be used for WebHooks 
+    /// Provides an abstract <see cref="IWebHookHandler" /> implementation which can be used to enqueue
+    /// WebHooks for processing outside their immediate HTTP request/response context. This can for example
+    /// be used to process WebHooks by a separate agent or at another time. It can also be used for WebHooks
     /// where the processing take longer than permitted by the immediate HTTP request/response context.
     /// </summary>
     public abstract class WebHookQueueHandler : WebHookHandler
@@ -41,20 +41,20 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                WebHookQueueContext queueContext = new WebHookQueueContext(receiver, context);
+                var queueContext = new WebHookQueueContext(receiver, context);
                 await EnqueueAsync(queueContext);
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.QueueHandler_EnqueueError, ex.Message);
-                context.Request.GetConfiguration().DependencyResolver.GetLogger().Error(msg, ex);
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.QueueHandler_EnqueueError, ex.Message);
+                context.Request.GetConfiguration().DependencyResolver.GetLogger().Error(message, ex);
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
 
         /// <summary>
         /// Enqueues an incoming WebHook for processing outside its immediate HTTP request/response context.
-        /// Any exception thrown will result in an HTTP error response being returned to the party generating 
+        /// Any exception thrown will result in an HTTP error response being returned to the party generating
         /// the WebHook.
         /// </summary>
         /// <param name="context">The <see cref="WebHookQueueContext"/> for the WebHook to be enqueued.</param>

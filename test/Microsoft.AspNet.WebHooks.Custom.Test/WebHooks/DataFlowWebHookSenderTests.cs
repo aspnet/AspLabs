@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.WebHooks
         {
             get
             {
-                TimeSpan delay = TimeSpan.FromMilliseconds(25);
+                var delay = TimeSpan.FromMilliseconds(25);
                 return new TheoryData<TimeSpan[], Func<HttpRequestMessage, int, Task<HttpResponseMessage>>, int, SendResult>
                 {
                     { new TimeSpan[0], CreateNotifyResponseHandler(1), 0, SendResult.Success },
@@ -90,10 +90,10 @@ namespace Microsoft.AspNet.WebHooks
         public async Task SendWebHook_StopsOnLastLastFailureOrFirstSuccessAndFirstGone(TimeSpan[] delays, Func<HttpRequestMessage, int, Task<HttpResponseMessage>> handler, int expectedOffset, SendResult expectedResult)
         {
             // Arrange
-            SendResult actualResult = SendResult.None;
-            ManualResetEvent done = new ManualResetEvent(initialState: false);
+            var actualResult = SendResult.None;
+            var done = new ManualResetEvent(initialState: false);
             WebHookWorkItem final = null;
-            int actualRetries = 0;
+            var actualRetries = 0;
             _sender = new TestDataflowWebHookSender(_loggerMock.Object, delays, _options, _httpClient,
             onWebHookRetry: item =>
             {
@@ -118,9 +118,9 @@ namespace Microsoft.AspNet.WebHooks
                 done.Set();
             });
             _handlerMock.Handler = handler;
-            NotificationDictionary notification = new NotificationDictionary("a1", data: null);
-            WebHook webHook = WebHookManagerTests.CreateWebHook();
-            WebHookWorkItem workItem = new WebHookWorkItem(webHook, new[] { notification })
+            var notification = new NotificationDictionary("a1", data: null);
+            var webHook = WebHookManagerTests.CreateWebHook();
+            var workItem = new WebHookWorkItem(webHook, new[] { notification })
             {
                 Id = "1234567890",
             };
@@ -130,7 +130,7 @@ namespace Microsoft.AspNet.WebHooks
             done.WaitOne();
 
             // Assert
-            int expectedRetries = expectedResult == SendResult.Failure ? Math.Max(0, expectedOffset - 1) : expectedOffset;
+            var expectedRetries = expectedResult == SendResult.Failure ? Math.Max(0, expectedOffset - 1) : expectedOffset;
             Assert.Equal(expectedRetries, actualRetries);
             Assert.Equal(expectedResult, actualResult);
             Assert.Equal(expectedOffset, final.Offset);
@@ -140,7 +140,7 @@ namespace Microsoft.AspNet.WebHooks
         public void Dispose_Succeeds()
         {
             // Arrange
-            DataflowWebHookSender s = new DataflowWebHookSender(_loggerMock.Object);
+            var s = new DataflowWebHookSender(_loggerMock.Object);
 
             // Act
             s.Dispose();
@@ -165,24 +165,24 @@ namespace Microsoft.AspNet.WebHooks
 
         private static HttpResponseMessage[] CreateResponseArray(int length, bool failuresOnly = false, bool isGone = false)
         {
-            HttpResponseMessage[] responses = new HttpResponseMessage[length];
-            int cnt = 0;
-            for (; cnt < length - 1; cnt++)
+            var responses = new HttpResponseMessage[length];
+            var count = 0;
+            for (; count < length - 1; count++)
             {
-                responses[cnt] = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                responses[count] = new HttpResponseMessage(HttpStatusCode.InternalServerError);
             }
 
             // Set the final response to be either success or failure.
-            responses[cnt] = new HttpResponseMessage(failuresOnly ? HttpStatusCode.InternalServerError : isGone ? HttpStatusCode.Gone : HttpStatusCode.OK);
+            responses[count] = new HttpResponseMessage(failuresOnly ? HttpStatusCode.InternalServerError : isGone ? HttpStatusCode.Gone : HttpStatusCode.OK);
             return responses;
         }
 
         private static Func<HttpRequestMessage, int, Task<HttpResponseMessage>> CreateNotifyResponseHandler(int requests, bool failuresOnly = false, bool throwExceptions = false, bool isGone = false)
         {
-            HttpResponseMessage[] responses = CreateResponseArray(requests, failuresOnly, isGone);
+            var responses = CreateResponseArray(requests, failuresOnly, isGone);
             return (req, counter) =>
             {
-                HttpResponseMessage response = responses[counter];
+                var response = responses[counter];
                 if (throwExceptions && !response.IsSuccessStatusCode)
                 {
                     throw new Exception("Catch this!");
@@ -214,38 +214,26 @@ namespace Microsoft.AspNet.WebHooks
 
             protected override Task OnWebHookRetry(WebHookWorkItem workItem)
             {
-                if (_onRetry != null)
-                {
-                    _onRetry(workItem);
-                }
+                _onRetry?.Invoke(workItem);
                 return Task.FromResult(true);
             }
 
             protected override Task OnWebHookSuccess(WebHookWorkItem workItem)
             {
-                if (_onSuccess != null)
-                {
-                    _onSuccess(workItem);
-                }
+                _onSuccess?.Invoke(workItem);
                 return Task.FromResult(true);
             }
 
             protected override Task OnWebHookGone(WebHookWorkItem workItem)
             {
-                if (_onGone != null)
-                {
-                    _onGone(workItem);
-                }
+                _onGone?.Invoke(workItem);
 
                 return Task.FromResult(true);
             }
 
             protected override Task OnWebHookFailure(WebHookWorkItem workItem)
             {
-                if (_onFailure != null)
-                {
-                    _onFailure(workItem);
-                }
+                _onFailure?.Invoke(workItem);
                 return Task.FromResult(true);
             }
         }

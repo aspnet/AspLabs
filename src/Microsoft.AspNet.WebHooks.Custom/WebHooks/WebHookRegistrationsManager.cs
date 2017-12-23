@@ -11,7 +11,7 @@ using Microsoft.AspNet.WebHooks.Properties;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IWebHookRegistrationsManager"/> for managing registrations for 
+    /// Provides an implementation of <see cref="IWebHookRegistrationsManager"/> for managing registrations for
     /// a given user.
     /// </summary>
     public class WebHookRegistrationsManager : IWebHookRegistrationsManager
@@ -56,7 +56,7 @@ namespace Microsoft.AspNet.WebHooks
         /// <inheritdoc />
         public virtual async Task<IEnumerable<WebHook>> GetWebHooksAsync(IPrincipal user, Func<string, WebHook, Task> predicate)
         {
-            string userId = await _userManager.GetUserIdAsync(user);
+            var userId = await _userManager.GetUserIdAsync(user);
             IEnumerable<WebHook> webHooks = await _store.GetAllWebHooksAsync(userId);
             await ApplyServiceSideFilterPredicate(userId, webHooks, predicate);
             return webHooks;
@@ -65,8 +65,8 @@ namespace Microsoft.AspNet.WebHooks
         /// <inheritdoc />
         public virtual async Task<WebHook> LookupWebHookAsync(IPrincipal user, string id, Func<string, WebHook, Task> predicate)
         {
-            string userId = await _userManager.GetUserIdAsync(user);
-            WebHook webHook = await _store.LookupWebHookAsync(userId, id);
+            var userId = await _userManager.GetUserIdAsync(user);
+            var webHook = await _store.LookupWebHookAsync(userId, id);
             await ApplyServiceSideFilterPredicate(userId, new[] { webHook }, predicate);
             return webHook;
         }
@@ -79,10 +79,10 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(webHook));
             }
 
-            string userId = await _userManager.GetUserIdAsync(user);
+            var userId = await _userManager.GetUserIdAsync(user);
             await ApplyServiceSideFilterPredicate(userId, new[] { webHook }, predicate);
 
-            StoreResult result = await _store.InsertWebHookAsync(userId, webHook);
+            var result = await _store.InsertWebHookAsync(userId, webHook);
             return result;
         }
 
@@ -94,25 +94,25 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(webHook));
             }
 
-            string userId = await _userManager.GetUserIdAsync(user);
+            var userId = await _userManager.GetUserIdAsync(user);
             await ApplyServiceSideFilterPredicate(userId, new[] { webHook }, predicate);
 
-            StoreResult result = await _store.UpdateWebHookAsync(userId, webHook);
+            var result = await _store.UpdateWebHookAsync(userId, webHook);
             return result;
         }
 
         /// <inheritdoc />
         public virtual async Task<StoreResult> DeleteWebHookAsync(IPrincipal user, string id)
         {
-            string userId = await _userManager.GetUserIdAsync(user);
-            StoreResult result = await _store.DeleteWebHookAsync(userId, id);
+            var userId = await _userManager.GetUserIdAsync(user);
+            var result = await _store.DeleteWebHookAsync(userId, id);
             return result;
         }
 
         /// <inheritdoc />
         public virtual async Task DeleteAllWebHooksAsync(IPrincipal user)
         {
-            string userId = await _userManager.GetUserIdAsync(user);
+            var userId = await _userManager.GetUserIdAsync(user);
             await _store.DeleteAllWebHooksAsync(userId);
         }
 
@@ -154,7 +154,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Verifies that the <see cref="WebHook.Filters"/> for the given <paramref name="webHook"/> 
+        /// Verifies that the <see cref="WebHook.Filters"/> for the given <paramref name="webHook"/>
         /// only contain registered filters provided by the <see cref="IWebHookFilterManager"/>.
         /// </summary>
         /// <param name="webHook">The <see cref="WebHook"/> to verify.</param>
@@ -172,13 +172,12 @@ namespace Microsoft.AspNet.WebHooks
                 return;
             }
 
-            IDictionary<string, WebHookFilter> filters = await _filterManager.GetAllWebHookFiltersAsync();
-            HashSet<string> normalizedFilters = new HashSet<string>();
-            List<string> invalidFilters = new List<string>();
-            foreach (string filter in webHook.Filters)
+            var filters = await _filterManager.GetAllWebHookFiltersAsync();
+            var normalizedFilters = new HashSet<string>();
+            var invalidFilters = new List<string>();
+            foreach (var filter in webHook.Filters)
             {
-                WebHookFilter hookFilter;
-                if (filters.TryGetValue(filter, out hookFilter))
+                if (filters.TryGetValue(filter, out var hookFilter))
                 {
                     normalizedFilters.Add(hookFilter.Name);
                 }
@@ -190,14 +189,14 @@ namespace Microsoft.AspNet.WebHooks
 
             if (invalidFilters.Count > 0)
             {
-                string invalidFiltersMsg = string.Join(", ", invalidFilters);
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.RegistrationsManager_InvalidFilters, invalidFiltersMsg);
-                throw new InvalidOperationException(msg);
+                var invalidFiltersMessage = string.Join(", ", invalidFilters);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.RegistrationsManager_InvalidFilters, invalidFiltersMessage);
+                throw new InvalidOperationException(message);
             }
             else
             {
                 webHook.Filters.Clear();
-                foreach (string filter in normalizedFilters)
+                foreach (var filter in normalizedFilters)
                 {
                     webHook.Filters.Add(filter);
                 }
@@ -205,8 +204,8 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Verifies the <see cref="WebHook.WebHookUri"/> by issuing an HTTP GET request to the provided 
-        /// <paramref name="webHook"/> to ensure that it is reachable and expects WebHooks. The WebHook 
+        /// Verifies the <see cref="WebHook.WebHookUri"/> by issuing an HTTP GET request to the provided
+        /// <paramref name="webHook"/> to ensure that it is reachable and expects WebHooks. The WebHook
         /// validation response is expected to echo the contents of the <c>echo</c> query parameter unless
         /// the WebHook URI has a <c>NoEcho</c> query parameter.
         /// </summary>

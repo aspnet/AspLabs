@@ -31,7 +31,7 @@ namespace Microsoft.AspNet.WebHooks
         /// Initializes a new instance of the <see cref="NotificationDictionary"/> class.
         /// </summary>
         /// <param name="action">An action describing the notification. In order for the actions to match
-        /// the WebHook filter, it must match one or more of the filter values registered with the 
+        /// the WebHook filter, it must match one or more of the filter values registered with the
         /// <see cref="IWebHookFilterManager"/>.</param>
         /// <param name="data">Optional additional data to include in the WebHook request.</param>
         public NotificationDictionary(string action, object data)
@@ -42,21 +42,21 @@ namespace Microsoft.AspNet.WebHooks
             }
 
             this[ActionKey] = action;
-            IDictionary<string, object> dataAsDictionary = data as IDictionary<string, object>;
+            var dataAsDictionary = data as IDictionary<string, object>;
             if (dataAsDictionary == null && data != null)
             {
                 dataAsDictionary = new Dictionary<string, object>();
-                PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(data);
+                var properties = TypeDescriptor.GetProperties(data);
                 foreach (PropertyDescriptor prop in properties)
                 {
-                    object val = prop.GetValue(data);
+                    var val = prop.GetValue(data);
                     dataAsDictionary.Add(prop.Name, val);
                 }
             }
 
             if (dataAsDictionary != null)
             {
-                foreach (KeyValuePair<string, object> item in dataAsDictionary)
+                foreach (var item in dataAsDictionary)
                 {
                     this[item.Key] = item.Value;
                 }
@@ -107,8 +107,8 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 catch (KeyNotFoundException)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Notification_KeyNotFound, key);
-                    throw new KeyNotFoundException(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Notification_KeyNotFound, key);
+                    throw new KeyNotFoundException(message);
                 }
             }
 

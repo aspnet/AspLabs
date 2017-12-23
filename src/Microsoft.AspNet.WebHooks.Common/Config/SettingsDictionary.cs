@@ -63,8 +63,8 @@ namespace Microsoft.AspNet.WebHooks.Config
                 }
                 catch (KeyNotFoundException)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.Settings_KeyNotFound, key);
-                    throw new KeyNotFoundException(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CommonResources.Settings_KeyNotFound, key);
+                    throw new KeyNotFoundException(message);
                 }
             }
 
@@ -75,14 +75,13 @@ namespace Microsoft.AspNet.WebHooks.Config
         }
 
         /// <summary>
-        /// Gets the value with the given key, or null if the key is not present. 
+        /// Gets the value with the given key, or null if the key is not present.
         /// </summary>
         /// <param name="key">The key whose value to get.</param>
         /// <returns>The value with the specified key if found; otherwise null.</returns>
         public string GetValueOrDefault(string key)
         {
-            string value;
-            return TryGetValue(key, out value) ? value : null;
+            return TryGetValue(key, out var value) ? value : null;
         }
 
         /// <summary>
@@ -110,11 +109,10 @@ namespace Microsoft.AspNet.WebHooks.Config
         /// <returns><c>true</c> if the value is set to 'true'; otherwise <c>false</c>.</returns>
         public bool IsTrue(string key)
         {
-            string value = GetValueOrDefault(key);
+            var value = GetValueOrDefault(key);
             if (value != null)
             {
-                bool isSet;
-                return bool.TryParse(value.Trim(), out isSet) ? isSet : false;
+                return bool.TryParse(value.Trim(), out var isSet) ? isSet : false;
             }
             return false;
         }

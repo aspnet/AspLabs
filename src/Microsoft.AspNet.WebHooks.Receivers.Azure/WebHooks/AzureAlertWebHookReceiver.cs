@@ -66,16 +66,15 @@ namespace Microsoft.AspNet.WebHooks
             await EnsureValidCode(request, id);
 
             // Read the request entity body
-            JObject data = await ReadAsJsonAsync(request);
+            var data = await ReadAsJsonAsync(request);
 
             // Get the action
-            JObject dataContext = data["context"] as JObject;
-            string action = dataContext != null ? dataContext.Value<string>(ActionParameter) : null;
+            var action = data["context"] is JObject dataContext ? dataContext.Value<string>(ActionParameter) : null;
             if (string.IsNullOrEmpty(action))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureReceiverResources.Receiver_BadBody, ActionParameter);
-                context.Configuration.DependencyResolver.GetLogger().Error(msg);
-                HttpResponseMessage badType = request.CreateErrorResponse(HttpStatusCode.BadRequest, msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureReceiverResources.Receiver_BadBody, ActionParameter);
+                context.Configuration.DependencyResolver.GetLogger().Error(message);
+                var badType = request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
                 return badType;
             }
 

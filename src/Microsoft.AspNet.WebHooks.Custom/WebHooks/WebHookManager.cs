@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -41,7 +40,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Initialize a new instance of the <see cref="WebHookManager"/> with the given <paramref name="httpClient"/>. This 
+        /// Initialize a new instance of the <see cref="WebHookManager"/> with the given <paramref name="httpClient"/>. This
         /// constructor is intended for unit testing purposes.
         /// </summary>
         internal WebHookManager(IWebHookStore webHookStore, IWebHookSender webHookSender, ILogger logger, HttpClient httpClient)
@@ -95,13 +94,13 @@ namespace Microsoft.AspNet.WebHooks
 
             // Get all actions in this batch
             ICollection<NotificationDictionary> nots = notifications.ToArray();
-            string[] actions = nots.Select(n => n.Action).ToArray();
+            var actions = nots.Select(n => n.Action).ToArray();
 
             // Find all active WebHooks that matches at least one of the actions
-            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAsync(user, actions, predicate);
+            var webHooks = await _webHookStore.QueryWebHooksAsync(user, actions, predicate);
 
             // For each WebHook set up a work item with the right set of notifications
-            IEnumerable<WebHookWorkItem> workItems = GetWorkItems(webHooks, nots);
+            var workItems = GetWorkItems(webHooks, nots);
 
             // Start sending WebHooks
             await _webHookSender.SendWebHookWorkItemsAsync(workItems);
@@ -118,13 +117,13 @@ namespace Microsoft.AspNet.WebHooks
 
             // Get all actions in this batch
             ICollection<NotificationDictionary> nots = notifications.ToArray();
-            string[] actions = nots.Select(n => n.Action).ToArray();
+            var actions = nots.Select(n => n.Action).ToArray();
 
             // Find all active WebHooks that matches at least one of the actions
-            ICollection<WebHook> webHooks = await _webHookStore.QueryWebHooksAcrossAllUsersAsync(actions, predicate);
+            var webHooks = await _webHookStore.QueryWebHooksAcrossAllUsersAsync(actions, predicate);
 
             // For each WebHook set up a work item with the right set of notifications
-            IEnumerable<WebHookWorkItem> workItems = GetWorkItems(webHooks, nots);
+            var workItems = GetWorkItems(webHooks, nots);
 
             // Start sending WebHooks
             await _webHookSender.SendWebHookWorkItemsAsync(workItems);
@@ -140,8 +139,8 @@ namespace Microsoft.AspNet.WebHooks
 
         internal static IEnumerable<WebHookWorkItem> GetWorkItems(ICollection<WebHook> webHooks, ICollection<NotificationDictionary> notifications)
         {
-            List<WebHookWorkItem> workItems = new List<WebHookWorkItem>();
-            foreach (WebHook webHook in webHooks)
+            var workItems = new List<WebHookWorkItem>();
+            foreach (var webHook in webHooks)
             {
                 ICollection<NotificationDictionary> webHookNotifications;
 
@@ -160,7 +159,7 @@ namespace Microsoft.AspNet.WebHooks
                     }
                 }
 
-                WebHookWorkItem workItem = new WebHookWorkItem(webHook, webHookNotifications);
+                var workItem = new WebHookWorkItem(webHook, webHookNotifications);
                 workItems.Add(workItem);
             }
             return workItems;
@@ -192,26 +191,28 @@ namespace Microsoft.AspNet.WebHooks
         protected virtual async Task VerifyEchoAsync(WebHook webHook)
         {
             // Create the echo query parameter that we want returned in response body as plain text.
-            string echo = Guid.NewGuid().ToString("N");
+            var echo = Guid.NewGuid().ToString("N");
 
             HttpResponseMessage response;
             try
             {
                 // If WebHook URI contains a "NoEcho" query parameter then we don't verify the URI using a GET request
-                NameValueCollection parameters = webHook.WebHookUri.ParseQueryString();
+                var parameters = webHook.WebHookUri.ParseQueryString();
                 if (parameters[NoEchoParameter] != null)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoEcho);
-                    _logger.Info(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoEcho);
+                    _logger.Info(message);
                     return;
                 }
 
                 // Get request URI with echo query parameter
-                UriBuilder webHookUri = new UriBuilder(webHook.WebHookUri);
-                webHookUri.Query = EchoParameter + "=" + echo;
+                var webHookUri = new UriBuilder(webHook.WebHookUri)
+                {
+                    Query = EchoParameter + "=" + echo
+                };
 
                 // Create request adding any additional request headers (not entity headers) from Web Hook
-                HttpRequestMessage hookRequest = new HttpRequestMessage(HttpMethod.Get, webHookUri.Uri);
+                var hookRequest = new HttpRequestMessage(HttpMethod.Get, webHookUri.Uri);
                 foreach (var kvp in webHook.Headers)
                 {
                     hookRequest.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
@@ -221,32 +222,32 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message);
             }
 
             if (!response.IsSuccessStatusCode)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, response.StatusCode);
-                _logger.Info(msg);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_VerifyFailure, response.StatusCode);
+                _logger.Info(message);
+                throw new InvalidOperationException(message);
             }
 
             // Verify response body
             if (response.Content == null)
             {
-                string msg = CustomResources.Manager_VerifyNoBody;
-                _logger.Error(msg);
-                throw new InvalidOperationException(msg);
+                var message = CustomResources.Manager_VerifyNoBody;
+                _logger.Error(message);
+                throw new InvalidOperationException(message);
             }
 
-            string actualEcho = await response.Content.ReadAsStringAsync();
+            var actualEcho = await response.Content.ReadAsStringAsync();
             if (!string.Equals(actualEcho, echo, StringComparison.Ordinal))
             {
-                string msg = CustomResources.Manager_VerifyBadEcho;
-                _logger.Error(msg);
-                throw new InvalidOperationException(msg);
+                var message = CustomResources.Manager_VerifyBadEcho;
+                _logger.Error(message);
+                throw new InvalidOperationException(message);
             }
         }
 
@@ -259,9 +260,9 @@ namespace Microsoft.AspNet.WebHooks
             // Check that WebHook URI scheme is either '<c>http</c>' or '<c>https</c>'.
             if (!(webHookUri.IsHttp() || webHookUri.IsHttps()))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoHttpUri, webHookUri);
-                _logger.Error(msg);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_NoHttpUri, webHookUri);
+                _logger.Error(message);
+                throw new InvalidOperationException(message);
             }
         }
 

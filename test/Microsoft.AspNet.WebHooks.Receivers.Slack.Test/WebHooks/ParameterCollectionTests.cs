@@ -27,14 +27,14 @@ namespace Microsoft.AspNet.WebHooks
         public void ToString_PrintsCorrectly(IDictionary<string, string> parameters, string expected)
         {
             // Arrange
-            ParameterCollection collection = new ParameterCollection();
+            var collection = new ParameterCollection();
             foreach (var parameter in parameters)
             {
                 collection.Add(parameter.Key, parameter.Value);
             }
 
             // Act
-            string actual = collection.ToString();
+            var actual = collection.ToString();
 
             // Assert
             Assert.Equal(expected, actual);
@@ -43,9 +43,9 @@ namespace Microsoft.AspNet.WebHooks
         private static IDictionary<string, string> GetParameters(int count)
         {
             IDictionary<string, string> parameters = new Dictionary<string, string>();
-            for (int cnt = 0; cnt < count; cnt++)
+            for (var i = 0; i < count; i++)
             {
-                parameters.Add("p" + cnt, "v" + cnt);
+                parameters.Add("p" + i, "v" + i);
             }
             return parameters;
         }

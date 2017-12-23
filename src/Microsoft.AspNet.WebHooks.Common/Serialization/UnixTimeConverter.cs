@@ -18,8 +18,8 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         private readonly bool _stringConverter;
 
         /// <summary>
-        /// Converts string or integer values to a <see cref="DateTime"/>. By default the 
-        /// <see cref="DateTime"/> gets serialized to an integer. 
+        /// Converts string or integer values to a <see cref="DateTime"/>. By default the
+        /// <see cref="DateTime"/> gets serialized to an integer.
         /// </summary>
         public UnixTimeConverter()
             : this(false)
@@ -27,10 +27,10 @@ namespace Microsoft.AspNet.WebHooks.Serialization
         }
 
         /// <summary>
-        /// Converts string values to a <see cref="DateTime"/>. By default the 
+        /// Converts string values to a <see cref="DateTime"/>. By default the
         /// <see cref="DateTime"/> gets serialized to an integer.
         /// </summary>
-        /// <param name="stringConverter">When <c>true</c> only deserializes string values and serializes to a string value; 
+        /// <param name="stringConverter">When <c>true</c> only deserializes string values and serializes to a string value;
         /// otherwise deserializes string and integer values and serializes to an integer value.</param>
         protected UnixTimeConverter(bool stringConverter)
         {
@@ -44,8 +44,8 @@ namespace Microsoft.AspNet.WebHooks.Serialization
             {
                 throw new ArgumentNullException(nameof(writer));
             }
-            DateTime utc = ((DateTime)value).ToUniversalTime();
-            long time = (long)(utc - _Epoch).TotalSeconds;
+            var utc = ((DateTime)value).ToUniversalTime();
+            var time = (long)(utc - _Epoch).TotalSeconds;
             if (_stringConverter)
             {
                 writer.WriteValue(time.ToString(CultureInfo.InvariantCulture));
@@ -65,8 +65,8 @@ namespace Microsoft.AspNet.WebHooks.Serialization
             }
             if (reader.Value == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_NullError, typeof(DateTime).Name);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_NullError, typeof(DateTime).Name);
+                throw new InvalidOperationException(message);
             }
 
             long time = 0;
@@ -74,8 +74,8 @@ namespace Microsoft.AspNet.WebHooks.Serialization
             {
                 if (!long.TryParse(reader.Value as string, out time))
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_BadFormat, reader.Value, typeof(DateTime).Name);
-                    throw new InvalidOperationException(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_BadFormat, reader.Value, typeof(DateTime).Name);
+                    throw new InvalidOperationException(message);
                 }
             }
             else if (reader.TokenType == JsonToken.Integer)
@@ -84,11 +84,11 @@ namespace Microsoft.AspNet.WebHooks.Serialization
             }
             else
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_BadFormat, reader.Value, typeof(DateTime).Name);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CommonResources.DateTime_BadFormat, reader.Value, typeof(DateTime).Name);
+                throw new InvalidOperationException(message);
             }
 
-            DateTime utc = _Epoch.AddSeconds(time);
+            var utc = _Epoch.AddSeconds(time);
             return utc;
         }
     }

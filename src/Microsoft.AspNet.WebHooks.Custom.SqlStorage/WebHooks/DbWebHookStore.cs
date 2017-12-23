@@ -52,7 +52,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DbWebHookStore{TContext,TRegistration}"/> class with the given <paramref name="protector"/>
-        /// and <paramref name="logger"/>. 
+        /// and <paramref name="logger"/>.
         /// Using this constructor, the data will be encrypted using the provided <paramref name="protector"/>.
         /// </summary>
         protected DbWebHookStore(IDataProtector protector, ILogger logger)
@@ -89,9 +89,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -120,9 +120,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -155,9 +155,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Lookup", ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Lookup", ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -187,33 +187,33 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (DbUpdateException uex)
             {
-                string error = uex.GetBaseException().Message;
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", error);
-                _logger.Error(msg, uex);
+                var error = uex.GetBaseException().Message;
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", error);
+                _logger.Error(message, uex);
                 return StoreResult.Conflict;
             }
             catch (OptimisticConcurrencyException ocex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Insert", ocex.Message);
-                _logger.Error(msg, ocex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Insert", ocex.Message);
+                _logger.Error(message, ocex);
                 return StoreResult.Conflict;
             }
             catch (SqlException sqlex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", sqlex.Message);
-                _logger.Error(msg, sqlex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", sqlex.Message);
+                _logger.Error(message, sqlex);
                 return StoreResult.OperationError;
             }
             catch (DbException dbex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", dbex.Message);
-                _logger.Error(msg, dbex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Insert", dbex.Message);
+                _logger.Error(message, dbex);
                 return StoreResult.OperationError;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Insert", ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Insert", ex.Message);
+                _logger.Error(message, ex);
                 return StoreResult.InternalError;
             }
             return StoreResult.Success;
@@ -249,26 +249,26 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (OptimisticConcurrencyException ocex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Update", ocex.Message);
-                _logger.Error(msg, ocex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Update", ocex.Message);
+                _logger.Error(message, ocex);
                 return StoreResult.Conflict;
             }
             catch (SqlException sqlex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Update", sqlex.Message);
-                _logger.Error(msg, sqlex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Update", sqlex.Message);
+                _logger.Error(message, sqlex);
                 return StoreResult.OperationError;
             }
             catch (DbException dbex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Update", dbex.Message);
-                _logger.Error(msg, dbex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Update", dbex.Message);
+                _logger.Error(message, dbex);
                 return StoreResult.OperationError;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Update", ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Update", ex.Message);
+                _logger.Error(message, ex);
                 return StoreResult.InternalError;
             }
             return StoreResult.Success;
@@ -303,26 +303,26 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (OptimisticConcurrencyException ocex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Delete", ocex.Message);
-                _logger.Error(msg, ocex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_ConcurrencyError, "Delete", ocex.Message);
+                _logger.Error(message, ocex);
                 return StoreResult.Conflict;
             }
             catch (SqlException sqlex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Delete", sqlex.Message);
-                _logger.Error(msg, sqlex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Delete", sqlex.Message);
+                _logger.Error(message, sqlex);
                 return StoreResult.OperationError;
             }
             catch (DbException dbex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Delete", dbex.Message);
-                _logger.Error(msg, dbex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_SqlOperationFailed, "Delete", dbex.Message);
+                _logger.Error(message, dbex);
                 return StoreResult.OperationError;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Delete", ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Delete", ex.Message);
+                _logger.Error(message, ex);
                 return StoreResult.InternalError;
             }
             return StoreResult.Success;
@@ -352,9 +352,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "DeleteAll", ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "DeleteAll", ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -376,7 +376,7 @@ namespace Microsoft.AspNet.WebHooks
                     var matches = new List<WebHook>();
                     foreach (var registration in registrations)
                     {
-                        WebHook webHook = ConvertToWebHook(registration);
+                        var webHook = ConvertToWebHook(registration);
                         if (MatchesAnyAction(webHook, actions) && predicate(webHook, registration.User))
                         {
                             matches.Add(webHook);
@@ -387,9 +387,9 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_OperationFailed, "Get", ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -408,14 +408,14 @@ namespace Microsoft.AspNet.WebHooks
 
             try
             {
-                string content = _protector != null ? _protector.Unprotect(registration.ProtectedData) : registration.ProtectedData;
-                WebHook webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
+                var content = _protector != null ? _protector.Unprotect(registration.ProtectedData) : registration.ProtectedData;
+                var webHook = JsonConvert.DeserializeObject<WebHook>(content, _serializerSettings);
                 return webHook;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_BadWebHook, typeof(WebHook).Name, ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_BadWebHook, typeof(WebHook).Name, ex.Message);
+                _logger.Error(message, ex);
             }
             return null;
         }
@@ -435,8 +435,8 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(webHook));
             }
 
-            string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string protectedData = _protector != null ? _protector.Protect(content) : content;
+            var content = JsonConvert.SerializeObject(webHook, _serializerSettings);
+            var protectedData = _protector != null ? _protector.Protect(content) : content;
             var registration = new TRegistration
             {
                 User = user,
@@ -466,8 +466,8 @@ namespace Microsoft.AspNet.WebHooks
 
             registration.User = user;
             registration.Id = webHook.Id;
-            string content = JsonConvert.SerializeObject(webHook, _serializerSettings);
-            string protectedData = _protector != null ? _protector.Protect(content) : content;
+            var content = JsonConvert.SerializeObject(webHook, _serializerSettings);
+            var protectedData = _protector != null ? _protector.Protect(content) : content;
             registration.ProtectedData = protectedData;
         }
 

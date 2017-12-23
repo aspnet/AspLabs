@@ -4,8 +4,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -44,7 +42,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         }
 
         /// <summary>
-        /// Supports POST for incoming WebHook requests. This is typically the actual WebHook. 
+        /// Supports POST for incoming WebHook requests. This is typically the actual WebHook.
         /// </summary>
         [Route("{webHookReceiver}/{id?}")]
         [AllowAnonymous]
@@ -56,20 +54,20 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
         private async Task<IHttpActionResult> ProcessWebHook(string webHookReceiver, string id)
         {
-            IWebHookReceiverManager receiverManager = Configuration.DependencyResolver.GetReceiverManager();
-            IWebHookReceiver receiver = receiverManager.GetReceiver(webHookReceiver);
+            var receiverManager = Configuration.DependencyResolver.GetReceiverManager();
+            var receiver = receiverManager.GetReceiver(webHookReceiver);
             if (receiver == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Unknown, webHookReceiver);
-                Configuration.DependencyResolver.GetLogger().Error(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Unknown, webHookReceiver);
+                Configuration.DependencyResolver.GetLogger().Error(message);
                 return NotFound();
             }
 
             try
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Processing, webHookReceiver, id);
-                Configuration.DependencyResolver.GetLogger().Info(msg);
-                HttpResponseMessage response = await receiver.ReceiveAsync(id, RequestContext, Request);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Processing, webHookReceiver, id);
+                Configuration.DependencyResolver.GetLogger().Info(message);
+                var response = await receiver.ReceiveAsync(id, RequestContext, Request);
                 return ResponseMessage(response);
             }
             catch (HttpResponseException rex)
@@ -78,9 +76,9 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
             catch (Exception ex)
             {
-                Exception inner = ex.GetBaseException();
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Failure, webHookReceiver, inner.Message);
-                Configuration.DependencyResolver.GetLogger().Error(msg, inner);
+                var inner = ex.GetBaseException();
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.ReceiverController_Failure, webHookReceiver, inner.Message);
+                Configuration.DependencyResolver.GetLogger().Error(message, inner);
                 throw;
             }
         }

@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using System.Web.Http;
-using Microsoft.AspNet.WebHooks.Diagnostics;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Services;
 
@@ -26,11 +25,11 @@ namespace Microsoft.AspNet.WebHooks.Config
             {
                 if (_httpConfig == null)
                 {
-                    string initializer = typeof(WebHooksConfig).Name + ".Initialize";
-                    string msg = string.Format(CultureInfo.CurrentCulture, CommonResources.Config_NotInitialized, initializer);
-                    ILogger logger = CommonServices.GetLogger();
-                    logger.Error(msg);
-                    throw new InvalidOperationException(msg);
+                    var initializer = typeof(WebHooksConfig).Name + ".Initialize";
+                    var message = string.Format(CultureInfo.CurrentCulture, CommonResources.Config_NotInitialized, initializer);
+                    var logger = CommonServices.GetLogger();
+                    logger.Error(message);
+                    throw new InvalidOperationException(message);
                 }
                 return _httpConfig;
             }

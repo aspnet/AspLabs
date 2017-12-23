@@ -288,7 +288,7 @@ namespace Microsoft.AspNet.WebHooks
             // Arrange
             Initialize(TestSecret);
             var name = "signature";
-            for (var cnt = 0; cnt < headers; cnt++)
+            for (var i = 0; i < headers; i++)
             {
                 _request.Headers.Add(name, "value");
             }

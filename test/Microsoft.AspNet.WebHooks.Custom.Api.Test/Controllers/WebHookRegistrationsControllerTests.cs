@@ -56,7 +56,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
             _request = new HttpRequestMessage(HttpMethod.Get, Address);
             _request.SetConfiguration(_config);
-            HttpRequestContext requestContext = new HttpRequestContext()
+            var requestContext = new HttpRequestContext()
             {
                 Configuration = _config,
                 Principal = _principal,
@@ -90,7 +90,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         {
             get
             {
-                string[] empty = new string[0];
+                var empty = new string[0];
                 return new TheoryData<IEnumerable<string>, IEnumerable<string>>
                 {
                     { new[] { "你", "好", "世", "界" }, new[] { "你", "好", "世", "界" } },
@@ -124,7 +124,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IEnumerable<WebHook> actual = await _controller.Get();
+            var actual = await _controller.Get();
 
             // Assert
             _regsMock.Verify();
@@ -140,7 +140,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IEnumerable<WebHook> actual = await _controller.Get();
+            var actual = await _controller.Get();
 
             // Assert
             _regsMock.Verify();
@@ -151,14 +151,14 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Lookup_Returns_WebHook()
         {
             // Arrange
-            WebHook hook = CreateWebHook();
+            var hook = CreateWebHook();
             _regsMock.Setup(r => r.LookupWebHookAsync(_principal, TestUser, It.IsAny<Func<string, WebHook, Task>>()))
                 .ReturnsAsync(hook)
                 .Verifiable();
 
             // Act
-            IHttpActionResult result = await _controller.Lookup(TestUser);
-            WebHook actual = ((OkNegotiatedContentResult<WebHook>)result).Content;
+            var result = await _controller.Lookup(TestUser);
+            var actual = ((OkNegotiatedContentResult<WebHook>)result).Content;
 
             // Assert
             Assert.Equal(TestUser, actual.Id);
@@ -173,7 +173,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
                 .Verifiable();
 
             // Act
-            IHttpActionResult actual = await _controller.Lookup(TestUser);
+            var actual = await _controller.Lookup(TestUser);
 
             // Assert
             Assert.IsType<NotFoundResult>(actual);
@@ -183,7 +183,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Post_ReturnsBadRequest_IfNoRequestBody()
         {
             // Act
-            IHttpActionResult actual = await _controller.Post(webHook: null);
+            var actual = await _controller.Post(webHook: null);
 
             // Assert
             Assert.IsType<BadRequestResult>(actual);
@@ -197,7 +197,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Post_ReturnsBadRequest_IfValidationFails(bool failId, bool failSecret, bool failFilters, bool failAddress)
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             if (failId)
             {
                 _idValidator.Setup(v => v.ValidateIdAsync(_request, webHook))
@@ -220,7 +220,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
 
             // Act
-            IHttpActionResult actual = await _controller.Post(webHook);
+            var actual = await _controller.Post(webHook);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, ((ResponseMessageResult)actual).Response.StatusCode);
@@ -230,12 +230,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Post_ReturnsInternalServerError_IfStoreThrows()
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.AddWebHookAsync(_principal, webHook, It.IsAny<Func<string, WebHook, Task>>()))
                 .Throws<Exception>();
 
             // Act
-            IHttpActionResult actual = await _controller.Post(webHook);
+            var actual = await _controller.Post(webHook);
 
             // Assert
             Assert.Equal(HttpStatusCode.InternalServerError, ((ResponseMessageResult)actual).Response.StatusCode);
@@ -246,12 +246,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Post_ReturnsError_IfStoreReturnsNonsuccess(StoreResult result, Type response)
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.AddWebHookAsync(_principal, webHook, It.IsAny<Func<string, WebHook, Task>>()))
                 .ReturnsAsync(result);
 
             // Act
-            IHttpActionResult actual = await _controller.Post(webHook);
+            var actual = await _controller.Post(webHook);
 
             // Assert
             Assert.IsType(response, actual);
@@ -261,12 +261,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Post_ReturnsCreated_IfValidWebHook()
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.AddWebHookAsync(_principal, webHook, It.IsAny<Func<string, WebHook, Task>>()))
                 .ReturnsAsync(StoreResult.Success);
 
             // Act
-            IHttpActionResult actual = await _controller.Post(webHook);
+            var actual = await _controller.Post(webHook);
 
             // Assert
             Assert.IsType<CreatedAtRouteNegotiatedContentResult<WebHook>>(actual);
@@ -276,7 +276,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsBadRequest_IfNoRequestBody()
         {
             // Act
-            IHttpActionResult actual = await _controller.Put(TestUser, webHook: null);
+            var actual = await _controller.Put(TestUser, webHook: null);
 
             // Assert
             Assert.IsType<BadRequestResult>(actual);
@@ -289,7 +289,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsBadRequest_IfValidationFails(bool failSecret, bool failFilters, bool failAddress)
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             if (failSecret)
             {
                 _regsMock.Setup(v => v.VerifySecretAsync(webHook))
@@ -307,7 +307,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             }
 
             // Act
-            IHttpActionResult actual = await _controller.Put(TestUser, webHook);
+            var actual = await _controller.Put(TestUser, webHook);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, ((ResponseMessageResult)actual).Response.StatusCode);
@@ -317,10 +317,10 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsBadRequest_IfWebHookIdDiffersFromUriId()
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
 
             // Act
-            IHttpActionResult actual = await _controller.Put("unknown", webHook);
+            var actual = await _controller.Put("unknown", webHook);
 
             // Assert
             Assert.IsType<BadRequestResult>(actual);
@@ -330,12 +330,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsInternalServerError_IfStoreThrows()
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.UpdateWebHookAsync(_principal, webHook, It.IsAny<Func<string, WebHook, Task>>()))
                 .Throws<Exception>();
 
             // Act
-            IHttpActionResult actual = await _controller.Put(TestUser, webHook);
+            var actual = await _controller.Put(TestUser, webHook);
 
             // Assert
             Assert.Equal(HttpStatusCode.InternalServerError, ((ResponseMessageResult)actual).Response.StatusCode);
@@ -346,12 +346,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsError_IfStoreReturnsNonsuccess(StoreResult result, Type response)
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.UpdateWebHookAsync(_principal, webHook, It.IsAny<Func<string, WebHook, Task>>()))
                 .ReturnsAsync(result);
 
             // Act
-            IHttpActionResult actual = await _controller.Put(TestUser, webHook);
+            var actual = await _controller.Put(TestUser, webHook);
 
             // Assert
             Assert.IsType(response, actual);
@@ -361,12 +361,12 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task Put_ReturnsOk_IfValidWebHook()
         {
             // Arrange
-            WebHook webHook = CreateWebHook();
+            var webHook = CreateWebHook();
             _regsMock.Setup(s => s.UpdateWebHookAsync(_principal, webHook, null))
                 .ReturnsAsync(StoreResult.Success);
 
             // Act
-            IHttpActionResult actual = await _controller.Put(webHook.Id, webHook);
+            var actual = await _controller.Put(webHook.Id, webHook);
 
             // Assert
             Assert.IsType<OkResult>(actual);
@@ -376,7 +376,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task AddPrivateFilters_Calls_RegistrarWithNoFilter()
         {
             // Arrange
-            WebHook webHook = new WebHook();
+            var webHook = new WebHook();
             _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Returns(Task.FromResult(true))
                 .Verifiable();
@@ -392,7 +392,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task AddPrivateFilters_Calls_RegistrarWithFilter()
         {
             // Arrange
-            WebHook webHook = new WebHook();
+            var webHook = new WebHook();
             webHook.Filters.Add(FilterName);
             _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Returns(Task.FromResult(true))
@@ -409,17 +409,17 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task AddPrivateFilters_Throws_IfRegistrarThrows()
         {
             // Arrange
-            Exception ex = new Exception("Catch this!");
-            WebHook webHook = new WebHook();
+            var ex = new Exception("Catch this!");
+            var webHook = new WebHook();
             webHook.Filters.Add(FilterName);
             _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Throws(ex);
 
             // Act
-            HttpResponseException rex = await Assert.ThrowsAsync<HttpResponseException>(() => _controller.AddPrivateFilters("12345", webHook));
+            var rex = await Assert.ThrowsAsync<HttpResponseException>(() => _controller.AddPrivateFilters("12345", webHook));
 
             // Assert
-            HttpError error = await rex.Response.Content.ReadAsAsync<HttpError>();
+            var error = await rex.Response.Content.ReadAsAsync<HttpError>();
             Assert.Equal("The 'IWebHookRegistrarProxy' implementation of 'IWebHookRegistrar' caused an exception: Catch this!", error.Message);
         }
 
@@ -427,14 +427,14 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public async Task AddPrivateFilters_Throws_HttpException_IfRegistrarThrows()
         {
             // Arrange
-            HttpResponseException rex = new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Conflict));
-            WebHook webHook = new WebHook();
+            var rex = new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Conflict));
+            var webHook = new WebHook();
             webHook.Filters.Add(FilterName);
             _registrarMock.Setup(r => r.RegisterAsync(_controllerContext.Request, webHook))
                 .Throws(rex);
 
             // Act
-            HttpResponseException ex = await Assert.ThrowsAsync<HttpResponseException>(() => _controller.AddPrivateFilters("12345", webHook));
+            var ex = await Assert.ThrowsAsync<HttpResponseException>(() => _controller.AddPrivateFilters("12345", webHook));
 
             // Assert
             Assert.Same(rex, ex);
@@ -445,8 +445,8 @@ namespace Microsoft.AspNet.WebHooks.Controllers
         public void RemovePrivateFilters_Succeeds(string[] input, string[] expected)
         {
             // Arrange
-            WebHook webHook = new WebHook();
-            foreach (string i in input)
+            var webHook = new WebHook();
+            foreach (var i in input)
             {
                 webHook.Filters.Add(i);
             }
@@ -460,7 +460,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
         private static WebHook CreateWebHook(string id = TestUser, string filterName = FilterName, bool addPrivateFilter = false)
         {
-            WebHook webHook = new WebHook()
+            var webHook = new WebHook()
             {
                 Id = id,
                 WebHookUri = new Uri(Address)
@@ -469,7 +469,7 @@ namespace Microsoft.AspNet.WebHooks.Controllers
             webHook.Filters.Add(filterName);
             if (addPrivateFilter)
             {
-                string privateFilter = WebHookRegistrar.PrivateFilterPrefix + "abc";
+                var privateFilter = WebHookRegistrar.PrivateFilterPrefix + "abc";
                 webHook.Filters.Add(privateFilter);
             }
 
@@ -478,10 +478,10 @@ namespace Microsoft.AspNet.WebHooks.Controllers
 
         private Collection<WebHook> CreateWebHooks(bool addPrivateFilter = false)
         {
-            Collection<WebHook> hooks = new Collection<WebHook>();
-            for (int cnt = 0; cnt < WebHookCount; cnt++)
+            var hooks = new Collection<WebHook>();
+            for (var i = 0; i < WebHookCount; i++)
             {
-                WebHook webHook = CreateWebHook(id: cnt.ToString(), filterName: "a" + cnt.ToString(), addPrivateFilter: addPrivateFilter);
+                var webHook = CreateWebHook(id: i.ToString(), filterName: "a" + i.ToString(), addPrivateFilter: addPrivateFilter);
                 hooks.Add(webHook);
             }
             return hooks;

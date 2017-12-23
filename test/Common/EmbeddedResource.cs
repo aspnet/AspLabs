@@ -14,11 +14,11 @@ namespace Microsoft.AspNet.WebHooks
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
         public static string ReadAsString(string name)
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
-            using (StreamReader reader = new StreamReader(content))
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = assembly.GetManifestResourceStream(name);
+            using (var reader = new StreamReader(content))
             {
-                string data = reader.ReadToEnd();
+                var data = reader.ReadToEnd();
                 return data;
             }
         }
@@ -26,11 +26,11 @@ namespace Microsoft.AspNet.WebHooks
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
         public static JObject ReadAsJObject(string name)
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
-            using (StreamReader reader = new StreamReader(content))
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = assembly.GetManifestResourceStream(name);
+            using (var reader = new StreamReader(content))
             {
-                string data = reader.ReadToEnd();
+                var data = reader.ReadToEnd();
                 return JObject.Parse(data);
             }
         }
@@ -38,11 +38,11 @@ namespace Microsoft.AspNet.WebHooks
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
         public static JArray ReadAsJArray(string name)
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
-            using (StreamReader reader = new StreamReader(content))
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = assembly.GetManifestResourceStream(name);
+            using (var reader = new StreamReader(content))
             {
-                string data = reader.ReadToEnd();
+                var data = reader.ReadToEnd();
                 return JArray.Parse(data);
             }
         }
@@ -50,11 +50,11 @@ namespace Microsoft.AspNet.WebHooks
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Not called in all contexts.")]
         public static XElement ReadAsJXElement(string name)
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream content = asm.GetManifestResourceStream(name);
-            using (StreamReader reader = new StreamReader(content))
+            var assembly = Assembly.GetExecutingAssembly();
+            var content = assembly.GetManifestResourceStream(name);
+            using (var reader = new StreamReader(content))
             {
-                string data = reader.ReadToEnd();
+                var data = reader.ReadToEnd();
                 return XElement.Parse(data);
             }
         }

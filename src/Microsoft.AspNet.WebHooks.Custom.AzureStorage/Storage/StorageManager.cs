@@ -58,11 +58,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            ConnectionSettings connection;
-            if (!settings.Connections.TryGetValue(AzureStoreConnectionStringName, out connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
+            if (!settings.Connections.TryGetValue(AzureStoreConnectionStringName, out var connection) || connection == null || string.IsNullOrEmpty(connection.ConnectionString))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NoConnectionString, AzureStoreConnectionStringName);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureStore_NoConnectionString, AzureStoreConnectionStringName);
+                throw new InvalidOperationException(message);
             }
             return connection.ConnectionString;
         }
@@ -76,15 +75,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 storageAccount = CloudStorageAccount.Parse(connectionString);
                 if (storageAccount == null)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_NoCloudStorageAccount, typeof(CloudStorageAccount).Name);
-                    throw new ArgumentException(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_NoCloudStorageAccount, typeof(CloudStorageAccount).Name);
+                    throw new ArgumentException(message);
                 }
             }
             catch (Exception ex)
             {
-                string msg = AzureStorageResources.StorageManager_InvalidConnectionString;
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var message = AzureStorageResources.StorageManager_InvalidConnectionString;
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
             return storageAccount;
         }
@@ -101,31 +100,31 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 throw new ArgumentNullException(nameof(tableName));
             }
 
-            string tableKey = GetLookupKey(connectionString, tableName);
-            CloudStorageAccount account = TableAccounts.GetOrAdd(
+            var tableKey = GetLookupKey(connectionString, tableName);
+            var account = TableAccounts.GetOrAdd(
                 tableKey,
                 key =>
                 {
-                    CloudStorageAccount storageAccount = GetCloudStorageAccount(connectionString);
+                    var storageAccount = GetCloudStorageAccount(connectionString);
                     try
                     {
                         // Ensure that table exists
-                        CloudTableClient client = storageAccount.CreateCloudTableClient();
-                        CloudTable cloudTable = client.GetTableReference(tableName);
+                        var client = storageAccount.CreateCloudTableClient();
+                        var cloudTable = client.GetTableReference(tableName);
                         cloudTable.CreateIfNotExists();
                     }
                     catch (Exception ex)
                     {
-                        string error = GetStorageErrorMessage(ex);
-                        string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_InitializationFailure, error);
-                        _logger.Error(msg, ex);
-                        throw new InvalidOperationException(msg, ex);
+                        var error = GetStorageErrorMessage(ex);
+                        var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_InitializationFailure, error);
+                        _logger.Error(message, ex);
+                        throw new InvalidOperationException(message, ex);
                     }
 
                     return storageAccount;
                 });
 
-            CloudTableClient cloudClient = account.CreateCloudTableClient();
+            var cloudClient = account.CreateCloudTableClient();
             return cloudClient.GetTableReference(tableName);
         }
 
@@ -141,31 +140,31 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 throw new ArgumentNullException(nameof(queueName));
             }
 
-            string queueKey = GetLookupKey(connectionString, queueName);
-            CloudStorageAccount account = QueueAccounts.GetOrAdd(
+            var queueKey = GetLookupKey(connectionString, queueName);
+            var account = QueueAccounts.GetOrAdd(
                 queueKey,
                 key =>
                 {
-                    CloudStorageAccount storageAccount = GetCloudStorageAccount(connectionString);
+                    var storageAccount = GetCloudStorageAccount(connectionString);
                     try
                     {
                         // Ensure that queue exists
-                        CloudQueueClient client = storageAccount.CreateCloudQueueClient();
-                        CloudQueue cloudQueue = client.GetQueueReference(queueName);
+                        var client = storageAccount.CreateCloudQueueClient();
+                        var cloudQueue = client.GetQueueReference(queueName);
                         cloudQueue.CreateIfNotExists();
                     }
                     catch (Exception ex)
                     {
-                        string error = GetStorageErrorMessage(ex);
-                        string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_InitializationFailure, error);
-                        _logger.Error(msg, ex);
-                        throw new InvalidOperationException(msg, ex);
+                        var error = GetStorageErrorMessage(ex);
+                        var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_InitializationFailure, error);
+                        _logger.Error(message, ex);
+                        throw new InvalidOperationException(message, ex);
                     }
 
                     return storageAccount;
                 });
 
-            CloudQueueClient cloudClient = account.CreateCloudQueueClient();
+            var cloudClient = account.CreateCloudQueueClient();
             return cloudClient.GetQueueReference(queueName);
         }
 
@@ -181,7 +180,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 throw new ArgumentNullException(nameof(partitionKey));
             }
 
-            string partitionKeyFilter = string.Format(CultureInfo.InvariantCulture, "{0} eq '{1}'", PartitionKey, partitionKey);
+            var partitionKeyFilter = string.Format(CultureInfo.InvariantCulture, "{0} eq '{1}'", PartitionKey, partitionKey);
             AddQueryConstraint(query, partitionKeyFilter);
         }
 
@@ -203,14 +202,14 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                TableOperation operation = TableOperation.Retrieve(partitionKey, rowKey);
-                TableResult result = await table.ExecuteAsync(operation);
+                var operation = TableOperation.Retrieve(partitionKey, rowKey);
+                var result = await table.ExecuteAsync(operation);
                 return result;
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_ErrorRetrieving, ex.Message);
-                _logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_ErrorRetrieving, ex.Message);
+                _logger.Error(message, ex);
             }
             return null;
         }
@@ -229,7 +228,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                List<DynamicTableEntity> result = new List<DynamicTableEntity>();
+                var result = new List<DynamicTableEntity>();
                 TableQuerySegment<DynamicTableEntity> segment;
                 TableContinuationToken continuationToken = null;
                 do
@@ -247,10 +246,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_QueryFailed, errorMessage);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_QueryFailed, errorMessage);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -268,15 +267,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                TableResult result = await table.ExecuteAsync(operation);
+                var result = await table.ExecuteAsync(operation);
                 return result;
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
 
                 return new TableResult { HttpStatusCode = statusCode };
             }
@@ -296,15 +295,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                IList<TableResult> results = await table.ExecuteBatchAsync(batch);
+                var results = await table.ExecuteBatchAsync(batch);
                 return results;
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
                 return new List<TableResult>();
             }
         }
@@ -322,7 +321,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
             }
 
             // Build query for retrieving exiting entries. We only ask for PK and RK.
-            TableQuery query = new TableQuery()
+            var query = new TableQuery()
             {
                 FilterString = filter,
                 SelectColumns = new List<string> { PartitionKey, RowKey },
@@ -335,24 +334,24 @@ namespace Microsoft.AspNet.WebHooks.Storage
                 TableContinuationToken continuationToken = null;
                 do
                 {
-                    DynamicTableEntity[] webHooks = (await ExecuteQueryAsync(table, query)).ToArray();
+                    var webHooks = (await ExecuteQueryAsync(table, query)).ToArray();
                     if (webHooks.Length == 0)
                     {
                         break;
                     }
 
                     // Delete query results in max of 100-count batches
-                    int totalSegmentCount = webHooks.Length;
-                    int segmentCount = 0;
+                    var totalSegmentCount = webHooks.Length;
+                    var segmentCount = 0;
                     do
                     {
-                        TableBatchOperation batch = new TableBatchOperation();
-                        int batchCount = Math.Min(totalSegmentCount - segmentCount, MaxBatchSize);
-                        for (int cnt = 0; cnt < batchCount; cnt++)
+                        var batch = new TableBatchOperation();
+                        var batchCount = Math.Min(totalSegmentCount - segmentCount, MaxBatchSize);
+                        for (var i = 0; i < batchCount; i++)
                         {
-                            DynamicTableEntity entity = webHooks[segmentCount + cnt];
+                            var entity = webHooks[segmentCount + i];
                             entity.ETag = "*";
-                            TableOperation operation = TableOperation.Delete(entity);
+                            var operation = TableOperation.Delete(entity);
                             batch.Add(operation);
                         }
 
@@ -367,11 +366,11 @@ namespace Microsoft.AspNet.WebHooks.Storage
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -385,10 +384,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                List<Task> addTasks = new List<Task>();
+                var addTasks = new List<Task>();
                 foreach (var message in messages)
                 {
-                    Task addTask = queue.AddMessageAsync(message);
+                    var addTask = queue.AddMessageAsync(message);
                     addTasks.Add(addTask);
                 }
 
@@ -396,10 +395,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
             }
         }
 
@@ -413,15 +412,15 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                IEnumerable<CloudQueueMessage> messages = await queue.GetMessagesAsync(messageCount, timeout, options: null, operationContext: null);
+                var messages = await queue.GetMessagesAsync(messageCount, timeout, options: null, operationContext: null);
                 return messages;
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
                 return Enumerable.Empty<CloudQueueMessage>();
             }
         }
@@ -436,10 +435,10 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
             try
             {
-                List<Task> deleteTasks = new List<Task>();
+                var deleteTasks = new List<Task>();
                 foreach (var message in messages)
                 {
-                    Task deleteTask = queue.DeleteMessageAsync(message);
+                    var deleteTask = queue.DeleteMessageAsync(message);
                     deleteTasks.Add(deleteTask);
                 }
 
@@ -447,21 +446,24 @@ namespace Microsoft.AspNet.WebHooks.Storage
             }
             catch (Exception ex)
             {
-                string errorMessage = GetStorageErrorMessage(ex);
-                int statusCode = GetStorageStatusCode(ex);
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
-                _logger.Error(msg, ex);
+                var errorMessage = GetStorageErrorMessage(ex);
+                var statusCode = GetStorageStatusCode(ex);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.StorageManager_OperationFailed, statusCode, errorMessage);
+                _logger.Error(message, ex);
             }
         }
 
         /// <inheritdoc />
         public string GetStorageErrorMessage(Exception ex)
         {
-            StorageException se = ex as StorageException;
-            if (se != null && se.RequestInformation != null)
+            if (ex is StorageException storageException && storageException.RequestInformation != null)
             {
-                string status = se.RequestInformation.HttpStatusMessage != null ? se.RequestInformation.HttpStatusMessage + " " : string.Empty;
-                string errorCode = se.RequestInformation.ExtendedErrorInformation != null ? "(" + se.RequestInformation.ExtendedErrorInformation.ErrorMessage + ")" : string.Empty;
+                var status = storageException.RequestInformation.HttpStatusMessage != null ?
+                    storageException.RequestInformation.HttpStatusMessage + " " :
+                    string.Empty;
+                var errorCode = storageException.RequestInformation.ExtendedErrorInformation != null ?
+                    "(" + storageException.RequestInformation.ExtendedErrorInformation.ErrorMessage + ")" :
+                    string.Empty;
                 return status + errorCode;
             }
             else if (ex != null)
@@ -474,8 +476,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
         /// <inheritdoc />
         public int GetStorageStatusCode(Exception ex)
         {
-            StorageException se = ex as StorageException;
-            return se != null && se.RequestInformation != null ? se.RequestInformation.HttpStatusCode : 500;
+            return ex is StorageException se && se.RequestInformation != null ? se.RequestInformation.HttpStatusCode : 500;
         }
 
         internal static IStorageManager GetInstance(ILogger logger)
@@ -499,7 +500,7 @@ namespace Microsoft.AspNet.WebHooks.Storage
 
         internal static string GetLookupKey(string connectionString, string identifier)
         {
-            string key = Hasher.GetFnvHash32AsString(connectionString) + "$" + identifier;
+            var key = Hasher.GetFnvHash32AsString(connectionString) + "$" + identifier;
             return key;
         }
     }

@@ -139,12 +139,12 @@ namespace Microsoft.AspNetCore.WebHooks
                     normalized.Append(quote);
                     if (++bytesConsumed == text.Length)
                     {
-                        var msg = string.Format(
+                        var message = string.Format(
                             CultureInfo.CurrentCulture,
                             Resources.Command_ContainsUnmatchedQuote,
                             quote,
                             quoteOffset);
-                        throw new ArgumentException(msg);
+                        throw new ArgumentException(message);
                     }
 
                     // Look for matching closing quote while encoding ';' on the way

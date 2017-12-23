@@ -30,19 +30,19 @@ namespace Microsoft.AspNet.WebHooks.Utilities
             {
                 throw new ArgumentNullException(nameof(content));
             }
-            byte[] data = Encoding.UTF8.GetBytes(content);
+            var data = Encoding.UTF8.GetBytes(content);
 
-            uint hash = FnvOffset32;
-            for (int cnt = 0; cnt < data.Length; cnt++)
+            var hash = FnvOffset32;
+            for (var i = 0; i < data.Length; i++)
             {
-                hash ^= data[cnt];
+                hash ^= data[i];
                 hash = hash * FnvPrime32;
             }
             return hash;
         }
 
         /// <summary>
-        /// Gets a string representation of a FNV-1a 32-bit hash of the provided <paramref name="content"/>. The FNV-1a 
+        /// Gets a string representation of a FNV-1a 32-bit hash of the provided <paramref name="content"/>. The FNV-1a
         /// algorithm is used in many context including DNS servers, database indexing hashes, non-cryptographic file
         /// fingerprints to name a few. For more information about FNV, please see the IETF document
         /// <c>The FNV Non-Cryptographic Hash Algorithm</c> as well as <c>http://isthe.com/chongo/tech/comp/fnv/</c>.

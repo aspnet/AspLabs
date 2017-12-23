@@ -56,28 +56,27 @@ namespace Microsoft.AspNet.WebHooks
                 id = string.Empty;
             }
 
-            string key = GetConfigKey(name, id);
-            string value;
-            string result = _config.TryGetValue(key, out value) ? value : null;
+            var key = GetConfigKey(name, id);
+            var result = _config.TryGetValue(key, out var value) ? value : null;
             return Task.FromResult(result);
         }
 
         internal static IDictionary<string, string> ReadSettings(SettingsDictionary settings, ILogger logger)
         {
             IDictionary<string, string> config = new Dictionary<string, string>();
-            foreach (KeyValuePair<string, string> setting in settings)
+            foreach (var setting in settings)
             {
-                string key = setting.Key;
+                var key = setting.Key;
                 if (key.Length > ConfigKeyPrefix.Length && key.StartsWith(ConfigKeyPrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     // Extract receiver name
-                    string receiver = key.Substring(ConfigKeyPrefix.Length);
+                    var receiver = key.Substring(ConfigKeyPrefix.Length);
 
                     // Parse values
-                    string[] segments = setting.Value.SplitAndTrim(',');
-                    foreach (string segment in segments)
+                    var segments = setting.Value.SplitAndTrim(',');
+                    foreach (var segment in segments)
                     {
-                        string[] values = segment.SplitAndTrim('=');
+                        var values = segment.SplitAndTrim('=');
                         if (values.Length == 1)
                         {
                             AddKey(config, logger, receiver, string.Empty, values[0]);
@@ -88,9 +87,9 @@ namespace Microsoft.AspNet.WebHooks
                         }
                         else
                         {
-                            string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_BadValue, key);
-                            logger.Error(msg);
-                            throw new InvalidOperationException(msg);
+                            var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_BadValue, key);
+                            logger.Error(message);
+                            throw new InvalidOperationException(message);
                         }
                     }
                 }
@@ -98,9 +97,9 @@ namespace Microsoft.AspNet.WebHooks
 
             if (config.Count == 0)
             {
-                string format = ConfigKeyPrefix + "<receiver>";
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_NoConfig, format);
-                logger.Error(msg);
+                var format = ConfigKeyPrefix + "<receiver>";
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_NoConfig, format);
+                logger.Error(message);
             }
 
             return config;
@@ -108,19 +107,19 @@ namespace Microsoft.AspNet.WebHooks
 
         internal static void AddKey(IDictionary<string, string> config, ILogger logger, string receiver, string id, string value)
         {
-            string lookupKey = GetConfigKey(receiver, id);
+            var lookupKey = GetConfigKey(receiver, id);
 
             try
             {
                 config.Add(lookupKey, value);
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddedName, receiver, id);
-                logger.Info(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddedName, receiver, id);
+                logger.Info(message);
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddFailure, receiver, id, ex.Message);
-                logger.Error(msg, ex);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Config_AddFailure, receiver, id, ex.Message);
+                logger.Error(message, ex);
+                throw new InvalidOperationException(message);
             }
         }
 

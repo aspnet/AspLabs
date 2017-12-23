@@ -34,8 +34,8 @@ namespace Microsoft.AspNet.WebHooks
         /// Initializes a new instance of the <see cref="TrelloWebHookClient"/> which can be used to create and delete WebHooks
         /// with Trello. For more information about Trello WebHooks, please see <c>https://trello.com/docs/gettingstarted/webhooks.html</c>.
         /// </summary>
-        /// <param name="userToken">The user token obtained when authenticating with Trello. The token can for example 
-        /// be obtained using either of the <c>Trello.Net</c> or <c>Owin.Security.Providers.Trello</c> Nuget packages. A sample user token is 
+        /// <param name="userToken">The user token obtained when authenticating with Trello. The token can for example
+        /// be obtained using either of the <c>Trello.Net</c> or <c>Owin.Security.Providers.Trello</c> Nuget packages. A sample user token is
         /// <c>0d3cce724413cba6d42084bb1c6bd7a285446deccb3ee2259152acd1eb6418a2</c>. Note that the token expires so it must be renewed on a regular basis.</param>
         /// <param name="applicationKey">Your Trello application key as obtained from <c>https://trello.com/app-key</c>.</param>
         public TrelloWebHookClient(string userToken, string applicationKey)
@@ -44,7 +44,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrelloWebHookClient"/> with the given <paramref name="httpClient"/>. 
+        /// Initializes a new instance of the <see cref="TrelloWebHookClient"/> with the given <paramref name="httpClient"/>.
         /// This constructor is intended for unit testing purposes.
         /// </summary>
         internal TrelloWebHookClient(string userToken, string applicationKey, HttpClient httpClient)
@@ -77,8 +77,8 @@ namespace Microsoft.AspNet.WebHooks
             }
             if (!callback.IsAbsoluteUri)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_NotAbsoluteCallback, "https://<host>/api/webhooks/incoming/trello");
-                throw new ArgumentException(msg, nameof(callback));
+                var message = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_NotAbsoluteCallback, "https://<host>/api/webhooks/incoming/trello");
+                throw new ArgumentException(message, nameof(callback));
             }
             if (modelId == null)
             {
@@ -89,26 +89,28 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(description));
             }
 
-            JObject parameters = new JObject();
-            parameters[DescriptionKey] = description;
-            parameters[CallbackKey] = callback;
-            parameters[ModelIdKey] = modelId;
+            var parameters = new JObject
+            {
+                [DescriptionKey] = description,
+                [CallbackKey] = callback,
+                [ModelIdKey] = modelId
+            };
 
-            using (HttpResponseMessage response = await _httpClient.PostAsJsonAsync(_createWebHookUri, parameters))
+            using (var response = await _httpClient.PostAsJsonAsync(_createWebHookUri, parameters))
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    string errorMessage = string.Empty;
+                    var errorMessage = string.Empty;
                     if (response.Content != null)
                     {
                         errorMessage = await response.Content.ReadAsStringAsync();
                     }
-                    string msg = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_CreateFailure, response.StatusCode, errorMessage.Trim());
-                    throw new InvalidOperationException(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, TrelloResources.Client_CreateFailure, response.StatusCode, errorMessage.Trim());
+                    throw new InvalidOperationException(message);
                 }
 
-                JObject content = await response.Content.ReadAsAsync<JObject>();
-                string id = content.Value<string>(IdKey);
+                var content = await response.Content.ReadAsAsync<JObject>();
+                var id = content.Value<string>(IdKey);
                 return id;
             }
         }
@@ -125,9 +127,9 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(webHookId));
             }
 
-            string address = string.Format(CultureInfo.InvariantCulture, _deleteWebHookUriTemplate, webHookId);
+            var address = string.Format(CultureInfo.InvariantCulture, _deleteWebHookUriTemplate, webHookId);
 
-            using (HttpResponseMessage response = await _httpClient.DeleteAsync(address))
+            using (var response = await _httpClient.DeleteAsync(address))
             {
                 return response.IsSuccessStatusCode;
             }

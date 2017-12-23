@@ -3,7 +3,6 @@
 
 using System;
 using System.Data.Entity;
-using System.Data.Entity.ModelConfiguration;
 using System.Globalization;
 using Microsoft.AspNet.WebHooks.Properties;
 using Microsoft.AspNet.WebHooks.Storage;
@@ -51,14 +50,14 @@ namespace Microsoft.AspNet.WebHooks
         {
             if (string.IsNullOrEmpty(schemaName))
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(schemaName));
-                throw new ArgumentException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(schemaName));
+                throw new ArgumentException(message);
             }
 
             if (string.IsNullOrEmpty(tableName))
             {
-                var msg = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(tableName));
-                throw new ArgumentException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, SqlStorageResources.SqlStore_EmptyString, nameof(tableName));
+                throw new ArgumentException(message);
             }
 
             _schemaName = schemaName;

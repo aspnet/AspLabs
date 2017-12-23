@@ -66,20 +66,20 @@ namespace Microsoft.AspNet.WebHooks
             {
                 messages = workItems.Select(item =>
                     {
-                        string content = JsonConvert.SerializeObject(item, _serializerSettings);
-                        CloudQueueMessage message = new CloudQueueMessage(content);
+                        var content = JsonConvert.SerializeObject(item, _serializerSettings);
+                        var message = new CloudQueueMessage(content);
                         return message;
                     }).ToArray();
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureSender_SerializeFailure, ex.Message);
-                _logger.Error(msg, ex);
-                throw new InvalidOperationException(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, AzureStorageResources.AzureSender_SerializeFailure, ex.Message);
+                _logger.Error(message, ex);
+                throw new InvalidOperationException(message);
             }
 
             // Insert queue messages into queue.
-            CloudQueue queue = _manager.GetCloudQueue(_connectionString, WebHookQueue);
+            var queue = _manager.GetCloudQueue(_connectionString, WebHookQueue);
             await _manager.AddMessagesAsync(queue, messages);
         }
     }

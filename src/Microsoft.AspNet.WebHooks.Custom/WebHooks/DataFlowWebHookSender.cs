@@ -16,7 +16,7 @@ using Microsoft.AspNet.WebHooks.Properties;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IWebHookSender"/> for sending HTTP requests to 
+    /// Provides an implementation of <see cref="IWebHookSender"/> for sending HTTP requests to
     /// registered <see cref="WebHook"/> instances using a default <see cref="WebHook"/> wire format
     /// and retry mechanism.
     /// </summary>
@@ -43,13 +43,13 @@ namespace Microsoft.AspNet.WebHooks
         /// <summary>
         /// Initializes a new instance of the <see cref="DataflowWebHookSender"/> class with a given collection of <paramref name="retryDelays"/> and
         /// <paramref name="options"/> for how to manage the queuing policy for each transmission. The transmission model is as follows: each try
-        /// and subsequent retries is managed by a separate <see cref="ActionBlock{T}"/> which controls the level of concurrency used to 
-        /// send out WebHooks. The <paramref name="options"/> parameter can be used to control all <see cref="ActionBlock{T}"/> instances 
+        /// and subsequent retries is managed by a separate <see cref="ActionBlock{T}"/> which controls the level of concurrency used to
+        /// send out WebHooks. The <paramref name="options"/> parameter can be used to control all <see cref="ActionBlock{T}"/> instances
         /// by setting the maximum level of concurrency, length of queue, and more.
         /// </summary>
         /// <param name="logger">The current <see cref="ILogger"/>.</param>
         /// <param name="retryDelays">A collection of <see cref="TimeSpan"/> instances indicating the delay between each retry. If <c>null</c>,
-        /// then a default retry policy is used of one retry after one 1 minute and then again after 4 minutes. A retry is attempted if the 
+        /// then a default retry policy is used of one retry after one 1 minute and then again after 4 minutes. A retry is attempted if the
         /// delivery fails or does not result in a 2xx HTTP status code. If the status code is 410 then no retry is attempted. If the collection
         /// is empty then no retries are attempted.</param>
         /// <param name="options">An <see cref="ExecutionDataflowBlockOptions"/> used to control the <see cref="ActionBlock{T}"/> instances.
@@ -82,15 +82,15 @@ namespace Microsoft.AspNet.WebHooks
             // Create the launch processors with the given retry delays
             _launchers = new ActionBlock<WebHookWorkItem>[1 + retryDelays.Count()];
 
-            int offset = 0;
+            var offset = 0;
             _launchers[offset++] = new ActionBlock<WebHookWorkItem>(async item => await LaunchWebHook(item), options);
-            foreach (TimeSpan delay in retryDelays)
+            foreach (var delay in retryDelays)
             {
                 _launchers[offset++] = new ActionBlock<WebHookWorkItem>(async item => await DelayedLaunchWebHook(item, delay), options);
             }
 
-            string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Started, typeof(DataflowWebHookSender).Name, _launchers.Length);
-            Logger.Info(msg);
+            var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Started, typeof(DataflowWebHookSender).Name, _launchers.Length);
+            Logger.Info(message);
         }
 
         /// <inheritdoc />
@@ -101,7 +101,7 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(workItems));
             }
 
-            foreach (WebHookWorkItem workItem in workItems)
+            foreach (var workItem in workItems)
             {
                 _launchers[0].Post(workItem);
             }
@@ -125,12 +125,12 @@ namespace Microsoft.AspNet.WebHooks
                         try
                         {
                             // Start shutting down launchers
-                            Task[] completionTasks = new Task[_launchers.Length];
-                            for (int cnt = 0; cnt < _launchers.Length; cnt++)
+                            var completionTasks = new Task[_launchers.Length];
+                            for (var i = 0; i < _launchers.Length; i++)
                             {
-                                ActionBlock<WebHookWorkItem> launcher = _launchers[cnt];
+                                var launcher = _launchers[i];
                                 launcher.Complete();
-                                completionTasks[cnt] = launcher.Completion;
+                                completionTasks[i] = launcher.Completion;
                             }
 
                             // Cancel any outstanding HTTP requests
@@ -146,8 +146,8 @@ namespace Microsoft.AspNet.WebHooks
                         catch (Exception ex)
                         {
                             ex = ex.GetBaseException();
-                            string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_CompletionFailure, ex.Message);
-                            Logger.Error(msg, ex);
+                            var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_CompletionFailure, ex.Message);
+                            Logger.Error(message, ex);
                         }
                     }
                 }
@@ -156,9 +156,9 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// If delivery of a WebHook is not successful, i.e. something other than a 2xx or 410 Gone 
-        /// HTTP status code is received and the request is to be retried, then <see cref="OnWebHookRetry"/> 
-        /// is called enabling additional post-processing of a retry request. 
+        /// If delivery of a WebHook is not successful, i.e. something other than a 2xx or 410 Gone
+        /// HTTP status code is received and the request is to be retried, then <see cref="OnWebHookRetry"/>
+        /// is called enabling additional post-processing of a retry request.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
         protected virtual Task OnWebHookRetry(WebHookWorkItem workItem)
@@ -168,7 +168,7 @@ namespace Microsoft.AspNet.WebHooks
 
         /// <summary>
         /// If delivery of a WebHook is successful, i.e. a 2xx HTTP status code is received,
-        /// then <see cref="OnWebHookSuccess"/> is called enabling additional post-processing. 
+        /// then <see cref="OnWebHookSuccess"/> is called enabling additional post-processing.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
         protected virtual Task OnWebHookSuccess(WebHookWorkItem workItem)
@@ -177,9 +177,9 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// If delivery of a WebHook is not successful, i.e. something other than a 2xx or 410 Gone 
-        /// HTTP status code is received after having retried the request according to the retry-policy, 
-        /// then <see cref="OnWebHookFailure"/> is called enabling additional post-processing. 
+        /// If delivery of a WebHook is not successful, i.e. something other than a 2xx or 410 Gone
+        /// HTTP status code is received after having retried the request according to the retry-policy,
+        /// then <see cref="OnWebHookFailure"/> is called enabling additional post-processing.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
         protected virtual Task OnWebHookFailure(WebHookWorkItem workItem)
@@ -188,8 +188,8 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// If delivery of a WebHook results in a 410 Gone HTTP status code, then <see cref="OnWebHookGone"/> 
-        /// is called enabling additional post-processing. 
+        /// If delivery of a WebHook results in a 410 Gone HTTP status code, then <see cref="OnWebHookGone"/>
+        /// is called enabling additional post-processing.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
         protected virtual Task OnWebHookGone(WebHookWorkItem workItem)
@@ -212,12 +212,12 @@ namespace Microsoft.AspNet.WebHooks
         {
             try
             {
-                // Setting up and send WebHook request 
-                HttpRequestMessage request = CreateWebHookRequest(workItem);
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
+                // Setting up and send WebHook request
+                var request = CreateWebHookRequest(workItem);
+                var response = await _httpClient.SendAsync(request);
 
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Result, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
-                Logger.Info(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_Result, workItem.WebHook.Id, response.StatusCode, workItem.Offset);
+                Logger.Info(message);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -234,8 +234,8 @@ namespace Microsoft.AspNet.WebHooks
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
-                Logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
+                Logger.Error(message, ex);
             }
 
             try
@@ -250,15 +250,15 @@ namespace Microsoft.AspNet.WebHooks
                 }
                 else
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_GivingUp, workItem.WebHook.Id, workItem.Offset);
-                    Logger.Error(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_GivingUp, workItem.WebHook.Id, workItem.Offset);
+                    Logger.Error(message);
                     await OnWebHookFailure(workItem);
                 }
             }
             catch (Exception ex)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
-                Logger.Error(msg, ex);
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_WebHookFailure, workItem.Offset, workItem.WebHook.Id, ex.Message);
+                Logger.Error(message, ex);
             }
         }
     }

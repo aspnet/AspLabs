@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
-    /// Provides a base <see cref="IWebHookHandler" /> implementation which can be used to for handling Visual Studio Team Services WebHook 
+    /// Provides a base <see cref="IWebHookHandler" /> implementation which can be used to for handling Visual Studio Team Services WebHook
     /// using strongly-typed payloads. For details about MyGet WebHooks, see <c>https://www.visualstudio.com/en-us/get-started/integrate/service-hooks/webhooks-and-vso-vs</c>.
     /// </summary>
     public abstract class VstsWebHookHandlerBase : WebHookHandler
@@ -22,7 +22,7 @@ namespace Microsoft.AspNet.WebHooks
         /// </summary>
         protected VstsWebHookHandlerBase()
         {
-            this.Receiver = VstsWebHookReceiver.ReceiverName;
+            Receiver = VstsWebHookReceiver.ReceiverName;
         }
 
         /// <inheritdoc />
@@ -33,8 +33,8 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(context));
             }
 
-            string action = context.Actions.First();
-            JObject data = context.GetDataOrDefault<JObject>();
+            var action = context.Actions.First();
+            var data = context.GetDataOrDefault<JObject>();
 
             // map eventType to corresponding payload
             switch (action)
@@ -52,8 +52,8 @@ namespace Microsoft.AspNet.WebHooks
                 case "git.pullrequest.updated": return ExecuteAsync(context, data.ToObject<GitPullRequestUpdatedPayload>());
                 case "git.pullrequest.merged": return ExecuteAsync(context, data.ToObject<GitPullRequestMergeCommitCreatedPayload>());
                 default:
-                    string msg = string.Format(CultureInfo.CurrentCulture, VstsReceiverResources.Handler_NonMappedEventType, action);
-                    context.RequestContext.Configuration.DependencyResolver.GetLogger().Warn(msg);
+                    var message = string.Format(CultureInfo.CurrentCulture, VstsReceiverResources.Handler_NonMappedEventType, action);
+                    context.RequestContext.Configuration.DependencyResolver.GetLogger().Warn(message);
                     return ExecuteAsync(context, data);
             }
         }

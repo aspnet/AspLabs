@@ -38,9 +38,9 @@ namespace Microsoft.AspNet.WebHooks
                .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
             _logger = logger;
 
-            string providerList = string.Join(", ", _receiverLookup.Keys);
-            string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_RegisteredNames, typeof(IWebHookReceiver).Name, providerList);
-            _logger.Info(msg);
+            var providerList = string.Join(", ", _receiverLookup.Keys);
+            var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_RegisteredNames, typeof(IWebHookReceiver).Name, providerList);
+            _logger.Info(message);
         }
 
         /// <inheritdoc />
@@ -51,19 +51,18 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(receiverName));
             }
 
-            List<IWebHookReceiver> matches;
-            if (!_receiverLookup.TryGetValue(receiverName, out matches))
+            if (!_receiverLookup.TryGetValue(receiverName, out var matches))
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_UnknownReceiver, receiverName);
-                _logger.Info(msg);
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_UnknownReceiver, receiverName);
+                _logger.Info(message);
                 return null;
             }
             else if (matches.Count > 1)
             {
-                string providerList = string.Join(Environment.NewLine, matches.Select(p => p.GetType()));
-                string msg = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_MultipleAmbiguousReceiversFound, receiverName, Environment.NewLine, providerList);
-                _logger.Error(msg);
-                throw new InvalidOperationException(msg);
+                var providerList = string.Join(Environment.NewLine, matches.Select(p => p.GetType()));
+                var message = string.Format(CultureInfo.CurrentCulture, ReceiverResources.Manager_MultipleAmbiguousReceiversFound, receiverName, Environment.NewLine, providerList);
+                _logger.Error(message);
+                throw new InvalidOperationException(message);
             }
             return matches.First();
         }

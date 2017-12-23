@@ -17,7 +17,7 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Provides a base implementation of <see cref="IWebHookSender"/> that defines the default format
-    /// for HTTP requests sent as WebHooks. 
+    /// for HTTP requests sent as WebHooks.
     /// </summary>
     public abstract class WebHookSender : IWebHookSender, IDisposable
     {
@@ -93,13 +93,13 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(workItem));
             }
 
-            WebHook hook = workItem.WebHook;
+            var hook = workItem.WebHook;
 
             // Create WebHook request
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, hook.WebHookUri);
+            var request = new HttpRequestMessage(HttpMethod.Post, hook.WebHookUri);
 
             // Fill in request body based on WebHook and work item data
-            JObject body = CreateWebHookRequestBody(workItem);
+            var body = CreateWebHookRequestBody(workItem);
             SignWebHookRequest(workItem, request, body);
 
             // Add extra request or entity headers
@@ -109,8 +109,8 @@ namespace Microsoft.AspNet.WebHooks
                 {
                     if (!request.Content.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value))
                     {
-                        string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_InvalidHeader, kvp.Key, hook.Id);
-                        _logger.Error(msg);
+                        var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Manager_InvalidHeader, kvp.Key, hook.Id);
+                        _logger.Error(message);
                     }
                 }
             }
@@ -130,14 +130,15 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(workItem));
             }
 
-            Dictionary<string, object> body = new Dictionary<string, object>();
-
-            // Set properties from work item
-            body[BodyIdKey] = workItem.Id;
-            body[BodyAttemptKey] = workItem.Offset + 1;
+            var body = new Dictionary<string, object>
+            {
+                // Set properties from work item
+                [BodyIdKey] = workItem.Id,
+                [BodyAttemptKey] = workItem.Offset + 1
+            };
 
             // Set properties from WebHook
-            IDictionary<string, object> properties = workItem.WebHook.Properties;
+            var properties = workItem.WebHook.Properties;
             if (properties != null)
             {
                 body[BodyPropertiesKey] = new Dictionary<string, object>(properties);
@@ -150,7 +151,7 @@ namespace Microsoft.AspNet.WebHooks
         }
 
         /// <summary>
-        /// Adds a SHA 256 signature to the <paramref name="body"/> and adds it to the <paramref name="request"/> as an 
+        /// Adds a SHA 256 signature to the <paramref name="body"/> and adds it to the <paramref name="request"/> as an
         /// HTTP header to the <see cref="HttpRequestMessage"/> along with the entity body.
         /// </summary>
         /// <param name="workItem">The current <see cref="WebHookWorkItem"/>.</param>
@@ -164,8 +165,8 @@ namespace Microsoft.AspNet.WebHooks
             }
             if (workItem.WebHook == null)
             {
-                string msg = string.Format(CultureInfo.CurrentCulture, CustomResources.Sender_BadWorkItem, this.GetType().Name, "WebHook");
-                throw new ArgumentException(msg, "workItem");
+                var message = string.Format(CultureInfo.CurrentCulture, CustomResources.Sender_BadWorkItem, this.GetType().Name, "WebHook");
+                throw new ArgumentException(message, "workItem");
             }
             if (request == null)
             {
@@ -176,15 +177,15 @@ namespace Microsoft.AspNet.WebHooks
                 throw new ArgumentNullException(nameof(body));
             }
 
-            byte[] secret = Encoding.UTF8.GetBytes(workItem.WebHook.Secret);
+            var secret = Encoding.UTF8.GetBytes(workItem.WebHook.Secret);
             using (var hasher = new HMACSHA256(secret))
             {
-                string serializedBody = body.ToString();
+                var serializedBody = body.ToString();
                 request.Content = new StringContent(serializedBody, Encoding.UTF8, "application/json");
 
-                byte[] data = Encoding.UTF8.GetBytes(serializedBody);
-                byte[] sha256 = hasher.ComputeHash(data);
-                string headerValue = string.Format(CultureInfo.InvariantCulture, SignatureHeaderValueTemplate, EncodingUtilities.ToHex(sha256));
+                var data = Encoding.UTF8.GetBytes(serializedBody);
+                var sha256 = hasher.ComputeHash(data);
+                var headerValue = string.Format(CultureInfo.InvariantCulture, SignatureHeaderValueTemplate, EncodingUtilities.ToHex(sha256));
                 request.Headers.Add(SignatureHeaderName, headerValue);
             }
         }
