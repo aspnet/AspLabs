@@ -240,6 +240,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StripeCoreReceiver", "sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test", "test\Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test\Microsoft.AspNetCore.WebHooks.Receivers.Stripe.Test.csproj", "{79247F99-4829-4FB4-8412-0ECF39FF7E37}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.Slack.Test", "test\Microsoft.AspNetCore.WebHooks.Receivers.Slack.Test\Microsoft.AspNetCore.WebHooks.Receivers.Slack.Test.csproj", "{DFD36032-179A-4C2E-A90B-0537A864969A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -835,6 +837,12 @@ Global
 		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79247F99-4829-4FB4-8412-0ECF39FF7E37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFD36032-179A-4C2E-A90B-0537A864969A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -944,6 +952,7 @@ Global
 		{D3A8D951-D55A-414E-8A5D-F8A8AF1F61FA} = {5759F48E-0D9E-457F-A93D-40FBC422B0CE}
 		{693E5E07-5A05-4569-8373-369D4F918BEF} = {5759F48E-0D9E-457F-A93D-40FBC422B0CE}
 		{79247F99-4829-4FB4-8412-0ECF39FF7E37} = {554337F5-F56F-4F93-9AE7-78F9EBCECC20}
+		{DFD36032-179A-4C2E-A90B-0537A864969A} = {554337F5-F56F-4F93-9AE7-78F9EBCECC20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}

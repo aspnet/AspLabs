@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter name cannot contain &apos;;&apos; characters: ({0})..
+        ///   Looks up a localized string similar to Parameter name cannot contain &apos;;&apos; characters. Unexpected escape sequence ({0}) discovered at position {1}..
         /// </summary>
         internal static string Command_NameInvalid {
             get {
@@ -79,11 +79,20 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter name cannot be a quoted string: ({0})..
+        ///   Looks up a localized string similar to Parameter name cannot be a quoted string. Unexpected character ({0}) discovered at position {1}..
         /// </summary>
         internal static string Command_NameIsQuotedString {
             get {
                 return ResourceManager.GetString("Command_NameIsQuotedString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter value contains text after a quoted string. Unexpected character ({0}) discovered at position {1}..
+        /// </summary>
+        internal static string Command_ValueInvalid {
+            get {
+                return ResourceManager.GetString("Command_ValueInvalid", resourceCulture);
             }
         }
         

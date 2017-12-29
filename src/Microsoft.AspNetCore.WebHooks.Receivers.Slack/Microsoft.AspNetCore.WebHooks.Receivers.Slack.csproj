@@ -6,9 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\ParameterCollection.cs">
-      <Link>ParameterCollection.cs</Link>
-    </Compile>
     <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackAttachment.cs">
       <Link>SlackAttachment.cs</Link>
     </Compile>

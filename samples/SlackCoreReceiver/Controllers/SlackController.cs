@@ -47,13 +47,21 @@ namespace SlackCoreReceiver.Controllers
                 text,
                 subtext);
 
+            var slashCommand = SlackCommand.ParseActionWithValue(command);
+
+            // Ignore an error parsing the remainder of the command except to keep that action value together.
+            var actionValue = slashCommand.Value;
+            var actionValueName = "value";
+            var (parameters, error) = SlackCommand.ParseParameters(slashCommand.Value);
+            if (error == null)
+            {
+                actionValue = SlackCommand.GetNormalizedParameterString(parameters);
+                actionValueName = "parameters";
+            }
+
             // Create the response.
-            var slashCommand = SlackCommand.ParseActionWithParameters(command);
-            var reply = string.Format(
-                "Received slash command '{0}' with action '{1}' and value '{2}'",
-                command,
-                slashCommand.Key,
-                slashCommand.Value.ToString());
+            var reply = $"Received slash command '{command}' with action '{slashCommand.Key}' and {actionValueName} " +
+                $"'{actionValue}'.";
 
             // Slash responses can be augmented with attachments containing data, images, and more.
             var attachment = new SlackAttachment("Attachment Text", "Fallback description")

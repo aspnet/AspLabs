@@ -121,10 +121,13 @@
     <value>Unmatched quote ({0}) discovered at position {1}.</value>
   </data>
   <data name="Command_NameInvalid" xml:space="preserve">
-    <value>Parameter name cannot contain ';' characters: ({0}).</value>
+    <value>Parameter name cannot contain ';' characters. Unexpected escape sequence ({0}) discovered at position {1}.</value>
   </data>
   <data name="Command_NameIsQuotedString" xml:space="preserve">
-    <value>Parameter name cannot be a quoted string: ({0}).</value>
+    <value>Parameter name cannot be a quoted string. Unexpected character ({0}) discovered at position {1}.</value>
+  </data>
+  <data name="Command_ValueInvalid" xml:space="preserve">
+    <value>Parameter value contains text after a quoted string. Unexpected character ({0}) discovered at position {1}.</value>
   </data>
   <data name="VerifyToken_BadValue" xml:space="preserve">
     <value>The '{0}' value provided in the HTTP request body did not match the expected value.</value>
