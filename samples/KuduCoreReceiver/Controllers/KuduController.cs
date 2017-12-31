@@ -6,7 +6,7 @@ namespace KuduCoreReceiver.Controllers
     public class KuduController : ControllerBase
     {
         [KuduWebHook(Id = "It")]
-        public IActionResult KuduForIt(KuduNotification data)
+        public IActionResult KuduForIt(string @event, KuduNotification data)
         {
             if (!ModelState.IsValid)
             {
@@ -23,7 +23,7 @@ namespace KuduCoreReceiver.Controllers
         }
 
         [KuduWebHook]
-        public IActionResult Kudu(string id, KuduNotification data)
+        public IActionResult Kudu(string id, string @event, KuduNotification data)
         {
             if (!ModelState.IsValid)
             {

@@ -83,6 +83,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// for the current request when there is a single event name.
         /// </summary>
         /// <seealso cref="Metadata.IWebHookEventMetadata"/>
+        /// <seealso cref="Metadata.IWebHookEventFromBodyMetadata"/>
         public static string EventKeyName => "event";
 
         /// <summary>

@@ -120,6 +120,9 @@
   <data name="EventConstraints_NoReceiverName" xml:space="preserve">
     <value>Invalid WebHook constraint configuration encountered. '{0}' executed though '{1}' should have disallowed the request.</value>
   </data>
+  <data name="EventMapper_NoBodyProperty" xml:space="preserve">
+    <value>A '{0}' WebHook request must contain a match for '{1}' in the HTTP request entity body indicating the type or types of event.</value>
+  </data>
   <data name="General_ArgumentCannotBeNullOrEmpty" xml:space="preserve">
     <value>Value cannot be null or empty.</value>
   </data>
@@ -132,6 +135,9 @@
   <data name="GetRequest_NoQueryParameter" xml:space="preserve">
     <value>A '{0}' WebHook verification request must contain a '{1}' query parameter.</value>
   </data>
+  <data name="MetadataProvider_ConflictingMetadataServices" xml:space="preserve">
+    <value>Invalid metadata services found. Receivers must not provide both '{0}' and '{1}' services.</value>
+  </data>
   <data name="MetadataProvider_DuplicateMetadata" xml:space="preserve">
     <value>Duplicate '{0}' registrations found.</value>
   </data>
@@ -140,6 +146,9 @@
   </data>
   <data name="MetadataProvider_MissingMetadata" xml:space="preserve">
     <value>No '{0}' implementation found for the '{1}' WebHook receiver.</value>
+  </data>
+  <data name="MetadataProvider_MissingMetadataServices" xml:space="preserve">
+    <value>Invalid metadata services found. Metadata services implementing '{0}' must also implement '{1}'.</value>
   </data>
   <data name="MetadataProvider_MissingMetadataServicesForReceiver" xml:space="preserve">
     <value>Invalid metadata services found for the '{0}' WebHook receiver. Receivers with attributes implementing '{1}' must also provide a '{2}' service.</value>

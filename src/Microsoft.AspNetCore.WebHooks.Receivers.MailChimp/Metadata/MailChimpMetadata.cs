@@ -9,6 +9,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     public class MailChimpMetadata :
         WebHookMetadata,
         IWebHookBodyTypeMetadataService,
+        IWebHookEventFromBodyMetadata,
         IWebHookGetRequestMetadata,
         IWebHookVerifyCodeMetadata
     {
@@ -24,6 +25,14 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Form;
+
+        // IWebHookEventFromBodyMetadata...
+
+        /// <inheritdoc />
+        public bool AllowMissing => false;
+
+        /// <inheritdoc />
+        public string BodyPropertyPath => MailChimpConstants.EventBodyPropertyName;
 
         // IWebHookGetRequestMetadata...
 

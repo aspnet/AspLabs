@@ -70,6 +70,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A &apos;{0}&apos; WebHook request must contain a match for &apos;{1}&apos; in the HTTP request entity body indicating the type or types of event..
+        /// </summary>
+        internal static string EventMapper_NoBodyProperty {
+            get {
+                return ResourceManager.GetString("EventMapper_NoBodyProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value cannot be null or empty..
         /// </summary>
         internal static string General_ArgumentCannotBeNullOrEmpty {
@@ -106,6 +115,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid metadata services found. Receivers must not provide both &apos;{0}&apos; and &apos;{1}&apos; services..
+        /// </summary>
+        internal static string MetadataProvider_ConflictingMetadataServices {
+            get {
+                return ResourceManager.GetString("MetadataProvider_ConflictingMetadataServices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duplicate &apos;{0}&apos; registrations found..
         /// </summary>
         internal static string MetadataProvider_DuplicateMetadata {
@@ -129,6 +147,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         internal static string MetadataProvider_MissingMetadata {
             get {
                 return ResourceManager.GetString("MetadataProvider_MissingMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid metadata services found. Metadata services implementing &apos;{0}&apos; must also implement &apos;{1}&apos;..
+        /// </summary>
+        internal static string MetadataProvider_MissingMetadataServices {
+            get {
+                return ResourceManager.GetString("MetadataProvider_MissingMetadataServices", resourceCulture);
             }
         }
         

@@ -13,6 +13,9 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <see cref="Routing.WebHookEventMapperConstraint"/> maps event names based on this metadata.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Receivers must not provide both this metadata and an <see cref="IWebHookEventFromBodyMetadata"/> service.
+    /// </remarks>
     public interface IWebHookEventMetadata : IWebHookMetadata, IWebHookReceiver
     {
         /// <summary>

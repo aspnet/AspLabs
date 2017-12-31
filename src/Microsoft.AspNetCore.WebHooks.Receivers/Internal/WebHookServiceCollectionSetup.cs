@@ -23,6 +23,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
         {
                 { typeof(WebHookGetRequestFilter), WebHookGetRequestFilter.Order },
                 { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
+                { typeof(WebHookEventMapperFilter), WebHookEventMapperFilter.Order },
                 { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },
                 { typeof(WebHookVerifyMethodFilter), WebHookVerifyMethodFilter.Order },
                 { typeof(WebHookVerifyRequiredValueFilter), WebHookVerifyRequiredValueFilter.Order },

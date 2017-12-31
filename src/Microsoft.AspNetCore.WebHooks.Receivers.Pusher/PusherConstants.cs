@@ -9,6 +9,14 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class PusherConstants
     {
         /// <summary>
+        /// Gets the JSON path of the properties in a Pusher WebHook request body containing the Pusher event names.
+        /// </summary>
+        /// <remarks>
+        /// Combines <see cref="EventRequestPropertyContainerName"/> and <see cref="EventNamePropertyName"/>.
+        /// </remarks>
+        public static string EventBodyPropertyPath => "$['events'][*]['name']";
+
+        /// <summary>
         /// Gets the name of the JSON property in a Pusher WebHook request body containing its Unix creation timestamp.
         /// </summary>
         public static string EventRequestCreatedAtPropertyName => "time_ms";

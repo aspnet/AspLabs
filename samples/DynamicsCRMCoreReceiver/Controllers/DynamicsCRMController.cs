@@ -15,38 +15,36 @@ namespace DynamicsCRMCoreReceiver.Controllers
         }
 
         [DynamicsCRMWebHook(Id = "It")]
-        public IActionResult DynamicsCRMForIt(JObject data)
+        public IActionResult DynamicsCRMForIt(string @event, JObject data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var messageName = data.Value<string>(DynamicsCRMConstants.EventRequestPropertyName);
             _logger.LogInformation(
                 0,
                 "{ControllerName} received '{MessageName}' for '{Id}'.",
                 nameof(DynamicsCRMController),
-                messageName,
+                @event,
                 "It");
 
             return Ok();
         }
 
         [DynamicsCRMWebHook]
-        public IActionResult DynamicsCRM(string id, JObject data)
+        public IActionResult DynamicsCRM(string id, string @event, JObject data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var messageName = data.Value<string>(DynamicsCRMConstants.EventRequestPropertyName);
             _logger.LogInformation(
                 1,
                 "{ControllerName} received '{MessageName}' for '{Id}'.",
                 nameof(DynamicsCRMController),
-                messageName,
+                @event,
                 id);
 
             return Ok();

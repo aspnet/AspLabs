@@ -6,7 +6,7 @@ namespace AzureAlertCoreReceiver.Controllers
     public class AzureAlertController : ControllerBase
     {
         [AzureAlertWebHook(Id = "It")]
-        public IActionResult AzureAlertForIt(AzureAlertNotification data)
+        public IActionResult AzureAlertForIt(string @event, AzureAlertNotification data)
         {
             if (!ModelState.IsValid)
             {
@@ -26,7 +26,7 @@ namespace AzureAlertCoreReceiver.Controllers
         }
 
         [AzureAlertWebHook]
-        public IActionResult AzureAlert(string id, AzureAlertNotification data)
+        public IActionResult AzureAlert(string id, string @event, AzureAlertNotification data)
         {
             if (!ModelState.IsValid)
             {

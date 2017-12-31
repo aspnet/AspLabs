@@ -50,11 +50,16 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             EnsureUniqueRegistrations(_pingMetadata);
 
             // Check for duplicates in other metadata registrations.
+            var eventFromBodyMetadata = metadata.OfType<IWebHookEventFromBodyMetadata>().ToArray();
+            EnsureUniqueRegistrations(eventFromBodyMetadata);
             EnsureUniqueRegistrations(metadata.OfType<IWebHookGetRequestMetadata>().ToArray());
             EnsureUniqueRegistrations(metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray());
 
             // Check for IWebHookBodyTypeMetadata services that do not also implement IWebHookReceiver.
             EnsureValidBodyTypeMetadata(metadata);
+
+            EnsureValidEventFromBodyMetadata(eventFromBodyMetadata, _bodyTypeMetadata);
+            EnsureValidEventFromBodyMetadata(eventFromBodyMetadata, _eventMetadata);
         }
 
         /// <summary>
@@ -250,6 +255,109 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     Resources.MetadataProvider_WrongInterface,
                     typeof(IWebHookBodyTypeMetadata),
                     typeof(IWebHookBodyTypeMetadataService));
+                throw new InvalidOperationException(message);
+            }
+        }
+
+        /// <summary>
+        /// Ensure members of given <paramref name="eventFromBodyMetadata"/> collection are valid. That is, confirm
+        /// the receivers also provide <see cref="IWebHookBodyTypeMetadataService"/> services.
+        /// </summary>
+        /// <param name="eventFromBodyMetadata">
+        /// The collection of <see cref="IWebHookEventFromBodyMetadata"/> services.
+        /// </param>
+        /// <param name="bodyTypeMetadata">
+        /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services.
+        /// </param>
+        protected void EnsureValidEventFromBodyMetadata(
+            IReadOnlyList<IWebHookEventFromBodyMetadata> eventFromBodyMetadata,
+            IReadOnlyList<IWebHookBodyTypeMetadataService> bodyTypeMetadata)
+        {
+            if (eventFromBodyMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(eventFromBodyMetadata));
+            }
+            if (bodyTypeMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(bodyTypeMetadata));
+            }
+
+            var invalidMetadata = false;
+            var receiversMissingRequiredRequestMetadata = eventFromBodyMetadata
+                .Where(metadata => !bodyTypeMetadata.Any(
+                    innerMetadata => innerMetadata.IsApplicable(metadata.ReceiverName)))
+                .Select(metadata => metadata.ReceiverName);
+            foreach (var receiverName in receiversMissingRequiredRequestMetadata)
+            {
+                invalidMetadata = true;
+                _logger.LogCritical(
+                    4,
+                    "The '{ReceiverName}' WebHook receiver has invalid '{MetadataType}'. Receivers must also have " +
+                    "'{RequiredMetadataType}'.",
+                    receiverName,
+                    typeof(IWebHookEventFromBodyMetadata),
+                    typeof(IWebHookBodyTypeMetadataService));
+            }
+
+            if (invalidMetadata)
+            {
+                var message = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.MetadataProvider_MissingMetadataServices,
+                    typeof(IWebHookEventFromBodyMetadata),
+                    typeof(IWebHookBodyTypeMetadataService));
+                throw new InvalidOperationException(message);
+            }
+        }
+
+        /// <summary>
+        /// Ensure members of given <paramref name="eventFromBodyMetadata"/> collection are valid. That is, confirm
+        /// no receiver provides both <see cref="IWebHookEventFromBodyMetadata"/> and
+        /// <see cref="IWebHookEventMetadata"/> services.
+        /// </summary>
+        /// <param name="eventFromBodyMetadata">
+        /// The collection of <see cref="IWebHookEventFromBodyMetadata"/> services.
+        /// </param>
+        /// <param name="eventMetadata">
+        /// The collection of <see cref="IWebHookEventMetadata"/> services.
+        /// </param>
+        protected void EnsureValidEventFromBodyMetadata(
+            IReadOnlyList<IWebHookEventFromBodyMetadata> eventFromBodyMetadata,
+            IReadOnlyList<IWebHookEventMetadata> eventMetadata)
+        {
+            if (eventFromBodyMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(eventFromBodyMetadata));
+            }
+            if (eventMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(eventMetadata));
+            }
+
+            var invalidMetadata = false;
+            var receiversWithConflictingMetadata = eventFromBodyMetadata
+                .Where(metadata => eventMetadata.Any(
+                    innerMetadata => innerMetadata.IsApplicable(metadata.ReceiverName)))
+                .Select(metadata => metadata.ReceiverName);
+            foreach (var receiverName in receiversWithConflictingMetadata)
+            {
+                invalidMetadata = true;
+                _logger.LogCritical(
+                    4,
+                    "Invalid metadata services found for the '{ReceiverName}' WebHook receiver. Receivers must not " +
+                    "provide both '{EventFromBodyMetadataType}' and '{EventMetadataType}' services.",
+                    receiverName,
+                    typeof(IWebHookEventFromBodyMetadata),
+                    typeof(IWebHookEventMetadata));
+            }
+
+            if (invalidMetadata)
+            {
+                var message = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.MetadataProvider_ConflictingMetadataServices,
+                    typeof(IWebHookEventFromBodyMetadata),
+                    typeof(IWebHookEventMetadata));
                 throw new InvalidOperationException(message);
             }
         }

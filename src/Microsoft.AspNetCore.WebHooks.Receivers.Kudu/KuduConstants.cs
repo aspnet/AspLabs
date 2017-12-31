@@ -9,10 +9,9 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class KuduConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a Kudu WebHook request body containing a value somewhat analogous to
-        /// an event name.
+        /// Gets the JSON path of the property in a Kudu WebHook request body containing the Kudu event name.
         /// </summary>
-        public static string EventRequestPropertyName => "status";
+        public static string EventBodyPropertyPath => "$.status";
 
         /// <summary>
         /// Gets the name of the Kudu WebHook receiver.

@@ -6,7 +6,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Dynamics CRM receiver.
     /// </summary>
-    public class DynamicsCRMMetadata : WebHookMetadata, IWebHookBodyTypeMetadataService, IWebHookVerifyCodeMetadata
+    public class DynamicsCRMMetadata :
+        WebHookMetadata,
+        IWebHookBodyTypeMetadataService,
+        IWebHookEventFromBodyMetadata,
+        IWebHookVerifyCodeMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="DynamicsCRMMetadata"/> instance.
@@ -20,5 +24,13 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;
+
+        // IWebHookEventFromBodyMetadata...
+
+        /// <inheritdoc />
+        public bool AllowMissing => true;
+
+        /// <inheritdoc />
+        public string BodyPropertyPath => DynamicsCRMConstants.EventBodyPropertyPath;
     }
 }

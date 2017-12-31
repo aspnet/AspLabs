@@ -6,7 +6,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Azure Alert receiver.
     /// </summary>
-    public class AzureAlertMetadata : WebHookMetadata, IWebHookBodyTypeMetadataService, IWebHookVerifyCodeMetadata
+    public class AzureAlertMetadata :
+        WebHookMetadata,
+        IWebHookBodyTypeMetadataService,
+        IWebHookEventFromBodyMetadata,
+        IWebHookVerifyCodeMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="AzureAlertMetadata"/> instance.
@@ -20,5 +24,13 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public WebHookBodyType BodyType => WebHookBodyType.Json;
+
+        // IWebHookEventFromBodyMetadata...
+
+        /// <inheritdoc />
+        public bool AllowMissing => false;
+
+        /// <inheritdoc />
+        public string BodyPropertyPath => AzureAlertConstants.EventBodyPropertyPath;
     }
 }

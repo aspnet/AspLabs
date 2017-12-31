@@ -9,16 +9,10 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class AzureAlertConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a Azure Alert WebHook request body containing a JSON object holding
-        /// the <see cref="EventRequestPropertyName"/> property.
+        /// Gets the JSON path of the property in an Azure Alert WebHook request body containing the Azure Alert event
+        /// name. Matches the Application Insights rule name.
         /// </summary>
-        public static string EventRequestPropertyContainerName => "context";
-
-        /// <summary>
-        /// Gets the name of the JSON property in a Azure Alert WebHook request body containing a value somewhat
-        /// analogous to an event name.
-        /// </summary>
-        public static string EventRequestPropertyName => "name";
+        public static string EventBodyPropertyPath => "$['context']['name']";
 
         /// <summary>
         /// Gets the name of the Azure Alert WebHook receiver.

@@ -17,8 +17,6 @@ using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
-    // TODO: Create similar IActionFilter for use in Azure Alert, Dynamics CRM, Kudu, MailChimp, and Pusher receivers.
-    // TODO:  Filter would require event name in request body and map that to route data. No action selection support.
     /// <summary>
     /// An <see cref="IAsyncResourceFilter"/> that verifies the Salesforce SOAP request body. Confirms the body
     /// deserializes as <see cref="XElement"/> that can be converted to <see cref="SalesforceNotifications"/>. Then

@@ -9,10 +9,10 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class DynamicsCRMConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a Dynamics CRM WebHook request body containing a value somewhat
-        /// an event name.
+        /// Gets the JSON path of the property in a Dynamics CRM WebHook request body containing the Dynamics CRM
+        /// event name.
         /// </summary>
-        public static string EventRequestPropertyName => "MessageName";
+        public static string EventBodyPropertyPath => "$.MessageName";
 
         /// <summary>
         /// Gets the name of the Dynamics CRM WebHook receiver.

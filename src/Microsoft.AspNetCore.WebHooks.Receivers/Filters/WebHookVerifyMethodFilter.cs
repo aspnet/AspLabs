@@ -53,6 +53,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in this filter).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
+        /// <see cref="WebHookEventMapperFilter"/>).
+        /// </item>
+        /// <item>
         /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
         /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>

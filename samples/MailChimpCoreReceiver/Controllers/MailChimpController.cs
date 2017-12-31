@@ -7,29 +7,23 @@ namespace MailChimpCoreReceiver.Controllers
     public class MailChimpController : ControllerBase
     {
         [MailChimpWebHook(Id = "It")]
-        public IActionResult MailChimpForIt(IFormCollection data)
+        public IActionResult MailChimpForIt(string @event, IFormCollection data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            // Get the event name.
-            var eventNames = data[MailChimpConstants.EventRequestPropertyName];
 
             return Ok();
         }
 
         [MailChimpWebHook]
-        public IActionResult MailChimp(string id, IFormCollection data)
+        public IActionResult MailChimp(string id, string @event, IFormCollection data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            // Get the event name.
-            var eventNames = data[MailChimpConstants.EventRequestPropertyName];
 
             return Ok();
         }

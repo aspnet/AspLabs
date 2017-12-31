@@ -9,10 +9,10 @@ namespace Microsoft.AspNetCore.WebHooks
     public static class MailChimpConstants
     {
         /// <summary>
-        /// Gets the name of the JSON property in a MailChimp WebHook request body containing a value somewhat
-        /// analogous to an event name.
+        /// Gets the name of the property in a MailChimp WebHook request entity body (formatted as HTML form
+        /// URL-encoded data) containing the MailChimp event name.
         /// </summary>
-        public static string EventRequestPropertyName => "type";
+        public static string EventBodyPropertyName => "type";
 
         /// <summary>
         /// Gets the name of the MailChimp WebHook receiver.
