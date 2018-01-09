@@ -168,7 +168,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     "Expecting exactly one '{HeaderName}' header field in the WebHook request but found " +
                     "{HeaderCount}. Please ensure the request contains exactly one '{HeaderName}' header field.",
                     headerName,
-                    headersCount);
+                    headersCount,
+                    headerName);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
