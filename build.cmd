@@ -43,6 +43,8 @@ if not exist %StorageEmulator% (
   goto BuildFail
 )
 
+%StorageEmulator% stop 2> NUL
+%StorageEmulator% clear 2> NUL
 %StorageEmulator% start 2> NUL
 
 if "%1" == "" goto BuildDefaults
