@@ -2,10 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNet.WebHooks.Serialization;
+using Microsoft.AspNetCore.WebHooks.ModelBinding;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// Contains information sent in a WebHook notification from Stripe, see

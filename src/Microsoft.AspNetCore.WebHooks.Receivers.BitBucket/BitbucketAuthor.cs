@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// Contains information about a Bitbucket author.

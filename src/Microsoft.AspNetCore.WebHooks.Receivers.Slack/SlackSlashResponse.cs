@@ -5,13 +5,13 @@ using System;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
-    /// An <see cref="IWebHookHandler"/> can post a response to a Slack Slash request by updating the
-    /// <see cref="System.Net.Http.HttpResponseMessage"/> on the <see cref="WebHookHandlerContext"/> with a response
-    /// containing a <see cref="SlackSlashResponse"/>. Please see <c>https://api.slack.com/docs/attachments#message_formatting</c>
-    /// for additional details.
+    /// An Slack WebHook action can post back a response to a Slack Slash request by returning a
+    /// <see cref="SlackSlashResponse"/> or an <see cref="Mvc.IActionResult"/> with a <see cref="SlackSlashResponse"/>
+    /// as its content. Please see <see href="https://api.slack.com/docs/attachments#message_formatting"/> for
+    /// additional details about Slack Slash messages.
     /// </summary>
     public class SlackSlashResponse
     {

@@ -5,7 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// The <see cref="SlackAttachment"/> is used to describe the contents of an <see cref="SlackSlashResponse"/>.

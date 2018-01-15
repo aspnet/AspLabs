@@ -6,24 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketAuthor.cs">
-      <Link>BitbucketAuthor.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketLink.cs">
-      <Link>BitbucketLink.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketParent.cs">
-      <Link>BitbucketParent.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketRepository.cs">
-      <Link>BitbucketRepository.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketTarget.cs">
-      <Link>BitbucketTarget.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.BitBucket\WebHooks\BitbucketUser.cs">
-      <Link>BitbucketUser.cs</Link>
-    </Compile>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.0.0" />
     <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
   </ItemGroup>

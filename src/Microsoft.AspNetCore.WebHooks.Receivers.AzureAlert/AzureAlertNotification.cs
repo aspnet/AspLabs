@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// Contains information sent in a WebHook notification from Azure Alert Service.

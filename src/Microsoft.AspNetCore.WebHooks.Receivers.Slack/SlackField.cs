@@ -4,7 +4,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// The <see cref="SlackField"/> class is used for expression table fields as part of a <see cref="SlackAttachment"/>,

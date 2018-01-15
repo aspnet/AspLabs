@@ -4,7 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// Common XML namespace URIs used by Salesforce SOAP messages.

@@ -7,8 +7,7 @@ mkdir bin
 
 :Build
 
-REM Find the most recent 32bit MSBuild.exe on the system. Require v15.0 (installed with VS2017) or later since .NET
-REM Core projects are coming soon.
+REM Find the most recent 32bit MSBuild.exe on the system. Require v15.0 (installed with VS2017) or later.
 REM Use `vswhere` for the search since %ProgramFiles(x86)%\msbuild\15.0\Bin\MSBuild.exe almost never exists.
 set vswhere="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist %vswhere% (
@@ -49,12 +48,12 @@ if not exist %StorageEmulator% (
 
 if "%1" == "" goto BuildDefaults
 
-%MSBuild% WebHooks.msbuild /m /nr:false /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal /t:%*
+%MSBuild% AspNetWebHooks.msbuild /m /nr:false /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal /t:%*
 if %ERRORLEVEL% neq 0 goto BuildFail
 goto BuildSuccess
 
 :BuildDefaults
-%MSBuild% WebHooks.msbuild /m /nr:false /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal
+%MSBuild% AspNetWebHooks.msbuild /m /nr:false /p:Platform="Any CPU" /p:Desktop=true /v:M /fl /flp:LogFile=bin\msbuild.log;Verbosity=Normal
 if %ERRORLEVEL% neq 0 goto BuildFail
 goto BuildSuccess
 

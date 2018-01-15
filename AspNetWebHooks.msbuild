@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SolutionsToBuild Include="WebHooks.sln">
+    <SolutionsToBuild Include="AspNetWebHooks.sln">
       <BuildInParallel>$(BuildInParallel)</BuildInParallel>
     </SolutionsToBuild>
   </ItemGroup>
@@ -125,7 +125,6 @@
       <_XunitProject Include="tools\WebHooks.xunit.targets">
         <Properties>TestAssembly=%(_TestDLLsXunit.FullPath);XmlPath=$(TestResultsDirectory)%(_TestDLLsXunit.FileName)-XunitResults.xml</Properties>
       </_XunitProject>
-      <_DirectTestProjects Include="test\Microsoft.AspNetCore.*\*.csproj" />
     </ItemGroup>
 
     <!-- Recreate the test results directory so that print summary doesn't run on old test results. -->
@@ -133,13 +132,6 @@
     <MakeDir Directories="$(TestResultsDirectory)" />
 
     <MSBuild Projects="@(_XunitProject)" BuildInParallel="$(TestInParallel)" Targets="Xunit" />
-
-    <!-- Failures in these projects will fail build. But, results will not be included in test run summary. -->
-    <MSBuild
-      BuildInParallel="$(TestInParallel)"
-      Properties="Configuration=$(Configuration);Platform=$(_Platform)"
-      Projects="@(_DirectTestProjects)"
-      Targets="Test" />
   </Target>
 
   <Target Name="CheckSkipStrongNames" DependsOnTargets="RestoreSkipStrongNames">

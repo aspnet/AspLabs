@@ -6,18 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackAttachment.cs">
-      <Link>SlackAttachment.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackField.cs">
-      <Link>SlackField.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackResponse.cs">
-      <Link>SlackResponse.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Slack\WebHooks\SlackSlashResponse.cs">
-      <Link>SlackSlashResponse.cs</Link>
-    </Compile>
     <Compile Include="..\shared\Utilities\TrimmingTokenizer.cs">
       <Link>Utilities\TrimmingTokenizer.cs</Link>
     </Compile>

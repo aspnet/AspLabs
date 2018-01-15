@@ -4,11 +4,7 @@
 using System.Collections.Specialized;
 using System.Text;
 
-#if NETSTANDARD2_0
-namespace Microsoft.AspNetCore.WebHooks
-#else
 namespace Microsoft.AspNet.WebHooks
-#endif
 {
     /// <summary>
     /// This version of <see cref="NameValueCollection"/> creates the output supported by <see cref="SlackCommand.ParseActionWithParameters"/>
@@ -18,9 +14,9 @@ namespace Microsoft.AspNet.WebHooks
         /// <inheritdoc />
         public override string ToString()
         {
-            bool first = true;
-            StringBuilder output = new StringBuilder();
-            foreach (string key in this.AllKeys)
+            var first = true;
+            var output = new StringBuilder();
+            foreach (var key in AllKeys)
             {
                 output.AppendFormat("{0}{1}={2}", first ? string.Empty : "; ", key, this[key]);
                 first = false;

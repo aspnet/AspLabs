@@ -4,26 +4,38 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNet.WebHooks
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
-    /// Contains information about a parent commit in Bitbucket.
+    /// Contains information about a user in Bitbucket.
     /// </summary>
-    public class BitbucketParent
+    public class BitbucketUser
     {
         private readonly IDictionary<string, BitbucketLink> _links = new Dictionary<string, BitbucketLink>();
 
         /// <summary>
-        /// Gets or sets the hash of the parent commit.
+        /// Gets or sets a unique ID for this user.
         /// </summary>
-        [JsonProperty("hash")]
-        public string Hash { get; set; }
+        [JsonProperty("uuid")]
+        public string UserId { get; set; }
 
         /// <summary>
-        /// The type of operation on the repository, e.g. 'commit'.
+        /// Gets or sets the type of the user.
         /// </summary>
         [JsonProperty("type")]
-        public string Operation { get; set; }
+        public string UserType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the the first and last name of the user.
+        /// </summary>
+        [JsonProperty("display_name")]
+        public string DisplayName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user name for this user.
+        /// </summary>
+        [JsonProperty("username")]
+        public string UserName { get; set; }
 
         /// <summary>
         /// Gets the collection of <see cref="BitbucketLink"/> instances and their link relationships. The

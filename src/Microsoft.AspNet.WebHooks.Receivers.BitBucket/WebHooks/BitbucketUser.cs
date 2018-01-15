@@ -4,11 +4,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-#if NETSTANDARD2_0
-namespace Microsoft.AspNetCore.WebHooks
-#else
 namespace Microsoft.AspNet.WebHooks
-#endif
 {
     /// <summary>
     /// Contains information about a user in Bitbucket.

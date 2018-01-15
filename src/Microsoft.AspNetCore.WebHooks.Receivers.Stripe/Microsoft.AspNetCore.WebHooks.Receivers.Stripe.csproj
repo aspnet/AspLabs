@@ -6,15 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Stripe\WebHooks\StripeEvent.cs">
-      <Link>StripeEvent.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Stripe\WebHooks\StripeEventData.cs">
-      <Link>StripeEventData.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Stripe\WebHooks\StripeRequestData.cs">
-      <Link>StripeRequestData.cs</Link>
-    </Compile>
     <Compile Include="..\shared\Utilities\TrimmingTokenizer.cs">
       <Link>Utilities\TrimmingTokenizer.cs</Link>
     </Compile>

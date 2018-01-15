@@ -6,18 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\Microsoft.AspNet.WebHooks.Receivers.Salesforce\Messages\FaultResponse.xml">
-      <Link>Messages\FaultResponse.xml</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Microsoft.AspNet.WebHooks.Receivers.Salesforce\Messages\NotificationResponse.xml">
-      <Link>Messages\NotificationResponse.xml</Link>
-    </EmbeddedResource>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Salesforce\WebHooks\SalesforceNamespaces.cs">
-      <Link>SalesforceNamespaces.cs</Link>
-    </Compile>
-    <Compile Include="..\Microsoft.AspNet.WebHooks.Receivers.Salesforce\WebHooks\SalesforceNotifications.cs">
-      <Link>SalesforceNotifications.cs</Link>
-    </Compile>
+    <EmbeddedResource Include="Messages\*.xml" />
     <Compile Include="..\shared\Utilities\ObjectPathUtilities.cs">
       <Link>Utilities\ObjectPathUtilities.cs</Link>
     </Compile>

@@ -21,20 +21,11 @@
   <Target Name="Build">
     <ItemGroup>
       <ProjectsToPack Include="@(NuGetsToPack -> '%(RelativeDir)%(FileName).csproj')" />
-      <ProjectsToBuild Include="..\*\*.csproj" Exclude="@(ProjectsToPack)" />
     </ItemGroup>
     <PropertyGroup>
-      <Platform Condition="'$(Platform)' == '' OR '$(Platform)' == 'Any Cpu'">AnyCpu</Platform>
       <!-- Default versioning for NuGet packages if it wasn't overridden -->
       <SymVersion Condition="'$(SymVersion)' == ''">$(VersionPrefix)-$(VersionSuffix)</SymVersion>
     </PropertyGroup>
 
     <Exec Command="&quot;$(NuGetExe)&quot; pack &quot;%(ProjectsToPack.FullPath)&quot; -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory $(OutputPath) -Properties SymVersion=$(SymVersion);Configuration=$(Configuration)" />
-
-    <MSBuild
-      Projects="@(ProjectsToBuild)"
-      BuildInParallel="$(BuildInParallel)"
-      Targets="Pack"
-      Properties="Configuration=$(Configuration);NoBuild=true;Platform=$(Platform)" />
-  </Target>
 </Project>
