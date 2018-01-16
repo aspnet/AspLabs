@@ -116,10 +116,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
                 enumerator.MoveNext();
                 var headerValue = enumerator.Current.Value;
-                var expectedHash = GetDecodedHash(headerValue, GitHubConstants.SignatureHeaderName, out errorResult);
-                if (errorResult != null)
+
+                var expectedHash = FromHex(headerValue, GitHubConstants.SignatureHeaderName);
+                if (expectedHash == null)
                 {
-                    context.Result = errorResult;
+                    context.Result = CreateBadHexEncodingResult(GitHubConstants.SignatureHeaderKey);
                     return;
                 }
 
@@ -138,13 +139,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 var secret = Encoding.UTF8.GetBytes(secretKey);
 
                 // 4. Get the actual hash of the request body.
-                var actualHash = await GetRequestBodyHash_SHA1(request, secret);
+                var actualHash = await ComputeRequestBodySha1HashAsync(request, secret);
 
                 // 5. Verify that the actual hash matches the expected hash.
                 if (!SecretEqual(expectedHash, actualHash))
                 {
                     // Log about the issue and short-circuit remainder of the pipeline.
-                    errorResult = CreateBadSignatureResult(receiverName, GitHubConstants.SignatureHeaderName);
+                    errorResult = CreateBadSignatureResult(GitHubConstants.SignatureHeaderName);
 
                     context.Result = errorResult;
                     return;

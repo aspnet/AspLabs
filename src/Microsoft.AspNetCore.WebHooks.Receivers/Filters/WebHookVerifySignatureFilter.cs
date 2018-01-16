@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -62,21 +62,56 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Converts a hex-encoded string to a <see cref="T:byte[]"/>.
+        /// Converts a Base64-encoded string to a <see cref="T:byte[]"/>.
         /// </summary>
-        /// <param name="content">THe hex-encoded string to convert.</param>
-        /// <returns>The converted <see cref="T:byte[]"/>.</returns>
-        protected static byte[] FromHex(string content)
+        /// <param name="content">THe Base64-encoded string to convert.</param>
+        /// <param name="signatureHeaderName">
+        /// The name of the HTTP header containing <paramref name="content"/>.
+        /// </param>
+        /// <returns>The converted <see cref="T:byte[]"/>. <see langword="null"/> if conversion fails.</returns>
+        protected byte[] FromBase64(string content, string signatureHeaderName)
         {
             if (string.IsNullOrEmpty(content))
             {
                 return Array.Empty<byte>();
             }
 
-            byte[] data = null;
             try
             {
-                data = new byte[content.Length / 2];
+                return Base64UrlTextEncoder.Decode(content);
+            }
+            catch (FormatException exception)
+            {
+                Logger.LogError(
+                    400,
+                    exception,
+                    "The '{HeaderName}' header value is invalid. The '{ReceiverName}' receiver requires a valid " +
+                    "hex-encoded string.",
+                    signatureHeaderName,
+                    ReceiverName);
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Converts a hex-encoded string to a <see cref="T:byte[]"/>.
+        /// </summary>
+        /// <param name="content">THe hex-encoded string to convert.</param>
+        /// <param name="signatureHeaderName">
+        /// The name of the HTTP header containing <paramref name="content"/>.
+        /// </param>
+        /// <returns>The converted <see cref="T:byte[]"/>. <see langword="null"/> if conversion fails.</returns>
+        protected byte[] FromHex(string content, string signatureHeaderName)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                return Array.Empty<byte>();
+            }
+
+            try
+            {
+                var data = new byte[content.Length / 2];
                 var input = 0;
                 for (var output = 0; output < data.Length; output++)
                 {
@@ -85,24 +120,32 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
                 if (input != content.Length)
                 {
-                    data = null;
+                    Logger.LogError(
+                        401,
+                        "The '{HeaderName}' header value is invalid. The '{ReceiverName}' receiver requires a valid " +
+                        "hex-encoded string.",
+                        signatureHeaderName,
+                        ReceiverName);
+
+                    return null;
                 }
-            }
-            catch
-            {
-                data = null;
-            }
 
-            if (data == null)
-            {
-                var message = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.VerifySignature_InvalidHexValue,
-                    content);
-                throw new InvalidOperationException(message);
+                return data;
             }
+            catch (Exception exception) when (exception is ArgumentException || exception is FormatException)
+            {
+                // FormatException is most likely. ToByte throws an ArgumentException when e.g. content contains a
+                // minus sign ('-').
+                Logger.LogError(
+                    402,
+                    exception,
+                    "The '{HeaderName}' header value is invalid. The '{ReceiverName}' receiver requires a valid " +
+                    "hex-encoded string.",
+                    signatureHeaderName,
+                    ReceiverName);
 
-            return data;
+                return null;
+            }
         }
 
         /// <summary>
@@ -145,7 +188,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// when executed will produce a response containing details about the problem.
         /// </param>
         /// <returns>The signature header; <see langword="null"/> if this cannot be found.</returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
         protected virtual string GetRequestHeader(
             HttpRequest request,
             string headerName,
@@ -164,7 +206,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 var headersCount = headers.Count;
                 Logger.LogInformation(
-                    400,
+                    403,
                     "Expecting exactly one '{HeaderName}' header field in the WebHook request but found " +
                     "{HeaderCount}. Please ensure the request contains exactly one '{HeaderName}' header field.",
                     headerName,
@@ -192,19 +234,114 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="request">The current <see cref="HttpRequest"/>.</param>
         /// <param name="secret">The key data used to initialize the <see cref="HMACSHA1"/>.</param>
         /// <returns>
-        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA1 HMAC of the
-        /// <paramref name="request"/>'s body.
+        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA1 HMAC of
+        /// the <paramref name="request"/>'s body.
         /// </returns>
-        protected virtual async Task<byte[]> GetRequestBodyHash_SHA1(HttpRequest request, byte[] secret)
+        protected Task<byte[]> ComputeRequestBodySha1HashAsync(HttpRequest request, byte[] secret)
         {
+            return ComputeRequestBodySha1HashAsync(request, secret, prefix: null);
+        }
+
+        /// <summary>
+        /// Returns the SHA1 HMAC of the given <paramref name="prefix"/> followed by the given
+        /// <paramref name="request"/>'s body.
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequest"/>.</param>
+        /// <param name="secret">The key data used to initialize the <see cref="HMACSHA1"/>.</param>
+        /// <param name="prefix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// before the <paramref name="request"/>'s body.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA1 HMAC of
+        /// the <paramref name="prefix"/> followed by the <paramref name="request"/>'s body.
+        /// </returns>
+        protected Task<byte[]> ComputeRequestBodySha1HashAsync(HttpRequest request, byte[] secret, byte[] prefix)
+        {
+            return ComputeRequestBodySha1HashAsync(request, secret, prefix, suffix: null);
+        }
+
+        /// <summary>
+        /// Returns the SHA1 HMAC of the given <paramref name="prefix"/>, the given <paramref name="request"/>'s
+        /// body, and the given <paramref name="suffix"/> (in that order).
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequest"/>.</param>
+        /// <param name="secret">The key data used to initialize the <see cref="HMACSHA1"/>.</param>
+        /// <param name="prefix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// before the <paramref name="request"/>'s body.
+        /// </param>
+        /// <param name="suffix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// after the <paramref name="request"/>'s body.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA1 HMAC of
+        /// the <paramref name="prefix"/>, the <paramref name="request"/>'s body, and the <paramref name="suffix"/>
+        /// (in that order).
+        /// </returns>
+        protected virtual async Task<byte[]> ComputeRequestBodySha1HashAsync(
+            HttpRequest request,
+            byte[] secret,
+            byte[] prefix,
+            byte[] suffix)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            if (secret == null)
+            {
+                throw new ArgumentNullException(nameof(secret));
+            }
+            if (secret.Length == 0)
+            {
+                throw new ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty);
+            }
+
             await WebHookHttpRequestUtilities.PrepareRequestBody(request);
 
             using (var hasher = new HMACSHA1(secret))
             {
                 try
                 {
-                    var hash = hasher.ComputeHash(request.Body);
-                    return hash;
+                    if (prefix != null && prefix.Length > 0)
+                    {
+                        hasher.TransformBlock(
+                            prefix,
+                            inputOffset: 0,
+                            inputCount: prefix.Length,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
+                    // Split body into 4K chunks.
+                    var buffer = new byte[4096];
+                    var inputStream = request.Body;
+                    int bytesRead;
+                    while ((bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        hasher.TransformBlock(
+                            buffer,
+                            inputOffset: 0,
+                            inputCount: bytesRead,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
+                    if (suffix != null && suffix.Length > 0)
+                    {
+                        hasher.TransformBlock(
+                            suffix,
+                            inputOffset: 0,
+                            inputCount: suffix.Length,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
+                    hasher.TransformFinalBlock(Array.Empty<byte>(), inputOffset: 0, inputCount: 0);
+
+                    return hasher.Hash;
                 }
                 finally
                 {
@@ -223,27 +360,68 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA256 HMAC of
         /// the <paramref name="request"/>'s body.
         /// </returns>
-        protected Task<byte[]> GetRequestBodyHash_SHA256(HttpRequest request, byte[] secret)
+        protected Task<byte[]> ComputeRequestBodySha256HashAsync(HttpRequest request, byte[] secret)
         {
-            return GetRequestBodyHash_SHA256(request, secret, prefix: null);
+            return ComputeRequestBodySha256HashAsync(request, secret, prefix: null);
         }
 
         /// <summary>
-        /// Returns the SHA256 HMAC of the given <paramref name="prefix"/> (if non-<see langword="null"/>) followed by
-        /// the given <paramref name="request"/>'s body.
+        /// Returns the SHA256 HMAC of the given <paramref name="prefix"/> followed by the given
+        /// <paramref name="request"/>'s body.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequest"/>.</param>
         /// <param name="secret">The key data used to initialize the <see cref="HMACSHA256"/>.</param>
-        /// <param name="prefix">If non-<see langword="null"/>, additional <c>byte</c>s to include in the hash.</param>
+        /// <param name="prefix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// before the <paramref name="request"/>'s body.
+        /// </param>
         /// <returns>
         /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA256 HMAC of
         /// the <paramref name="prefix"/> followed by the <paramref name="request"/>'s body.
         /// </returns>
-        protected virtual async Task<byte[]> GetRequestBodyHash_SHA256(
+        protected Task<byte[]> ComputeRequestBodySha256HashAsync(HttpRequest request, byte[] secret, byte[] prefix)
+        {
+            return ComputeRequestBodySha256HashAsync(request, secret, prefix, suffix: null);
+        }
+
+        /// <summary>
+        /// Returns the SHA256 HMAC of the given <paramref name="prefix"/>, the given <paramref name="request"/>'s
+        /// body, and the given <paramref name="suffix"/> (in that order).
+        /// </summary>
+        /// <param name="request">The current <see cref="HttpRequest"/>.</param>
+        /// <param name="secret">The key data used to initialize the <see cref="HMACSHA256"/>.</param>
+        /// <param name="prefix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// before the <paramref name="request"/>'s body.
+        /// </param>
+        /// <param name="suffix">
+        /// If non-<see langword="null"/> and non-empty, additional <c>byte</c>s to include in the hashed content
+        /// after the <paramref name="request"/>'s body.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that on completion provides a <see cref="byte"/> array containing the SHA256 HMAC of
+        /// the <paramref name="prefix"/>, the <paramref name="request"/>'s body, and the <paramref name="suffix"/>
+        /// (in that order).
+        /// </returns>
+        protected virtual async Task<byte[]> ComputeRequestBodySha256HashAsync(
             HttpRequest request,
             byte[] secret,
-            byte[] prefix)
+            byte[] prefix,
+            byte[] suffix)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            if (secret == null)
+            {
+                throw new ArgumentNullException(nameof(secret));
+            }
+            if (secret.Length == 0)
+            {
+                throw new ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty);
+            }
+
             await WebHookHttpRequestUtilities.PrepareRequestBody(request);
 
             using (var hasher = new HMACSHA256(secret))
@@ -260,8 +438,33 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                             outputOffset: 0);
                     }
 
-                    var hash = hasher.ComputeHash(request.Body);
-                    return hash;
+                    // Split body into 4K chunks.
+                    var buffer = new byte[4096];
+                    var inputStream = request.Body;
+                    int bytesRead;
+                    while ((bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        hasher.TransformBlock(
+                            buffer,
+                            inputOffset: 0,
+                            inputCount: bytesRead,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
+                    if (suffix != null && suffix.Length > 0)
+                    {
+                        hasher.TransformBlock(
+                            suffix,
+                            inputOffset: 0,
+                            inputCount: suffix.Length,
+                            outputBuffer: null,
+                            outputOffset: 0);
+                    }
+
+                    hasher.TransformFinalBlock(Array.Empty<byte>(), inputOffset: 0, inputCount: 0);
+
+                    return hasher.Hash;
                 }
                 finally
                 {
@@ -272,78 +475,86 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Decode the given <paramref name="hexEncodedValue"/>.
+        /// Returns a new <see cref="IActionResult"/> that when executed produces a response indicating the request
+        /// had a signature header containing an invalid (non-Base64-encoded) hash value.
         /// </summary>
-        /// <param name="hexEncodedValue">The hex-encoded <see cref="string"/>.</param>
-        /// <param name="signatureHeaderName">
-        /// The name of the HTTP header containing the <paramref name="hexEncodedValue"/>.
-        /// </param>
-        /// <param name="errorResult">
-        /// Set to <see langword="null"/> if decoding is successful. Otherwise, an <see cref="IActionResult"/> that
-        /// when executed will produce a response containing details about the problem.
-        /// </param>
-        /// <returns>
-        /// If successful, the <see cref="byte"/> array containing the decoded hash. <see langword="null"/> if any
-        /// issues occur.
-        /// </returns>
-        protected virtual byte[] GetDecodedHash(
-            string hexEncodedValue,
-            string signatureHeaderName,
-            out IActionResult errorResult)
-        {
-            try
-            {
-                var decodedHash = FromHex(hexEncodedValue);
-                errorResult = null;
-
-                return decodedHash;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(
-                    401,
-                    ex,
-                    "The '{HeaderName}' header value is invalid. It must be a valid hex-encoded string.",
-                    signatureHeaderName);
-            }
-
-            var message = string.Format(
-                CultureInfo.CurrentCulture,
-                Resources.VerifySignature_BadHeaderEncoding,
-                signatureHeaderName);
-            errorResult = new BadRequestObjectResult(message);
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns a new <see cref="IActionResult"/> that when executed produces a response indicating that a
-        /// request had an invalid signature and as a result could not be processed.
-        /// </summary>
-        /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>
-        /// <param name="signatureHeaderName">The name of the HTTP header with invalid contents.</param>
+        /// <param name="signatureHeaderName">The name of the HTTP header with invalid content.</param>
         /// <returns>
         /// An <see cref="IActionResult"/> that when executed will produce a response with status code 400 "Bad
         /// Request" and containing details about the problem.
         /// </returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller")]
-        protected virtual IActionResult CreateBadSignatureResult(string receiverName, string signatureHeaderName)
+        protected virtual IActionResult CreateBadBase64EncodingResult(string signatureHeaderName)
         {
+            if (signatureHeaderName == null)
+            {
+                throw new ArgumentNullException(nameof(signatureHeaderName));
+            }
+
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                Resources.VerifySignature_BadBase64Encoding,
+                signatureHeaderName,
+                ReceiverName);
+
+            return new BadRequestObjectResult(message);
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="IActionResult"/> that when executed produces a response indicating the request
+        /// had a signature header containing an invalid (non-hex-encoded) hash value.
+        /// </summary>
+        /// <param name="signatureHeaderName">The name of the HTTP header with invalid content.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> that when executed will produce a response with status code 400 "Bad
+        /// Request" and containing details about the problem.
+        /// </returns>
+        protected virtual IActionResult CreateBadHexEncodingResult(string signatureHeaderName)
+        {
+            if (signatureHeaderName == null)
+            {
+                throw new ArgumentNullException(nameof(signatureHeaderName));
+            }
+
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                Resources.VerifySignature_BadHexEncoding,
+                signatureHeaderName,
+                ReceiverName);
+
+            return new BadRequestObjectResult(message);
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="IActionResult"/> that when executed produces a response indicating the request
+        /// invalid signature (an unexpected hash value) and as a result could not be processed. Also logs about the
+        /// problem.
+        /// </summary>
+        /// <param name="signatureHeaderName">The name of the HTTP header with invalid content.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> that when executed will produce a response with status code 400 "Bad
+        /// Request" and containing details about the problem.
+        /// </returns>
+        protected virtual IActionResult CreateBadSignatureResult(string signatureHeaderName)
+        {
+            if (signatureHeaderName == null)
+            {
+                throw new ArgumentNullException(nameof(signatureHeaderName));
+            }
+
             Logger.LogError(
-                402,
+                404,
                 "The WebHook signature provided by the '{HeaderName}' header field does not match the value " +
                 "expected by the '{ReceiverName}' receiver. WebHook request is invalid.",
                 signatureHeaderName,
-                receiverName);
+                ReceiverName);
 
             var message = string.Format(
                 CultureInfo.CurrentCulture,
                 Resources.VerifySignature_BadSignature,
                 signatureHeaderName,
-                receiverName);
-            var badSignature = new BadRequestObjectResult(message);
+                ReceiverName);
 
-            return badSignature;
+            return new BadRequestObjectResult(message);
         }
     }
 }

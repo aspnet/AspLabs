@@ -80,10 +80,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     return;
                 }
 
-                var expectedHash = GetDecodedHash(header, PusherConstants.SignatureHeaderName, out errorResult);
-                if (errorResult != null)
+                var expectedHash = FromHex(header, PusherConstants.SignatureHeaderName);
+                if (expectedHash == null)
                 {
-                    context.Result = errorResult;
+                    context.Result = CreateBadHexEncodingResult(PusherConstants.SignatureHeaderName);
                     return;
                 }
 
@@ -95,7 +95,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     return;
                 }
 
-                var applicationKey = GetRequestHeader(request, PusherConstants.SignatureKeyHeaderName, out errorResult);
+                var applicationKey = GetRequestHeader(
+                    request,
+                    PusherConstants.SignatureKeyHeaderName,
+                    out errorResult);
                 if (errorResult != null)
                 {
                     context.Result = errorResult;
@@ -128,13 +131,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 var secret = Encoding.UTF8.GetBytes(secretKey);
 
                 // 4. Get the actual hash of the request body.
-                var actualHash = await GetRequestBodyHash_SHA256(request, secret);
+                var actualHash = await ComputeRequestBodySha256HashAsync(request, secret);
 
                 // 5. Verify that the actual hash matches the expected hash.
                 if (!SecretEqual(expectedHash, actualHash))
                 {
                     // Log about the issue and short-circuit remainder of the pipeline.
-                    errorResult = CreateBadSignatureResult(receiverName, PusherConstants.SignatureHeaderName);
+                    errorResult = CreateBadSignatureResult(PusherConstants.SignatureHeaderName);
 
                     context.Result = errorResult;
                     return;

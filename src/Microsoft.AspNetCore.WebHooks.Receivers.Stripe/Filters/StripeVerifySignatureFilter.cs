@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var prefix = Encoding.UTF8.GetBytes(timestamp + ".");
 
             // 5. Get the actual hash of the request body.
-            var actualHash = await GetRequestBodyHash_SHA256(request, secret, prefix);
+            var actualHash = await ComputeRequestBodySha256HashAsync(request, secret, prefix);
 
             // 6. Verify that the actual hash matches one of the expected hashes.
             var match = false;
@@ -125,13 +125,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 // While this looks repetitious compared to hex-encoding actualHash (once), a single v1 entry in the
                 // header is the normal case. Expect multiple signatures only when rolling secret keys.
-                var expectedHash = GetDecodedHash(
-                    signature.Value,
-                    StripeConstants.SignatureHeaderName,
-                    out errorResult);
-                if (errorResult != null)
+                var expectedHash = FromHex(signature.Value, StripeConstants.SignatureHeaderName);
+                if (expectedHash == null)
                 {
-                    context.Result = errorResult;
+                    context.Result = CreateBadHexEncodingResult(StripeConstants.SignatureHeaderName);
                     return;
                 }
 
@@ -145,7 +142,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             if (!match)
             {
                 // Log about the issue and short-circuit remainder of the pipeline.
-                context.Result = CreateBadSignatureResult(ReceiverName, StripeConstants.SignatureHeaderName);
+                context.Result = CreateBadSignatureResult(StripeConstants.SignatureHeaderName);
                 return;
             }
 

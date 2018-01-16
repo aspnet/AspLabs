@@ -195,11 +195,14 @@
   <data name="VerifyRequiredValue_NoRouteValue" xml:space="preserve">
     <value>A '{0}' WebHook request must contain a '{1}' value in the route data.</value>
   </data>
+  <data name="VerifySignature_BadBase64Encoding" xml:space="preserve">
+    <value>The '{0}' header value is invalid. The '{1}' receiver requires a valid Base64-encoded string.</value>
+  </data>
   <data name="VerifySignature_BadHeader" xml:space="preserve">
     <value>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Please ensure the request contains exactly one '{0}' header field.</value>
   </data>
-  <data name="VerifySignature_BadHeaderEncoding" xml:space="preserve">
-    <value>The '{0}' header value is invalid. It must be a valid hex-encoded string.</value>
+  <data name="VerifySignature_BadHexEncoding" xml:space="preserve">
+    <value>The '{0}' header value is invalid. The '{1}' receiver requires a valid hex-encoded string.</value>
   </data>
   <data name="VerifySignature_BadSignature" xml:space="preserve">
     <value>The signature provided by the '{0}' header field does not match the value expected by the '{1}' WebHook receiver. WebHook request is invalid.</value>

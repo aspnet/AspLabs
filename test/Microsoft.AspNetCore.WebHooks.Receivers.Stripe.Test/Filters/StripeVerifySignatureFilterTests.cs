@@ -210,8 +210,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public async Task OnResourceExecutionAsync_Fails_IfPostHasInvalidSignatureEncoding()
         {
             // Arrange
-            var expectedMessage = $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. It must be " +
-                "a valid hex-encoded string.";
+            var expectedMessage = $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. The " +
+                "'stripe' receiver requires a valid hex-encoded string.";
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
             var header = $"{StripeConstants.TimestampKey}={TestTimestamp}, " +

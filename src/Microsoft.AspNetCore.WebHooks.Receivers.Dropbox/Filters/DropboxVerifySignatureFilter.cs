@@ -78,10 +78,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     return;
                 }
 
-                var expectedHash = GetDecodedHash(header, DropboxConstants.SignatureHeaderName, out errorResult);
-                if (errorResult != null)
+                var expectedHash = FromHex(header, DropboxConstants.SignatureHeaderName);
+                if (expectedHash == null)
                 {
-                    context.Result = errorResult;
+                    context.Result = CreateBadHexEncodingResult(DropboxConstants.SignatureHeaderName);
                     return;
                 }
 
@@ -100,13 +100,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 var secret = Encoding.UTF8.GetBytes(secretKey);
 
                 // 4. Get the actual hash of the request body.
-                var actualHash = await GetRequestBodyHash_SHA256(request, secret);
+                var actualHash = await ComputeRequestBodySha256HashAsync(request, secret);
 
                 // 5. Verify that the actual hash matches the expected hash.
                 if (!SecretEqual(expectedHash, actualHash))
                 {
                     // Log about the issue and short-circuit remainder of the pipeline.
-                    errorResult = CreateBadSignatureResult(receiverName, DropboxConstants.SignatureHeaderName);
+                    errorResult = CreateBadSignatureResult(DropboxConstants.SignatureHeaderName);
 
                     context.Result = errorResult;
                     return;
