@@ -22,6 +22,7 @@ ASP.NET Core MVC is part of ASP.NET Core. You can find samples, documentation an
 - [SalesForce](/samples/SalesforceCoreReceiver)
 - [Slack](/samples/SlackCoreReceiver)
 - [Stripe](/samples/StripeCoreReceiver)
+- [Trello](/samples/TrelloCoreReceiver)
 - [WordPress](/samples/WordPressCoreReceiver)
 
 ### Building from source
