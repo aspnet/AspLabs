@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IResourceFilter"/> to allow only POST WebHook requests with a non-empty request body. To support
-    /// GET or HEAD requests the receiver project should implement <see cref="Metadata.IWebHookGetRequestMetadata"/>
+    /// GET or HEAD requests the receiver project should implement <see cref="Metadata.IWebHookGetHeadRequestMetadata"/>
     /// in its metadata service.
     /// </summary>
     /// <remarks>
@@ -48,7 +48,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in
+        /// <see cref="WebHookGetHeadRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in this filter).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
@@ -57,12 +58,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookEventMapperFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
         /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookGetRequestFilter.Order + 10;
+        public static int Order => WebHookGetHeadRequestFilter.Order + 10;
 
         /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)

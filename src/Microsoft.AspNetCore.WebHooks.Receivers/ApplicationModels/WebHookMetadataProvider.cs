@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             // Check for duplicates in other metadata registrations.
             var eventFromBodyMetadata = metadata.OfType<IWebHookEventFromBodyMetadata>().ToArray();
             EnsureUniqueRegistrations(eventFromBodyMetadata);
-            EnsureUniqueRegistrations(metadata.OfType<IWebHookGetRequestMetadata>().ToArray());
+            EnsureUniqueRegistrations(metadata.OfType<IWebHookGetHeadRequestMetadata>().ToArray());
             EnsureUniqueRegistrations(metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray());
 
             // Check for IWebHookBodyTypeMetadata services that do not also implement IWebHookReceiver.

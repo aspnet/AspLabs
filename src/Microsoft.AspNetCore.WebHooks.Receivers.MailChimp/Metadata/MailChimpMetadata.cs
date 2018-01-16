@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         WebHookMetadata,
         IWebHookBodyTypeMetadataService,
         IWebHookEventFromBodyMetadata,
-        IWebHookGetRequestMetadata,
+        IWebHookGetHeadRequestMetadata,
         IWebHookVerifyCodeMetadata
     {
         /// <summary>
@@ -34,8 +34,12 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public string BodyPropertyPath => MailChimpConstants.EventBodyPropertyName;
 
-        // IWebHookGetRequestMetadata...
+        // IWebHookGetHeadRequestMetadata...
 
+        /// <inheritdoc />
+        public bool AllowHeadRequests => false;
+
+        /// <inheritdoc />
         /// <inheritdoc />
         public string ChallengeQueryParameterName => null;
 

@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
     {
         private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
         {
-                { typeof(WebHookGetRequestFilter), WebHookGetRequestFilter.Order },
+                { typeof(WebHookGetHeadRequestFilter), WebHookGetHeadRequestFilter.Order },
                 { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
                 { typeof(WebHookEventMapperFilter), WebHookEventMapperFilter.Order },
                 { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },

@@ -69,12 +69,17 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// parameters are provided (in <see cref="WebHookVerifyRequiredValueFilter"/>).
         /// </item>
         /// <item>
-        /// Short-circuit GET or HEAD requests, if receiver supports either (in <see cref="WebHookGetRequestFilter"/>).
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in
+        /// <see cref="WebHookGetHeadRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in this filter).</item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
+        /// <see cref="WebHookEventMapperFilter"/>).
+        /// </item>
+        /// <item>
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
         /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>

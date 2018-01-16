@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </item>
         /// <item>
         /// Short-circuit GET or HEAD requests, if receiver supports either (in
-        /// <see cref="WebHookGetRequestFilter"/>).
+        /// <see cref="WebHookGetHeadRequestFilter"/>).
         /// </item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// this filter).
         /// </item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetRequestFilter"/> for this receiver (in
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
         /// <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>

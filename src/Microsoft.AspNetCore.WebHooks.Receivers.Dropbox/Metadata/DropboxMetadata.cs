@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         WebHookMetadata,
         IWebHookBodyTypeMetadataService,
         IWebHookEventMetadata,
-        IWebHookGetRequestMetadata
+        IWebHookGetHeadRequestMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="DropboxMetadata"/> instance.
@@ -36,7 +36,10 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public string QueryParameterName => null;
 
-        // IWebHookGetRequestMetadata...
+        // IWebHookGetHeadRequestMetadata...
+
+        /// <inheritdoc />
+        public bool AllowHeadRequests => false;
 
         /// <inheritdoc />
         public string ChallengeQueryParameterName => DropboxConstants.ChallengeQueryParameterName;

@@ -18,14 +18,14 @@ using Microsoft.Extensions.Primitives;
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IResourceFilter"/> to verify secret keys and short-circuit WebHook GET requests.
+    /// An <see cref="IResourceFilter"/> to verify secret keys and short-circuit WebHook GET or HEAD requests.
     /// </summary>
-    public class WebHookGetRequestFilter : WebHookSecurityFilter, IResourceFilter
+    public class WebHookGetHeadRequestFilter : WebHookSecurityFilter, IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookGetRequestMetadata> _getRequestMetadata;
+        private readonly IReadOnlyList<IWebHookGetHeadRequestMetadata> _getHeadRequestMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookGetRequestFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookGetHeadRequestFilter"/> instance.
         /// </summary>
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
@@ -38,18 +38,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
         /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookGetRequestFilter(
+        public WebHookGetHeadRequestFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             IEnumerable<IWebHookMetadata> metadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _getRequestMetadata = metadata.OfType<IWebHookGetRequestMetadata>().ToArray();
+            _getHeadRequestMetadata = metadata.OfType<IWebHookGetHeadRequestMetadata>().ToArray();
         }
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookGetRequestFilter"/>
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookGetHeadRequestFilter"/>
         /// instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
@@ -63,6 +63,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Short-circuit GET or HEAD requests, if receiver supports either (in this filter).</item>
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
+        /// <item>
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
+        /// <see cref="WebHookEventMapperFilter"/>).
+        /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in this filter for this receiver (in
         /// <see cref="WebHookPingRequestFilter"/>).
@@ -80,12 +84,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
+            var request = context.HttpContext.Request;
             if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
-                HttpMethods.IsGet(context.HttpContext.Request.Method))
+                (HttpMethods.IsGet(request.Method) || HttpMethods.IsHead(request.Method)))
             {
-                var getRequestMetadata = _getRequestMetadata
+                var getHeadRequestMetadata = _getHeadRequestMetadata
                     .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-                if (getRequestMetadata != null)
+                if (getHeadRequestMetadata != null)
                 {
                     // First verify that we have the secret key configuration value. This may be redundant if the
                     // receiver also implements IWebHookVerifyCodeMetadata in its metadata. However this verification
@@ -94,23 +99,35 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     var secretKey = GetSecretKey(
                         receiverName,
                         routeData,
-                        getRequestMetadata.SecretKeyMinLength,
-                        getRequestMetadata.SecretKeyMaxLength);
+                        getHeadRequestMetadata.SecretKeyMinLength,
+                        getHeadRequestMetadata.SecretKeyMaxLength);
                     if (secretKey == null)
                     {
                         context.Result = new NotFoundResult();
                         return;
                     }
 
-                    if (getRequestMetadata.ChallengeQueryParameterName == null)
+                    if (HttpMethods.IsHead(request.Method))
                     {
-                        // Simple case. Have done all necessary verification.
+                        if (getHeadRequestMetadata.AllowHeadRequests)
+                        {
+                            // Success #1
+                            context.Result = new OkResult();
+                        }
+
+                        // Never respond to a HEAD request with a challenge response.
+                        return;
+                    }
+
+                    if (getHeadRequestMetadata.ChallengeQueryParameterName == null)
+                    {
+                        // Success #2: Simple GET case. Have done all necessary verification.
                         context.Result = new OkResult();
                         return;
                     }
 
-                    var request = context.HttpContext.Request;
-                    context.Result = GetChallengeResponse(getRequestMetadata, receiverName, request, routeData);
+                    // Success #3 unless required query parameter is missing.
+                    context.Result = GetChallengeResponse(getHeadRequestMetadata, receiverName, request, routeData);
                 }
             }
         }
@@ -122,13 +139,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         private IActionResult GetChallengeResponse(
-            IWebHookGetRequestMetadata getRequestMetadata,
+            IWebHookGetHeadRequestMetadata getHeadRequestMetadata,
             string receiverName,
             HttpRequest request,
             RouteData routeData)
         {
             // Get the 'challenge' parameter from the request URI.
-            var challenge = request.Query[getRequestMetadata.ChallengeQueryParameterName];
+            var challenge = request.Query[getHeadRequestMetadata.ChallengeQueryParameterName];
             if (StringValues.IsNullOrEmpty(challenge))
             {
                 Logger.LogError(
@@ -136,13 +153,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     "A '{ReceiverName}' WebHook verification request must contain a '{ParameterName}' query " +
                     "parameter.",
                     receiverName,
-                    getRequestMetadata.ChallengeQueryParameterName);
+                    getHeadRequestMetadata.ChallengeQueryParameterName);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.GetRequest_NoQueryParameter,
                     receiverName,
-                    getRequestMetadata.ChallengeQueryParameterName);
+                    getHeadRequestMetadata.ChallengeQueryParameterName);
                 var noChallenge = new BadRequestObjectResult(message);
 
                 return noChallenge;
