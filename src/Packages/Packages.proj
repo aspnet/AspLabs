@@ -28,4 +28,5 @@
     </PropertyGroup>
 
     <Exec Command="&quot;$(NuGetExe)&quot; pack &quot;%(ProjectsToPack.FullPath)&quot; -IncludeReferencedProjects -Symbols -NonInteractive -Verbosity quiet -OutputDirectory $(OutputPath) -Properties SymVersion=$(SymVersion);Configuration=$(Configuration)" />
+  </Target>
 </Project>
