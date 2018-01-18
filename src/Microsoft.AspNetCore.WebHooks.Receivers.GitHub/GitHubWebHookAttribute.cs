@@ -19,7 +19,9 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <code>
     /// Task{IActionResult} ActionName(string id, string @event, TData data)
     /// </code>
-    /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests.
+    /// or include the subset of parameters required. <c>TData</c> must be compatible with expected requests e.g.
+    /// <see cref="Newtonsoft.Json.Linq.JObject"/> or <see cref="Http.IFormCollection"/> (if
+    /// <see cref="AcceptFormData"/> is <see langword="true"/>).
     /// </para>
     /// <para>
     /// An example GitHub WebHook URI is '<c>https://{host}/api/webhooks/incoming/github/{id}</c>'. See

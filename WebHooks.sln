@@ -90,6 +90,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHoo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.shared.Test", "test\Microsoft.AspNetCore.shared.Test\Microsoft.AspNetCore.WebHooks.shared.Test.csproj", "{9E9BD14E-E4EA-411C-A980-066C7178D5E8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordPressCoreReceiver", "samples\WordPressCoreReceiver\WordPressCoreReceiver.csproj", "{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -212,6 +214,10 @@ Global
 		{9E9BD14E-E4EA-411C-A980-066C7178D5E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E9BD14E-E4EA-411C-A980-066C7178D5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E9BD14E-E4EA-411C-A980-066C7178D5E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -246,9 +252,10 @@ Global
 		{79247F99-4829-4FB4-8412-0ECF39FF7E37} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{DFD36032-179A-4C2E-A90B-0537A864969A} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{9E9BD14E-E4EA-411C-A980-066C7178D5E8} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{2796FB1C-FE9B-49EF-8BF7-DAB28615F79E} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
+		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}
 	EndGlobalSection
 EndGlobal
