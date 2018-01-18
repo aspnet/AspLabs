@@ -15,7 +15,7 @@ namespace Microsoft.AspNet.WebHooks
 {
     /// <summary>
     /// Provides a base <see cref="IWebHookHandler" /> implementation which can be used to for handling MyGet WebHook using strongly-typed
-    /// payloads. For details about MyGet WebHooks, see <c>http://docs.myget.org/docs/reference/webhooks</c>.
+    /// payloads. For details about MyGet WebHooks, see <c>https://docs.myget.org/docs/reference/webhooks</c>.
     /// </summary>
     public abstract class MyGetWebHookHandlerBase : WebHookHandler
     {

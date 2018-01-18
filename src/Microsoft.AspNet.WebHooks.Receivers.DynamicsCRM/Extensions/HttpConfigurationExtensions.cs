@@ -19,7 +19,7 @@ namespace System.Web.Http
         /// same value as configured in the '<c>MS_WebHookReceiverSecret_DynamicsCRM</c>' application setting, optionally using IDs
         /// to differentiate between multiple WebHooks, for example '<c>secret0, id1=secret1, id2=secret2</c>'.
         /// The 'code' parameter must be between 32 and 128 characters long.
-        /// For details about Microsoft Dynamics CRM WebHooks, see <c>http://go.microsoft.com/fwlink/?LinkId=722218</c>.
+        /// For details about Microsoft Dynamics CRM WebHooks, see <c>https://go.microsoft.com/fwlink/?LinkId=722218</c>.
         /// </summary>
         /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>
         public static void InitializeReceiveDynamicsCrmWebHooks(this HttpConfiguration config)

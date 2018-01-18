@@ -6,9 +6,9 @@
     <title>Microsoft ASP.NET Custom WebHooks Module</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
-    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
-    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <licenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <projectUrl>https://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
+    <iconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
       This package provides functionality for adding your own custom WebHook support to your ASP.NET project. The functionality enables users to register WebHooks using a simple pub/sub model, and for your code to send WebHooks to registered receivers with matching WebHook registrations.

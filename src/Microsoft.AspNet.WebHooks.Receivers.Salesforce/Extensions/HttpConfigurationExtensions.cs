@@ -17,7 +17,7 @@ namespace System.Web.Http
         /// A sample WebHook URI is of the form '<c>https://&lt;host&gt;/api/webhooks/incoming/sfsoap/{id}</c>'.
         /// For security reasons, the WebHook URI must be an <c>https</c> URI and the '<c>MS_WebHookReceiverSecret_SalesforceSoap</c>' 
         /// application setting must be configured to the Salesforce Organization IDs. Organizational IDs can be found at 
-        /// <c>http://www.salesforce.com</c> under <c>Setup | Company Profile | Company Information</c>.
+        /// <c>https://www.salesforce.com</c> under <c>Setup | Company Profile | Company Information</c>.
         /// For details about Salesforce Outbound Messages, see <c>https://go.microsoft.com/fwlink/?linkid=838587</c>. 
         /// </summary>
         /// <param name="config">The current <see cref="HttpConfiguration"/>config.</param>

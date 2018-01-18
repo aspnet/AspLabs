@@ -6,11 +6,14 @@
     <title>Microsoft ASP.NET WebHooks Receiver for Bitbucket</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
-    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
-    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <licenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <projectUrl>https://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
+    <iconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>This package provides support for receiving WebHooks from Bitbucket. For information about Bitbucket WebHooks, see "https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html".</description>
+    <description>
+      This package provides support for receiving WebHooks from Bitbucket. For information about Bitbucket WebHooks,
+      see https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html.
+    </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
     <tags>Microsoft AspNet WebApi AspNetWebApi WebHooks Bitbucket</tags>

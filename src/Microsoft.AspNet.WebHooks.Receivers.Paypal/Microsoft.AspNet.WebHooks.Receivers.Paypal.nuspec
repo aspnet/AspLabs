@@ -6,12 +6,14 @@
     <title>Microsoft ASP.NET WebHooks Receiver for Paypal</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
-    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
-    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <licenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <projectUrl>https://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
+    <iconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides support for receiving WebHooks from Paypal using the Paypal .NET SDK, see "https://www.nuget.org/packages/PayPal". For information about Paypal WebHooks, see "https://developer.paypal.com/webapps/developer/docs/integration/direct/rest-webhooks-overview/".
+      This package provides support for receiving WebHooks from Paypal using the Paypal .NET SDK, see
+      https://www.nuget.org/packages/PayPal. For information about Paypal WebHooks, see
+      https://developer.paypal.com/webapps/developer/docs/integration/direct/rest-webhooks-overview/.
     </description>
     <releaseNotes></releaseNotes>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>

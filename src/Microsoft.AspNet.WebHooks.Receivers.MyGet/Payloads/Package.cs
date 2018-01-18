@@ -5,7 +5,7 @@ namespace Microsoft.AspNet.WebHooks.Payloads
 {
     /// <summary>
     /// Describes a Package being manipulated.
-    /// See <c>http://docs.myget.org/docs/reference/webhooks</c> for details.
+    /// See <c>https://docs.myget.org/docs/reference/webhooks</c> for details.
     /// </summary>
     public class Package
     {

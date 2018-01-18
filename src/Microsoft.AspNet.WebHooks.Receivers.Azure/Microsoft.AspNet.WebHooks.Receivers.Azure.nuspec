@@ -6,12 +6,14 @@
     <title>Microsoft ASP.NET WebHooks Receiver for Azure WebHooks.</title>
     <authors>Microsoft</authors>
     <owners>Microsoft, aspnet</owners>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_ENU.htm</licenseUrl>
-    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
-    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <licenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <projectUrl>https://go.microsoft.com/fwlink/?LinkId=690277</projectUrl>
+    <iconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      This package provides support for receiving WebHooks from Kudu (Azure Web App Deployment) and Azure Alerts. For information about Kudu WebHooks, see "https://github.com/projectkudu/kudu/wiki/Web-hooks" and for Azure Alerts, see "https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/".
+      This package provides support for receiving WebHooks from Kudu (Azure Web App Deployment) and Azure Alerts. For
+      information about Kudu WebHooks, see https://github.com/projectkudu/kudu/wiki/Web-hooks and for Azure Alerts, see
+      https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/.
     </description>
     <summary>
       This package provides support for receiving WebHooks from Kudu (Azure Web App Deployment) and Azure Alerts.

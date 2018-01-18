@@ -8,7 +8,7 @@ namespace Microsoft.AspNet.WebHooks.Payloads
 {
     /// <summary>
     /// Package metadata.
-    /// See <c>http://docs.myget.org/docs/reference/webhooks</c> for details.
+    /// See <c>https://docs.myget.org/docs/reference/webhooks</c> for details.
     /// </summary>
     public class PackageMetadata
     {

@@ -18,7 +18,7 @@ namespace Microsoft.AspNet.WebHooks
     /// For security reasons the WebHook URI must be an <c>https</c> URI and contain a 'code' query parameter with the
     /// same value as configured in the '<c>MS_WebHookReceiverSecret_MyGet</c>' application setting.
     /// The 'code' parameter must be between 32 and 128 characters long.
-    /// For details about MyGet WebHooks, see <c>http://docs.myget.org/docs/reference/webhooks</c>.
+    /// For details about MyGet WebHooks, see <c>https://docs.myget.org/docs/reference/webhooks</c>.
     /// </summary>
     public class MyGetWebHookReceiver : WebHookReceiver
     {

@@ -11,7 +11,7 @@ namespace Microsoft.AspNet.WebHooks
     /// Provides a custom <see cref="IAssembliesResolver"/> implementation that ensures that the WebHooks receiver 
     /// assemblies are loaded. This is useful when running ASP.NET Web API using the OWIN Self Host as there 
     /// assemblies have to be loaded explicitly. For more information on running Web API in a self host, please see 
-    /// '<c>http://www.asp.net/web-api/overview/hosting-aspnet-web-api/use-owin-to-self-host-web-api</c>'.
+    /// '<c>https://www.asp.net/web-api/overview/hosting-aspnet-web-api/use-owin-to-self-host-web-api</c>'.
     /// </summary>
     public class WebHookAssemblyResolver : DefaultAssembliesResolver
     {
