@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core GitHub WebHooks infrastructure. Contains the GitHubWebHookAttribute class and AddGitHubWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;github</PackageTags>
   </PropertyGroup>

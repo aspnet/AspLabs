@@ -1,0 +1,10 @@
+﻿<Project>
+  <PropertyGroup>
+    <DisablePackageReferenceRestrictions>true</DisablePackageReferenceRestrictions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DotNetCoreRuntime Include="2.0.0" />
+    <DotNetCoreRuntime Include="2.1.0-preview1-26016-05" />
+  </ItemGroup>
+</Project>

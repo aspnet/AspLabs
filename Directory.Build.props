@@ -1,61 +1,29 @@
 ﻿<Project>
-  <!-- Imported only from .NET Core and .NET Standard projects. See conditions in lower-level Directory.Build.props files -->
+  <!-- Will also stop MsBuild searching parent directories for this file. -->
+  <Import
+    Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), AspNetCoreSettings.props))\AspNetCoreSettings.props"
+    Condition=" '$(CI)' != 'true' AND '$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), AspNetCoreSettings.props))' != '' " />
 
   <Import Project="version.props" />
+  <Import Project="build\sources.props" />
 
-  <!-- Ensure changes to this file and version.props cause project rebuilds. -->
+  <!-- Ensure changes to this file cause project rebuilds. -->
   <PropertyGroup>
-    <RepositoryRoot Condition=" '$(RepositoryRoot)' == '' ">$([System.IO.Path]::GetFullPath( '$(MSBuildThisFileDirectory)' ))</RepositoryRoot>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(RepositoryRoot)version.props</MSBuildAllProjects>
   </PropertyGroup>
 
-  <!-- Common package options. -->
   <PropertyGroup>
-    <Authors>Microsoft</Authors>
-    <Company>Microsoft Corporation.</Company>
-    <Copyright>Copyright © Microsoft Corporation</Copyright>
-    <IncludeSource>true</IncludeSource>
-    <IncludeSymbols>true</IncludeSymbols>
+    <!-- Have not released 1.0.0 yet. -->
+    <EnableApiCheck>false</EnableApiCheck>
 
-    <!-- Work around https://github.com/NuGet/Home/issues/4726 -->
-    <IncludeSymbols Condition=" '$(NuspecFile)' != '' ">false</IncludeSymbols>
-
-    <LangVersion>7.1</LangVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-    <PackageIconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/aspnet/Home/2.0.0/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://asp.net</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
-
-  <!-- Default $(AssemblyRevision) when manually building an individual project. -->
-  <PropertyGroup>
-    <_TwoDigitYear>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), 2000))</_TwoDigitYear>
-    <_ThreeDigitDayOfYear>$([System.DateTime]::UtcNow.DayOfYear.ToString().PadLeft(3, '0'))</_ThreeDigitDayOfYear>
-    <AssemblyRevision Condition=" '$(AssemblyRevision)' == '' ">$(_TwoDigitYear)$(_ThreeDigitDayOfYear)</AssemblyRevision>
-  </PropertyGroup>
-
-  <!-- Additional specifics of this repository. -->
-  <PropertyGroup>
     <Product>Microsoft ASP.NET Core WebHooks</Product>
-    <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/aspnet/WebHooks</RepositoryUrl>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
 
-    <AssemblyOriginatorKeyFile>$(RepositoryRoot)tools\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)build\Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-
-    <!-- Must delay-sign the assemblies because 35MSSharedLib1024.snk contains no private key. -->
-    <DelaySign>true</DelaySign>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>BuildNumber</_Parameter1>
-      <_Parameter2>$(BuildNumber)</_Parameter2>
-    </AssemblyAttribute>
-  </ItemGroup>
 </Project>

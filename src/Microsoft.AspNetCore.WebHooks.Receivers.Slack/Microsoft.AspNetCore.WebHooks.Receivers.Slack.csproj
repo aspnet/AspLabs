@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Slack WebHooks infrastructure. Contains the SlackWebHookAttribute class and AddSlackWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;slack</PackageTags>
   </PropertyGroup>

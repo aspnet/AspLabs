@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core Pusher WebHooks infrastructure. Contains the PusherWebHookAttribute class and AddPusherWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;pusher</PackageTags>
   </PropertyGroup>

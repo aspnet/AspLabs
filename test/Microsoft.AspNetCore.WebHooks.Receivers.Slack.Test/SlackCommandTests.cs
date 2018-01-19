@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
@@ -113,7 +114,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expected, actual);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("text")]
         [InlineData("  text")]
         [InlineData("\\text")]
@@ -138,7 +140,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Null(error);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("text", "text")]
         [InlineData("  text", "text")]
         [InlineData("你 世界", "你 世界")]
@@ -190,7 +193,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Null(error);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [MemberData(nameof(RoundTripData))]
         public void ParseParameters_GetNormalizedParameterString_RoundTrips(string text, string expectedParameters)
         {
@@ -203,7 +207,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expectedParameters, actual);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("'text'", '\'', 0)]
         [InlineData("\"text\"", '"', 0)]
         [InlineData("   \"text\"", '"', 3)]
@@ -221,7 +226,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.StartsWith(expected, error);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("\\;text", 0)]
         [InlineData("te\\;xt", 2)]
         [InlineData("te\\;\\;xt", 2)]
@@ -243,7 +249,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expected, error);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("a='", '\'', 2 )]
         [InlineData("a=\"", '"', 2 )]
         [InlineData("  a=\"", '"', 4)]
@@ -266,7 +273,8 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expected, error);
         }
 
-        [Theory]
+        [ConditionalTheory]
+        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
         [InlineData("a='''", '\'', 4)]
         [InlineData("a=\"\"\"", '"', 4)]
         [InlineData("  a=\"\"\"", '"', 6)]

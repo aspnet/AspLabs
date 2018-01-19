@@ -1,15 +1,25 @@
 <Project>
+  <Import Project="..\Directory.Build.props" />
+
   <PropertyGroup>
-    <_ImportParentFile>false</_ImportParentFile>
-    <_ImportParentFile Condition="$(MSBuildProjectName.StartsWith( 'Microsoft.AspNetCore.' ))">true</_ImportParentFile>
+    <DeveloperBuildTestTfms Condition=" '$(DeveloperBuildTestTfms)' == '' ">netcoreapp2.1</DeveloperBuildTestTfms>
+    <StandardTestTfms>$(DeveloperBuildTestTfms)</StandardTestTfms>
+    <StandardTestTfms Condition=" '$(DeveloperBuild)' != 'true' ">netcoreapp2.1;netcoreapp2.0</StandardTestTfms>
+    <StandardTestTfms Condition=" '$(DeveloperBuild)' != 'true' AND '$(OS)' == 'Windows_NT' ">$(StandardTestTfms);net461</StandardTestTfms>
   </PropertyGroup>
 
-  <Import Project="..\Directory.Build.props" Condition="$(_ImportParentFile)" />
-
-  <PropertyGroup Condition="$(_ImportParentFile)">
-    <DefineConstants>$(DefineConstants);ASPNETWEBHOOKS</DefineConstants>
+  <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Microsoft.AspNetCore.WebHooks</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Internal.AspNetCore.Sdk" PrivateAssets="All" Version="2.1.0-preview1-15651" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Moq" Version="4.7.49" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.analyzers" Version="0.8.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>
 </Project>

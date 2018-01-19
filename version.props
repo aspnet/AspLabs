@@ -1,6 +1,11 @@
 <Project>
+  <!-- Ensure changes to this file cause project rebuilds. -->
   <PropertyGroup>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix>preview1</VersionSuffix>
     <PackageVersion Condition="'$(IsFinalBuild)' == 'true' AND '$(VersionSuffix)' == 'rtm' ">$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(IsFinalBuild)' == 'true' AND '$(VersionSuffix)' != 'rtm' ">$(VersionPrefix)-$(VersionSuffix)-final</PackageVersion>

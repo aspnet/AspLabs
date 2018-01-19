@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core WordPress WebHooks infrastructure. Contains the WordPressWebHookAttribute class and AddWordPressWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;wordpress</PackageTags>
   </PropertyGroup>

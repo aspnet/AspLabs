@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>$(Configurations);CodeAnalysis</Configurations>
     <Description>ASP.NET Core WebHooks abstractions and infrastructure components for receivers. Contains constraints, filters, metadata, and the application models to apply them.</Description>
     <PackageTags>aspnetcore;webhook;receiver</PackageTags>
   </PropertyGroup>

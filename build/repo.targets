@@ -1,0 +1,10 @@
+﻿<Project>
+  <Target Name="GetBuildNumber">
+    <!-- Create second-based build number for local builds. 635556672000000000 is Jan 1, 2015. -->
+    <PropertyGroup>
+      <_SecondBasedTimeStamp>$([System.DateTime]::UtcNow.Subtract($([System.DateTime]::FromBinary(635556672000000000))).TotalSeconds.ToString("F0"))</_SecondBasedTimeStamp>
+      <_SecondBasedTimeStamp>t$([System.Int64]::Parse($(_SecondBasedTimeStamp)).ToString("x9"))</_SecondBasedTimeStamp>
+    </PropertyGroup>
+    <Message Text="/p:BuildNumber=$(_SecondBasedTimeStamp)" Importance="High" />
+  </Target>
+</Project>

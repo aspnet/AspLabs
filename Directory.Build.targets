@@ -1,19 +1,14 @@
 <Project>
   <!-- Will also stop MsBuild searching parent directories for this file. -->
 
-  <!-- $(Configuration) is not defined until after Directory.Build.props runs. -->
-  <PropertyGroup Condition="$(_ImportParentFile)">
-    <!-- Update $(PackageOutputPath) only if it has a default value. Users can override this e.g. on command line. -->
-    <PackageOutputPath Condition=" 	'$(PackageOutputPath)' == '$(BaseOutputPath)$(Configuration)\' ">
-      $(RepositoryRoot)bin\$(Configuration)\
-    </PackageOutputPath>
-    <PackageOutputPath Condition=" '$(PackageOutputPath)' == '$(BaseOutputPath)$(PlatformName)\$(Configuration)\' ">
-      $(RepositoryRoot)bin\$(PlatformName)\$(Configuration)\
-    </PackageOutputPath>
+  <!-- In Directory.Build.targets because $(TargetFramework) may not be set when Directory.Build.props is imported. -->
+  <PropertyGroup>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">2.1.0-preview1-26016-05</RuntimeFrameworkVersion>
   </PropertyGroup>
 
-  <!-- Default items are added after Directory.Build.props runs, causing invalid duplicate entries. -->
-  <ItemGroup Condition="$(_ImportParentFile) AND Exists( '$(MSBuildProjectDirectory)\Properties\Resources.resx' )">
+  <!-- In Directory.Build.targets because default items are added after Directory.Build.props is imported, causing invalid duplicate entries. -->
+  <ItemGroup Condition="Exists( '$(MSBuildProjectDirectory)\Properties\Resources.resx' )">
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

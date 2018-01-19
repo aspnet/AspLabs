@@ -1,22 +1,13 @@
 <Project>
+  <Import Project="..\Directory.Build.props" />
+
   <PropertyGroup>
-    <_ImportParentFile>false</_ImportParentFile>
-    <_ImportParentFile Condition="$(MSBuildProjectName.StartsWith( 'Microsoft.AspNetCore.' ))">true</_ImportParentFile>
-  </PropertyGroup>
-
-  <Import Project="..\Directory.Build.props" Condition="$(_ImportParentFile)" />
-
-  <PropertyGroup Condition="$(_ImportParentFile)">
-    <DefineConstants>$(DefineConstants);ASPNETWEBHOOKS</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Microsoft.AspNetCore.WebHooks</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(_ImportParentFile)">
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>Serviceable</_Parameter1>
-      <_Parameter2>True</_Parameter2>
-    </AssemblyAttribute>
+  <ItemGroup>
+    <PackageReference Include="Internal.AspNetCore.Sdk" PrivateAssets="All" Version="2.1.0-preview1-15651" />
   </ItemGroup>
 </Project>
