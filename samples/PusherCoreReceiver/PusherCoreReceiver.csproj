@@ -4,8 +4,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="$(MicrosoftAspNetCorePackageVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="$(MicrosoftAspNetCoreStaticFilesPackageVersion)" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Pusher\Microsoft.AspNetCore.WebHooks.Receivers.Pusher.csproj" />
   </ItemGroup>
 
