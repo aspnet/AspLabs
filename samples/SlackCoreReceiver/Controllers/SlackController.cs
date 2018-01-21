@@ -52,7 +52,7 @@ namespace SlackCoreReceiver.Controllers
             // Ignore an error parsing the remainder of the command except to keep that action value together.
             var actionValue = slashCommand.Value;
             var actionValueName = "value";
-            var (parameters, error) = SlackCommand.ParseParameters(slashCommand.Value);
+            var parameters = SlackCommand.TryParseParameters(slashCommand.Value, out var error);
             if (error == null)
             {
                 actionValue = SlackCommand.GetNormalizedParameterString(parameters);

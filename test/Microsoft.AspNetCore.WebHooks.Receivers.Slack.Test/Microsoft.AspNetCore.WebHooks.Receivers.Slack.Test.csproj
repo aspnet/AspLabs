@@ -5,6 +5,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Slack\Microsoft.AspNetCore.WebHooks.Receivers.Slack.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Testing" Version="2.1.0-preview1-28055" />
   </ItemGroup>
 </Project>

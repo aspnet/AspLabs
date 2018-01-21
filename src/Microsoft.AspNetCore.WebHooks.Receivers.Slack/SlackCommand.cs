@@ -74,14 +74,19 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <see cref="KeyValuePair{StringSegment, StringSegment}.Value"/> from what
         /// <see cref="ParseActionWithValue"/> returned.
         /// </param>
+        /// <param name="errorMessage">
+        /// A <see cref="string"/> describing the specific problem when an issue is encountered. <see langword="null"/>
+        /// when the method successfully returns a non-<see langword="null"/> dictionary.
+        /// <paramref name="errorMessage"/> and the return value are never both <see langword="null"/>.
+        /// </param>
         /// <returns>
-        /// A <see cref="ValueTuple{T1, T2}"/> in which one property is always <see langword="null"/>. When successful,
-        /// <c>Error</c> is <see langword="null"/> and <c>Parameters</c> an <see cref="IDictionary{TKey, TValue}"/>
-        /// mapping zero or more parameter names to zero or more values. Otherwise, <c>Parameters</c> is
-        /// <see langword="null"/> and <c>Error</c> a <see cref="string"/> describing the specific problem.
+        /// An <see cref="IDictionary{TKey, TValue}"/> mapping zero or more parameter names to zero or more values.
+        /// <see langword="null"/> when an issue is encountered. <paramref name="errorMessage"/> and the return value
+        /// are never both <see langword="null"/>.
         /// </returns>
-        public static (IDictionary<StringSegment, IList<StringSegment>> Parameters, string Error) ParseParameters(
-            StringSegment text)
+        public static IDictionary<StringSegment, IList<StringSegment>> TryParseParameters(
+            StringSegment text,
+            out string errorMessage)
         {
             var parameters = new Dictionary<StringSegment, IList<StringSegment>>(
                 StringSegmentComparer.OrdinalIgnoreCase);
@@ -91,7 +96,8 @@ namespace Microsoft.AspNetCore.WebHooks
                 var (length, name, error) = GetParameterName(text, index);
                 if (error != null)
                 {
-                    return (Parameters: null, error);
+                    errorMessage = error;
+                    return null;
                 }
 
                 index += length;
@@ -105,7 +111,8 @@ namespace Microsoft.AspNetCore.WebHooks
                     (length, value, error) = GetParameterValue(text, index);
                     if (error != null)
                     {
-                        return (Parameters: null, error);
+                        errorMessage = error;
+                        return null;
                     }
 
                     index += length;
@@ -125,17 +132,18 @@ namespace Microsoft.AspNetCore.WebHooks
                 index += GetSemicolonLength(text, index);
             }
 
-            return (parameters, Error: null);
+            errorMessage = null;
+            return parameters;
         }
 
         /// <summary>
         /// <para>
         /// Returns a normalized representation of the given <paramref name="parameters"/>. This method and
-        /// <see cref="ParseParameters"/> round-trip the semantics of the original text.
+        /// <see cref="TryParseParameters"/> round-trip the semantics of the original text.
         /// </para>
         /// <para>
         /// Does not preserve syntax such as whitespace in the <see cref="StringSegment"/> passed to
-        /// <see cref="ParseParameters"/>, how parameter values were quoted, or the parameter order.
+        /// <see cref="TryParseParameters"/>, how parameter values were quoted, or the parameter order.
         /// </para>
         /// </summary>
         /// <param name="parameters">The mapping of parameter names to zero or more parameter values.</param>

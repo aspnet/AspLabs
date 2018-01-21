@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
@@ -114,8 +113,7 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expected, actual);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("text")]
         [InlineData("  text")]
         [InlineData("\\text")]
@@ -127,7 +125,7 @@ namespace Microsoft.AspNetCore.WebHooks
         {
             // Arrange & Act
             var expectedName = name.Trim();
-            var (result, error) = SlackCommand.ParseParameters(name);
+            var result = SlackCommand.TryParseParameters(name, out var error);
 
             // Assert
             var keyValuePair = Assert.Single(result);
@@ -140,8 +138,7 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Null(error);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("text", "text")]
         [InlineData("  text", "text")]
         [InlineData("你 世界", "你 世界")]
@@ -179,7 +176,7 @@ namespace Microsoft.AspNetCore.WebHooks
         public void ParseParameters_AcceptsValidValue(string value, string expectedValue)
         {
             // Arrange & Act
-            var (result, error) = SlackCommand.ParseParameters($"name={value}");
+            var result = SlackCommand.TryParseParameters($"name={value}", out var error);
 
             // Assert
             var keyValuePair = Assert.Single(result);
@@ -193,13 +190,12 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Null(error);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [MemberData(nameof(RoundTripData))]
         public void ParseParameters_GetNormalizedParameterString_RoundTrips(string text, string expectedParameters)
         {
             // Arrange & Act
-            var (result, error) = SlackCommand.ParseParameters(text);
+            var result = SlackCommand.TryParseParameters(text, out var error);
             var actual = SlackCommand.GetNormalizedParameterString(result);
 
             // Assert
@@ -207,8 +203,7 @@ namespace Microsoft.AspNetCore.WebHooks
             Assert.Equal(expectedParameters, actual);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("'text'", '\'', 0)]
         [InlineData("\"text\"", '"', 0)]
         [InlineData("   \"text\"", '"', 3)]
@@ -219,15 +214,14 @@ namespace Microsoft.AspNetCore.WebHooks
                 $"discovered at position {offset}.";
 
             // Act
-            var (result, error) = SlackCommand.ParseParameters(name);
+            var result = SlackCommand.TryParseParameters(name, out var error);
 
             // Assert
             Assert.Null(result);
             Assert.StartsWith(expected, error);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("\\;text", 0)]
         [InlineData("te\\;xt", 2)]
         [InlineData("te\\;\\;xt", 2)]
@@ -242,15 +236,14 @@ namespace Microsoft.AspNetCore.WebHooks
                 $"discovered at position {offset}.";
 
             // Act
-            var (result, error) = SlackCommand.ParseParameters(name);
+            var result = SlackCommand.TryParseParameters(name, out var error);
 
             // Assert
             Assert.Null(result);
             Assert.Equal(expected, error);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("a='", '\'', 2 )]
         [InlineData("a=\"", '"', 2 )]
         [InlineData("  a=\"", '"', 4)]
@@ -266,15 +259,14 @@ namespace Microsoft.AspNetCore.WebHooks
             var expected = $"Unmatched quote ({quote}) discovered at position {offset}.";
 
             // Act
-            var (result, error) = SlackCommand.ParseParameters(input);
+            var result = SlackCommand.TryParseParameters(input, out var error);
 
             // Assert
             Assert.Null(result);
             Assert.Equal(expected, error);
         }
 
-        [ConditionalTheory]
-        [FrameworkSkipCondition(RuntimeFrameworks.CLR, SkipReason = "Fails due to dotnet/standard#567")]
+        [Theory]
         [InlineData("a='''", '\'', 4)]
         [InlineData("a=\"\"\"", '"', 4)]
         [InlineData("  a=\"\"\"", '"', 6)]
@@ -291,7 +283,7 @@ namespace Microsoft.AspNetCore.WebHooks
                 $"discovered at position {offset}.";
 
             // Act
-            var (result, error) = SlackCommand.ParseParameters(input);
+            var result = SlackCommand.TryParseParameters(input, out var error);
 
             // Assert
             Assert.Null(result);
