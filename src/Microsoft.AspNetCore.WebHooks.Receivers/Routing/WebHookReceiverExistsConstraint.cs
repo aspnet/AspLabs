@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -11,15 +11,15 @@ using Microsoft.AspNetCore.WebHooks.Metadata;
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
     /// <summary>
-    /// An <see cref="IActionConstraint"/> implementation which confirms an <see cref="IWebHookMetadata"/> service
-    /// exists describing the receiver for the current request.
+    /// An <see cref="IActionConstraint"/> implementation which confirms a service implementing
+    /// <see cref="IWebHookBodyTypeMetadataService"/> exists describing the receiver for the current request.
     /// </summary>
     public class WebHookReceiverExistsConstraint : IActionConstraint
     {
         private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _bodyTypeMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookReceiverNameConstraint"/> instance.
+        /// Instantiates a new <see cref="WebHookReceiverExistsConstraint"/> instance.
         /// </summary>
         /// <param name="bodyTypeMetadata">
         /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services.
@@ -55,14 +55,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             if (!_bodyTypeMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
             {
                 // Received a request for (say) https://{host}/api/webhooks/incoming/mine but the "mine" receiver
-                // is not configured. Not necessarily a misconfiguration in this application.
-                //
-                // WebHookMetadataProvider throws if it encounters a receiver that does not register an
-                // IWebHookBodyTypeMetadataService implementation. The provider only does this if the application uses
-                // a receiver's specific attribute. This constraint handles the remaining case, ensuring requests for
-                // such a mis configured receiver do not reach [GeneralWebHook] actions. (May be nice to have extra
-                // logging for a mis-configured receiver over a non-existent one. But, that would require checks for
-                // every other metadata type.)
+                // is not configured. Not necessarily a misconfiguration in this application. (WebHookMetadataProvier
+                // should detect "incomplete" receivers i.e. those with some metadata services but lacking an
+                // IWebHookBodyTypeMetadataService implementation.)
                 return false;
             }
 

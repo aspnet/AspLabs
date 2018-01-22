@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -11,10 +11,10 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// Base class for <see cref="IWebHookMetadata"/> services.
     /// </summary>
-    public abstract class WebHookMetadata : IWebHookMetadata, IWebHookReceiver
+    public abstract class WebHookMetadata : IWebHookBodyTypeMetadataService
     {
         /// <summary>
-        /// Instantiates a new <see cref="WebHookMetadata"/> with the given <paramref name="receiverName"/>.
+        /// Instantiates a new <see cref="WebHookMetadata"/> instance with the given <paramref name="receiverName"/>.
         /// </summary>
         /// <param name="receiverName">The name of an available <see cref="IWebHookReceiver"/>.</param>
         protected WebHookMetadata(string receiverName)
@@ -26,6 +26,9 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
             ReceiverName = receiverName;
         }
+
+        /// <inheritdoc />
+        public abstract WebHookBodyType BodyType { get; }
 
         /// <inheritdoc />
         public string ReceiverName { get; }

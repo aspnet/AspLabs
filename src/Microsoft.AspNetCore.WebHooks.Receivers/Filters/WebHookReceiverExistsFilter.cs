@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -65,20 +65,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 if (!context.RouteData.GetWebHookReceiverExists())
                 {
-                    _logger.LogCritical(
+                    _logger.LogError(
                         0,
-                        "Unable to find WebHook routing constraints for the '{ReceiverName}' receiver. Add " +
-                        "the required configuration by calling a receiver-specific method that calls " +
-                        "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
-                        "application startup code. For example, call " +
-                        "'{GitHubBuilderInterface}.{GitHubBuilderMethod}' to configure a minimal GitHub receiver.",
-                        receiverName,
-                        nameof(IMvcBuilder),
-                        nameof(WebHookMvcBuilderExtensions.AddWebHooks),
-                        nameof(IMvcCoreBuilder),
-                        nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
-                        nameof(IMvcCoreBuilder),
-                        "AddGitHubWebHooks");
+                        "Unable to find WebHook routing constraints for the '{ReceiverName}' receiver. Add the " +
+                        $"required configuration by calling a receiver-specific method that calls " +
+                        $"'{typeof(IMvcBuilder)}.{nameof(WebHookMvcBuilderExtensions.AddWebHooks)}' or " +
+                        $"'{nameof(IMvcCoreBuilder)}.{nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks)}' in the " +
+                        $"application startup code. For example, call '{nameof(IMvcCoreBuilder)}.AddGitHubWebHooks' " +
+                        "to configure a minimal GitHub receiver.",
+                        receiverName);
 
                     context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                     return;
@@ -101,20 +96,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     if (!found)
                     {
                         // This case is actually more likely a gap in the receiver-specific configuration method.
-                        _logger.LogCritical(
+                        _logger.LogError(
                             1,
-                            "Unable to find WebHook filters for the '{ReceiverName}' receiver. Add the " +
-                            "required configuration by calling a receiver-specific method that calls " +
-                            "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
-                            "application startup code. For example, call " +
-                            "'{GitHubBuilderInterface}.{GitHubBuilderMethod}' to configure a minimal GitHub receiver.",
-                            receiverName,
-                            nameof(IMvcBuilder),
-                            nameof(WebHookMvcBuilderExtensions.AddWebHooks),
-                            nameof(IMvcCoreBuilder),
-                            nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
-                            nameof(IMvcCoreBuilder),
-                            "AddGitHubWebHooks");
+                            "Unable to find WebHook filters for the '{ReceiverName}' receiver. Add the required " +
+                            "configuration by calling a receiver-specific method that calls " +
+                            $"'{typeof(IMvcBuilder)}.{nameof(WebHookMvcBuilderExtensions.AddWebHooks)}' or " +
+                            $"'{nameof(IMvcCoreBuilder)}.{nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks)}' in " +
+                            "the application startup code. For example, call " +
+                            $"'{nameof(IMvcCoreBuilder)}.AddGitHubWebHooks' to configure a minimal GitHub receiver.",
+                            receiverName);
 
                         context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                         return;
@@ -123,20 +113,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
             else
             {
-                // Routing not configured at all (no template) but the request reached this action.
-                _logger.LogCritical(
+                // Routing not configured at all (wrong template) but the request reached this action.
+                _logger.LogError(
                     2,
                     "Unable to find WebHook routing information in the request. Add the required " +
                     "configuration by calling a receiver-specific method that calls " +
-                    "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
-                    "application startup code. For example, call '{GitHubBuilderInterface}.{GitHubBuilderMethod}' " +
-                    "to configure a minimal GitHub receiver.",
-                    nameof(IMvcBuilder),
-                    nameof(WebHookMvcBuilderExtensions.AddWebHooks),
-                    nameof(IMvcCoreBuilder),
-                    nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks),
-                    nameof(IMvcCoreBuilder),
-                    "AddGitHubWebHooks");
+                    $"'{typeof(IMvcBuilder)}.{nameof(WebHookMvcBuilderExtensions.AddWebHooks)}' or " +
+                    $"'{nameof(IMvcCoreBuilder)}.{nameof(WebHookMvcCoreBuilderExtensions.AddWebHooks)}' in the " +
+                    $"application startup code. For example, call '{nameof(IMvcCoreBuilder)}.AddGitHubWebHooks' to " +
+                    "configure a minimal GitHub receiver.");
 
                 context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                 return;

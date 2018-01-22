@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
@@ -17,8 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 {
     /// <summary>
-    /// An <see cref="IActionModelConvention"/> implementation that adds attribute routing information to WebHook
-    /// actions.
+    /// An <see cref="IActionModelConvention"/> implementation that adds routing information to WebHook actions.
     /// </summary>
     public class WebHookRoutingProvider : IApplicationModelProvider
     {
@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookRoutingProvider"/> with the given
+        /// Instantiates a new <see cref="WebHookRoutingProvider"/> instance with the given
         /// <paramref name="existsConstraint"/>, <paramref name="eventMapperConstraint"/> and
         /// <paramref name="loggerFactory"/>.
         /// </summary>
@@ -44,8 +44,28 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             _loggerFactory = loggerFactory;
         }
 
+        /// <summary>
+        /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
+        /// <see cref="WebHookRoutingProvider"/> instances. The recommended <see cref="IApplicationModelProvider"/>
+        /// order is
+        /// <list type="number">
+        /// <item>
+        /// Validate metadata services and <see cref="WebHookAttribute"/> metadata implementations and add information
+        /// used in later application model providers (in <see cref="WebHookMetadataProvider"/>).
+        /// </item>
+        /// <item>
+        /// Add routing information (template, constraints and filters) to <see cref="ActionModel"/>s (in this filter).
+        /// </item>
+        /// <item>
+        /// Add model binding information (<see cref="Mvc.ModelBinding.BindingInfo"/> settings) to
+        /// <see cref="ParameterModel"/>s (in <see cref="WebHookModelBindingProvider"/>).
+        /// </item>
+        /// </list>
+        /// </summary>
+        public static int Order => WebHookMetadataProvider.Order + 10;
+
         /// <inheritdoc />
-        public int Order => WebHookMetadataProvider.Order + 10;
+        int IApplicationModelProvider.Order => Order;
 
         /// <inheritdoc />
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
@@ -82,7 +102,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 return;
             }
 
-            var template = ChooseTemplate(action.RouteValues);
+            var template = ChooseTemplate();
             var selectors = action.Selectors;
             if (selectors.Count == 0)
             {
@@ -102,18 +122,12 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
             AddConstraints(attribute, selectors);
             AddConstraints(action.Properties, selectors);
-
-            if (action.Properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out var bodyTypeMetadata))
-            {
-                action.Filters.Add(new WebHookVerifyBodyTypeFilter(
-                    (IWebHookBodyTypeMetadata)bodyTypeMetadata,
-                    _loggerFactory));
-            }
+            AddFilters(action.Properties, action.Filters);
         }
 
-        // Use a constant template since we'll need constraints in any case. That is, need constraints either to match
-        // receiver names and ids (current choice) or need them to map another route value to what model binding expects.
-        private static string ChooseTemplate(IDictionary<string, string> routeValues)
+        // Use a constant template since all WebHook constraints use the resulting route values and we have no
+        // requirements for user-specified route templates.
+        private static string ChooseTemplate()
         {
             var template = "/api/webhooks/incoming/"
                 + $"{{{WebHookConstants.ReceiverKeyName}}}/"
@@ -131,8 +145,9 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.RoutingProvider_MixedRouteWithWebHookAttribute,
-                    attribute.GetType().Name,
-                    selector.AttributeRouteModel.Attribute?.GetType().Name);
+                    attribute.GetType(),
+                    selector.AttributeRouteModel.Attribute?.GetType(),
+                    attribute.GetType().Name);
                 throw new InvalidOperationException(message);
             }
 
@@ -204,6 +219,23 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     AddConstraint(constraint, selectors);
                 }
             }
+        }
+
+        private void AddFilters(IDictionary<object, object> properties, IList<IFilterMetadata> filters)
+        {
+            WebHookVerifyBodyTypeFilter filter;
+            var bodyTypeMetadataObject = properties[typeof(IWebHookBodyTypeMetadataService)];
+            if (bodyTypeMetadataObject is IWebHookBodyTypeMetadataService receiverBodyTypeMetadata)
+            {
+                filter = new WebHookVerifyBodyTypeFilter(receiverBodyTypeMetadata, _loggerFactory);
+            }
+            else
+            {
+                var allBodyTypeMetadata = (IReadOnlyList<IWebHookBodyTypeMetadataService>)bodyTypeMetadataObject;
+                filter = new WebHookVerifyBodyTypeFilter(allBodyTypeMetadata, _loggerFactory);
+            }
+
+            filters.Add(filter);
         }
     }
 }

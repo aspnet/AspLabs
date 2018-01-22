@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -129,8 +129,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            StringValues eventNames;
+            // Determine the applicable WebhookBodyType i.e. how to read the request body.
+            // WebHookReceiverExistsConstraint confirms the IWebHookBodyTypeMetadataService implementation exists.
             var bodyTypeMetadata = _bodyTypeMetadata.First(metadata => metadata.IsApplicable(receiverName));
+
+            // No need to double-check the request's Content-Type. WebHookVerifyBodyTypeFilter would have
+            // short-circuited the request if unsupported.
+            StringValues eventNames;
             switch (bodyTypeMetadata.BodyType)
             {
                 case WebHookBodyType.Form:
@@ -194,15 +199,15 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     var message = string.Format(
                         CultureInfo.CurrentCulture,
                         Resources.General_InvalidEnumValue,
-                        nameof(WebHookBodyType),
+                        typeof(WebHookBodyType),
                         bodyTypeMetadata.BodyType);
                     throw new InvalidOperationException(message);
             }
 
             if (StringValues.IsNullOrEmpty(eventNames) && !eventFromBodyMetadata.AllowMissing)
             {
-                _logger.LogError(
-                    500,
+                _logger.LogWarning(
+                    0,
                     "A '{ReceiverName}' WebHook request must contain a match for '{BodyPropertyPath}' in the HTTP " +
                     "request entity body indicating the type or types of event.",
                     receiverName,

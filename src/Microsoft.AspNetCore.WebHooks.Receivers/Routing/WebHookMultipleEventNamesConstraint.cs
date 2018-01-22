@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookEventNamesConstraint"/> instance with the given
+        /// Instantiates a new <see cref="WebHookMultipleEventNamesConstraint"/> instance with the given
         /// <paramref name="eventName"/> and <paramref name="pingMetadata"/>.
         /// </summary>
         /// <param name="eventName">Name of the event this action expects.</param>

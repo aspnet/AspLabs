@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Salesforce receiver.
     /// </summary>
-    public class SalesforceMetadata : WebHookMetadata, IWebHookBodyTypeMetadataService
+    public class SalesforceMetadata : WebHookMetadata
     {
         /// <summary>
         /// Instantiates a new <see cref="SalesforceMetadata"/> instance.
@@ -17,6 +17,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         }
 
         /// <inheritdoc />
-        public WebHookBodyType BodyType => WebHookBodyType.Xml;
+        public override WebHookBodyType BodyType => WebHookBodyType.Xml;
     }
 }

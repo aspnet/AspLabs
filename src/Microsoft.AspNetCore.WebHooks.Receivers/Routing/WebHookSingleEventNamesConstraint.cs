@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         private readonly string _pingEventName;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookEventNamesConstraint"/> instance with the given
+        /// Instantiates a new <see cref="WebHookSingleEventNamesConstraint"/> instance with the given
         /// <paramref name="eventName"/> and <paramref name="pingEventName"/>.
         /// </summary>
         /// <param name="eventName">The event name to match.</param>

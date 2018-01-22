@@ -28,8 +28,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             }
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookEventMetadata, GitHubMetadata>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookPingRequestMetadata, GitHubMetadata>());
+            WebHookMetadata.Register<GitHubMetadata>(services);
 
             services.TryAddSingleton<GitHubVerifySignatureFilter>();
         }

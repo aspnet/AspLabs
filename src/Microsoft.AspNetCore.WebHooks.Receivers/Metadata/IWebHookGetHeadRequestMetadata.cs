@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <summary>
         /// Gets the name of a query parameter containing a value to include in the response to an HTTP GET request.
         /// If non-<see langword="null"/>, the request must contain this query parameter and the receiver responds
-        /// with its value in the body.  Otherwise, the receiver responds to an HTTP GET request with an empty
+        /// with its value in the body. Otherwise, the receiver responds to an HTTP GET request with an empty
         /// response body. The receiver ignores this parameter for HTTP POST requests.
         /// </summary>
         /// <value>Should not return an empty string.</value>

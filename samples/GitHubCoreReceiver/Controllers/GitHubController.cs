@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Newtonsoft.Json.Linq;
 
@@ -51,7 +51,7 @@ namespace GitHubCoreReceiver.Controllers
         }
 
         [GeneralWebHook]
-        public IActionResult FallbackHandler(string receiverName, string id, string eventName, JObject data)
+        public IActionResult FallbackHandler(string receiverName, string id, string eventName)
         {
             if (!ModelState.IsValid)
             {

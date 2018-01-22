@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -211,7 +211,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             // Arrange
             var expectedMessage = $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. The " +
-                "'stripe' receiver requires a valid hex-encoded string.";
+                "'stripe' WebHook receiver requires a valid hex-encoded string.";
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
             var header = $"{StripeConstants.TimestampKey}={TestTimestamp}, " +

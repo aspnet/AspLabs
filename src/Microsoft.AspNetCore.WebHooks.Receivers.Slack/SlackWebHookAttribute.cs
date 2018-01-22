@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <summary>
     /// <para>
     /// An <see cref="Attribute"/> indicating the associated action is a Slack WebHook endpoint. Specifies the optional
-    /// <see cref="WebHookAttribute.Id"/>.  Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
+    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
     /// action and delegates its <see cref="IResultFilter"/> <see cref="IApiResponseMetadataProvider"/> implementations
     /// to a <see cref="ProducesAttribute"/>, indicating the action produces JSON-formatted responses.
     /// </para>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -21,12 +21,12 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
     {
         private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
         {
-                { typeof(WebHookGetHeadRequestFilter), WebHookGetHeadRequestFilter.Order },
-                { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
-                { typeof(WebHookEventMapperFilter), WebHookEventMapperFilter.Order },
-                { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },
-                { typeof(WebHookVerifyMethodFilter), WebHookVerifyMethodFilter.Order },
-                { typeof(WebHookVerifyRequiredValueFilter), WebHookVerifyRequiredValueFilter.Order },
+            { typeof(WebHookGetHeadRequestFilter), WebHookGetHeadRequestFilter.Order },
+            { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
+            { typeof(WebHookEventMapperFilter), WebHookEventMapperFilter.Order },
+            { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },
+            { typeof(WebHookVerifyMethodFilter), WebHookVerifyMethodFilter.Order },
+            { typeof(WebHookVerifyRequiredValueFilter), WebHookVerifyRequiredValueFilter.Order },
         };
 
         /// <summary>
