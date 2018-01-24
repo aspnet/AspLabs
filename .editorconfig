@@ -3,32 +3,44 @@
 # top-most EditorConfig file
 root = true
 
-# Don't use tabs for indentation.
 [*]
-indent_style = space
+# Don't use tabs for indentation.
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
+indent_style = space
 
-# Where supported (e.g. in VS Code but not VS), add a final newline to files.
-insert_final_newline = true
+charset = utf-8
 
 # Where supported, trim trailing whitespace on all lines.
 trim_trailing_whitespace = true
 
+# Where supported (e.g. in VS Code but not VS), add a final newline to files.
+insert_final_newline = true
+
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
+dotnet_sort_system_directives_first = true:warning
 
 # Xml project files
-[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+[*.{*proj,vcxproj.filters,projitems}]
 indent_size = 2
 
 # Xml config files
-[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct,tasks,xml,yml}]
 indent_size = 2
 
 # JSON files
 [*.json]
 indent_size = 2
+
+# PowerShell
+[*.{ps1,psm1}]
+indent_size = 4
+
+# Shell
+[*.sh]
+indent_size = 4
+end_of_line = lf
 
 # Dotnet code style settings:
 [*.cs]

@@ -3,8 +3,8 @@
 
   <!-- In Directory.Build.targets because $(TargetFramework) may not be set when Directory.Build.props is imported. -->
   <PropertyGroup>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">2.1.0-preview1-26016-05</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">$(MicrosoftNETCoreApp20PackageVersion)</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">$(MicrosoftNETCoreApp21PackageVersion)</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <!-- In Directory.Build.targets because default items are added after Directory.Build.props is imported, causing invalid duplicate entries. -->
