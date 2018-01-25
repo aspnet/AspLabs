@@ -2,9 +2,9 @@
   - git config --global core.autocrlf true
 branches:
   only:
+    - /^release\/.*/
     - dev
     - /^(.*\/)?ci-.*$/
-    - /^rel\/.*/
 configuration:
   - Debug
   - Release
