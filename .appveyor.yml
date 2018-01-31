@@ -1,22 +1,22 @@
-﻿init:
-  - git config --global core.autocrlf true
+init:
+- git config --global core.autocrlf true
 branches:
   only:
-    - /^release\/.*/
-    - dev
-    - /^(.*\/)?ci-.*$/
+  - dev
+  - /^release\/.*$/
+  - /^(.*\/)?ci-.*$/
 configuration:
-  - Debug
-  - Release
+- Debug
+- Release
 matrix:
   fast_finish: true
 build_script:
-  - ps: .\run.ps1 default-build /P:Configuration=%Configuration%
+- ps: .\run.ps1 default-build /P:Configuration=%Configuration%
 clone_depth: 1
 environment:
   global:
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
     DOTNET_CLI_TELEMETRY_OPTOUT: 1
-test: off
-deploy: off
+test: 'off'
+deploy: 'off'
 image: Visual Studio 2017
