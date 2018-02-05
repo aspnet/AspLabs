@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookVerifyBodyTypeFilter.Order + 10;
+        public static int Order => WebHookEventMapperFilter.Order + 10;
 
         /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)
