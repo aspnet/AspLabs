@@ -208,7 +208,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 Logger.LogInformation(
                     403,
                     "Expecting exactly one '{HeaderName}' header field in the WebHook request but found " +
-                    "{HeaderCount}. Please ensure the request contains exactly one '{HeaderName}' header field.",
+                    "{HeaderCount}. Ensure the request contains exactly one '{HeaderName}' header field.",
                     headerName,
                     headersCount,
                     headerName);

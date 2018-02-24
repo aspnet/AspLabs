@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EventConstraints_NoReceiverName" xml:space="preserve">
-    <value>Invalid WebHook constraint configuration encountered. '{0}' executed though '{1}' should have disallowed the request.</value>
+    <value>Invalid WebHook constraint configuration encountered. '{0}' executed though request contained no receiver name and '{1}' should have disallowed the request.</value>
   </data>
   <data name="EventMapper_NoBodyProperty" xml:space="preserve">
     <value>A '{0}' WebHook request must contain a match for '{1}' in the HTTP request entity body indicating the type or types of event.</value>
@@ -163,16 +163,16 @@
     <value>The MVC model binding system unexpectedly failed. Binding the {0} type should never add {1} errors.</value>
   </data>
   <data name="RoutingProvider_MixedRouteWithWebHookAttribute" xml:space="preserve">
-    <value>{0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template.</value>
+    <value>'{0}' and '{1}' were applied to the same action. '{0}' must not be combined with another attribute that provides a route template.</value>
   </data>
   <data name="Security_BadSecret" xml:space="preserve">
     <value>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'.  The value must be between {2} and {3} characters long.</value>
   </data>
   <data name="Security_NoHttps" xml:space="preserve">
-    <value>The '{0}' WebHook receiver requires {1} in order to be secure. Please register a WebHook URI of type '{2}'.</value>
+    <value>The '{0}' WebHook receiver requires {1} in order to be secure. Register a WebHook URI of type '{2}'.</value>
   </data>
   <data name="Security_NoSecrets" xml:space="preserve">
-    <value>Could not find a valid configuration for the '{0}' WebHook receiver. Please configure secret keys for this receiver.</value>
+    <value>Could not find a valid configuration for the '{0}' WebHook receiver. Configure secret keys for this receiver.</value>
   </data>
   <data name="VerifyBody_NoFormData" xml:space="preserve">
     <value>The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</value>
@@ -199,7 +199,7 @@
     <value>The '{0}' header value is invalid. The '{1}' receiver requires a valid Base64-encoded string.</value>
   </data>
   <data name="VerifySignature_BadHeader" xml:space="preserve">
-    <value>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Please ensure the request contains exactly one '{0}' header field.</value>
+    <value>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Ensure the request contains exactly one '{0}' header field.</value>
   </data>
   <data name="VerifySignature_BadHexEncoding" xml:space="preserve">
     <value>The '{0}' header value is invalid. The '{1}' receiver requires a valid hex-encoded string.</value>
@@ -208,6 +208,6 @@
     <value>The signature provided by the '{0}' header field does not match the value expected by the '{1}' WebHook receiver. WebHook request is invalid.</value>
   </data>
   <data name="VerifySignature_InvalidHexValue" xml:space="preserve">
-    <value>Input is not a valid hex-encoded string: '{0}'. Please provide a valid hex-encoded string.</value>
+    <value>Input is not a valid hex-encoded string: '{0}'.</value>
   </data>
 </root>

@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     Logger.LogError(
                         0,
                         "The '{HeaderName}' header value of '{HeaderValue}' is not recognized as a valid " +
-                        "application key. Please ensure the correct application key / secret key pairs have " +
+                        "application key. Ensure the correct application key / secret key pairs have " +
                         "been configured.",
                         PusherConstants.SignatureKeyHeaderName,
                         applicationKey);

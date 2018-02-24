@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid WebHook constraint configuration encountered. &apos;{0}&apos; executed though &apos;{1}&apos; should have disallowed the request..
+        ///   Looks up a localized string similar to Invalid WebHook constraint configuration encountered. &apos;{0}&apos; executed though request contained no receiver name and &apos;{1}&apos; should have disallowed the request..
         /// </summary>
         internal static string EventConstraints_NoReceiverName {
             get {
@@ -196,7 +196,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} and {1} were applied to the same action. {0} must not be combined with another attribute that provides a route template..
+        ///   Looks up a localized string similar to &apos;{0}&apos; and &apos;{1}&apos; were applied to the same action. &apos;{0}&apos; must not be combined with another attribute that provides a route template..
         /// </summary>
         internal static string RoutingProvider_MixedRouteWithWebHookAttribute {
             get {
@@ -214,7 +214,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; WebHook receiver requires {1} in order to be secure. Please register a WebHook URI of type &apos;{2}&apos;..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; WebHook receiver requires {1} in order to be secure. Register a WebHook URI of type &apos;{2}&apos;..
         /// </summary>
         internal static string Security_NoHttps {
             get {
@@ -223,7 +223,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver. Please configure secret keys for this receiver..
+        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver. Configure secret keys for this receiver..
         /// </summary>
         internal static string Security_NoSecrets {
             get {
@@ -304,7 +304,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expecting exactly one &apos;{0}&apos; header field in the WebHook request but found {1}. Please ensure the request contains exactly one &apos;{0}&apos; header field..
+        ///   Looks up a localized string similar to Expecting exactly one &apos;{0}&apos; header field in the WebHook request but found {1}. Ensure the request contains exactly one &apos;{0}&apos; header field..
         /// </summary>
         internal static string VerifySignature_BadHeader {
             get {
@@ -331,7 +331,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Input is not a valid hex-encoded string: &apos;{0}&apos;. Please provide a valid hex-encoded string..
+        ///   Looks up a localized string similar to Input is not a valid hex-encoded string: &apos;{0}&apos;..
         /// </summary>
         internal static string VerifySignature_InvalidHexValue {
             get {

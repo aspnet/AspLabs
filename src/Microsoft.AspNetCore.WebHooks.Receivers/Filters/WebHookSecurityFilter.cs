@@ -143,7 +143,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 Logger.LogError(
                     500,
                     "The '{ReceiverName}' WebHook receiver requires {UpperSchemeName} in order to be secure. " +
-                    "Please register a WebHook URI of type '{SchemeName}'.",
+                    "Register a WebHook URI of type '{SchemeName}'.",
                     receiverName,
                     Uri.UriSchemeHttps.ToUpper(),
                     Uri.UriSchemeHttps);

@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
-    /// The <see cref="SlackField"/> class is used for expression table fields as part of a <see cref="SlackAttachment"/>,
-    /// please see <c>https://api.slack.com/docs/attachments</c> for details. Fields are displayed in a table inside the message
-    /// attachment.
+    /// The <see cref="SlackField"/> class is used for expression table fields as part of a
+    /// <see cref="SlackAttachment"/>, see <c>https://api.slack.com/docs/attachments</c> for details. Fields are
+    /// displayed in a table inside the message attachment.
     /// </summary>
     public class SlackField
     {
@@ -20,10 +20,15 @@ namespace Microsoft.AspNetCore.WebHooks
         /// Initializes a new instance of the <see cref="SlackField"/> with the given <paramref name="title"/>
         /// and <paramref name="value"/>.
         /// </summary>
-        /// <param name="title">The field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
-        /// by the receiver.</param>
-        /// <param name="value">The field value which may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>.
-        /// The value may be multi-line and must be escaped following Markdown rules.</param>
+        /// <param name="title">
+        /// The field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
+        /// by the receiver.
+        /// </param>
+        /// <param name="value">
+        /// The field value which may contain Markdown-style formatting as described in
+        /// <c>https://api.slack.com/docs/formatting</c>. The value may be multi-line and must be escaped following
+        /// Markdown rules.
+        /// </param>
         public SlackField(string title, string value)
         {
             if (title == null)
@@ -46,8 +51,8 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets the field title shown as a bold heading above the value text. It cannot contain markup and will be escaped
-        /// by the receiver.
+        /// Gets or sets the field title shown as a bold heading above the value text. It cannot contain markup and
+        /// will be escaped by the receiver.
         /// </summary>
         [JsonProperty("title")]
         public string Title
@@ -67,8 +72,9 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets the field value. It may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>.
-        /// The value may be multi-line and must be escaped following Markdown rules.
+        /// Gets or sets the field value. It may contain Markdown-style formatting as described in
+        /// <c>https://api.slack.com/docs/formatting</c>. The value may be multi-line and must be escaped following
+        /// Markdown rules.
         /// </summary>
         [JsonProperty("value")]
         public string Value
@@ -88,7 +94,8 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the field is short enough to be displayed side-by-side with other fields.
+        /// Gets or sets a value indicating whether the field is short enough to be displayed side-by-side with other
+        /// fields.
         /// </summary>
         [JsonProperty("short")]
         public bool Short { get; set; }

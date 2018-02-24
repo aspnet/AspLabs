@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             // Arrange
             var expectedMessage = $"Expecting exactly one '{StripeConstants.SignatureHeaderName}' header field in " +
-                "the WebHook request but found 0. Please ensure the request contains exactly one " +
+                "the WebHook request but found 0. Ensure the request contains exactly one " +
                 $"'{StripeConstants.SignatureHeaderName}' header field.";
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);
@@ -146,7 +146,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             // Arrange
             var expectedMessage = $"Expecting exactly one '{StripeConstants.SignatureHeaderName}' header field in " +
-                "the WebHook request but found 2. Please ensure the request contains exactly one " +
+                "the WebHook request but found 2. Ensure the request contains exactly one " +
                 $"'{StripeConstants.SignatureHeaderName}' header field.";
             var filter = GetFilter(TestSecret);
             var context = GetContext(TestContent);

@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 {
                     _logger.LogCritical(
                         0,
-                        "Unable to find WebHook routing constraints for the '{ReceiverName}' receiver. Please add " +
+                        "Unable to find WebHook routing constraints for the '{ReceiverName}' receiver. Add " +
                         "the required configuration by calling a receiver-specific method that calls " +
                         "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
                         "application startup code. For example, call " +
@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         // This case is actually more likely a gap in the receiver-specific configuration method.
                         _logger.LogCritical(
                             1,
-                            "Unable to find WebHook filters for the '{ReceiverName}' receiver. Please add the " +
+                            "Unable to find WebHook filters for the '{ReceiverName}' receiver. Add the " +
                             "required configuration by calling a receiver-specific method that calls " +
                             "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
                             "application startup code. For example, call " +
@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 // Routing not configured at all (no template) but the request reached this action.
                 _logger.LogCritical(
                     2,
-                    "Unable to find WebHook routing information in the request. Please add the required " +
+                    "Unable to find WebHook routing information in the request. Add the required " +
                     "configuration by calling a receiver-specific method that calls " +
                     "'{BuilderInterface}.{BuilderMethod}' or '{CoreInterface}.{CoreBuilderMethod}' in the " +
                     "application startup code. For example, call '{GitHubBuilderInterface}.{GitHubBuilderMethod}' " +

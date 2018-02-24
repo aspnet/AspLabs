@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; header value of &apos;{1}&apos; is not recognized as a valid application key. Please ensure the correct application key / secret key pairs have been configured..
+        ///   Looks up a localized string similar to The &apos;{0}&apos; header value of &apos;{1}&apos; is not recognized as a valid application key. Ensure the correct application key / secret key pairs have been configured..
         /// </summary>
         internal static string SignatureFilter_SecretNotFound {
             get {
