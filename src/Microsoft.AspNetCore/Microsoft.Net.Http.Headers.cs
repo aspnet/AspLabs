@@ -135,7 +135,7 @@ namespace Microsoft.Net.Http.Headers
         public const string ProxyAuthorization = "Proxy-Authorization";
         public const string Range = "Range";
         public const string Referer = "Referer";
-        public const string RefererPolicy = "Referrer-Policy";
+        public const string ReferrerPolicy = "Referrer-Policy";
         public const string RetryAfter = "Retry-After";
         public const string Server = "Server";
         public const string SetCookie = "Set-Cookie";
