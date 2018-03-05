@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -71,7 +71,6 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             var message = string.Format(
                 CultureInfo.CurrentCulture,
                 Resources.EventConstraints_NoReceiverName,
-                typeof(WebHookEventMapperConstraint),
                 typeof(WebHookReceiverExistsConstraint));
             throw new InvalidOperationException(message);
         }
@@ -131,8 +130,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             routeData.TryGetWebHookReceiverName(out var receiverName);
             if (eventMetadata.QueryParameterName == null)
             {
-                _logger.LogError(
-                    500,
+                _logger.LogWarning(
+                    0,
                     "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header " +
                     "indicating the type of event.",
                     receiverName,
@@ -140,8 +139,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             }
             else if (eventMetadata.HeaderName == null)
             {
-                _logger.LogError(
-                    501,
+                _logger.LogWarning(
+                    1,
                     "A '{ReceiverName}' WebHook request must contain a '{QueryParameterKey}' query " +
                     "parameter indicating the type of event.",
                     receiverName,
@@ -149,8 +148,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             }
             else
             {
-                _logger.LogError(
-                    502,
+                _logger.LogWarning(
+                    2,
                     "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header or a " +
                     "'{QueryParameterKey}' query parameter indicating the type of event.",
                     receiverName,

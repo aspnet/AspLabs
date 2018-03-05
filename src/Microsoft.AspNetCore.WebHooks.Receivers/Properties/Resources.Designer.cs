@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid WebHook constraint configuration encountered. &apos;{0}&apos; executed though request contained no receiver name and &apos;{1}&apos; should have disallowed the request..
+        ///   Looks up a localized string similar to Invalid WebHook constraint configuration encountered. Request contained no receiver name and &apos;{0}&apos; should have disallowed the request..
         /// </summary>
         internal static string EventConstraints_NoReceiverName {
             get {

@@ -1,6 +1,7 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -80,7 +81,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         {
             if (context == null)
             {
-                throw new System.ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(context));
             }
 
             var routeData = context.RouteData;
@@ -103,6 +104,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         getHeadRequestMetadata.SecretKeyMaxLength);
                     if (secretKey == null)
                     {
+                        // Have already logged about this case.
                         context.Result = new NotFoundResult();
                         return;
                     }
@@ -112,6 +114,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         if (getHeadRequestMetadata.AllowHeadRequests)
                         {
                             // Success #1
+                            Logger.LogInformation(
+                                400,
+                                "Received a HEAD request for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                                receiverName);
                             context.Result = new OkResult();
                         }
 
@@ -122,6 +128,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     if (getHeadRequestMetadata.ChallengeQueryParameterName == null)
                     {
                         // Success #2: Simple GET case. Have done all necessary verification.
+                        Logger.LogInformation(
+                            401,
+                            "Received a GET request for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                            receiverName);
                         context.Result = new OkResult();
                         return;
                     }
@@ -148,8 +158,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var challenge = request.Query[getHeadRequestMetadata.ChallengeQueryParameterName];
             if (StringValues.IsNullOrEmpty(challenge))
             {
-                Logger.LogError(
-                    400,
+                Logger.LogWarning(
+                    402,
                     "A '{ReceiverName}' WebHook verification request must contain a '{ParameterName}' query " +
                     "parameter.",
                     receiverName,
@@ -164,6 +174,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
                 return noChallenge;
             }
+
+            Logger.LogInformation(
+                403,
+                "Received a GET request for the '{ReceiverName}' WebHook receiver -- returning challenge response.",
+                receiverName);
 
             // Echo the challenge back to the caller.
             return new ContentResult

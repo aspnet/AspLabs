@@ -1,6 +1,7 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.WebHooks.Properties;
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
@@ -45,11 +46,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         {
             if (string.IsNullOrEmpty(name))
             {
-                throw new System.ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty, nameof(name));
+                throw new ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty, nameof(name));
             }
             if (string.IsNullOrEmpty(sourceName))
             {
-                throw new System.ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty, nameof(sourceName));
+                throw new ArgumentException(Resources.General_ArgumentCannotBeNullOrEmpty, nameof(sourceName));
             }
 
             Name = name;

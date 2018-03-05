@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
@@ -36,8 +36,8 @@ namespace StripeCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} / '{ReceiverId}' received a '{EventType}' notification (event '{EventName}').",
-                nameof(StripeController),
+                $"{nameof(StripeController)} / '{{ReceiverId}}' received a '{{EventType}}' notification (event " +
+                "'{EventName}').",
                 id,
                 data.EventType,
                 @event);

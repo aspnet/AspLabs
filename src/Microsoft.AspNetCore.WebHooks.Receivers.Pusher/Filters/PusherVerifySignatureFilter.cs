@@ -110,12 +110,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     secretKey.Length < PusherConstants.SecretKeyMinLength ||
                     secretKey.Length > PusherConstants.SecretKeyMaxLength)
                 {
-                    Logger.LogError(
+                    Logger.LogWarning(
                         0,
-                        "The '{HeaderName}' header value of '{HeaderValue}' is not recognized as a valid " +
-                        "application key. Ensure the correct application key / secret key pairs have " +
-                        "been configured.",
-                        PusherConstants.SignatureKeyHeaderName,
+                        $"The '{PusherConstants.SignatureKeyHeaderName}' header value of '{{HeaderValue}}' is not " +
+                        "recognized as a valid application key. Ensure the correct application key / secret key " +
+                        "pairs have been configured.",
                         applicationKey);
 
                     var message = string.Format(

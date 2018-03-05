@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -39,9 +39,8 @@ namespace SalesforceCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} / '{ReceiverId}' received {Count} notifications with ActionId '{ActionId}' (event " +
-                "'{EventName}').",
-                nameof(SalesforceController),
+                $"{nameof(SalesforceController)} / '{{ReceiverId}}' received {{Count}} notifications with ActionId " +
+                "'{ActionId}' (event '{EventName}').",
                 id,
                 data.Notifications.Count(),
                 data.ActionId,

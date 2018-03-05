@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -100,10 +100,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var notificationId = data.Value<string>(StripeConstants.NotificationIdPropertyName);
             if (string.IsNullOrEmpty(notificationId))
             {
-                _logger.LogError(
+                _logger.LogWarning(
                     0,
-                    "The HTTP request body did not contain a required '{PropertyName}' property.",
-                    StripeConstants.NotificationIdPropertyName);
+                    "The HTTP request body did not contain a required " +
+                    $"'{StripeConstants.NotificationIdPropertyName}' property.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -118,10 +118,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var eventName = data.Value<string>(StripeConstants.EventPropertyName);
             if (string.IsNullOrEmpty(eventName))
             {
-                _logger.LogError(
+                _logger.LogWarning(
                     1,
-                    "The HTTP request body did not contain a required '{PropertyName}' property.",
-                    StripeConstants.EventPropertyName);
+                    $"The HTTP request body did not contain a required '{StripeConstants.EventPropertyName}' " +
+                    "property.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,

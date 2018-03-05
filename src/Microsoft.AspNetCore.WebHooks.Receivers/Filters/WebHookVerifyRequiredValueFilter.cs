@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                             message = string.Format(
                                 CultureInfo.CurrentCulture,
                                 Resources.General_InvalidEnumValue,
-                                nameof(WebHookParameterType),
+                                typeof(WebHookParameterType),
                                 parameter.ParameterType);
                             throw new InvalidOperationException(message);
                     }
@@ -155,8 +155,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return true;
             }
 
-            _logger.LogError(
-                500,
+            _logger.LogWarning(
+                0,
                 "A '{ReceiverName}' WebHook request must contain a '{KeyName}' value in the route data.",
                 receiverName,
                 keyName);
@@ -181,8 +181,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return true;
             }
 
-            _logger.LogError(
-                501,
+            _logger.LogWarning(
+                1,
                 "A '{ReceiverName}' WebHook request must contain a '{HeaderName}' HTTP header.",
                 receiverName,
                 headerName);
@@ -207,8 +207,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return true;
             }
 
-            _logger.LogError(
-                502,
+            _logger.LogWarning(
+                2,
                 "A '{ReceiverName}' WebHook request must contain a '{QueryParameterName}' query parameter.",
                 receiverName,
                 parameterName);

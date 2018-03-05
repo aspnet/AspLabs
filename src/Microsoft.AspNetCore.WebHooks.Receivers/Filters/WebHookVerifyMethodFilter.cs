@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
         private IActionResult CreateBadMethodResult(string methodName, string receiverName)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 0,
                 "The HTTP '{RequestMethod}' method is not supported by the '{ReceiverName}' WebHook receiver.",
                 methodName,
@@ -104,7 +104,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 Resources.VerifyMethod_BadMethod,
                 methodName,
                 receiverName);
-
             var badMethod = new BadRequestObjectResult(message)
             {
                 StatusCode = StatusCodes.Status405MethodNotAllowed

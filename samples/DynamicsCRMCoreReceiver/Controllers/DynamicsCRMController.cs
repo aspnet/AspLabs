@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -24,10 +24,8 @@ namespace DynamicsCRMCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} received '{MessageName}' for '{Id}'.",
-                nameof(DynamicsCRMController),
-                @event,
-                "It");
+                $"{nameof(DynamicsCRMController)} / 'It' received '{{MessageName}}'.",
+                @event);
 
             return Ok();
         }
@@ -42,10 +40,9 @@ namespace DynamicsCRMCoreReceiver.Controllers
 
             _logger.LogInformation(
                 1,
-                "{ControllerName} received '{MessageName}' for '{Id}'.",
-                nameof(DynamicsCRMController),
-                @event,
-                id);
+                $"{nameof(DynamicsCRMController)} / '{{Id}}' received '{{MessageName}}'.",
+                id,
+                @event);
 
             return Ok();
         }

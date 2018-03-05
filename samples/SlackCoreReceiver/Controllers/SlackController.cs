@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
@@ -24,9 +24,7 @@ namespace SlackCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
-                nameof(SlackController),
-                "command",
+                $"{nameof(SlackController)} / 'command' received {{Count}} properties with event '{{EventName}}'.",
                 data.Count,
                 @event);
 
@@ -88,9 +86,7 @@ namespace SlackCoreReceiver.Controllers
 
             _logger.LogInformation(
                 3,
-                "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
-                nameof(SlackController),
-                "trigger",
+                $"{nameof(SlackController)} / 'trigger' received {{Count}} properties with event '{{EventName}}'.",
                 data.Count,
                 @event);
 
@@ -134,8 +130,8 @@ namespace SlackCoreReceiver.Controllers
 
             _logger.LogInformation(
                 6,
-                "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
-                nameof(SlackController),
+                $"{nameof(SlackController)} / '{{ReceiverId}}' received {{Count}} properties with event " +
+                "'{EventName}'.",
                 id,
                 data.Count,
                 @event);

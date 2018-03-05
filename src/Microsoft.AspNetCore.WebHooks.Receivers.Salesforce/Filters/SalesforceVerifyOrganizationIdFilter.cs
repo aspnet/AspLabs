@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -121,10 +121,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var organizationIds = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.OrganizationIdPath);
             if (StringValues.IsNullOrEmpty(organizationIds))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     0,
-                    "The HTTP request body did not contain a required '{XPath}' element.",
-                    SalesforceConstants.OrganizationIdPath);
+                    $"The HTTP request body did not contain a required '{SalesforceConstants.OrganizationIdPath}' " +
+                    "element.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -145,10 +145,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var secretKey = GetShortOrganizationId(secret);
             if (!SecretEqual(organizationId, secretKey))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     1,
-                    "The '{XPath}' value provided in the HTTP request body did not match the expected value.",
-                    SalesforceConstants.OrganizationIdPath);
+                    $"The '{SalesforceConstants.OrganizationIdPath}' value provided in the HTTP request body did " +
+                    "not match the expected value.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -163,10 +163,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var eventNames = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.EventNamePath);
             if (StringValues.IsNullOrEmpty(eventNames))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     2,
-                    "The HTTP request body did not contain a required '{XPath}' element.",
-                    SalesforceConstants.EventNamePath);
+                    $"The HTTP request body did not contain a required '{SalesforceConstants.EventNamePath}' " +
+                    "element.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,

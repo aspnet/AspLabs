@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -24,10 +24,8 @@ namespace BitbucketStronglyTypedCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} received '{EventName}' for '{Id}' and '{WebHookId}'.",
-                nameof(BitbucketController),
+                $"{nameof(BitbucketController)} / 'It' received '{{EventName}}' and '{{WebHookId}}'.",
                 @event,
-                "It",
                 webHookId);
 
             return Ok();
@@ -70,10 +68,9 @@ namespace BitbucketStronglyTypedCoreReceiver.Controllers
 
             _logger.LogInformation(
                 1,
-                "{ControllerName} received '{EventName}' for '{Id}' and '{WebHookId}'.",
-                nameof(BitbucketController),
-                @event,
+                $"{nameof(BitbucketController)} / '{{Id}}' received '{{EventName}}' and '{{WebHookId}}'.",
                 id,
+                @event,
                 webHookId);
 
             return Ok();

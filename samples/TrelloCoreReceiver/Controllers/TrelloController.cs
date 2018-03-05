@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -24,10 +24,8 @@ namespace TrelloCoreReceiver.Controllers
 
             _logger.LogInformation(
                 0,
-                "{ControllerName} received '{MessageName}' for '{Id}'.",
-                nameof(TrelloController),
-                @event,
-                "It");
+                $"{nameof(TrelloController)} / 'It' received '{{MessageName}}'.",
+                @event);
 
             return Ok();
         }
@@ -42,10 +40,9 @@ namespace TrelloCoreReceiver.Controllers
 
             _logger.LogInformation(
                 1,
-                "{ControllerName} received '{MessageName}' for '{Id}'.",
-                nameof(TrelloController),
-                @event,
-                id);
+                $"{nameof(TrelloController)} / '{{Id}}' received '{{MessageName}}'.",
+                id,
+                @event);
 
             return Ok();
         }

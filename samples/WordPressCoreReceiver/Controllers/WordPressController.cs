@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
@@ -25,9 +25,7 @@ namespace WordPressCoreReceiver.Controllers
 
             _logger.LogInformation(
                0,
-               "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
-               nameof(WordPressController),
-               "It",
+               $"{nameof(WordPressController)} / 'It' received {{Count}} properties with event '{{EventName}}'.",
                data.Count,
                @event);
             foreach (var keyValuePair in data)
@@ -60,8 +58,8 @@ namespace WordPressCoreReceiver.Controllers
 
             _logger.LogInformation(
                2,
-               "{ControllerName} / '{ReceiverId}' received {Count} properties with event '{EventName}').",
-               nameof(WordPressController),
+               $"{nameof(WordPressController)} / '{{ReceiverId}}' received {{Count}} properties with event " +
+               "'{EventName}'.",
                id,
                data.Count,
                @event);

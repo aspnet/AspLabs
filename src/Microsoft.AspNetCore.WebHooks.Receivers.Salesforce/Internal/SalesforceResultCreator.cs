@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.Internal
 {
@@ -17,17 +16,6 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
     /// </summary>
     public class SalesforceResultCreator : ISalesforceResultCreator
     {
-        private readonly ILogger _logger;
-
-        /// <summary>
-        /// Instantiates a new <see cref="SalesforceResultCreator"/> instance.
-        /// </summary>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public SalesforceResultCreator(ILoggerFactory loggerFactory)
-        {
-            _logger = loggerFactory.CreateLogger<SalesforceResultCreator>();
-        }
-
         /// <inheritdoc />
         public async Task<ContentResult> GetFailedResultAsync(string message)
         {
@@ -82,12 +70,6 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             if (content == null)
             {
                 var assemblyName = assembly.GetName().Name;
-                _logger.LogCritical(
-                    3,
-                    "No '{0}' embedded resource found in the '{1}' assembly.",
-                    resourceName,
-                    assemblyName);
-
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.ResultCreator_MissingResource,

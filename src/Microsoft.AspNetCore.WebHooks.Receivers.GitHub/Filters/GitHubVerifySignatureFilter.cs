@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -95,12 +95,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         GitHubConstants.SignatureHeaderKey,
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.LogError(
-                        1,
-                        "Invalid '{HeaderName}' header value. Expecting a value of '{Key}={Value}'.",
-                        GitHubConstants.SignatureHeaderName,
-                        GitHubConstants.SignatureHeaderKey,
-                        "<value>");
+                    Logger.LogWarning(
+                        0,
+                        $"Invalid '{GitHubConstants.SignatureHeaderName}' header value. Expecting a value of " +
+                        $"'{GitHubConstants.SignatureHeaderKey}=<value>'.");
 
                     var message = string.Format(
                         CultureInfo.CurrentCulture,

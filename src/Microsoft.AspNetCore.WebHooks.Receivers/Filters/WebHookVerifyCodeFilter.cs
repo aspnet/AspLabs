@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -121,12 +121,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var code = request.Query[WebHookConstants.CodeQueryParameterName];
             if (StringValues.IsNullOrEmpty(code))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     400,
-                    "A '{ReceiverName}' WebHook verification request must contain a '{ParameterName}' query " +
+                    "A '{ReceiverName}' WebHook verification request must contain a " +
+                    $"'{WebHookConstants.CodeQueryParameterName}' query " +
                     "parameter.",
-                    receiverName,
-                    WebHookConstants.CodeQueryParameterName);
+                    receiverName);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -150,11 +150,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             if (!SecretEqual(code, secretKey))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     401,
-                    "The '{ParameterName}' query parameter provided in the HTTP request did not match the " +
-                    "expected value.",
-                    WebHookConstants.CodeQueryParameterName);
+                    $"The '{WebHookConstants.CodeQueryParameterName}' query parameter provided in the HTTP request " +
+                    "did not match the expected value.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,

@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -197,10 +197,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 if (keyValuePair.Count != 2)
                 {
                     // Header is not formatted correctly.
-                    Logger.LogError(
-                        2,
-                        "The '{HeaderName}' header value is invalid. '{InvalidPair}' should be a 'key=value' pair.",
-                        StripeConstants.SignatureHeaderName,
+                    Logger.LogWarning(
+                        0,
+                        $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. '{{InvalidPair}}' " +
+                        "should be a 'key=value' pair.",
                         pair);
 
                     var message = string.Format(
@@ -228,20 +228,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             if (!hasSignature)
             {
-                Logger.LogError(
-                    3,
-                    "The '{HeaderName}' header value is invalid. Does not contain a timestamp ('{Key}') value.",
-                    StripeConstants.SignatureHeaderName,
-                    StripeConstants.SignatureKey);
+                Logger.LogWarning(
+                    1,
+                    $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. Does not contain a " +
+                    $"timestamp ('{StripeConstants.SignatureKey}') value.");
             }
 
             if (!hasTimestamp)
             {
-                Logger.LogError(
-                    4,
-                    "The '{HeaderName}' header value is invalid. Does not contain a signature ('{Key}') value.",
-                    StripeConstants.SignatureHeaderName,
-                    StripeConstants.TimestampKey);
+                Logger.LogWarning(
+                    2,
+                    $"The '{StripeConstants.SignatureHeaderName}' header value is invalid. Does not contain a " +
+                    $"signature ('{StripeConstants.TimestampKey}') value.");
             }
 
             if (!hasSignature || !hasTimestamp)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.DateTime_NullError,
-                    nameof(DateTime));
+                    typeof(DateTime));
                 throw new InvalidOperationException(message);
             }
 
@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
                         CultureInfo.CurrentCulture,
                         Resources.DateTime_BadFormat,
                         reader.Value,
-                        nameof(DateTime));
+                        typeof(DateTime));
                     throw new InvalidOperationException(message);
                 }
             }
@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
                     CultureInfo.CurrentCulture,
                     Resources.DateTime_BadFormat,
                     reader.Value,
-                    nameof(DateTime));
+                    typeof(DateTime));
                 throw new InvalidOperationException(message);
             }
 

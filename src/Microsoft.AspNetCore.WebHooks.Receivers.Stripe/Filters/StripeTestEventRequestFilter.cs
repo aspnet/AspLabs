@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 var passThroughString = _configuration[StripeConstants.PassThroughTestEventsConfigurationKey];
                 if (bool.TryParse(passThroughString, out var passThrough) && passThrough)
                 {
-                    _logger.LogInformation(0, "Received a Stripe Test Event.");
+                    _logger.LogDebug(0, "Received a Stripe Test Event.");
                 }
                 else
                 {

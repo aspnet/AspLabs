@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.Extensions.Logging;
@@ -28,8 +28,8 @@ namespace PusherCoreReceiver.Controllers
             var createdAt = DateTimeOffset.FromUnixTimeMilliseconds(createdAtUnix);
             _logger.LogInformation(
                 0,
-                "{ControllerName} received {Count} notifications and {EventCount} events created at '{CreatedAt}'.",
-                nameof(PusherController),
+                $"{nameof(PusherController)} / 'It' received {{Count}} notifications and {{EventCount}} events " +
+                "created at '{CreatedAt}'.",
                 data.Events.Count,
                 eventNames.Length,
                 createdAt.ToString("o"));
@@ -71,12 +71,12 @@ namespace PusherCoreReceiver.Controllers
                 }
                 else
                 {
-                    _logger.LogError(
+                    _logger.LogWarning(
                         4,
-                        "Event {EventNumber} has {Count} properties but does not contain a {PropertyName} property.",
+                        "Event {EventNumber} has {Count} properties but does not contain a " +
+                        $"{PusherConstants.EventNamePropertyName} property.",
                         index,
-                        @event.Count,
-                        PusherConstants.EventNamePropertyName);
+                        @event.Count);
                 }
 
                 index++;
@@ -99,9 +99,8 @@ namespace PusherCoreReceiver.Controllers
             var events = data.Value<JArray>(PusherConstants.EventRequestPropertyContainerName);
             _logger.LogInformation(
                 5,
-                "{ControllerName} / '{Id}' received {Count} notifications and {EventCount} events created at " +
-                "'{CreatedAt}'.",
-                nameof(PusherController),
+                $"{nameof(PusherController)} / '{{Id}}' received {{Count}} notifications and {{EventCount}} events " +
+                "created at '{CreatedAt}'.",
                 id,
                 events.Count,
                 eventNames.Length,
@@ -147,12 +146,12 @@ namespace PusherCoreReceiver.Controllers
                 }
                 else
                 {
-                    _logger.LogError(
+                    _logger.LogWarning(
                         9,
-                        "Event {EventNumber} has {Count} properties but does not contain a {PropertyName} property.",
+                        "Event {EventNumber} has {Count} properties but does not contain a " +
+                        $"{PusherConstants.EventNamePropertyName} property.",
                         index,
-                        @event.Count,
-                        PusherConstants.EventNamePropertyName);
+                        @event.Count);
                 }
 
                 index++;

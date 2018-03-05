@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -106,10 +106,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             string token = data[SlackConstants.TokenRequestFieldName];
             if (string.IsNullOrEmpty(token))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     0,
-                    "The HTTP request body did not contain a required '{PropertyName}' property.",
-                    SlackConstants.TokenRequestFieldName);
+                    $"The HTTP request body did not contain a required '{SlackConstants.TokenRequestFieldName}' " +
+                    "property.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -128,10 +128,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             if (!SecretEqual(token, secretKey))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     1,
-                    "The '{PropertyName}' value provided in the HTTP request body did not match the expected value.",
-                    SlackConstants.TokenRequestFieldName);
+                    $"The '{SlackConstants.TokenRequestFieldName}' value provided in the HTTP request body did not " +
+                    "match the expected value.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -163,13 +163,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             if (string.IsNullOrEmpty(eventName))
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     2,
-                    "The HTTP request body did not contain a required '{PropertyName1}', '{PropertyName2}', or " +
-                    "'{PropertyName3}' property.",
-                    SlackConstants.TriggerRequestFieldName,
-                    SlackConstants.CommandRequestFieldName,
-                    SlackConstants.TextRequestFieldName);
+                    $"The HTTP request body did not contain a required '{SlackConstants.TriggerRequestFieldName}', " +
+                    $"'{SlackConstants.CommandRequestFieldName}', or '{SlackConstants.TextRequestFieldName}' " +
+                    "property.");
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,

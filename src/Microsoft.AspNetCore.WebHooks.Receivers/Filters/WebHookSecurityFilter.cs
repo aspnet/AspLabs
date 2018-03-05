@@ -140,13 +140,11 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // Require HTTPS.
             if (!request.IsHttps)
             {
-                Logger.LogError(
+                Logger.LogWarning(
                     500,
-                    "The '{ReceiverName}' WebHook receiver requires {UpperSchemeName} in order to be secure. " +
-                    "Register a WebHook URI of type '{SchemeName}'.",
-                    receiverName,
-                    Uri.UriSchemeHttps.ToUpper(),
-                    Uri.UriSchemeHttps);
+                    "The '{ReceiverName}' WebHook receiver requires SSL/TLS in order to be secure. Register a " +
+                    $"WebHook URI of type '{Uri.UriSchemeHttps}'.",
+                    receiverName);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
@@ -200,6 +198,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var secrets = GetSecretKeys(sectionKey, routeData);
             if (!secrets.Exists())
             {
+                // Have already logged about this case.
                 return null;
             }
 
@@ -207,6 +206,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             if (secret == null)
             {
                 // Strange case: User incorrectly configured this id with sub-keys.
+                Logger.LogError(
+                    501,
+                    "Found a corrupted configuration for the '{ReceiverName}' WebHook receiver.",
+                    sectionKey);
                 return null;
             }
 
@@ -214,15 +217,6 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 // Secrete key found but it does not meet the length requirements.
                 routeData.TryGetWebHookReceiverId(out var id);
-                Logger.LogCritical(
-                    501,
-                    "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver, instance " +
-                    "'{Id}'. The value must be between {MinLength} and {MaxLength} characters long.",
-                    sectionKey,
-                    id,
-                    minLength,
-                    maxLength);
-
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.Security_BadSecret,
@@ -274,19 +268,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 if (!HasSecretKeys(Configuration, sectionKey))
                 {
                     // No secret key configuration for this receiver at all.
-                    Logger.LogCritical(
-                        502,
-                        "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver.",
-                        sectionKey);
-
                     var message = string.Format(CultureInfo.CurrentCulture, Resources.Security_NoSecrets, sectionKey);
                     throw new InvalidOperationException(message);
                 }
 
-                // ID was not configured or the key length is invalid. Caller should treat null return value with a
-                // Not Found response.
-                Logger.LogError(
-                    503,
+                // ID was not configured. Caller should treat null return value with a Not Found response.
+                Logger.LogWarning(
+                    502,
                     "Could not find a valid configuration for the '{ReceiverName}' WebHook receiver, instance '{Id}'.",
                     sectionKey,
                     id);

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EventConstraints_NoReceiverName" xml:space="preserve">
-    <value>Invalid WebHook constraint configuration encountered. '{0}' executed though request contained no receiver name and '{1}' should have disallowed the request.</value>
+    <value>Invalid WebHook constraint configuration encountered. Request contained no receiver name and '{0}' should have disallowed the request.</value>
   </data>
   <data name="EventMapper_NoBodyProperty" xml:space="preserve">
     <value>A '{0}' WebHook request must contain a match for '{1}' in the HTTP request entity body indicating the type or types of event.</value>

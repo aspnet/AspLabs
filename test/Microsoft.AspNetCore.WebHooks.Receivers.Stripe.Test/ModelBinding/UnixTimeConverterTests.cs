@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
             var ex = Assert.Throws<InvalidOperationException>(() => JsonConvert.DeserializeObject<TestClass>(input));
 
             // Assert
-            Assert.Equal("Cannot convert null value to type 'DateTime'.", ex.Message);
+            Assert.Equal("Cannot convert null value to type 'System.DateTime'.", ex.Message);
         }
 
         [Theory]
