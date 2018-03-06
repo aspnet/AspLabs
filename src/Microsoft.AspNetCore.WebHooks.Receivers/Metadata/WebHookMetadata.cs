@@ -3,6 +3,8 @@
 
 using System;
 using Microsoft.AspNetCore.WebHooks.Properties;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
 {
@@ -42,6 +44,49 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
             }
 
             return string.Equals(ReceiverName, receiverName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Register <typeparamref name="TService"/> as all metadata interfaces it implements (always including
+        /// <see cref="IWebHookBodyTypeMetadataService"/>) in <paramref name="services"/>.
+        /// </summary>
+        /// <typeparam name="TService">The <see cref="IWebHookMetadata"/> type to register.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
+        public static void Register<TService>(IServiceCollection services)
+            where TService : class, IWebHookBodyTypeMetadataService
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookBodyTypeMetadataService, TService>());
+
+            var type = typeof(TService);
+            if (typeof(IWebHookBindingMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookBindingMetadata), type));
+            }
+
+            if (typeof(IWebHookEventFromBodyMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookEventFromBodyMetadata), type));
+            }
+
+            if (typeof(IWebHookEventMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookEventMetadata), type));
+            }
+
+            if (typeof(IWebHookGetHeadRequestMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookGetHeadRequestMetadata), type));
+            }
+
+            if (typeof(IWebHookPingRequestMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookPingRequestMetadata), type));
+            }
+
+            if (typeof(IWebHookVerifyCodeMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookVerifyCodeMetadata), type));
+            }
         }
     }
 }

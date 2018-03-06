@@ -37,29 +37,33 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     public class WebHookEventMapperFilter : IAsyncResourceFilter
     {
         private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _bodyTypeMetadata;
-        private readonly IReadOnlyList<IWebHookEventFromBodyMetadata> _eventMetadata;
+        private readonly IReadOnlyList<IWebHookEventFromBodyMetadata> _eventFromBodyMetadata;
         private readonly ILogger _logger;
         private readonly IWebHookRequestReader _requestReader;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookEventMapperFilter"/> instance with the given
-        /// <paramref name="loggerFactory"/>, <paramref name="metadata"/> and <paramref name="requestReader"/>.
+        /// Instantiates a new <see cref="WebHookEventMapperFilter"/> instance.
         /// </summary>
-        /// <param name="loggerFactory">The <see creFf="ILoggerFactory"/>.</param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
+        /// <param name="bodyTypeMetadata">
+        /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services.
+        /// </param>
+        /// <param name="eventFromBodyMetadata">
+        /// The collection of <see cref="IWebHookEventFromBodyMetadata"/> services.
+        /// </param>
         /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
+        /// <param name="loggerFactory">The <see creFf="ILoggerFactory"/>.</param>
         public WebHookEventMapperFilter(
-            ILoggerFactory loggerFactory,
-            IEnumerable<IWebHookMetadata> metadata,
-            IWebHookRequestReader requestReader)
+            IEnumerable<IWebHookBodyTypeMetadataService> bodyTypeMetadata,
+            IEnumerable<IWebHookEventFromBodyMetadata> eventFromBodyMetadata,
+            IWebHookRequestReader requestReader,
+            ILoggerFactory loggerFactory)
         {
-            _eventMetadata = metadata.OfType<IWebHookEventFromBodyMetadata>().ToArray();
+            _eventFromBodyMetadata = eventFromBodyMetadata.ToArray();
 
             // No need to track metadata unless it's applicable in this filter.
-            _bodyTypeMetadata = metadata
-                .OfType<IWebHookBodyTypeMetadataService>()
-                .Where(bodyTypeMetadata => _eventMetadata.Any(
-                    eventMetadata => eventMetadata.IsApplicable(bodyTypeMetadata.ReceiverName)))
+            _bodyTypeMetadata = bodyTypeMetadata
+                .Where(bodyMetadata => _eventFromBodyMetadata.Any(
+                    eventMetadata => eventMetadata.IsApplicable(bodyMetadata.ReceiverName)))
                 .ToArray();
 
             _logger = loggerFactory.CreateLogger<WebHookEventMapperFilter>();
@@ -117,8 +121,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            var eventMetadata = _eventMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-            if (eventMetadata == null)
+            var eventFromBodyMetadata = _eventFromBodyMetadata
+                .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
+            if (eventFromBodyMetadata == null)
             {
                 await next();
                 return;
@@ -138,7 +143,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         return;
                     }
 
-                    eventNames = form[eventMetadata.BodyPropertyPath];
+                    eventNames = form[eventFromBodyMetadata.BodyPropertyPath];
                     break;
 
                 case WebHookBodyType.Json:
@@ -160,7 +165,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         return;
                     }
 
-                    eventNames = ObjectPathUtilities.GetStringValues(json, eventMetadata.BodyPropertyPath);
+                    eventNames = ObjectPathUtilities.GetStringValues(json, eventFromBodyMetadata.BodyPropertyPath);
                     break;
 
                 case WebHookBodyType.Xml:
@@ -182,7 +187,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                         return;
                     }
 
-                    eventNames = ObjectPathUtilities.GetStringValues(xml, eventMetadata.BodyPropertyPath);
+                    eventNames = ObjectPathUtilities.GetStringValues(xml, eventFromBodyMetadata.BodyPropertyPath);
                     break;
 
                 default:
@@ -194,20 +199,20 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     throw new InvalidOperationException(message);
             }
 
-            if (StringValues.IsNullOrEmpty(eventNames) && !eventMetadata.AllowMissing)
+            if (StringValues.IsNullOrEmpty(eventNames) && !eventFromBodyMetadata.AllowMissing)
             {
                 _logger.LogError(
                     500,
                     "A '{ReceiverName}' WebHook request must contain a match for '{BodyPropertyPath}' in the HTTP " +
                     "request entity body indicating the type or types of event.",
                     receiverName,
-                    eventMetadata.BodyPropertyPath);
+                    eventFromBodyMetadata.BodyPropertyPath);
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
                     Resources.EventMapper_NoBodyProperty,
                     receiverName,
-                    eventMetadata.BodyPropertyPath);
+                    eventFromBodyMetadata.BodyPropertyPath);
                 context.Result = new BadRequestObjectResult(message);
 
                 return;

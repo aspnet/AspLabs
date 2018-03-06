@@ -26,14 +26,15 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookEventMapperConstraint"/> instance with the given
-        /// <paramref name="loggerFactory"/> and <paramref name="metadata"/>.
+        /// Instantiates a new <see cref="WebHookEventMapperConstraint"/> instance.
         /// </summary>
+        /// <param name="eventMetadata">The collection of <see cref="IWebHookEventMetadata"/> services.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookEventMapperConstraint(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
+        public WebHookEventMapperConstraint(
+            IEnumerable<IWebHookEventMetadata> eventMetadata,
+            ILoggerFactory loggerFactory)
         {
-            _eventMetadata = metadata.OfType<IWebHookEventMetadata>().ToArray();
+            _eventMetadata = eventMetadata.ToArray();
             _logger = loggerFactory.CreateLogger<WebHookEventMapperConstraint>();
         }
 

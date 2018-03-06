@@ -31,6 +31,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
         /// </param>
+        /// <param name="getHeadRequestMetadata">
+        /// The collection of <see cref="IWebHookGetHeadRequestMetadata"/> services.
+        /// </param>
         /// <param name="hostingEnvironment">
         /// The <see cref="IHostingEnvironment" /> used to initialize
         /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
@@ -38,15 +41,14 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
         public WebHookGetHeadRequestFilter(
             IConfiguration configuration,
+            IEnumerable<IWebHookGetHeadRequestMetadata> getHeadRequestMetadata,
             IHostingEnvironment hostingEnvironment,
-            ILoggerFactory loggerFactory,
-            IEnumerable<IWebHookMetadata> metadata)
+            ILoggerFactory loggerFactory)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _getHeadRequestMetadata = metadata.OfType<IWebHookGetHeadRequestMetadata>().ToArray();
+            _getHeadRequestMetadata = getHeadRequestMetadata.ToArray();
         }
 
         /// <summary>

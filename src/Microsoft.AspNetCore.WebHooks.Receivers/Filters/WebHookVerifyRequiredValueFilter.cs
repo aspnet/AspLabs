@@ -34,18 +34,20 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </remarks>
     public class WebHookVerifyRequiredValueFilter : IResourceFilter
     {
-        private readonly ILogger _logger;
         private readonly IReadOnlyList<IWebHookBindingMetadata> _bindingMetadata;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyRequiredValueFilter"/> instance.
         /// </summary>
+        /// <param name="bindingMetadata">The collection of <see cref="IWebHookBindingMetadata"/> services.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookVerifyRequiredValueFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
+        public WebHookVerifyRequiredValueFilter(
+            IEnumerable<IWebHookBindingMetadata> bindingMetadata,
+            ILoggerFactory loggerFactory)
         {
+            _bindingMetadata = bindingMetadata.ToArray();
             _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
-            _bindingMetadata = metadata.OfType<IWebHookBindingMetadata>().ToArray();
         }
 
         /// <summary>

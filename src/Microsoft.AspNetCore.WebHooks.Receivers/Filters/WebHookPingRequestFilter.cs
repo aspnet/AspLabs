@@ -18,17 +18,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     public class WebHookPingRequestFilter : IResourceFilter
     {
         private readonly ILogger _logger;
-        private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingMetadata;
+        private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingRequestMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookPingRequestFilter"/> instance.
         /// </summary>
+        /// <param name="pingRequestMetadata">
+        /// The collection of <see cref="IWebHookPingRequestMetadata"/> services.
+        /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        public WebHookPingRequestFilter(ILoggerFactory loggerFactory, IEnumerable<IWebHookMetadata> metadata)
+        public WebHookPingRequestFilter(
+            IEnumerable<IWebHookPingRequestMetadata> pingRequestMetadata,
+            ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<WebHookPingRequestFilter>();
-            _pingMetadata = metadata.OfType<IWebHookPingRequestMetadata>().ToArray();
+            _pingRequestMetadata = pingRequestMetadata.ToArray();
         }
 
         /// <summary>
@@ -72,21 +76,20 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var routeData = context.RouteData;
             if (routeData.TryGetWebHookReceiverName(out var receiverName))
             {
-                var pingMetadata = _pingMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-                if (pingMetadata != null &&
-                    routeData.TryGetWebHookEventName(out var eventName))
-                {
-                    // If this is a ping request, short-circuit further processing.
-                    if (string.Equals(eventName, pingMetadata.PingEventName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        _logger.LogInformation(
-                            0,
-                            "Received a Ping Event for the '{ReceiverName}' WebHook receiver -- ignoring.",
-                            receiverName);
+                var pingRequestMetadata = _pingRequestMetadata
+                    .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
 
-                        context.Result = new OkResult();
-                        return;
-                    }
+                // If this is a ping request, short-circuit further processing.
+                if (pingRequestMetadata != null &&
+                    routeData.TryGetWebHookEventName(out var eventName) &&
+                    string.Equals(eventName, pingRequestMetadata.PingEventName, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogInformation(
+                        0,
+                        "Received a Ping Event for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                        receiverName);
+
+                    context.Result = new OkResult();
                 }
             }
         }

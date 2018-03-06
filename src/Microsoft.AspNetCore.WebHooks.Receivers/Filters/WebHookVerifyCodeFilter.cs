@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class WebHookVerifyCodeFilter : WebHookSecurityFilter, IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _codeVerifierMetadata;
+        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _verifyCodeMetadata;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance.
@@ -37,18 +37,20 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="IHostingEnvironment" /> used to initialize
         /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
         /// </param>
+        /// <param name="verifyCodeMetadata">
+        /// The collection of <see cref="IWebHookVerifyCodeMetadata"/> services.
+        /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
         public WebHookVerifyCodeFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
-            ILoggerFactory loggerFactory,
-            IEnumerable<IWebHookMetadata> metadata)
+            IEnumerable<IWebHookVerifyCodeMetadata> verifyCodeMetadata,
+            ILoggerFactory loggerFactory)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _codeVerifierMetadata = metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray();
+            _verifyCodeMetadata = verifyCodeMetadata.ToArray();
         }
 
         /// <inheritdoc />
@@ -61,7 +63,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             var routeData = context.RouteData;
             if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
-                _codeVerifierMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
+                _verifyCodeMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
             {
                 var result = EnsureValidCode(context.HttpContext.Request, routeData, receiverName);
                 if (result != null)

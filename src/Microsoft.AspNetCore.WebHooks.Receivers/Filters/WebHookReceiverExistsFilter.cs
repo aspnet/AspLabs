@@ -23,18 +23,21 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class WebHookReceiverExistsFilter : IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _codeVerifierMetadata;
+        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _verifyCodeMetadata;
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookReceiverExistsFilter"/> with the given
-        /// <paramref name="loggerFactory"/>.
+        /// Instantiates a new <see cref="WebHookReceiverExistsFilter"/> instance.
         /// </summary>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
+        /// <param name="verifyCodeMetadata">
+        /// The collection of <see cref="IWebHookVerifyCodeMetadata"/> services.
+        /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public WebHookReceiverExistsFilter(IEnumerable<IWebHookMetadata> metadata, ILoggerFactory loggerFactory)
+        public WebHookReceiverExistsFilter(
+            IEnumerable<IWebHookVerifyCodeMetadata> verifyCodeMetadata,
+            ILoggerFactory loggerFactory)
         {
-            _codeVerifierMetadata = metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray();
+            _verifyCodeMetadata = verifyCodeMetadata.ToArray();
             _logger = loggerFactory.CreateLogger<WebHookReceiverExistsFilter>();
         }
 
@@ -82,7 +85,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // Check for receiver-specific filters only for receivers that do _not_ use code verification.
-                if (!_codeVerifierMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
+                if (!_verifyCodeMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
                 {
                     var found = false;
                     for (var i = 0; i < context.Filters.Count; i++)

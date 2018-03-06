@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -27,39 +27,60 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         private readonly IReadOnlyList<IWebHookBindingMetadata> _bindingMetadata;
         private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _bodyTypeMetadata;
         private readonly IReadOnlyList<IWebHookEventMetadata> _eventMetadata;
-        private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingMetadata;
+        private readonly IReadOnlyList<IWebHookPingRequestMetadata> _pingRequestMetadata;
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookMetadataProvider"/> with the given <paramref name="metadata"/>.
+        /// Instantiates a new <see cref="WebHookMetadataProvider"/> instance with the given metadata.
         /// </summary>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
+        /// <param name="bindingMetadata">The collection of <see cref="IWebHookBindingMetadata"/> services.</param>
+        /// <param name="bodyTypeMetadata">
+        /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services.
+        /// </param>
+        /// <param name="eventFromBodyMetadata">
+        /// The collection of <see cref="IWebHookEventFromBodyMetadata"/> services.
+        /// </param>
+        /// <param name="eventMetadata">The collection of <see cref="IWebHookEventMetadata"/> services.</param>
+        /// <param name="getHeadRequestMetadata">
+        /// The collection of <see cref="IWebHookGetHeadRequestMetadata"/> services.
+        /// </param>
+        /// <param name="pingRequestMetadata">
+        /// The collection of <see cref="IWebHookPingRequestMetadata"/> services.
+        /// </param>
+        /// <param name="verifyCodeMetadata">
+        /// The collection of <see cref="IWebHookVerifyCodeMetadata"/> services.
+        /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public WebHookMetadataProvider(IEnumerable<IWebHookMetadata> metadata, ILoggerFactory loggerFactory)
+        public WebHookMetadataProvider(
+            IEnumerable<IWebHookBindingMetadata> bindingMetadata,
+            IEnumerable<IWebHookBodyTypeMetadataService> bodyTypeMetadata,
+            IEnumerable<IWebHookEventFromBodyMetadata> eventFromBodyMetadata,
+            IEnumerable<IWebHookEventMetadata> eventMetadata,
+            IEnumerable<IWebHookGetHeadRequestMetadata> getHeadRequestMetadata,
+            IEnumerable<IWebHookPingRequestMetadata> pingRequestMetadata,
+            IEnumerable<IWebHookVerifyCodeMetadata> verifyCodeMetadata,
+            ILoggerFactory loggerFactory)
         {
-            _bindingMetadata = metadata.OfType<IWebHookBindingMetadata>().ToArray();
-            _bodyTypeMetadata = metadata.OfType<IWebHookBodyTypeMetadataService>().ToArray();
-            _eventMetadata = metadata.OfType<IWebHookEventMetadata>().ToArray();
-            _pingMetadata = metadata.OfType<IWebHookPingRequestMetadata>().ToArray();
+            _bindingMetadata = bindingMetadata.ToArray();
+            _bodyTypeMetadata = bodyTypeMetadata.ToArray();
+            _eventMetadata = eventMetadata.ToArray();
+            _pingRequestMetadata = pingRequestMetadata.ToArray();
             _logger = loggerFactory.CreateLogger<WebHookMetadataProvider>();
 
             // Check for duplicate registrations in the collections tracked here.
             EnsureUniqueRegistrations(_bindingMetadata);
             EnsureUniqueRegistrations(_bodyTypeMetadata);
             EnsureUniqueRegistrations(_eventMetadata);
-            EnsureUniqueRegistrations(_pingMetadata);
+            EnsureUniqueRegistrations(_pingRequestMetadata);
 
             // Check for duplicates in other metadata registrations.
-            var eventFromBodyMetadata = metadata.OfType<IWebHookEventFromBodyMetadata>().ToArray();
-            EnsureUniqueRegistrations(eventFromBodyMetadata);
-            EnsureUniqueRegistrations(metadata.OfType<IWebHookGetHeadRequestMetadata>().ToArray());
-            EnsureUniqueRegistrations(metadata.OfType<IWebHookVerifyCodeMetadata>().ToArray());
+            var eventFromBodyMetadataArray = eventFromBodyMetadata.ToArray();
+            EnsureUniqueRegistrations(eventFromBodyMetadataArray);
+            EnsureUniqueRegistrations(getHeadRequestMetadata.ToArray());
+            EnsureUniqueRegistrations(verifyCodeMetadata.ToArray());
 
-            // Check for IWebHookBodyTypeMetadata services that do not also implement IWebHookReceiver.
-            EnsureValidBodyTypeMetadata(metadata);
-
-            EnsureValidEventFromBodyMetadata(eventFromBodyMetadata, _bodyTypeMetadata);
-            EnsureValidEventFromBodyMetadata(eventFromBodyMetadata, _eventMetadata);
+            EnsureValidEventFromBodyMetadata(eventFromBodyMetadataArray, _bodyTypeMetadata);
+            EnsureValidEventFromBodyMetadata(eventFromBodyMetadataArray, _eventMetadata);
         }
 
         /// <summary>
@@ -124,7 +145,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 // Pass along all IWebHookEventMetadata and IWebHookPingRequestMetadata instances.
                 eventMetadata = null;
                 action.Properties[typeof(IWebHookEventMetadata)] = _eventMetadata;
-                action.Properties[typeof(IWebHookPingRequestMetadata)] = _pingMetadata;
+                action.Properties[typeof(IWebHookPingRequestMetadata)] = _pingRequestMetadata;
             }
             else
             {
@@ -134,10 +155,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     action.Properties[typeof(IWebHookEventMetadata)] = eventMetadata;
                 }
 
-                var pingMetadata = _pingMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-                if (pingMetadata != null)
+                var pingRequestMetadata = _pingRequestMetadata
+                    .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
+                if (pingRequestMetadata != null)
                 {
-                    action.Properties[typeof(IWebHookPingRequestMetadata)] = pingMetadata;
+                    action.Properties[typeof(IWebHookPingRequestMetadata)] = pingRequestMetadata;
                 }
             }
 
@@ -217,46 +239,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             }
 
             action.Properties[typeof(IWebHookBodyTypeMetadata)] = bodyTypeMetadata;
-        }
-
-        /// <summary>
-        /// Ensure <see cref="IWebHookBodyTypeMetadata"/> registrations in given <paramref name="metadata"/> are valid.
-        /// That is, confirm all such metadata also implements <see cref="IWebHookBodyTypeMetadataService"/>.
-        /// </summary>
-        /// <param name="metadata">The collection of <see cref="IWebHookMetadata"/> services.</param>
-        protected void EnsureValidBodyTypeMetadata(IEnumerable<IWebHookMetadata> metadata)
-        {
-            if (metadata == null)
-            {
-                throw new ArgumentNullException(nameof(metadata));
-            }
-
-            var nonServiceTypeNames = metadata
-                .Where(item => item is IWebHookBodyTypeMetadata && !(item is IWebHookBodyTypeMetadataService))
-                .Select(item => item.GetType().Name)
-                .Distinct();
-
-            var invalidRegistrations = false;
-            foreach (var typeName in nonServiceTypeNames)
-            {
-                invalidRegistrations = true;
-                _logger.LogCritical(
-                    3,
-                    "'{ConcreteType}' implements '{MetadataType}' but not '{ServiceType}'.",
-                    typeName,
-                    typeof(IWebHookBodyTypeMetadata),
-                    typeof(IWebHookBodyTypeMetadataService));
-            }
-
-            if (invalidRegistrations)
-            {
-                var message = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.MetadataProvider_WrongInterface,
-                    typeof(IWebHookBodyTypeMetadata),
-                    typeof(IWebHookBodyTypeMetadataService));
-                throw new InvalidOperationException(message);
-            }
         }
 
         /// <summary>
