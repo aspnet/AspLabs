@@ -5,16 +5,15 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Methods to add services for the Trello receiver.
     /// </summary>
-    public static class TrelloServiceCollectionSetup
+    internal static class TrelloServiceCollectionSetup
     {
         /// <summary>
         /// Add services for the Trello receiver.

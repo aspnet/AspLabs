@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Properties;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// The default <see cref="ISalesforceResultCreator"/> implementation.
     /// </summary>
-    public class SalesforceResultCreator : ISalesforceResultCreator
+    internal class SalesforceResultCreator : ISalesforceResultCreator
     {
         /// <inheritdoc />
         public async Task<ContentResult> GetFailedResultAsync(string message)

@@ -5,22 +5,21 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the Slack receiver.
+    /// Methods to add services for the Stripe receiver.
     /// </summary>
-    public static class SlackServiceCollectionSetup
+    internal static class StripeServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Slack receiver.
+        /// Add services for the Stripe receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddSlackServices(IServiceCollection services)
+        public static void AddStripeServices(IServiceCollection services)
         {
             if (services == null)
             {
@@ -28,9 +27,11 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             }
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-            WebHookMetadata.Register<SlackMetadata>(services);
+            WebHookMetadata.Register<StripeMetadata>(services);
 
-            services.TryAddSingleton<SlackVerifyTokenFilter>();
+            services.TryAddSingleton<StripeTestEventRequestFilter>();
+            services.TryAddSingleton<StripeVerifyNotificationIdFilter>();
+            services.TryAddSingleton<StripeVerifySignatureFilter>();
         }
 
         private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
@@ -43,7 +44,10 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
                     throw new ArgumentNullException(nameof(options));
                 }
 
-                options.Filters.AddService<SlackVerifyTokenFilter>(WebHookSecurityFilter.Order);
+                var filters = options.Filters;
+                filters.AddService<StripeTestEventRequestFilter>(StripeTestEventRequestFilter.Order);
+                filters.AddService<StripeVerifyNotificationIdFilter>(StripeVerifyNotificationIdFilter.Order);
+                filters.AddService<StripeVerifySignatureFilter>(WebHookSecurityFilter.Order);
             }
         }
     }

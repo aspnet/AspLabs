@@ -5,22 +5,21 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the Dropbox receiver.
+    /// Methods to add services for the Slack receiver.
     /// </summary>
-    public static class DropboxServiceCollectionSetup
+    internal static class SlackServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Dropbox receiver.
+        /// Add services for the Slack receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddDropboxServices(IServiceCollection services)
+        public static void AddSlackServices(IServiceCollection services)
         {
             if (services == null)
             {
@@ -28,9 +27,9 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
             }
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-            WebHookMetadata.Register<DropboxMetadata>(services);
+            WebHookMetadata.Register<SlackMetadata>(services);
 
-            services.TryAddSingleton<DropboxVerifySignatureFilter>();
+            services.TryAddSingleton<SlackVerifyTokenFilter>();
         }
 
         private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
@@ -43,7 +42,7 @@ namespace Microsoft.AspNetCore.WebHooks.Internal
                     throw new ArgumentNullException(nameof(options));
                 }
 
-                options.Filters.AddService<DropboxVerifySignatureFilter>(WebHookSecurityFilter.Order);
+                options.Filters.AddService<SlackVerifyTokenFilter>(WebHookSecurityFilter.Order);
             }
         }
     }

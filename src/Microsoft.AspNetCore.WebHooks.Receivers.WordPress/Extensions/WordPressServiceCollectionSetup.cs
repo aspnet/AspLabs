@@ -3,27 +3,26 @@
 
 using System;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the Bitbucket receiver.
+    /// Methods to add services for the WordPress receiver.
     /// </summary>
-    public static class BitbucketServiceCollectionSetup
+    internal static class WordPressServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Bitbucket receiver.
+        /// Add services for the WordPress receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddBitbucketServices(IServiceCollection services)
+        public static void AddWordPressServices(IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            WebHookMetadata.Register<BitbucketMetadata>(services);
+            WebHookMetadata.Register<WordPressMetadata>(services);
         }
     }
 }

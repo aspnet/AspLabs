@@ -5,19 +5,19 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.ApplicationModels;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Methods to add services for WebHook receivers.
     /// </summary>
-    public static class WebHookServiceCollectionSetup
+    internal static class WebHookServiceCollectionSetup
     {
         private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
         {

@@ -3,27 +3,26 @@
 
 using System;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the MailChimp receiver.
+    /// Methods to add services for the Bitbucket receiver.
     /// </summary>
-    public static class MailChimpServiceCollectionSetup
+    internal static class BitbucketServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the MailChimp receiver.
+        /// Add services for the Bitbucket receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddMailChimpServices(IServiceCollection services)
+        public static void AddBitbucketServices(IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            WebHookMetadata.Register<MailChimpMetadata>(services);
+            WebHookMetadata.Register<BitbucketMetadata>(services);
         }
     }
 }

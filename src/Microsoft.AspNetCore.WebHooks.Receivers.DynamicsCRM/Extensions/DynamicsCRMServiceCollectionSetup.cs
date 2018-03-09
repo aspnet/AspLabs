@@ -3,27 +3,26 @@
 
 using System;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the Kudu receiver.
+    /// Methods to add services for the Dynamics CRM receiver.
     /// </summary>
-    public static class KuduServiceCollectionSetup
+    internal static class DynamicsCRMServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Kudu receiver.
+        /// Add services for the Dynamics CRM receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddKuduServices(IServiceCollection services)
+        public static void AddDynamicsCRMServices(IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            WebHookMetadata.Register<KuduMetadata>(services);
+            WebHookMetadata.Register<DynamicsCRMMetadata>(services);
         }
     }
 }

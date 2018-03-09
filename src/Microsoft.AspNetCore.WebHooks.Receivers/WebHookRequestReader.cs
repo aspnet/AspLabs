@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -14,12 +14,12 @@ using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// The default <see cref="IWebHookRequestReader"/> implementation.
     /// </summary>
-    public class WebHookRequestReader : IWebHookRequestReader
+    internal class WebHookRequestReader : IWebHookRequestReader
     {
         private readonly IModelBinder _bodyModelBinder;
         private readonly IModelMetadataProvider _metadataProvider;

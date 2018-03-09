@@ -3,27 +3,26 @@
 
 using System;
 using Microsoft.AspNetCore.WebHooks.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.WebHooks.Internal
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Methods to add services for the Azure Alert receiver.
+    /// Methods to add services for the MailChimp receiver.
     /// </summary>
-    public static class AzureAlertServiceCollectionSetup
+    internal static class MailChimpServiceCollectionSetup
     {
         /// <summary>
-        /// Add services for the Azure Alert receiver.
+        /// Add services for the MailChimp receiver.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to update.</param>
-        public static void AddAzureAlertServices(IServiceCollection services)
+        public static void AddMailChimpServices(IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            WebHookMetadata.Register<AzureAlertMetadata>(services);
+            WebHookMetadata.Register<MailChimpMetadata>(services);
         }
     }
 }
