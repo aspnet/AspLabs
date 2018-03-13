@@ -1,13 +1,19 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.WebHooks.Filters;
 
 namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
     /// <para>
-    /// An <see cref="System.Attribute"/> indicating the associated action is an Azure Alert WebHook endpoint.
-    /// Specifies the optional <see cref="WebHookAttribute.Id"/>. Also adds a
-    /// <see cref="Filters.WebHookReceiverExistsFilter"/> for the action.
+    /// An <see cref="Attribute"/> indicating the associated action is an Azure Alert WebHook endpoint. Specifies the
+    /// optional <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="WebHookReceiverExistsFilter"/> and a
+    /// <see cref="ModelStateInvalidFilter"/> (unless <see cref="ApiBehaviorOptions.SuppressModelStateInvalidFilter"/>
+    /// is <see langword="true"/>) for the action.
     /// </para>
     /// <para>
     /// The signature of the action should be:

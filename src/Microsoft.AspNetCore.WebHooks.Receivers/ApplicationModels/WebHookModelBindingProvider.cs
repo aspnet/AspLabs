@@ -37,24 +37,29 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
         /// <summary>
         /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
-        /// <see cref="WebHookModelBindingProvider"/> instances. The recommended
-        /// <see cref="IApplicationModelProvider"/> order is
+        /// <see cref="WebHookModelBindingProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/>
+        /// order is
         /// <list type="number">
         /// <item>
-        /// Validate metadata services and <see cref="WebHookAttribute"/> metadata implementations and add information
-        /// used in later application model providers (in <see cref="WebHookMetadataProvider"/>).
+        /// Add <see cref="IWebHookMetadata"/> references to the <see cref="ActionModel.Properties"/> collections of
+        /// WebHook actions and validate those <see cref="IWebHookMetadata"/> attributes and services (in
+        /// <see cref="WebHookMetadataProvider"/>).
         /// </item>
         /// <item>
-        /// Add routing information (template, constraints and filters) to <see cref="ActionModel"/>s (in
-        /// <see cref="WebHookRoutingProvider"/>).
+        /// Add routing information (<see cref="SelectorModel"/> settings) to <see cref="ActionModel"/>s of WebHook
+        /// actions (in <see cref="WebHookRoutingProvider"/>).
         /// </item>
         /// <item>
-        /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s (in
-        /// this filter).
+        /// Add filters to the <see cref="ActionModel.Filters"/> collections of WebHook actions (in
+        /// <see cref="WebHookFilterProvider"/>).
+        /// </item>
+        /// <item>
+        /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s of
+        /// WebHook actions (in this provider).
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookRoutingProvider.Order + 10;
+        public static int Order => WebHookFilterProvider.Order + 10;
 
         /// <inheritdoc />
         int IApplicationModelProvider.Order => Order;
