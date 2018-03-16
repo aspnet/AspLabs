@@ -86,13 +86,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     {
                         bodyType = receiverBodyTypeMetadata.BodyType;
                     }
-                    else
+                    else if (action.Properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out bodyTypeMetadata))
                     {
-                        // Reachable only for [GeneralWebHook] cases. That attribute implements
-                        // IWebHookBodyTypeMetadata and WebHookMetadataProvider passed it along.
-                        bodyTypeMetadata = action.Properties[typeof(IWebHookBodyTypeMetadata)];
+                        // Reachable only in [GeneralWebHook(WebHookBodyType)] cases. That attribute implements
+                        // IWebHookBodyTypeMetadata and WebHookMetadataProvider passed it along because its BodyType is
+                        // not null.
                         var actionBodyTypeMetadata = (IWebHookBodyTypeMetadata)bodyTypeMetadata;
                         bodyType = actionBodyTypeMetadata.BodyType;
+                    }
+                    else
+                    {
+                        // Reachable only in [GeneralWebHook] cases. SourceData will warn if a data parameter is found.
+                        bodyType = null;
                     }
 
                     action.Properties.TryGetValue(typeof(IWebHookBindingMetadata), out var bindingMetadata);
