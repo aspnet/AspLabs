@@ -1,9 +1,11 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,8 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <summary>
     /// Base for <see cref="Attribute"/>s indicating the associated action is a WebHook endpoint. Specifies the
     /// required (in most cases) <see cref="ReceiverName"/> and optional <see cref="Id"/>. Also adds a
-    /// <see cref="WebHookReceiverExistsFilter"/> for the action.
+    /// <see cref="WebHookReceiverExistsFilter"/> and a <see cref="ModelStateInvalidFilter"/> (unless
+    /// <see cref="ApiBehaviorOptions.SuppressModelStateInvalidFilter"/> is <see langword="true"/>) for the action.
     /// </summary>
     /// <remarks>
     /// <para>

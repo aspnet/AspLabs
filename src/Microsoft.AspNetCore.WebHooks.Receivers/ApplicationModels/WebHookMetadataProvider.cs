@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 
@@ -14,11 +15,12 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
     /// <summary>
     /// <para>
     /// An <see cref="IApplicationModelProvider"/> implementation that adds <see cref="IWebHookMetadata"/>
-    /// references to WebHook <see cref="ActionModel"/>s. Metadata is stored in <see cref="ActionModel.Properties"/>
-    /// and used in <see cref="WebHookModelBindingProvider"/> and <see cref="WebHookRoutingProvider"/>.
+    /// references to <see cref="ActionModel.Properties"/> collections of WebHook actions. Later WebHook
+    /// <see cref="IApplicationModelProvider"/> implementations (<see cref="WebHookFilterProvider"/>,
+    /// <see cref="WebHookModelBindingProvider"/> and <see cref="WebHookRoutingProvider"/>) use this metadata.
     /// </para>
     /// <para>
-    /// Detects missing and duplicate <see cref="IWebHookMetadata"/> services.
+    /// Detects duplicate, missing and invalid <see cref="IWebHookMetadata"/> attributes and services.
     /// </para>
     /// </summary>
     public class WebHookMetadataProvider : IApplicationModelProvider
@@ -100,20 +102,25 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
         /// <summary>
         /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
-        /// <see cref="WebHookMetadataProvider"/> instances. The recommended <see cref="IApplicationModelProvider"/>
-        /// order is
+        /// <see cref="WebHookMetadataProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/> order
+        /// is
         /// <list type="number">
         /// <item>
-        /// Validate metadata services and <see cref="WebHookAttribute"/> metadata implementations and add information
-        /// used in later application model providers (in this provider).
+        /// Add <see cref="IWebHookMetadata"/> references to the <see cref="ActionModel.Properties"/> collections of
+        /// WebHook actions and validate those <see cref="IWebHookMetadata"/> attributes and services (in this
+        /// provider).
         /// </item>
         /// <item>
-        /// Add routing information (template, constraints and filters) to <see cref="ActionModel"/>s (in
-        /// <see cref="WebHookRoutingProvider"/>).
+        /// Add routing information (<see cref="SelectorModel"/> settings) to <see cref="ActionModel"/>s of WebHook
+        /// actions (in <see cref="WebHookRoutingProvider"/>).
         /// </item>
         /// <item>
-        /// Add model binding information (<see cref="Mvc.ModelBinding.BindingInfo"/> settings) to
-        /// <see cref="ParameterModel"/>s (in <see cref="WebHookModelBindingProvider"/>).
+        /// Add filters to the <see cref="ActionModel.Filters"/> collections of WebHook actions (in
+        /// <see cref="WebHookFilterProvider"/>).
+        /// </item>
+        /// <item>
+        /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s of
+        /// WebHook actions (in <see cref="WebHookModelBindingProvider"/>).
         /// </item>
         /// </list>
         /// </summary>

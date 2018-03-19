@@ -8,57 +8,58 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.WebHooks.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Routing;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 {
     /// <summary>
-    /// An <see cref="IActionModelConvention"/> implementation that adds routing information to WebHook actions.
+    /// An <see cref="IActionModelConvention"/> implementation that adds routing information
+    /// (<see cref="SelectorModel"/> settings, including a template and constraints) to <see cref="ActionModel"/>s of
+    /// WebHook actions.
     /// </summary>
     public class WebHookRoutingProvider : IApplicationModelProvider
     {
         private readonly WebHookReceiverExistsConstraint _existsConstraint;
         private readonly WebHookEventMapperConstraint _eventMapperConstraint;
-        private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookRoutingProvider"/> instance with the given
-        /// <paramref name="existsConstraint"/>, <paramref name="eventMapperConstraint"/> and
-        /// <paramref name="loggerFactory"/>.
+        /// <paramref name="existsConstraint"/> and <paramref name="eventMapperConstraint"/>.
         /// </summary>
         /// <param name="existsConstraint">The <see cref="WebHookReceiverExistsConstraint"/>.</param>
         /// <param name="eventMapperConstraint">The <see cref="WebHookEventMapperConstraint"/>.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         public WebHookRoutingProvider(
             WebHookReceiverExistsConstraint existsConstraint,
-            WebHookEventMapperConstraint eventMapperConstraint,
-            ILoggerFactory loggerFactory)
+            WebHookEventMapperConstraint eventMapperConstraint)
         {
             _existsConstraint = existsConstraint;
             _eventMapperConstraint = eventMapperConstraint;
-            _loggerFactory = loggerFactory;
         }
 
         /// <summary>
         /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
-        /// <see cref="WebHookRoutingProvider"/> instances. The recommended <see cref="IApplicationModelProvider"/>
-        /// order is
+        /// <see cref="WebHookRoutingProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/> order
+        /// is
         /// <list type="number">
         /// <item>
-        /// Validate metadata services and <see cref="WebHookAttribute"/> metadata implementations and add information
-        /// used in later application model providers (in <see cref="WebHookMetadataProvider"/>).
+        /// Add <see cref="IWebHookMetadata"/> references to the <see cref="ActionModel.Properties"/> collections of
+        /// WebHook actions and validate those <see cref="IWebHookMetadata"/> attributes and services (in
+        /// <see cref="WebHookMetadataProvider"/>).
         /// </item>
         /// <item>
-        /// Add routing information (template, constraints and filters) to <see cref="ActionModel"/>s (in this filter).
+        /// Add routing information (<see cref="SelectorModel"/> settings) to <see cref="ActionModel"/>s of WebHook
+        /// actions (in this provider).
         /// </item>
         /// <item>
-        /// Add model binding information (<see cref="Mvc.ModelBinding.BindingInfo"/> settings) to
-        /// <see cref="ParameterModel"/>s (in <see cref="WebHookModelBindingProvider"/>).
+        /// Add filters to the <see cref="ActionModel.Filters"/> collections of WebHook actions (in
+        /// <see cref="WebHookFilterProvider"/>).
+        /// </item>
+        /// <item>
+        /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s of
+        /// WebHook actions (in <see cref="WebHookModelBindingProvider"/>).
         /// </item>
         /// </list>
         /// </summary>
@@ -92,8 +93,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             // No-op
         }
 
-        /// <inheritdoc />
-        public void Apply(ActionModel action)
+        private void Apply(ActionModel action)
         {
             var attribute = action.Attributes.OfType<WebHookAttribute>().FirstOrDefault();
             if (attribute == null)
@@ -122,7 +122,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 
             AddConstraints(attribute, selectors);
             AddConstraints(action.Properties, selectors);
-            AddFilters(action.Properties, action.Filters);
         }
 
         // Use a constant template since all WebHook constraints use the resulting route values and we have no
@@ -219,23 +218,6 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     AddConstraint(constraint, selectors);
                 }
             }
-        }
-
-        private void AddFilters(IDictionary<object, object> properties, IList<IFilterMetadata> filters)
-        {
-            WebHookVerifyBodyTypeFilter filter;
-            var bodyTypeMetadataObject = properties[typeof(IWebHookBodyTypeMetadataService)];
-            if (bodyTypeMetadataObject is IWebHookBodyTypeMetadataService receiverBodyTypeMetadata)
-            {
-                filter = new WebHookVerifyBodyTypeFilter(receiverBodyTypeMetadata, _loggerFactory);
-            }
-            else
-            {
-                var allBodyTypeMetadata = (IReadOnlyList<IWebHookBodyTypeMetadataService>)bodyTypeMetadataObject;
-                filter = new WebHookVerifyBodyTypeFilter(allBodyTypeMetadata, _loggerFactory);
-            }
-
-            filters.Add(filter);
         }
     }
 }

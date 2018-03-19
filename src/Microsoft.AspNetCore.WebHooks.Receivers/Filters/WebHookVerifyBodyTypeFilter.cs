@@ -34,12 +34,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </remarks>
     public class WebHookVerifyBodyTypeFilter : IResourceFilter, IOrderedFilter
     {
+        private static readonly MediaTypeHeaderValue ApplicationAnyJsonMediaType
+            = new MediaTypeHeaderValue("application/*+json").CopyAsReadOnly();
+        private static readonly MediaTypeHeaderValue ApplicationAnyXmlMediaType
+            = new MediaTypeHeaderValue("application/*+xml").CopyAsReadOnly();
         private static readonly MediaTypeHeaderValue ApplicationJsonMediaType
-            = new MediaTypeHeaderValue("application/json");
+            = new MediaTypeHeaderValue("application/json").CopyAsReadOnly();
         private static readonly MediaTypeHeaderValue ApplicationXmlMediaType
-            = new MediaTypeHeaderValue("application/xml");
-        private static readonly MediaTypeHeaderValue TextJsonMediaType = new MediaTypeHeaderValue("text/json");
-        private static readonly MediaTypeHeaderValue TextXmlMediaType = new MediaTypeHeaderValue("text/xml");
+            = new MediaTypeHeaderValue("application/xml").CopyAsReadOnly();
+        private static readonly MediaTypeHeaderValue TextJsonMediaType
+            = new MediaTypeHeaderValue("text/json").CopyAsReadOnly();
+        private static readonly MediaTypeHeaderValue TextXmlMediaType
+            = new MediaTypeHeaderValue("text/xml").CopyAsReadOnly();
 
         private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _allBodyTypeMetadata;
         private readonly IWebHookBodyTypeMetadataService _receiverBodyTypeMetadata;
@@ -253,16 +259,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return false;
             }
 
-            if (contentType.IsSubsetOf(ApplicationJsonMediaType) || contentType.IsSubsetOf(TextJsonMediaType))
-            {
-                return true;
-            }
-
-            // MVC's JsonInputFormatter does not support text/*+json by default. RFC 3023 and 6839 allow */*+json but
-            // https://www.iana.org/assignments/media-types/media-types.xhtml shows all +json registrations except
-            // model/gltf+json match application/*+json.
-            return contentType.Type.Equals("application", StringComparison.OrdinalIgnoreCase) &&
-                contentType.SubType.EndsWith("+json", StringComparison.OrdinalIgnoreCase);
+            return contentType.IsSubsetOf(ApplicationJsonMediaType) ||
+                contentType.IsSubsetOf(ApplicationAnyJsonMediaType) ||
+                contentType.IsSubsetOf(TextJsonMediaType);
         }
 
         /// <summary>
@@ -282,16 +281,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return false;
             }
 
-            if (contentType.IsSubsetOf(ApplicationXmlMediaType) || contentType.IsSubsetOf(TextXmlMediaType))
-            {
-                return true;
-            }
-
-            // MVC's XML input formatters do not support text/*+xml by default. RFC 3023 and 6839 allow */*+xml but
-            // https://www.iana.org/assignments/media-types/media-types.xhtml shows almost all +xml registrations
-            // match application/*+xml and none match text/*+xml.
-            return contentType.Type.Equals("application", StringComparison.OrdinalIgnoreCase) &&
-                contentType.SubType.EndsWith("+xml", StringComparison.OrdinalIgnoreCase);
+            return contentType.IsSubsetOf(ApplicationXmlMediaType) ||
+                contentType.IsSubsetOf(ApplicationAnyXmlMediaType) ||
+                contentType.IsSubsetOf(TextXmlMediaType);
         }
     }
 }

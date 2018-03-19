@@ -3,6 +3,9 @@
 
 using System;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 
@@ -12,8 +15,9 @@ namespace Microsoft.AspNetCore.WebHooks
     /// <para>
     /// An <see cref="Attribute"/> indicating the associated action is a WebHook endpoint for all configured receivers.
     /// Specifies the expected <see cref="BodyType"/> (if any), optional <see cref="EventName"/>, and optional
-    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="Filters.WebHookReceiverExistsFilter"/> for the
-    /// action.
+    /// <see cref="WebHookAttribute.Id"/>. Also adds a <see cref="WebHookReceiverExistsFilter"/> and a
+    /// <see cref="ModelStateInvalidFilter"/> (unless <see cref="ApiBehaviorOptions.SuppressModelStateInvalidFilter"/>
+    /// is <see langword="true"/>) for the action.
     /// </para>
     /// <para>
     /// The signature of the action should be:
