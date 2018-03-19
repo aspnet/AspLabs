@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -62,10 +62,9 @@ namespace Microsoft.AspNetCore.Routing
 
             if (routeData.Values.TryGetValue(WebHookConstants.EventKeyName, out var name))
             {
-                var potentialEventName = (string)name;
-                if (!string.IsNullOrEmpty(potentialEventName))
+                eventName = (string)name;
+                if (!string.IsNullOrEmpty(eventName))
                 {
-                    eventName = potentialEventName;
                     return true;
                 }
             }
@@ -141,7 +140,10 @@ namespace Microsoft.AspNetCore.Routing
             if (routeData.Values.TryGetValue(WebHookConstants.IdKeyName, out var identifier))
             {
                 id = (string)identifier;
-                return !string.IsNullOrEmpty(id);
+                if (!string.IsNullOrEmpty(id))
+                {
+                    return true;
+                }
             }
 
             id = null;
@@ -167,7 +169,10 @@ namespace Microsoft.AspNetCore.Routing
             if (routeData.Values.TryGetValue(WebHookConstants.ReceiverKeyName, out var receiver))
             {
                 receiverName = (string)receiver;
-                return !string.IsNullOrEmpty(receiverName);
+                if (!string.IsNullOrEmpty(receiverName))
+                {
+                    return true;
+                }
             }
 
             receiverName = null;

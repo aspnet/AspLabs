@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 
@@ -53,7 +52,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.RouteContext.RouteData.TryGetWebHookReceiverName(out var receiverName))
+            if (context.RouteContext.RouteData.TryGetWebHookReceiverName(
+                context.CurrentCandidate.Action,
+                out var receiverName))
             {
                 var pingMetadata = _pingMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
                 return Accept(context, _eventName, pingMetadata?.PingEventName);
