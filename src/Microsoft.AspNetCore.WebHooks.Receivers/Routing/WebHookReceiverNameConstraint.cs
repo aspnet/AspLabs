@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
@@ -48,7 +47,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!context.RouteContext.RouteData.TryGetWebHookReceiverName(out var receiverName))
+            if (!context.RouteContext.RouteData.TryGetWebHookReceiverName(
+                context.CurrentCandidate.Action,
+                out var receiverName))
             {
                 return false;
             }

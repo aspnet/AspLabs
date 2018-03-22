@@ -1,9 +1,8 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
@@ -46,7 +45,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!context.RouteContext.RouteData.TryGetWebHookReceiverId(out var id))
+            if (!context.RouteContext.RouteData.TryGetWebHookReceiverId(context.CurrentCandidate.Action, out var id))
             {
                 return false;
             }
