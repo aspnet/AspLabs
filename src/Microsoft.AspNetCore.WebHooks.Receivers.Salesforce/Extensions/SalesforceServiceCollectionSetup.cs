@@ -33,7 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             WebHookMetadata.Register<SalesforceMetadata>(services);
             services.TryAddSingleton<ISalesforceResultCreator, SalesforceResultCreator>();
-
             services.TryAddSingleton<SalesforceVerifyOrganizationIdFilter>();
         }
 

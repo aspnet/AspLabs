@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Newtonsoft.Json;
@@ -6,7 +6,8 @@ using Newtonsoft.Json;
 namespace Microsoft.AspNetCore.WebHooks
 {
     /// <summary>
-    /// Provides information about the condition under which the WebHook notification was sent from Azure Alert Service.
+    /// Provides information about the condition under which the WebHook notification was sent from Azure Alert
+    /// Service.
     /// </summary>
     public class AzureAlertCondition
     {
@@ -45,7 +46,8 @@ namespace Microsoft.AspNetCore.WebHooks
 
         /// <summary>
         /// Gets or sets how the data is collection, e.g. 'Average' and 'Last'.
-        /// See '<c>https://msdn.microsoft.com/en-us/library/microsoft.azure.insights.models.aggregationtype.aspx</c>' for details.
+        /// See '<c>https://msdn.microsoft.com/en-us/library/microsoft.azure.insights.models.aggregationtype.aspx</c>'
+        /// for details.
         /// </summary>
         [JsonProperty("timeAggregation")]
         public string TimeAggregation { get; set; }

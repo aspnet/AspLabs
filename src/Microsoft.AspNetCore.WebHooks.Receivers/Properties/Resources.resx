@@ -142,7 +142,7 @@
     <value>Invalid metadata services found for the '{0}' WebHook receiver. Receivers must not have more than one '{1}' registration.</value>
   </data>
   <data name="MetadataProvider_MissingMetadata" xml:space="preserve">
-    <value>Invalid metadata services found for the '{0}' WebHook receiver.  Receiver must have an '{1}' implementation.</value>
+    <value>Invalid metadata services found for the '{0}' WebHook receiver. Receiver must have an '{1}' implementation.</value>
   </data>
   <data name="MetadataProvider_MissingMetadataServices" xml:space="preserve">
     <value>Invalid metadata services found for the '{0}' WebHook receiver. Receivers with attributes implementing '{1}' must also provide a '{2}' service.</value>

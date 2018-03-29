@@ -28,7 +28,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             WebHookMetadata.Register<DropboxMetadata>(services);
-
             services.TryAddSingleton<DropboxVerifySignatureFilter>();
         }
 

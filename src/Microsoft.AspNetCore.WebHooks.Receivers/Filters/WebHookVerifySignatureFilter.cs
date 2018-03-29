@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// <summary>
     /// Base class for <see cref="IWebHookReceiver"/> and <see cref="Mvc.Filters.IResourceFilter"/> or
     /// <see cref="Mvc.Filters.IAsyncResourceFilter"/> implementations that verify request body content e.g. filters
-    /// that verify signatures of request body content. Subclasses should have an
+    /// that verify signatures of request body content. Subclasses by default have an
     /// <see cref="Mvc.Filters.IOrderedFilter.Order"/> equal to <see cref="WebHookSecurityFilter.Order"/>.
     /// </summary>
     public abstract class WebHookVerifySignatureFilter : WebHookSecurityFilter, IWebHookReceiver

@@ -28,7 +28,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             WebHookMetadata.Register<StripeMetadata>(services);
-
             services.TryAddSingleton<StripeTestEventRequestFilter>();
             services.TryAddSingleton<StripeVerifyNotificationIdFilter>();
             services.TryAddSingleton<StripeVerifySignatureFilter>();

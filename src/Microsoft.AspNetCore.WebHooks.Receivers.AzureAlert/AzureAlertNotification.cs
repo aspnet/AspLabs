@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
@@ -14,8 +14,8 @@ namespace Microsoft.AspNetCore.WebHooks
         private readonly IDictionary<string, object> _properties = new Dictionary<string, object>();
 
         /// <summary>
-        /// Gets or sets the kind of alert. Azure automatically sends activated and resolved alerts for the condition sets.
-        /// Examples of values include '<c>Activated</c>' and '<c>Resolved</c>'.
+        /// Gets or sets the kind of alert. Azure automatically sends activated and resolved alerts for the condition
+        /// sets. Examples of values include '<c>Activated</c>' and '<c>Resolved</c>'.
         /// </summary>
         [JsonProperty("status", Required = Required.Always)]
         public string Status { get; set; }

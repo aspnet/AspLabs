@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -92,21 +92,22 @@ namespace Microsoft.AspNetCore.WebHooks
         public string AuthorName { get; set; }
 
         /// <summary>
-        /// Gets or sets a URI that will show up as a hyper link for the <see cref="AuthorName"/> text. This will only be applied
-        /// if <see cref="AuthorName"/> is present.
+        /// Gets or sets a URI that will show up as a hyper link for the <see cref="AuthorName"/> text. This will only
+        /// be applied if <see cref="AuthorName"/> is present.
         /// </summary>
         [JsonProperty("author_link")]
         public Uri AuthorLink { get; set; }
 
         /// <summary>
-        /// Gets or sets a URI that display a small 16x16 pixel image to the left of the <see cref="AuthorName"/> text. This will only
-        /// be applied if <see cref="AuthorName"/> is present.
+        /// Gets or sets a URI that display a small 16x16 pixel image to the left of the <see cref="AuthorName"/> text.
+        /// This will only be applied if <see cref="AuthorName"/> is present.
         /// </summary>
         [JsonProperty("author_icon")]
         public Uri AuthorIcon { get; set; }
 
         /// <summary>
-        /// Gets or sets an optional title which is displayed as larger, bold text near the top of a message attachment.
+        /// Gets or sets an optional title which is displayed as larger, bold text near the top of a message
+        /// attachment.
         /// </summary>
         [JsonProperty("title")]
         public string Title { get; set; }
@@ -119,8 +120,9 @@ namespace Microsoft.AspNetCore.WebHooks
         public Uri TitleLink { get; set; }
 
         /// <summary>
-        /// Gets or sets the main text in a message attachment. The text may contain Markdown-style formatting as described in <c>https://api.slack.com/docs/formatting</c>.
-        /// The contents will automatically be collapsed if it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with a
+        /// Gets or sets the main text in a message attachment. The text may contain Markdown-style formatting as
+        /// described in <c>https://api.slack.com/docs/formatting</c>. The contents will automatically be collapsed if
+        /// it contains more than 700 characters or more than 5 line breaks. In this case it will be displayed with a
         /// <c>"Show more..."</c> link to the contents.
         /// </summary>
         [JsonProperty("text")]
@@ -141,20 +143,22 @@ namespace Microsoft.AspNetCore.WebHooks
         }
 
         /// <summary>
-        /// Gets or a URI to an image that will be displayed inside a message attachment. Currently supported formats include GIF, JPEG, PNG, and BMP.
+        /// Gets or a URI to an image that will be displayed inside a message attachment. Currently supported formats
+        /// include GIF, JPEG, PNG, and BMP.
         /// </summary>
         [JsonProperty("image_url")]
         public Uri ImageLink { get; set; }
 
         /// <summary>
-        /// Gets or a URI to an image that will be displayed as a thumbnail on the right side of a message attachment. Currently supported formats
-        /// include GIF, JPEG, PNG, and BMP.
+        /// Gets or a URI to an image that will be displayed as a thumbnail on the right side of a message attachment.
+        /// Currently supported formats include GIF, JPEG, PNG, and BMP.
         /// </summary>
         [JsonProperty("thumb_url")]
         public Uri ThumbLink { get; set; }
 
         /// <summary>
-        /// Gets a set of <see cref="SlackField"/> instances that will be displayed in a table inside the message attachment
+        /// Gets a set of <see cref="SlackField"/> instances that will be displayed in a table inside the message
+        /// attachment
         /// </summary>
         [JsonProperty("fields")]
         public Collection<SlackField> Fields

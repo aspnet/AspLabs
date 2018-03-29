@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -147,7 +147,10 @@ namespace Microsoft.AspNetCore.WebHooks
             {
                 if (_notifications == null)
                 {
-                    _notifications = _doc.Element(Soap + "Body").Element(Outbound + "notifications").Elements(Outbound + "Notification")
+                    _notifications = _doc
+                        .Element(Soap + "Body")
+                        .Element(Outbound + "notifications")
+                        .Elements(Outbound + "Notification")
                         .Select(n => GetNotificationValues(n).ToDictionary(x => x.Name.LocalName, x => x.Value))
                         .ToList();
                 }
@@ -189,7 +192,10 @@ namespace Microsoft.AspNetCore.WebHooks
         {
             try
             {
-                var value = _doc.Element(Soap + "Body").Element(Outbound + "notifications").Element(Outbound + property).Value;
+                var value = _doc
+                    .Element(Soap + "Body")
+                    .Element(Outbound + "notifications")
+                    .Element(Outbound + property).Value;
                 return value;
             }
             catch
