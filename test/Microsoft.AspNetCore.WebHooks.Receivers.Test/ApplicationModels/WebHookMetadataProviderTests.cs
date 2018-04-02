@@ -8,6 +8,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Internal; // For DefaultApplicationModelProvider
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -415,9 +416,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         {
             // Arrange
             var provider = new TestMetadataProvider(ValidMetadata);
-            var context = new ApplicationModelProviderContext(new[] { typeof(GeneralController).GetTypeInfo() });
-            var defaultProvider = new DefaultApplicationModelProvider(Options.Create(new MvcOptions()));
-            defaultProvider.OnProvidersExecuting(context);
+            var context = GetApplicatonModelProviderContext(typeof(GeneralController));
 
             // Act
             provider.OnProvidersExecuting(context);
@@ -453,9 +452,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         {
             // Arrange
             var provider = new TestMetadataProvider(ValidMetadata);
-            var context = new ApplicationModelProviderContext(new[] { typeof(JsonGeneralController).GetTypeInfo() });
-            var defaultProvider = new DefaultApplicationModelProvider(Options.Create(new MvcOptions()));
-            defaultProvider.OnProvidersExecuting(context);
+            var context = GetApplicatonModelProviderContext(typeof(JsonGeneralController));
 
             // Act
             provider.OnProvidersExecuting(context);
@@ -497,9 +494,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         {
             // Arrange
             var provider = new TestMetadataProvider(ValidMetadata);
-            var context = new ApplicationModelProviderContext(new[] { typeof(SomeController).GetTypeInfo() });
-            var defaultProvider = new DefaultApplicationModelProvider(Options.Create(new MvcOptions()));
-            defaultProvider.OnProvidersExecuting(context);
+            var context = GetApplicatonModelProviderContext(typeof(SomeController));
 
             // Act
             provider.OnProvidersExecuting(context);
@@ -533,6 +528,17 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     Assert.Equal(typeof(IWebHookPingRequestMetadata), kvp.Key);
                     Assert.IsAssignableFrom<IWebHookPingRequestMetadata>(kvp.Value);
                 });
+        }
+
+        private static ApplicationModelProviderContext GetApplicatonModelProviderContext(Type controllerType)
+        {
+            var context = new ApplicationModelProviderContext(new[] { controllerType.GetTypeInfo() });
+            var defaultProvider = new DefaultApplicationModelProvider(
+                Options.Create(new MvcOptions()),
+                new EmptyModelMetadataProvider());
+
+            defaultProvider.OnProvidersExecuting(context);
+            return context;
         }
 
         private class TestMetadataProvider : WebHookMetadataProvider

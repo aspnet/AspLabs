@@ -5,9 +5,9 @@
 
   <PropertyGroup Label="Package Versions">
     <InternalAspNetCoreSdkPackageVersion>2.1.0-preview3-17001</InternalAspNetCoreSdkPackageVersion>
-    <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCoreMvcCorePackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
+    <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-a-preview3-break-18678</MicrosoftAspNetCoreMvcCorePackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-a-preview3-break-18678</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-a-preview3-break-18678</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
     <MicrosoftAspNetCorePackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCorePackageVersion>
     <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCoreStaticFilesPackageVersion>
     <MicrosoftAspNetCoreTestingPackageVersion>2.1.0-preview3-32037</MicrosoftAspNetCoreTestingPackageVersion>
