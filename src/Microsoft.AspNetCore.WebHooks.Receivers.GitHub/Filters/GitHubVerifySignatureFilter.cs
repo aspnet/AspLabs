@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -63,11 +62,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            var routeData = context.RouteData;
             var request = context.HttpContext.Request;
-            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
-                IsApplicable(receiverName) &&
-                HttpMethods.IsPost(request.Method))
+            if (HttpMethods.IsPost(request.Method))
             {
                 // 1. Confirm a secure connection.
                 var errorResult = EnsureSecureConnection(ReceiverName, context.HttpContext.Request);
@@ -125,7 +121,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 // 3. Get the configured secret key.
                 var secretKey = GetSecretKey(
                     ReceiverName,
-                    routeData,
+                    context.RouteData,
                     GitHubConstants.SecretKeyMinLength,
                     GitHubConstants.SecretKeyMaxLength);
                 if (secretKey == null)

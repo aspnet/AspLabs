@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Routing
         /// </summary>
         /// <param name="routeData">The <see cref="RouteData"/> for the current request.</param>
         /// <returns>
-        /// <see langword="true"/> if an indication <see cref="WebHookReceiverExistsConstraint"/> ran successfully was
+        /// <see langword="true"/> if an indication <see cref="WebHookReceiverNameConstraint"/> ran successfully was
         /// found in the <paramref name="routeData"/>; <see langword="false"/> otherwise.
         /// </returns>
         public static bool GetWebHookReceiverExists(this RouteData routeData)

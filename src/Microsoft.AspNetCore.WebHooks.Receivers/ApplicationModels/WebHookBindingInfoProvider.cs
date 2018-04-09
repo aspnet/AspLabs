@@ -21,37 +21,37 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
     /// (<see cref="BindingInfo"/> settings similar to <see cref="IBindingSourceMetadata"/> and
     /// <see cref="IModelNameProvider"/>) to <see cref="ParameterModel"/>s of WebHook actions.
     /// </summary>
-    public class WebHookModelBindingProvider : IApplicationModelProvider
+    public class WebHookBindingInfoProvider : IApplicationModelProvider
     {
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookModelBindingProvider"/> instance with the given
+        /// Instantiates a new <see cref="WebHookBindingInfoProvider"/> instance with the given
         /// <paramref name="loggerFactory"/>.
         /// </summary>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public WebHookModelBindingProvider(ILoggerFactory loggerFactory)
+        public WebHookBindingInfoProvider(ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<WebHookModelBindingProvider>();
+            _logger = loggerFactory.CreateLogger<WebHookBindingInfoProvider>();
         }
 
         /// <summary>
         /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
-        /// <see cref="WebHookModelBindingProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/>
+        /// <see cref="WebHookBindingInfoProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/>
         /// order is
         /// <list type="number">
         /// <item>
         /// Add <see cref="IWebHookMetadata"/> references to the <see cref="ActionModel.Properties"/> collections of
         /// WebHook actions and validate those <see cref="IWebHookMetadata"/> attributes and services (in
-        /// <see cref="WebHookMetadataProvider"/>).
+        /// <see cref="WebHookActionModelPropertyProvider"/>).
         /// </item>
         /// <item>
         /// Add routing information (<see cref="SelectorModel"/> settings) to <see cref="ActionModel"/>s of WebHook
-        /// actions (in <see cref="WebHookRoutingProvider"/>).
+        /// actions (in <see cref="WebHookSelectorModelProvider"/>).
         /// </item>
         /// <item>
         /// Add filters to the <see cref="ActionModel.Filters"/> collections of WebHook actions (in
-        /// <see cref="WebHookFilterProvider"/>).
+        /// <see cref="WebHookActionModelFilterProvider"/>).
         /// </item>
         /// <item>
         /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s of
@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookFilterProvider.Order + 10;
+        public static int Order => WebHookActionModelFilterProvider.Order + 10;
 
         /// <inheritdoc />
         int IApplicationModelProvider.Order => Order;
@@ -86,17 +86,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     }
 
                     WebHookBodyType? bodyType;
-                    var bodyTypeMetadata = action.Properties[typeof(IWebHookBodyTypeMetadataService)];
-                    if (bodyTypeMetadata is IWebHookBodyTypeMetadataService receiverBodyTypeMetadata)
+                    var properties = action.Properties;
+                    var bodyTypeMetadataObject = properties[typeof(IWebHookBodyTypeMetadataService)];
+                    if (bodyTypeMetadataObject is IWebHookBodyTypeMetadataService bodyTypeMetadata)
                     {
-                        bodyType = receiverBodyTypeMetadata.BodyType;
+                        bodyType = bodyTypeMetadata.BodyType;
                     }
-                    else if (action.Properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out bodyTypeMetadata))
+                    else if (properties.TryGetValue(typeof(IWebHookBodyTypeMetadata), out bodyTypeMetadataObject))
                     {
                         // Reachable only in [GeneralWebHook(WebHookBodyType)] cases. That attribute implements
-                        // IWebHookBodyTypeMetadata and WebHookMetadataProvider passed it along because its BodyType is
-                        // not null.
-                        var actionBodyTypeMetadata = (IWebHookBodyTypeMetadata)bodyTypeMetadata;
+                        // IWebHookBodyTypeMetadata and WebHookActionModelPropertyProvider passed it along because its
+                        // BodyType is not null.
+                        var actionBodyTypeMetadata = (IWebHookBodyTypeMetadata)bodyTypeMetadataObject;
                         bodyType = actionBodyTypeMetadata.BodyType;
                     }
                     else
@@ -105,7 +106,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                         bodyType = null;
                     }
 
-                    action.Properties.TryGetValue(typeof(IWebHookBindingMetadata), out var bindingMetadata);
+                    properties.TryGetValue(typeof(IWebHookBindingMetadata), out var bindingMetadata);
                     for (var k = 0; k < action.Parameters.Count; k++)
                     {
                         var parameter = action.Parameters[k];

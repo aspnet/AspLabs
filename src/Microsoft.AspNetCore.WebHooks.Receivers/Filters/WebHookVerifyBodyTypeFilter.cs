@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -47,69 +45,65 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         private static readonly MediaTypeHeaderValue TextXmlMediaType
             = new MediaTypeHeaderValue("text/xml").CopyAsReadOnly();
 
-        private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _allBodyTypeMetadata;
-        private readonly IWebHookBodyTypeMetadataService _receiverBodyTypeMetadata;
+        private readonly IWebHookBodyTypeMetadataService _bodyTypeMetadata;
         private readonly ILogger _logger;
+        private readonly WebHookMetadataProvider _metadataProvider;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyBodyTypeFilter"/> instance to verify the given
-        /// <paramref name="receiverBodyTypeMetadata"/>.
+        /// <paramref name="bodyTypeMetadata"/>.
         /// </summary>
-        /// <param name="receiverBodyTypeMetadata">
-        /// The receiver's <see cref="IWebHookBodyTypeMetadataService"/>.
-        /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="bodyTypeMetadata">The receiver's <see cref="IWebHookBodyTypeMetadataService"/>.</param>
         public WebHookVerifyBodyTypeFilter(
-            IWebHookBodyTypeMetadataService receiverBodyTypeMetadata,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IWebHookBodyTypeMetadataService bodyTypeMetadata)
         {
-            if (receiverBodyTypeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(receiverBodyTypeMetadata));
-            }
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
+            if (bodyTypeMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(bodyTypeMetadata));
+            }
 
-            _receiverBodyTypeMetadata = receiverBodyTypeMetadata;
+            _bodyTypeMetadata = bodyTypeMetadata;
             _logger = loggerFactory.CreateLogger<WebHookVerifyBodyTypeFilter>();
         }
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookVerifyBodyTypeFilter"/> instance to verify the receiver's
         /// <see cref="IWebHookBodyTypeMetadataService.BodyType"/>. That <see cref="WebHookBodyType"/> value is found
-        /// in <paramref name="allBodyTypeMetadata"/>).
+        /// in <paramref name="metadataProvider"/>.
         /// </summary>
-        /// <param name="allBodyTypeMetadata">
-        /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services. Searched for applicable metadata
-        /// per-request.
-        /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <remarks>
-        /// This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.
-        /// </remarks>
-        public WebHookVerifyBodyTypeFilter(
-            IReadOnlyList<IWebHookBodyTypeMetadataService> allBodyTypeMetadata,
-            ILoggerFactory loggerFactory)
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable metadata per-request.
+        /// </param>
+        /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
+        public WebHookVerifyBodyTypeFilter(ILoggerFactory loggerFactory, WebHookMetadataProvider metadataProvider)
         {
-            if (allBodyTypeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(allBodyTypeMetadata));
-            }
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
+            if (metadataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(metadataProvider));
+            }
 
-            _allBodyTypeMetadata = allBodyTypeMetadata;
             _logger = loggerFactory.CreateLogger<WebHookVerifyBodyTypeFilter>();
+            _metadataProvider = metadataProvider;
         }
 
         /// <summary>
         /// Gets the <see cref="IOrderedFilter.Order"/> used in all <see cref="WebHookVerifyBodyTypeFilter"/>
         /// instances. The recommended filter sequence is
         /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
         /// <item>
         /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
         /// <see cref="WebHookSecurityFilter"/> subclass.
@@ -125,8 +119,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in this filter).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// <see cref="WebHookEventMapperFilter"/>).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
@@ -147,19 +141,23 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName))
+            // bodyTypeMetadata will never end up null. WebHookActionModelPropertyProvider and
+            // WebHookEventNameConstraint confirms the IWebHookBodyTypeMetadataService implementation exists.
+            var bodyTypeMetadata = _bodyTypeMetadata;
+            if (bodyTypeMetadata == null)
             {
-                return;
+                if (!context.RouteData.TryGetWebHookReceiverName(out var requestReceiverName))
+                {
+                    return;
+                }
+
+                bodyTypeMetadata = _metadataProvider.GetBodyTypeMetadata(requestReceiverName);
             }
 
-            var receiverBodyTypeMetadata = _receiverBodyTypeMetadata ??
-                // WebHookReceiverExistsConstraint confirms the IWebHookBodyTypeMetadataService implementation exists.
-                _allBodyTypeMetadata.First(metadata => metadata.IsApplicable(receiverName));
-
+            var receiverName = bodyTypeMetadata.ReceiverName;
             var request = context.HttpContext.Request;
             var contentType = request.GetTypedHeaders().ContentType;
-            switch (receiverBodyTypeMetadata.BodyType)
+            switch (bodyTypeMetadata.BodyType)
             {
                 case WebHookBodyType.Form:
                     if (!request.HasFormContentType)
@@ -230,7 +228,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                             CultureInfo.CurrentCulture,
                             Resources.General_InvalidEnumValue,
                             typeof(WebHookBodyType),
-                            receiverBodyTypeMetadata.BodyType);
+                            bodyTypeMetadata.BodyType);
                         throw new InvalidOperationException(message);
                     }
             }

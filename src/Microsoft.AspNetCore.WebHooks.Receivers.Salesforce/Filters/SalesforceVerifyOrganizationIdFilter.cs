@@ -81,24 +81,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            // 1. Confirm this filter applies.
-            var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
-            {
-                await next();
-                return;
-            }
-
-            // 2. Confirm we were reached using HTTPS.
+            // 1. Confirm we were reached using HTTPS.
             var request = context.HttpContext.Request;
-            var errorResult = EnsureSecureConnection(receiverName, request);
+            var errorResult = EnsureSecureConnection(ReceiverName, request);
             if (errorResult != null)
             {
                 context.Result = errorResult;
                 return;
             }
 
-            // 3. Get XElement from the request body.
+            // 2. Get XElement from the request body.
             var data = await _requestReader.ReadBodyAsync<XElement>(context);
             if (data == null)
             {
@@ -117,7 +109,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 4. Ensure the organization ID exists and matches the expected value.
+            // 3. Ensure the organization ID exists and matches the expected value.
             var organizationIds = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.OrganizationIdPath);
             if (StringValues.IsNullOrEmpty(organizationIds))
             {
@@ -135,6 +127,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
+            var routeData = context.RouteData;
             var secret = GetSecretKey(
                 ReceiverName,
                 routeData,
@@ -159,7 +152,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 5. Get the event name.
+            // 4. Get the event name.
             var eventNames = ObjectPathUtilities.GetStringValues(data, SalesforceConstants.EventNamePath);
             if (StringValues.IsNullOrEmpty(eventNames))
             {
@@ -177,7 +170,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 6. Success. Provide event name for model binding.
+            // 5. Success. Provide event name for model binding.
             routeData.SetWebHookEventNames(eventNames);
 
             await next();

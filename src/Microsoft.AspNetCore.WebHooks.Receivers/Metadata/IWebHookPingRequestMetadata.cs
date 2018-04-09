@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// for receivers that accept ping requests.
     /// </para>
     /// <para>
-    /// The <see cref="Routing.WebHookEventNamesConstraint"/> subclasses select a default action (when a ping request
+    /// The <see cref="Routing.WebHookEventNameConstraint"/> subclasses select a default action (when a ping request
     /// would not otherwise match) based on this metadata. <see cref="Filters.WebHookPingRequestFilter"/>
     /// short-circuits ping requests based on this metadata.
     /// </para>

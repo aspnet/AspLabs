@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <see cref="IWebHookMetadata"/> service for receivers that support additional action parameters.
     /// </para>
     /// <para>
-    /// <see cref="ApplicationModels.WebHookModelBindingProvider"/> sets <see cref="Mvc.ModelBinding.BindingInfo"/>
+    /// <see cref="ApplicationModels.WebHookBindingInfoProvider"/> sets <see cref="Mvc.ModelBinding.BindingInfo"/>
     /// properties based on this metadata and <see cref="IWebHookBodyTypeMetadata"/>.
     /// <see cref="Filters.WebHookVerifyRequiredValueFilter"/> performs request validation based on this metadata,
     /// <see cref="WebHookParameter.IsRequired"/> in particular.

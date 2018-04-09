@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -34,46 +32,89 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// <remarks>
     /// This filter ignores errors other filters will handle but rejects requests that cause model binding failures.
     /// </remarks>
-    public class WebHookEventMapperFilter : IAsyncResourceFilter
+    public class WebHookEventNameMapperFilter : IAsyncResourceFilter, IOrderedFilter
     {
-        private readonly IReadOnlyList<IWebHookBodyTypeMetadataService> _bodyTypeMetadata;
-        private readonly IReadOnlyList<IWebHookEventFromBodyMetadata> _eventFromBodyMetadata;
+        private readonly IWebHookBodyTypeMetadataService _bodyTypeMetadata;
+        private readonly IWebHookEventFromBodyMetadata _eventFromBodyMetadata;
         private readonly ILogger _logger;
+        private readonly WebHookMetadataProvider _metadataProvider;
         private readonly IWebHookRequestReader _requestReader;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookEventMapperFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookEventNameMapperFilter"/> instance to map event names using the given
+        /// <paramref name="eventFromBodyMetadata"/>.
         /// </summary>
-        /// <param name="bodyTypeMetadata">
-        /// The collection of <see cref="IWebHookBodyTypeMetadataService"/> services.
-        /// </param>
-        /// <param name="eventFromBodyMetadata">
-        /// The collection of <see cref="IWebHookEventFromBodyMetadata"/> services.
-        /// </param>
         /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
         /// <param name="loggerFactory">The <see creFf="ILoggerFactory"/>.</param>
-        public WebHookEventMapperFilter(
-            IEnumerable<IWebHookBodyTypeMetadataService> bodyTypeMetadata,
-            IEnumerable<IWebHookEventFromBodyMetadata> eventFromBodyMetadata,
+        /// <param name="bodyTypeMetadata">The receiver's <see cref="IWebHookBodyTypeMetadataService"/>.</param>
+        /// <param name="eventFromBodyMetadata">The receiver's <see cref="IWebHookEventFromBodyMetadata"/>.</param>
+        public WebHookEventNameMapperFilter(
             IWebHookRequestReader requestReader,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IWebHookBodyTypeMetadataService bodyTypeMetadata,
+            IWebHookEventFromBodyMetadata eventFromBodyMetadata)
+            : this(requestReader, loggerFactory)
         {
-            _eventFromBodyMetadata = eventFromBodyMetadata.ToArray();
+            if (bodyTypeMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(bodyTypeMetadata));
+            }
+            if (eventFromBodyMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(eventFromBodyMetadata));
+            }
 
-            // No need to track metadata unless it's applicable in this filter.
-            _bodyTypeMetadata = bodyTypeMetadata
-                .Where(bodyMetadata => _eventFromBodyMetadata.Any(
-                    eventMetadata => eventMetadata.IsApplicable(bodyMetadata.ReceiverName)))
-                .ToArray();
+            _bodyTypeMetadata = bodyTypeMetadata;
+            _eventFromBodyMetadata = eventFromBodyMetadata;
+        }
 
-            _logger = loggerFactory.CreateLogger<WebHookEventMapperFilter>();
+        /// <summary>
+        /// Instantiates a new <see cref="WebHookEventNameMapperFilter"/> instance to map event names using the
+        /// receiver's <see cref="IWebHookEventFromBodyMetadata"/>. That metadata is found in
+        /// <paramref name="metadataProvider"/>.
+        /// </summary>
+        /// <param name="requestReader">The <see cref="IWebHookRequestReader"/>.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable metadata per-request.
+        /// </param>
+        /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
+        public WebHookEventNameMapperFilter(
+            IWebHookRequestReader requestReader,
+            ILoggerFactory loggerFactory,
+            WebHookMetadataProvider metadataProvider)
+            : this(requestReader, loggerFactory)
+        {
+            if (metadataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(metadataProvider));
+            }
+
+            _metadataProvider = metadataProvider;
+        }
+
+        private WebHookEventNameMapperFilter(IWebHookRequestReader requestReader, ILoggerFactory loggerFactory)
+        {
+            if (requestReader == null)
+            {
+                throw new ArgumentNullException(nameof(requestReader));
+            }
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
+
+            _logger = loggerFactory.CreateLogger<WebHookEventNameMapperFilter>();
             _requestReader = requestReader;
         }
 
         /// <summary>
-        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookEventMapperFilter"/>
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookEventNameMapperFilter"/>
         /// instances. The recommended filter sequence is
         /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
         /// <item>
         /// Confirm signature or <c>code</c> query parameter (e.g. in <see cref="WebHookVerifyCodeFilter"/> or a
         /// <see cref="WebHookVerifySignatureFilter"/> subclass).
@@ -89,16 +130,19 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// this filter).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in this filter).
         /// </item>
         /// <item>
-        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
-        /// <see cref="WebHookPingRequestFilter"/>).
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver
+        /// (in <see cref="WebHookPingRequestFilter"/>).
         /// </item>
         /// </list>
         /// </summary>
         public static int Order => WebHookVerifyBodyTypeFilter.Order + 10;
+
+        /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
 
         /// <inheritdoc />
         public virtual async Task OnResourceExecutionAsync(
@@ -115,23 +159,24 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName))
+            var bodyTypeMetadata = _bodyTypeMetadata;
+            var eventFromBodyMetadata = _eventFromBodyMetadata;
+            if (bodyTypeMetadata == null)
             {
-                await next();
-                return;
-            }
+                if (!routeData.TryGetWebHookReceiverName(out var receiverName))
+                {
+                    await next();
+                    return;
+                }
 
-            var eventFromBodyMetadata = _eventFromBodyMetadata
-                .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-            if (eventFromBodyMetadata == null)
-            {
-                await next();
-                return;
+                bodyTypeMetadata = _metadataProvider.GetBodyTypeMetadata(receiverName);
+                eventFromBodyMetadata = _metadataProvider.GetEventFromBodyMetadata(receiverName);
+                if (eventFromBodyMetadata == null)
+                {
+                    await next();
+                    return;
+                }
             }
-
-            // Determine the applicable WebhookBodyType i.e. how to read the request body.
-            // WebHookReceiverExistsConstraint confirms the IWebHookBodyTypeMetadataService implementation exists.
-            var bodyTypeMetadata = _bodyTypeMetadata.First(metadata => metadata.IsApplicable(receiverName));
 
             // No need to double-check the request's Content-Type. WebHookVerifyBodyTypeFilter would have
             // short-circuited the request if unsupported.
@@ -206,6 +251,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 
             if (StringValues.IsNullOrEmpty(eventNames) && !eventFromBodyMetadata.AllowMissing)
             {
+                var receiverName = bodyTypeMetadata.ReceiverName;
                 _logger.LogWarning(
                     0,
                     "A '{ReceiverName}' WebHook request must contain a match for '{BodyPropertyPath}' in the HTTP " +

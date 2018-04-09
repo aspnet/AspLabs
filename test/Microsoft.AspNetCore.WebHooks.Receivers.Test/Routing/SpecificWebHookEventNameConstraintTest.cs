@@ -8,21 +8,11 @@ using Moq;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
-    public class WebHookMultipleEventNamesConstraintTests : WebHookEventNamesConstraintTestBase
+    public class SpecificWebHookEventNameConstraintTest : WebHookEventNameConstraintTestBase
     {
-        protected override ActionConstraintContext GetContext(IActionConstraint constraint)
-        {
-            var context = base.GetContext(constraint);
-
-            // Constraint throws if receiver name is not present in the request.
-            context.RouteContext.RouteData.Values.Add(WebHookConstants.ReceiverKeyName, "ping");
-
-            return context;
-        }
-
         protected override IActionConstraint GetConstraint()
         {
-            return new WebHookMultipleEventNamesConstraint("match", Array.Empty<IWebHookPingRequestMetadata>());
+            return new WebHookEventNameConstraint("match");
         }
 
         protected override IActionConstraint GetConstraintForPingMatch()
@@ -38,7 +28,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .Setup(m => m.IsApplicable(It.IsAny<string>()))
                 .Returns((string value) => string.Equals("ping", value, StringComparison.OrdinalIgnoreCase));
 
-            return new WebHookMultipleEventNamesConstraint("match", new[] { pingMetadata.Object });
+            return new WebHookEventNameConstraint("match", pingMetadata.Object);
         }
     }
 }

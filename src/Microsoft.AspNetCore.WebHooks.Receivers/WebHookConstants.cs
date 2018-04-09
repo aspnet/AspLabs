@@ -101,9 +101,9 @@ namespace Microsoft.AspNetCore.WebHooks
 
         /// <summary>
         /// Gets the name of the <see cref="AspNetCore.Routing.RouteValueDictionary"/> entry containing an indication
-        /// the <see cref="WebHookReceiverExistsConstraint"/> successfully confirmed the request matched a configured
+        /// the <see cref="WebHookReceiverNameConstraint"/> successfully confirmed the request matched a configured
         /// receiver.
         /// </summary>
-        public static string ReceiverExistsKeyName => nameof(WebHookReceiverExistsConstraint);
+        public static string ReceiverExistsKeyName => nameof(WebHookReceiverNameConstraint);
     }
 }

@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebHooks.Metadata;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
     // Variant of WebHookConstraintTestBase which eliminates most tests using ActionDescriptor.RouteValues.
-    public abstract class WebHookEventNamesConstraintTestBase
+    public abstract class WebHookEventNameConstraintTestBase
     {
         [Fact]
         public void Accept_Fails_OnEmpty()
@@ -208,7 +210,18 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             var constraint = GetConstraintForPingMatch();
 
             // E.g. the other action is configured specifically for ping requests.
-            var secondConstraint = new WebHookSingleEventNamesConstraint("pingMatch", pingEventName: "pingMatch");
+            var pingMetadata = new Mock<IWebHookPingRequestMetadata>(MockBehavior.Strict);
+            pingMetadata
+                .SetupGet(m => m.PingEventName)
+                .Returns("pingMatch");
+            pingMetadata
+                .SetupGet(m => m.ReceiverName)
+                .Returns("ping");
+            pingMetadata
+                .Setup(m => m.IsApplicable(It.IsAny<string>()))
+                .Returns((string value) => string.Equals("ping", value, StringComparison.OrdinalIgnoreCase));
+
+            var secondConstraint = new WebHookEventNameConstraint("pingMatch", pingMetadata.Object);
 
             var context = GetContext(constraint);
             context.CurrentCandidate.Action.RouteValues.Add(WebHookConstants.EventKeyName, "pingMatch");

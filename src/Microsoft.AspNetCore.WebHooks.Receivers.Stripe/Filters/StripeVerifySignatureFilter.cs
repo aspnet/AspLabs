@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -65,11 +64,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             // 1. Confirm this filter applies.
-            var routeData = context.RouteData;
             var request = context.HttpContext.Request;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName) ||
-                !IsApplicable(receiverName) ||
-                !HttpMethods.IsPost(request.Method))
+            if (!HttpMethods.IsPost(request.Method))
             {
                 await next();
                 return;
@@ -104,7 +100,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // 4. Get the configured secret key.
             var secretKey = GetSecretKey(
                 ReceiverName,
-                routeData,
+                context.RouteData,
                 StripeConstants.SecretKeyMinLength,
                 StripeConstants.SecretKeyMaxLength);
             if (secretKey == null)

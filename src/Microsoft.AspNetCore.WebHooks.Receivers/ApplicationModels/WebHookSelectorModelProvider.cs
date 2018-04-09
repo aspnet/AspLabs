@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.AspNetCore.WebHooks.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 {
@@ -20,34 +20,33 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
     /// (<see cref="SelectorModel"/> settings, including a template and constraints) to <see cref="ActionModel"/>s of
     /// WebHook actions.
     /// </summary>
-    public class WebHookRoutingProvider : IApplicationModelProvider
+    public class WebHookSelectorModelProvider : IApplicationModelProvider
     {
-        private readonly WebHookReceiverExistsConstraint _existsConstraint;
-        private readonly WebHookEventMapperConstraint _eventMapperConstraint;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly WebHookMetadataProvider _metadataProvider;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookRoutingProvider"/> instance with the given
-        /// <paramref name="existsConstraint"/> and <paramref name="eventMapperConstraint"/>.
+        /// Instantiates a new <see cref="WebHookSelectorModelProvider"/> instance.
         /// </summary>
-        /// <param name="existsConstraint">The <see cref="WebHookReceiverExistsConstraint"/>.</param>
-        /// <param name="eventMapperConstraint">The <see cref="WebHookEventMapperConstraint"/>.</param>
-        public WebHookRoutingProvider(
-            WebHookReceiverExistsConstraint existsConstraint,
-            WebHookEventMapperConstraint eventMapperConstraint)
+        /// <param name="metadataProvider">The <see cref="WebHookMetadataProvider"/>.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        public WebHookSelectorModelProvider(
+            WebHookMetadataProvider metadataProvider,
+            ILoggerFactory loggerFactory)
         {
-            _existsConstraint = existsConstraint;
-            _eventMapperConstraint = eventMapperConstraint;
+            _loggerFactory = loggerFactory;
+            _metadataProvider = metadataProvider;
         }
 
         /// <summary>
         /// Gets the <see cref="IApplicationModelProvider.Order"/> value used in all
-        /// <see cref="WebHookRoutingProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/> order
-        /// is
+        /// <see cref="WebHookSelectorModelProvider"/> instances. The WebHook <see cref="IApplicationModelProvider"/>
+        /// order is
         /// <list type="number">
         /// <item>
         /// Add <see cref="IWebHookMetadata"/> references to the <see cref="ActionModel.Properties"/> collections of
         /// WebHook actions and validate those <see cref="IWebHookMetadata"/> attributes and services (in
-        /// <see cref="WebHookMetadataProvider"/>).
+        /// <see cref="WebHookActionModelPropertyProvider"/>).
         /// </item>
         /// <item>
         /// Add routing information (<see cref="SelectorModel"/> settings) to <see cref="ActionModel"/>s of WebHook
@@ -55,15 +54,15 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         /// </item>
         /// <item>
         /// Add filters to the <see cref="ActionModel.Filters"/> collections of WebHook actions (in
-        /// <see cref="WebHookFilterProvider"/>).
+        /// <see cref="WebHookActionModelFilterProvider"/>).
         /// </item>
         /// <item>
         /// Add model binding information (<see cref="BindingInfo"/> settings) to <see cref="ParameterModel"/>s of
-        /// WebHook actions (in <see cref="WebHookModelBindingProvider"/>).
+        /// WebHook actions (in <see cref="WebHookBindingInfoProvider"/>).
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => WebHookMetadataProvider.Order + 10;
+        public static int Order => WebHookActionModelPropertyProvider.Order + 10;
 
         /// <inheritdoc />
         int IApplicationModelProvider.Order => Order;
@@ -120,8 +119,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 }
             }
 
-            AddConstraints(attribute, selectors);
-            AddConstraints(action.Properties, selectors);
+            var properties = action.Properties;
+            AddEventMapperConstraint(properties, selectors);
+            AddEventNamesConstraint(properties, selectors);
+            AddIdConstraint(attribute, selectors);
+            AddReceiverExistsConstraint(properties, selectors);
         }
 
         // Use a constant template since all WebHook constraints use the resulting route values and we have no
@@ -167,16 +169,54 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             }
         }
 
-        private void AddConstraints(WebHookAttribute attribute, IList<SelectorModel> selectors)
+        private void AddEventMapperConstraint(IDictionary<object, object> properties, IList<SelectorModel> selectors)
         {
-            AddConstraint(_existsConstraint, selectors);
-
-            if (attribute.ReceiverName != null)
+            if (properties.TryGetValue(typeof(IWebHookEventMetadata), out var eventMetadataObject))
             {
-                var constraint = new WebHookReceiverNameConstraint(attribute.ReceiverName);
+                WebHookEventNameMapperConstraint constraint;
+                if (eventMetadataObject is IWebHookEventMetadata eventMetadata)
+                {
+                    constraint = new WebHookEventNameMapperConstraint(_loggerFactory, eventMetadata);
+                }
+                else
+                {
+                    constraint = new WebHookEventNameMapperConstraint(_loggerFactory, _metadataProvider);
+                }
+
                 AddConstraint(constraint, selectors);
             }
+        }
 
+        private void AddEventNamesConstraint(IDictionary<object, object> properties, IList<SelectorModel> selectors)
+        {
+            if (properties.TryGetValue(typeof(IWebHookEventSelectorMetadata), out var eventSourceMetadata))
+            {
+                var eventName = ((IWebHookEventSelectorMetadata)eventSourceMetadata).EventName;
+                if (eventName != null)
+                {
+                    properties.TryGetValue(typeof(IWebHookPingRequestMetadata), out var pingRequestMetadataObject);
+
+                    IActionConstraintMetadata constraint;
+                    if (pingRequestMetadataObject == null)
+                    {
+                        constraint = new WebHookEventNameConstraint(eventName);
+                    }
+                    else if (pingRequestMetadataObject is IWebHookPingRequestMetadata pingRequestMetadata)
+                    {
+                        constraint = new WebHookEventNameConstraint(eventName, pingRequestMetadata);
+                    }
+                    else
+                    {
+                        constraint = new WebHookEventNameConstraint(eventName, _metadataProvider);
+                    }
+
+                    AddConstraint(constraint, selectors);
+                }
+            }
+        }
+
+        private void AddIdConstraint(WebHookAttribute attribute, IList<SelectorModel> selectors)
+        {
             if (attribute.Id != null)
             {
                 var constraint = new WebHookIdConstraint(attribute.Id);
@@ -184,40 +224,23 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             }
         }
 
-        private void AddConstraints(IDictionary<object, object> properties, IList<SelectorModel> selectors)
+        private void AddReceiverExistsConstraint(
+            IDictionary<object, object> properties,
+            IList<SelectorModel> selectors)
         {
-            if (properties.TryGetValue(typeof(IWebHookEventMetadata), out var eventMetadata))
+            var bodyTypeMetadataObject = properties[typeof(IWebHookBodyTypeMetadataService)];
+
+            WebHookReceiverNameConstraint constraint;
+            if (bodyTypeMetadataObject is IWebHookBodyTypeMetadataService bodyTypeMetadata)
             {
-                AddConstraint(_eventMapperConstraint, selectors);
+                constraint = new WebHookReceiverNameConstraint(bodyTypeMetadata);
+            }
+            else
+            {
+                constraint = new WebHookReceiverNameConstraint(_metadataProvider);
             }
 
-            if (properties.TryGetValue(typeof(IWebHookEventSelectorMetadata), out var eventSourceMetadata))
-            {
-                var eventName = ((IWebHookEventSelectorMetadata)eventSourceMetadata).EventName;
-                if (eventName != null)
-                {
-                    // IWebHookEventMetadata is mandatory when performing action selection using event names.
-                    Debug.Assert(eventMetadata != null);
-                    properties.TryGetValue(typeof(IWebHookPingRequestMetadata), out var pingMetadata);
-
-                    // Use eventMetadata to choose constraint type because IWebHookPingRequestMetadata is optional.
-                    IActionConstraintMetadata constraint;
-                    if (eventMetadata is IWebHookEventMetadata)
-                    {
-                        constraint = new WebHookSingleEventNamesConstraint(
-                            eventName,
-                            ((IWebHookPingRequestMetadata)pingMetadata)?.PingEventName);
-                    }
-                    else
-                    {
-                        constraint = new WebHookMultipleEventNamesConstraint(
-                            eventName,
-                            (IReadOnlyList<IWebHookPingRequestMetadata>)pingMetadata);
-                    }
-
-                    AddConstraint(constraint, selectors);
-                }
-            }
+            AddConstraint(constraint, selectors);
         }
     }
 }

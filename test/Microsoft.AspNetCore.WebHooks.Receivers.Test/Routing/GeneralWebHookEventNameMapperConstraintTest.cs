@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.WebHooks.Routing
 {
-    public class WebHookEventMapperConstraintTests : WebHookConstraintTestBase
+    public class GeneralWebHookEventNameMapperConstraintTest : WebHookConstraintTestBase
     {
         protected override string KeyName => WebHookConstants.ReceiverKeyName;
 
@@ -23,9 +23,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .SetupGet(m => m.ConstantValue)
                 .Returns("constant value");
 
-            var constraint = new WebHookEventMapperConstraint(
-                new[] { webHookEventMetadata.Object },
-                NullLoggerFactory.Instance);
+            var constraint = new WebHookEventNameMapperConstraint(
+                NullLoggerFactory.Instance,
+                new TestMetadataProvider(webHookEventMetadata.Object));
             var context = GetContext(constraint);
             context.RouteContext.RouteData.Values.Add(KeyName, "match");
 
@@ -45,9 +45,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .SetupGet(m => m.HeaderName)
                 .Returns("another");
 
-            var constraint = new WebHookEventMapperConstraint(
-                new[] { webHookEventMetadata.Object },
-                NullLoggerFactory.Instance);
+            var constraint = new WebHookEventNameMapperConstraint(
+                NullLoggerFactory.Instance,
+                new TestMetadataProvider(webHookEventMetadata.Object));
             var context = GetContext(constraint);
             context.RouteContext.RouteData.Values.Add(KeyName, "match");
 
@@ -71,9 +71,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .SetupGet(m => m.QueryParameterName)
                 .Returns("query");
 
-            var constraint = new WebHookEventMapperConstraint(
-                new[] { webHookEventMetadata.Object },
-                NullLoggerFactory.Instance);
+            var constraint = new WebHookEventNameMapperConstraint(
+                NullLoggerFactory.Instance,
+                new TestMetadataProvider(webHookEventMetadata.Object));
             var context = GetContext(constraint);
             context.RouteContext.RouteData.Values.Add(KeyName, "match");
 
@@ -94,9 +94,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .SetupGet(m => m.QueryParameterName)
                 .Returns("another");
 
-            var constraint = new WebHookEventMapperConstraint(
-                new[] { webHookEventMetadata.Object },
-                NullLoggerFactory.Instance);
+            var constraint = new WebHookEventNameMapperConstraint(
+                NullLoggerFactory.Instance,
+                new TestMetadataProvider(webHookEventMetadata.Object));
             var context = GetContext(constraint);
             context.RouteContext.RouteData.Values.Add(KeyName, "match");
 
@@ -142,7 +142,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             // This constraint throws if request does not contain receiver name route value.
             // Arrange 2
             var expectedMessage = "Invalid WebHook constraint configuration encountered. Request contained no " +
-                $"receiver name and '{typeof(WebHookReceiverExistsConstraint)}' should have disallowed the request.";
+                $"receiver name and '{typeof(WebHookReceiverNameConstraint)}' should have disallowed the request.";
 
             // Act & Assert
             var exception = Assert.Throws<InvalidOperationException>(() => process(context));
@@ -172,7 +172,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .SetupGet(m => m.QueryParameterName)
                 .Returns("query");
 
-            return new WebHookEventMapperConstraint(new[] { webHookEventMetadata.Object }, NullLoggerFactory.Instance);
+            return new WebHookEventNameMapperConstraint(
+                NullLoggerFactory.Instance,
+                new TestMetadataProvider(webHookEventMetadata.Object));
         }
 
         private Mock<IWebHookEventMetadata> GetEventMetadata()
@@ -197,6 +199,61 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
                 .Returns((string)null);
 
             return webHookEventMetadata;
+        }
+
+        private class TestMetadataProvider : WebHookMetadataProvider
+        {
+            private readonly IWebHookEventMetadata _eventMetadata;
+
+            public TestMetadataProvider(IWebHookEventMetadata eventMetadata)
+            {
+                _eventMetadata = eventMetadata;
+            }
+
+            public override IWebHookBindingMetadata GetBindingMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookBodyTypeMetadataService GetBodyTypeMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookEventFromBodyMetadata GetEventFromBodyMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookEventMetadata GetEventMetadata(string receiverName)
+            {
+                if (string.Equals("match", receiverName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return _eventMetadata;
+                }
+
+                return null;
+            }
+
+            public override IWebHookFilterMetadata GetFilterMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookGetHeadRequestMetadata GetGetHeadRequestMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookPingRequestMetadata GetPingRequestMetadata(string receiverName)
+            {
+                return null;
+            }
+
+            public override IWebHookVerifyCodeMetadata GetVerifyCodeMetadata(string receiverName)
+            {
+                return null;
+            }
         }
     }
 }

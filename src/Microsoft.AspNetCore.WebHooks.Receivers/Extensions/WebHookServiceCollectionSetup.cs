@@ -2,15 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.ApplicationModels;
 using Microsoft.AspNetCore.WebHooks.Filters;
-using Microsoft.AspNetCore.WebHooks.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -19,16 +16,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     internal static class WebHookServiceCollectionSetup
     {
-        private static readonly Dictionary<Type, int> SingletonFilters = new Dictionary<Type, int>
-        {
-            { typeof(WebHookGetHeadRequestFilter), WebHookGetHeadRequestFilter.Order },
-            { typeof(WebHookPingRequestFilter), WebHookPingRequestFilter.Order },
-            { typeof(WebHookEventMapperFilter), WebHookEventMapperFilter.Order },
-            { typeof(WebHookVerifyCodeFilter), WebHookSecurityFilter.Order },
-            { typeof(WebHookVerifyMethodFilter), WebHookVerifyMethodFilter.Order },
-            { typeof(WebHookVerifyRequiredValueFilter), WebHookVerifyRequiredValueFilter.Order },
-        };
-
         /// <summary>
         /// Add services for WebHook receivers.
         /// </summary>
@@ -41,42 +28,20 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-
+                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookActionModelFilterProvider>());
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookMetadataProvider>());
+                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookActionModelPropertyProvider>());
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookModelBindingProvider>());
+                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookBindingInfoProvider>());
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookRoutingProvider>());
-
-            services.TryAddSingleton<WebHookEventMapperConstraint>();
-            services.TryAddSingleton<WebHookReceiverExistsConstraint>();
+                ServiceDescriptor.Transient<IApplicationModelProvider, WebHookSelectorModelProvider>());
 
             services.TryAddSingleton<WebHookReceiverExistsFilter>();
+            services.TryAddSingleton<WebHookVerifyMethodFilter>();
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IFilterProvider, WebHookFilterProvider>());
+
             services.TryAddSingleton<IWebHookRequestReader, WebHookRequestReader>();
-
-            foreach (var keyValuePair in SingletonFilters)
-            {
-                services.TryAddSingleton(keyValuePair.Key);
-            }
-        }
-
-        private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
-        {
-            /// <inheritdoc />
-            public void Configure(MvcOptions options)
-            {
-                if (options == null)
-                {
-                    throw new ArgumentNullException(nameof(options));
-                }
-
-                foreach (var keyValuePair in SingletonFilters)
-                {
-                    options.Filters.AddService(keyValuePair.Key, keyValuePair.Value);
-                }
-            }
         }
     }
 }

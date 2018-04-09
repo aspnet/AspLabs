@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
 {
-    public class WebHookMetadataProviderTests
+    public class WebHookActionModelPropertyProviderTest
     {
         public static TheoryData<IWebHookMetadata[], Type> DuplicateMetadataData
         {
@@ -327,14 +327,14 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             var metadata = Array.Empty<IWebHookMetadata>();
 
             // Act & Assert (does not throw)
-            new TestMetadataProvider(metadata);
+            new TestActionModelPropertyProvider(metadata);
         }
 
         [Fact]
         public void Constructor_SucceedsWithValidMetadata()
         {
             // Arrange, Act & Assert (does not throw)
-            new TestMetadataProvider(ValidMetadata);
+            new TestActionModelPropertyProvider(ValidMetadata);
         }
 
         [Theory]
@@ -346,7 +346,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 $"Receivers must not have more than one '{metadataType}' registration.";
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => new TestMetadataProvider(metadata));
+            var exception = Assert.Throws<InvalidOperationException>(() => new TestActionModelPropertyProvider(metadata));
             Assert.Equal(expectedMessage, exception.Message);
         }
 
@@ -377,7 +377,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             };
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => new TestMetadataProvider(metadata));
+            var exception = Assert.Throws<InvalidOperationException>(() => new TestActionModelPropertyProvider(metadata));
             Assert.Equal(expectedMessage, exception.Message);
         }
 
@@ -407,7 +407,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             };
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => new TestMetadataProvider(metadata));
+            var exception = Assert.Throws<InvalidOperationException>(() => new TestActionModelPropertyProvider(metadata));
             Assert.Equal(expectedMessage, exception.Message);
         }
 
@@ -415,7 +415,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         public void OnProvidersExecuting_SucceedsWithGeneralAttributeAndValidMetadata()
         {
             // Arrange
-            var provider = new TestMetadataProvider(ValidMetadata);
+            var provider = new TestActionModelPropertyProvider(ValidMetadata);
             var context = GetApplicatonModelProviderContext(typeof(GeneralController));
 
             // Act
@@ -427,8 +427,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             Assert.Collection(actionModel.Properties.OrderBy(kvp => ((Type)kvp.Key).Name),
                 kvp =>
                 {
+                    Assert.Equal(typeof(IWebHookBindingMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookBindingMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
                     Assert.Equal(typeof(IWebHookBodyTypeMetadataService), kvp.Key);
                     Assert.IsAssignableFrom<IReadOnlyList<IWebHookBodyTypeMetadataService>>(kvp.Value);
+                },
+                kvp =>
+                {
+                    Assert.Equal(typeof(IWebHookEventFromBodyMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookEventFromBodyMetadata>>(kvp.Value);
                 },
                 kvp =>
                 {
@@ -442,8 +452,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 },
                 kvp =>
                 {
+                    Assert.Equal(typeof(IWebHookGetHeadRequestMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookGetHeadRequestMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
                     Assert.Equal(typeof(IWebHookPingRequestMetadata), kvp.Key);
                     Assert.IsAssignableFrom<IReadOnlyList<IWebHookPingRequestMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
+                    Assert.Equal(typeof(IWebHookVerifyCodeMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookVerifyCodeMetadata>>(kvp.Value);
                 });
         }
 
@@ -451,7 +471,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         public void OnProvidersExecuting_SucceedsWithGeneralAttributeAndValidMetadata_IncludingBodyType()
         {
             // Arrange
-            var provider = new TestMetadataProvider(ValidMetadata);
+            var provider = new TestActionModelPropertyProvider(ValidMetadata);
             var context = GetApplicatonModelProviderContext(typeof(JsonGeneralController));
 
             // Act
@@ -461,6 +481,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             var controllerModel = Assert.Single(context.Result.Controllers);
             var actionModel = Assert.Single(controllerModel.Actions);
             Assert.Collection(actionModel.Properties.OrderBy(kvp => ((Type)kvp.Key).Name),
+                kvp =>
+                {
+                    Assert.Equal(typeof(IWebHookBindingMetadata), kvp.Key);
+                    var attribute = Assert.IsAssignableFrom<IReadOnlyList<IWebHookBindingMetadata>>(kvp.Value);
+                },
                 kvp =>
                 {
                     Assert.Equal(typeof(IWebHookBodyTypeMetadata), kvp.Key);
@@ -474,6 +499,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 },
                 kvp =>
                 {
+                    Assert.Equal(typeof(IWebHookEventFromBodyMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookEventFromBodyMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
                     Assert.Equal(typeof(IWebHookEventMetadata), kvp.Key);
                     Assert.IsAssignableFrom<IReadOnlyList<IWebHookEventMetadata>>(kvp.Value);
                 },
@@ -484,8 +514,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 },
                 kvp =>
                 {
+                    Assert.Equal(typeof(IWebHookGetHeadRequestMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookGetHeadRequestMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
                     Assert.Equal(typeof(IWebHookPingRequestMetadata), kvp.Key);
                     Assert.IsAssignableFrom<IReadOnlyList<IWebHookPingRequestMetadata>>(kvp.Value);
+                },
+                kvp =>
+                {
+                    Assert.Equal(typeof(IWebHookVerifyCodeMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IReadOnlyList<IWebHookVerifyCodeMetadata>>(kvp.Value);
                 });
         }
 
@@ -493,7 +533,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
         public void OnProvidersExecuting_SucceedsWithValidAttributesAndMetadata()
         {
             // Arrange
-            var provider = new TestMetadataProvider(ValidMetadata);
+            var provider = new TestActionModelPropertyProvider(ValidMetadata);
             var context = GetApplicatonModelProviderContext(typeof(SomeController));
 
             // Act
@@ -525,8 +565,18 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 },
                 kvp =>
                 {
+                    Assert.Equal(typeof(IWebHookGetHeadRequestMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IWebHookGetHeadRequestMetadata>(kvp.Value);
+                },
+                kvp =>
+                {
                     Assert.Equal(typeof(IWebHookPingRequestMetadata), kvp.Key);
                     Assert.IsAssignableFrom<IWebHookPingRequestMetadata>(kvp.Value);
+                },
+                kvp =>
+                {
+                    Assert.Equal(typeof(IWebHookVerifyCodeMetadata), kvp.Key);
+                    Assert.IsAssignableFrom<IWebHookVerifyCodeMetadata>(kvp.Value);
                 });
         }
 
@@ -541,14 +591,15 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             return context;
         }
 
-        private class TestMetadataProvider : WebHookMetadataProvider
+        private class TestActionModelPropertyProvider : WebHookActionModelPropertyProvider
         {
-            public TestMetadataProvider(IEnumerable<IWebHookMetadata> metadata)
+            public TestActionModelPropertyProvider(IEnumerable<IWebHookMetadata> metadata)
                 : base(
                     metadata.OfType<IWebHookBindingMetadata>(),
                     metadata.OfType<IWebHookBodyTypeMetadataService>(),
                     metadata.OfType<IWebHookEventFromBodyMetadata>(),
                     metadata.OfType<IWebHookEventMetadata>(),
+                    metadata.OfType<IWebHookFilterMetadata>(),
                     metadata.OfType<IWebHookGetHeadRequestMetadata>(),
                     metadata.OfType<IWebHookPingRequestMetadata>(),
                     metadata.OfType<IWebHookVerifyCodeMetadata>())

@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -18,7 +17,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// a <see cref="JObject"/>. Confirms notification identifier and event name are present. Adds both strings to
     /// route values.
     /// </summary>
-    public class StripeVerifyNotificationIdFilter : IAsyncResourceFilter, IWebHookReceiver
+    public class StripeVerifyNotificationIdFilter : IAsyncResourceFilter, IWebHookReceiver, IOrderedFilter
     {
         private readonly ILogger _logger;
         private readonly IWebHookRequestReader _requestReader;
@@ -42,6 +41,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// for this receiver; required parameters are enforced in this filter.
         /// </summary>
         public static int Order => WebHookVerifyRequiredValueFilter.Order;
+
+        /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
 
         /// <inheritdoc />
         public string ReceiverName => StripeConstants.ReceiverName;
@@ -69,15 +71,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            // 1. Confirm this filter applies.
-            var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName) || !IsApplicable(receiverName))
-            {
-                await next();
-                return;
-            }
-
-            // 2. Get JObject from the request body.
+            // 1. Get JObject from the request body.
             var data = await _requestReader.ReadBodyAsync<JObject>(context);
             if (data == null)
             {
@@ -96,7 +90,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 3. Ensure the notification identifier exists.
+            // 2. Ensure the notification identifier exists.
             var notificationId = data.Value<string>(StripeConstants.NotificationIdPropertyName);
             if (string.IsNullOrEmpty(notificationId))
             {
@@ -114,7 +108,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 4. Ensure the event name exists.
+            // 3. Ensure the event name exists.
             var eventName = data.Value<string>(StripeConstants.EventPropertyName);
             if (string.IsNullOrEmpty(eventName))
             {
@@ -132,7 +126,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return;
             }
 
-            // 5. Success. Provide event name and notification id for model binding.
+            // 4. Success. Provide event name and notification id for model binding.
+            var routeData = context.RouteData;
             routeData.Values[WebHookConstants.EventKeyName] = eventName;
             routeData.Values[StripeConstants.NotificationIdKeyName] = notificationId;
 

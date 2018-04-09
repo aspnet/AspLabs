@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// service for receivers that do not place event names in the request body or special-case event name mapping.
     /// </para>
     /// <para>
-    /// <see cref="Routing.WebHookEventMapperConstraint"/> maps event names based on this metadata.
+    /// <see cref="Routing.WebHookEventNameMapperConstraint"/> maps event names based on this metadata.
     /// </para>
     /// </summary>
     /// <remarks>

@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <see cref="IWebHookEventMetadata"/> service.
     /// </para>
     /// <para>
-    /// The <see cref="Routing.WebHookEventNamesConstraint"/> subclasses perform action selection based on this
+    /// The <see cref="Routing.WebHookEventNameConstraint"/> subclasses perform action selection based on this
     /// metadata.
     /// </para>
     /// </summary>

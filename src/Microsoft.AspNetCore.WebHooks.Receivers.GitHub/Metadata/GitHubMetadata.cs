@@ -1,19 +1,29 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.WebHooks.Filters;
+
 namespace Microsoft.AspNetCore.WebHooks.Metadata
 {
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the GitHub receiver.
     /// </summary>
-    public class GitHubMetadata : WebHookMetadata, IWebHookEventMetadata, IWebHookPingRequestMetadata
+    public class GitHubMetadata :
+        WebHookMetadata,
+        IWebHookEventMetadata,
+        IWebHookFilterMetadata,
+        IWebHookPingRequestMetadata
     {
+        private readonly GitHubVerifySignatureFilter _verifySignatureFilter;
+
         /// <summary>
         /// Instantiates a new <see cref="GitHubMetadata"/> instance.
         /// </summary>
-        public GitHubMetadata()
+        /// <param name="verifySignatureFilter">The <see cref="GitHubVerifySignatureFilter"/>.</param>
+        public GitHubMetadata(GitHubVerifySignatureFilter verifySignatureFilter)
             : base(GitHubConstants.ReceiverName)
         {
+            _verifySignatureFilter = verifySignatureFilter;
         }
 
         // IWebHookBodyTypeMetadataService...
@@ -36,5 +46,13 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public string PingEventName => GitHubConstants.PingEventName;
+
+        // IWebHookFilterMetadata...
+
+        /// <inheritdoc />
+        public void AddFilters(WebHookFilterMetadataContext context)
+        {
+            context.Results.Add(_verifySignatureFilter);
+        }
     }
 }

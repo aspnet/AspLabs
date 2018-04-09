@@ -14,15 +14,16 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
     /// An <see cref="IResourceFilter"/> to allow only POST WebHook requests with a non-empty request body. To support
-    /// GET or HEAD requests the receiver project should implement <see cref="Metadata.IWebHookGetHeadRequestMetadata"/>
-    /// in its metadata service.
+    /// GET or HEAD requests the receiver project should implement
+    /// <see cref="Metadata.IWebHookGetHeadRequestMetadata"/> in its metadata service.
     /// </summary>
     /// <remarks>
     /// Done as an <see cref="IResourceFilter"/> implementation and not an
     /// <see cref="Mvc.ActionConstraints.IActionConstraintMetadata"/> because GET and HEAD requests (often pings or
-    /// simple verifications) are never of interest in user code.
+    /// simple verifications) are never of interest in user code. However, some senders require specific responses to
+    /// GET or HEAD requests and those requests and responses are handled in <see cref="WebHookGetHeadRequestFilter"/>.
     /// </remarks>
-    public class WebHookVerifyMethodFilter : IResourceFilter
+    public class WebHookVerifyMethodFilter : IResourceFilter, IOrderedFilter
     {
         private readonly ILogger _logger;
 
@@ -40,6 +41,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// instances. The recommended filter sequence is
         /// <list type="number">
         /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
+        /// <item>
         /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
         /// <see cref="WebHookSecurityFilter"/> subclass.
         /// </item>
@@ -54,8 +58,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in this filter).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// <see cref="WebHookEventMapperFilter"/>).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
@@ -66,6 +70,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public static int Order => WebHookGetHeadRequestFilter.Order + 10;
 
         /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
+
+        /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if (context == null)
@@ -74,13 +81,13 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var request = context.HttpContext.Request;
-            if (context.RouteData.TryGetWebHookReceiverName(out var receiverName) &&
-                (request.Body == null ||
-                 !request.ContentLength.HasValue ||
-                 request.ContentLength.Value == 0L ||
-                 !HttpMethods.IsPost(request.Method)))
+            if (request.Body == null ||
+                !request.ContentLength.HasValue ||
+                request.ContentLength.Value == 0L ||
+                !HttpMethods.IsPost(request.Method))
             {
                 // Log about the issue and short-circuit remainder of the pipeline.
+                context.RouteData.TryGetWebHookReceiverName(out var receiverName);
                 context.Result = CreateBadMethodResult(request.Method, receiverName);
             }
         }

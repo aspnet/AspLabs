@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +23,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class WebHookVerifyCodeFilter : WebHookSecurityFilter, IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _verifyCodeMetadata;
+        private readonly WebHookMetadataProvider _metadataProvider;
+        private readonly IWebHookVerifyCodeMetadata _verifyCodeMetadata;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance to verify the given
+        /// <paramref name="verifyCodeMetadata"/>.
         /// </summary>
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
@@ -37,20 +37,56 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// The <see cref="IHostingEnvironment" /> used to initialize
         /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
         /// </param>
-        /// <param name="verifyCodeMetadata">
-        /// The collection of <see cref="IWebHookVerifyCodeMetadata"/> services.
+        /// <param name="loggerFactory">
+        /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
+        /// </param>
+        /// <param name="verifyCodeMetadata">The receiver's <see cref="IWebHookVerifyCodeMetadata"/>.</param>
+        public WebHookVerifyCodeFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory,
+            IWebHookVerifyCodeMetadata verifyCodeMetadata)
+            : base(configuration, hostingEnvironment, loggerFactory)
+        {
+            if (verifyCodeMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(verifyCodeMetadata));
+            }
+
+            _verifyCodeMetadata = verifyCodeMetadata;
+        }
+
+        /// <summary>
+        /// Instantiates a new <see cref="WebHookVerifyCodeFilter"/> instance to verify the receiver's
+        /// <see cref="IWebHookVerifyCodeMetadata"/>. That metadata is found in <paramref name="metadataProvider"/>.
+        /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable metadata per-request.
+        /// </param>
+        /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
         public WebHookVerifyCodeFilter(
             IConfiguration configuration,
             IHostingEnvironment hostingEnvironment,
-            IEnumerable<IWebHookVerifyCodeMetadata> verifyCodeMetadata,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            WebHookMetadataProvider metadataProvider)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _verifyCodeMetadata = verifyCodeMetadata.ToArray();
+            if (metadataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(metadataProvider));
+            }
+
+            _metadataProvider = metadataProvider;
         }
 
         /// <inheritdoc />
@@ -62,14 +98,25 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
-                _verifyCodeMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
+            var verifyCodeMetadata = _verifyCodeMetadata;
+            if (verifyCodeMetadata == null)
             {
-                var result = EnsureValidCode(context.HttpContext.Request, routeData, receiverName);
-                if (result != null)
+                if (!routeData.TryGetWebHookReceiverName(out var requestReceiverName))
                 {
-                    context.Result = result;
+                    return;
                 }
+
+                verifyCodeMetadata = _metadataProvider.GetVerifyCodeMetadata(requestReceiverName);
+                if (verifyCodeMetadata == null)
+                {
+                    return;
+                }
+            }
+
+            var result = EnsureValidCode(context.HttpContext.Request, routeData, verifyCodeMetadata.ReceiverName);
+            if (result != null)
+            {
+                context.Result = result;
             }
         }
 

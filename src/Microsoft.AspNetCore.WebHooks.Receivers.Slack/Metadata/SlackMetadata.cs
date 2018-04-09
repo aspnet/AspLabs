@@ -2,20 +2,25 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.WebHooks.Filters;
 
 namespace Microsoft.AspNetCore.WebHooks.Metadata
 {
     /// <summary>
     /// An <see cref="IWebHookMetadata"/> service containing metadata about the Slack receiver.
     /// </summary>
-    public class SlackMetadata : WebHookMetadata, IWebHookBindingMetadata
+    public class SlackMetadata : WebHookMetadata, IWebHookBindingMetadata, IWebHookFilterMetadata
     {
+        private readonly SlackVerifyTokenFilter _verifyTokenFilter;
+
         /// <summary>
         /// Instantiates a new <see cref="SlackMetadata"/> instance.
         /// </summary>
-        public SlackMetadata()
+        /// <param name="verifyTokenFilter">The <see cref="SlackVerifyTokenFilter"/>.</param>
+        public SlackMetadata(SlackVerifyTokenFilter verifyTokenFilter)
             : base(SlackConstants.ReceiverName)
         {
+            _verifyTokenFilter = verifyTokenFilter;
         }
 
         // IWebHookBindingMetadata...
@@ -34,5 +39,13 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public override WebHookBodyType BodyType => WebHookBodyType.Form;
+
+        // IWebHookFilterMetadata...
+
+        /// <inheritdoc />
+        public void AddFilters(WebHookFilterMetadataContext context)
+        {
+            context.Results.Add(_verifyTokenFilter);
+        }
     }
 }

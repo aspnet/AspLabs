@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,18 +19,17 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// <summary>
     /// An <see cref="IResourceFilter"/> to verify secret keys and short-circuit WebHook GET or HEAD requests.
     /// </summary>
-    public class WebHookGetHeadRequestFilter : WebHookSecurityFilter, IResourceFilter
+    public class WebHookGetHeadRequestFilter : WebHookSecurityFilter, IResourceFilter, IOrderedFilter
     {
-        private readonly IReadOnlyList<IWebHookGetHeadRequestMetadata> _getHeadRequestMetadata;
+        private readonly IWebHookGetHeadRequestMetadata _getHeadRequestMetadata;
+        private readonly WebHookMetadataProvider _metadataProvider;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookGetHeadRequestFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookGetHeadRequestFilter"/> instance to short-circuit WebHook requests
+        /// based on the given <paramref name="getHeadRequestMetadata"/>.
         /// </summary>
         /// <param name="configuration">
         /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
-        /// </param>
-        /// <param name="getHeadRequestMetadata">
-        /// The collection of <see cref="IWebHookGetHeadRequestMetadata"/> services.
         /// </param>
         /// <param name="hostingEnvironment">
         /// The <see cref="IHostingEnvironment" /> used to initialize
@@ -41,20 +38,63 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
         /// </param>
+        /// <param name="getHeadRequestMetadata">The receiver's <see cref="IWebHookGetHeadRequestMetadata"/>.</param>
         public WebHookGetHeadRequestFilter(
             IConfiguration configuration,
-            IEnumerable<IWebHookGetHeadRequestMetadata> getHeadRequestMetadata,
             IHostingEnvironment hostingEnvironment,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IWebHookGetHeadRequestMetadata getHeadRequestMetadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            _getHeadRequestMetadata = getHeadRequestMetadata.ToArray();
+            if (getHeadRequestMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(getHeadRequestMetadata));
+            }
+
+            _getHeadRequestMetadata = getHeadRequestMetadata;
+        }
+
+        /// <summary>
+        /// Instantiates a new <see cref="WebHookGetHeadRequestFilter"/> instance to short-circuit WebHook requests
+        /// based on the receiver's <see cref="IWebHookGetHeadRequestMetadata"/>. That metadata is found in
+        /// <paramref name="metadataProvider"/>.
+        /// </summary>
+        /// <param name="configuration">
+        /// The <see cref="IConfiguration"/> used to initialize <see cref="WebHookSecurityFilter.Configuration"/>.
+        /// </param>
+        /// <param name="hostingEnvironment">
+        /// The <see cref="IHostingEnvironment" /> used to initialize
+        /// <see cref="WebHookSecurityFilter.HostingEnvironment"/>.
+        /// </param>
+        /// <param name="loggerFactory">
+        /// The <see cref="ILoggerFactory"/> used to initialize <see cref="WebHookSecurityFilter.Logger"/>.
+        /// </param>
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable metadata per-request.
+        /// </param>
+        /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
+        public WebHookGetHeadRequestFilter(
+            IConfiguration configuration,
+            IHostingEnvironment hostingEnvironment,
+            ILoggerFactory loggerFactory,
+            WebHookMetadataProvider metadataProvider)
+            : base(configuration, hostingEnvironment, loggerFactory)
+        {
+            if (metadataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(metadataProvider));
+            }
+
+            _metadataProvider = metadataProvider;
         }
 
         /// <summary>
         /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookGetHeadRequestFilter"/>
         /// instances. The recommended filter sequence is
         /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
         /// <item>
         /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
         /// <see cref="WebHookSecurityFilter"/> subclass.
@@ -67,8 +107,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// <see cref="WebHookEventMapperFilter"/>).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in this filter for this receiver (in
@@ -79,6 +119,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public new static int Order => WebHookVerifyRequiredValueFilter.Order + 10;
 
         /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
+
+        /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if (context == null)
@@ -87,60 +130,70 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            var request = context.HttpContext.Request;
-            if (routeData.TryGetWebHookReceiverName(out var receiverName) &&
-                (HttpMethods.IsGet(request.Method) || HttpMethods.IsHead(request.Method)))
+            var getHeadRequestMetadata = _getHeadRequestMetadata;
+            if (getHeadRequestMetadata == null)
             {
-                var getHeadRequestMetadata = _getHeadRequestMetadata
-                    .FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
-                if (getHeadRequestMetadata != null)
+                if (!routeData.TryGetWebHookReceiverName(out var requestReceiverName))
                 {
-                    // First verify that we have the secret key configuration value. This may be redundant if the
-                    // receiver also implements IWebHookVerifyCodeMetadata in its metadata. However this verification
-                    // is necessary for some receivers because signature verification (for example) is not possible
-                    // without a body.
-                    var secretKey = GetSecretKey(
-                        receiverName,
-                        routeData,
-                        getHeadRequestMetadata.SecretKeyMinLength,
-                        getHeadRequestMetadata.SecretKeyMaxLength);
-                    if (secretKey == null)
-                    {
-                        // Have already logged about this case.
-                        context.Result = new NotFoundResult();
-                        return;
-                    }
+                    return;
+                }
 
-                    if (HttpMethods.IsHead(request.Method))
-                    {
-                        if (getHeadRequestMetadata.AllowHeadRequests)
-                        {
-                            // Success #1
-                            Logger.LogInformation(
-                                400,
-                                "Received a HEAD request for the '{ReceiverName}' WebHook receiver -- ignoring.",
-                                receiverName);
-                            context.Result = new OkResult();
-                        }
+                getHeadRequestMetadata = _metadataProvider.GetGetHeadRequestMetadata(requestReceiverName);
+                if (getHeadRequestMetadata == null)
+                {
+                    return;
+                }
+            }
 
-                        // Never respond to a HEAD request with a challenge response.
-                        return;
-                    }
+            var request = context.HttpContext.Request;
+            if (HttpMethods.IsGet(request.Method) || HttpMethods.IsHead(request.Method))
+            {
+                // First verify that we have the secret key configuration value. This may be redundant if the
+                // receiver also implements IWebHookVerifyCodeMetadata in its metadata. However this verification
+                // is necessary for some receivers because signature verification (for example) is not possible
+                // without a body.
+                var receiverName = getHeadRequestMetadata.ReceiverName;
+                var secretKey = GetSecretKey(
+                    receiverName,
+                    routeData,
+                    getHeadRequestMetadata.SecretKeyMinLength,
+                    getHeadRequestMetadata.SecretKeyMaxLength);
+                if (secretKey == null)
+                {
+                    // Have already logged about this case.
+                    context.Result = new NotFoundResult();
+                    return;
+                }
 
-                    if (getHeadRequestMetadata.ChallengeQueryParameterName == null)
+                if (HttpMethods.IsHead(request.Method))
+                {
+                    if (getHeadRequestMetadata.AllowHeadRequests)
                     {
-                        // Success #2: Simple GET case. Have done all necessary verification.
+                        // Success #1
                         Logger.LogInformation(
-                            401,
-                            "Received a GET request for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                            400,
+                            "Received a HEAD request for the '{ReceiverName}' WebHook receiver -- ignoring.",
                             receiverName);
                         context.Result = new OkResult();
-                        return;
                     }
 
-                    // Success #3 unless required query parameter is missing.
-                    context.Result = GetChallengeResponse(getHeadRequestMetadata, receiverName, request, routeData);
+                    // Never respond to a HEAD request with a challenge response.
+                    return;
                 }
+
+                if (getHeadRequestMetadata.ChallengeQueryParameterName == null)
+                {
+                    // Success #2: Simple GET case. Have done all necessary verification.
+                    Logger.LogInformation(
+                        401,
+                        "Received a GET request for the '{ReceiverName}' WebHook receiver -- ignoring.",
+                        receiverName);
+                    context.Result = new OkResult();
+                    return;
+                }
+
+                // Success #3 unless required query parameter is missing.
+                context.Result = GetChallengeResponse(getHeadRequestMetadata, receiverName, request);
             }
         }
 
@@ -153,8 +206,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         private IActionResult GetChallengeResponse(
             IWebHookGetHeadRequestMetadata getHeadRequestMetadata,
             string receiverName,
-            HttpRequest request,
-            RouteData routeData)
+            HttpRequest request)
         {
             // Get the 'challenge' parameter from the request URI.
             var challenge = request.Query[getHeadRequestMetadata.ChallengeQueryParameterName];

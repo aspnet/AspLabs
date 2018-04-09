@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// Request must have <c>content-type</c> <c>application/x-www-form-urlencoded</c>.
         /// </summary>
         /// <remarks>
-        /// The <see cref="ApplicationModels.WebHookModelBindingProvider"/> gives a bound <c>data</c> parameter the
+        /// The <see cref="ApplicationModels.WebHookBindingInfoProvider"/> gives a bound <c>data</c> parameter the
         /// same <see cref="Mvc.ModelBinding.BindingInfo"/> as an associated <c>[FromForm]</c> attribute when the
         /// action or receiver has this <see cref="WebHookBodyType"/>.
         /// </remarks>
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// or a subset.
         /// </summary>
         /// <remarks>
-        /// The <see cref="ApplicationModels.WebHookModelBindingProvider"/> gives a bound <c>data</c> parameter the
+        /// The <see cref="ApplicationModels.WebHookBindingInfoProvider"/> gives a bound <c>data</c> parameter the
         /// same <see cref="Mvc.ModelBinding.BindingInfo"/> as an associated <c>[FromBody]</c> attribute when the
         /// action or receiver has this <see cref="WebHookBodyType"/>.
         /// </remarks>
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// or a subset.
         /// </summary>
         /// <remarks>
-        /// The <see cref="ApplicationModels.WebHookModelBindingProvider"/> gives a bound <c>data</c> parameter the
+        /// The <see cref="ApplicationModels.WebHookBindingInfoProvider"/> gives a bound <c>data</c> parameter the
         /// same <see cref="Mvc.ModelBinding.BindingInfo"/> as an associated <c>[FromBody]</c> attribute when the
         /// action or receiver has this <see cref="WebHookBodyType"/>.
         /// </remarks>

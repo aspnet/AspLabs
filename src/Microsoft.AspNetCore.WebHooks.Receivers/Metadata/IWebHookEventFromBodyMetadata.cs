@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// do not special-case event name mapping.
     /// </para>
     /// <para>
-    /// <see cref="Filters.WebHookEventMapperFilter"/> maps event names based on this metadata.
+    /// <see cref="Filters.WebHookEventNameMapperFilter"/> maps event names based on this metadata.
     /// </para>
     /// </summary>
     /// <remarks>
@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// </summary>
         /// <value>
         /// If <see langword="true"/>, requests lacking event names are allowed. Otherwise,
-        /// <see cref="Filters.WebHookEventMapperFilter"/> short-circuits the request, responding with a 400 "Bad
+        /// <see cref="Filters.WebHookEventNameMapperFilter"/> short-circuits the request, responding with a 400 "Bad
         /// Request" status code.
         /// </value>
         bool AllowMissing { get; }

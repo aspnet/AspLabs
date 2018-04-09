@@ -2,8 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// An <see cref="IResourceFilter"/> that confirms the <see cref="Routing.WebHookReceiverExistsConstraint"/> is
+    /// An <see cref="IResourceFilter"/> that confirms the <see cref="Routing.WebHookReceiverNameConstraint"/> is
     /// configured and ran successfully for this request. Also confirms either <see cref="IWebHookVerifyCodeMetadata"/>
     /// is applicable or at least one <see cref="IWebHookReceiver"/> filter is configured to handle this request.
     /// The minimal configuration for a receiver without <see cref="IWebHookVerifyCodeMetadata"/> includes a
@@ -23,27 +21,62 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </summary>
     public class WebHookReceiverExistsFilter : IResourceFilter
     {
-        private readonly IReadOnlyList<IWebHookVerifyCodeMetadata> _verifyCodeMetadata;
         private readonly ILogger _logger;
+        private readonly WebHookMetadataProvider _metadataProvider;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookReceiverExistsFilter"/> instance.
         /// </summary>
-        /// <param name="verifyCodeMetadata">
-        /// The collection of <see cref="IWebHookVerifyCodeMetadata"/> services.
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable
+        /// <see cref="IWebHookVerifyCodeMetadata"/> per-request.
         /// </param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         public WebHookReceiverExistsFilter(
-            IEnumerable<IWebHookVerifyCodeMetadata> verifyCodeMetadata,
+            WebHookMetadataProvider metadataProvider,
             ILoggerFactory loggerFactory)
         {
-            _verifyCodeMetadata = verifyCodeMetadata.ToArray();
             _logger = loggerFactory.CreateLogger<WebHookReceiverExistsFilter>();
+            _metadataProvider = metadataProvider;
         }
 
         /// <summary>
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookReceiverExistsFilter"/>
+        /// instances. The recommended filter sequence is
+        /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in this filter).
+        /// </item>
+        /// <item>
+        /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
+        /// <see cref="WebHookSecurityFilter"/> subclass.
+        /// </item>
+        /// <item>
+        /// Confirm required headers, <see cref="RouteValueDictionary"/> entries and query parameters are provided (in
+        /// <see cref="WebHookVerifyRequiredValueFilter"/>).
+        /// </item>
+        /// <item>
+        /// Short-circuit GET or HEAD requests, if receiver supports either (in
+        /// <see cref="WebHookGetHeadRequestFilter"/>).
+        /// </item>
+        /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
+        /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
+        /// <item>
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
+        /// </item>
+        /// <item>
+        /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
+        /// <see cref="WebHookPingRequestFilter"/>).
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <value>Chosen to run WebHook filters early, prior to application-specific filters.</value>
+        public static int Order => -500;
+
+        /// <summary>
         /// <para>
-        /// Confirms the <see cref="Routing.WebHookReceiverExistsConstraint"/> is configured and ran successfully for
+        /// Confirms the <see cref="Routing.WebHookReceiverNameConstraint"/> is configured and ran successfully for
         /// this request. Also confirms at least one <see cref="IWebHookReceiver"/> filter is configured to handle this
         /// request.
         /// </para>
@@ -80,7 +113,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // Check for receiver-specific filters only for receivers that do _not_ use code verification.
-                if (!_verifyCodeMetadata.Any(metadata => metadata.IsApplicable(receiverName)))
+                if (_metadataProvider.GetVerifyCodeMetadata(receiverName) == null)
                 {
                     var found = false;
                     for (var i = 0; i < context.Filters.Count; i++)

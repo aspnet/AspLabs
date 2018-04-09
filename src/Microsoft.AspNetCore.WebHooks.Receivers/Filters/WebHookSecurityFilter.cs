@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebHooks.Properties;
 using Microsoft.Extensions.Configuration;
@@ -15,12 +16,12 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.WebHooks.Filters
 {
     /// <summary>
-    /// Base class for <see cref="Mvc.Filters.IResourceFilter"/> or <see cref="Mvc.Filters.IAsyncResourceFilter"/>
-    /// implementations that for example verify request signatures or <c>code</c> query parameters. Subclasses may
-    /// also implement <see cref="IWebHookReceiver"/>. Subclasses should have an
-    /// <see cref="Mvc.Filters.IOrderedFilter.Order"/> equal to <see cref="Order"/>.
+    /// Base class for <see cref="IResourceFilter"/> or <see cref="IAsyncResourceFilter"/> implementations that for
+    /// example verify request signatures or <c>code</c> query parameters. Subclasses may also implement
+    /// <see cref="IWebHookReceiver"/>. Subclasses by default have an <see cref="IOrderedFilter.Order"/> equal to
+    /// <see cref="Order"/>.
     /// </summary>
-    public abstract class WebHookSecurityFilter
+    public abstract class WebHookSecurityFilter : IOrderedFilter
     {
         /// <summary>
         /// Instantiates a new <see cref="WebHookSecurityFilter"/> instance.
@@ -58,9 +59,12 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         }
 
         /// <summary>
-        /// Gets the <see cref="Mvc.Filters.IOrderedFilter.Order"/> recommended for all
-        /// <see cref="WebHookSecurityFilter"/> instances. The recommended filter sequence is
+        /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all <see cref="WebHookSecurityFilter"/>
+        /// instances. The recommended filter sequence is
         /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
         /// <item>
         /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
         /// <see cref="WebHookSecurityFilter"/> subclass.
@@ -76,8 +80,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// <see cref="WebHookEventMapperFilter"/>).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
@@ -85,7 +89,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// </item>
         /// </list>
         /// </summary>
-        public static int Order => -500;
+        public static int Order => WebHookReceiverExistsFilter.Order + 10;
+
+        /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
 
         /// <summary>
         /// Gets the <see cref="IConfiguration"/> for the application.

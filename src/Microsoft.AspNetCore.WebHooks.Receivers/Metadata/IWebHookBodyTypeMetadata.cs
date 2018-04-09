@@ -9,10 +9,10 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
     /// <remarks>
     /// <para>
     /// When the action has an associated <see cref="GeneralWebHookAttribute"/>,
-    /// <see cref="ApplicationModels.WebHookModelBindingProvider"/> sets <see cref="Mvc.ModelBinding.BindingInfo"/>
+    /// <see cref="ApplicationModels.WebHookBindingInfoProvider"/> sets <see cref="Mvc.ModelBinding.BindingInfo"/>
     /// properties for a <c>data</c> parameter based on <see cref="IWebHookBindingMetadata"/> and this metadata.
     /// Otherwise i.e. when the action has an associated receiver-specific <see cref="WebHookAttribute"/>,
-    /// <see cref="ApplicationModels.WebHookModelBindingProvider"/> uses <see cref="IWebHookBindingMetadata"/> and
+    /// <see cref="ApplicationModels.WebHookBindingInfoProvider"/> uses <see cref="IWebHookBindingMetadata"/> and
     /// <see cref="IWebHookBodyTypeMetadataService"/>.
     /// </para>
     /// <para>

@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -28,32 +26,72 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
     /// </para>
     /// </summary>
     /// <remarks>
-    /// The <see cref="WebHookVerifyCodeFilter"/>, <see cref="Routing.WebHookEventMapperConstraint"/> and
-    /// <see cref="Routing.WebHookEventMapperConstraint"/> subclasses also verify required HTTP headers and query
-    /// parameters. But, none of those constraints and filters use <see cref="IWebHookBindingMetadata"/> information.
+    /// The <see cref="Routing.WebHookEventNameMapperConstraint"/> and <see cref="WebHookVerifyCodeFilter"/> also
+    /// verify required HTTP headers, <see cref="RouteValueDictionary"/> entries and query parameters. But, those
+    /// constraints and filters do not use <see cref="IWebHookBindingMetadata"/> information.
     /// </remarks>
-    public class WebHookVerifyRequiredValueFilter : IResourceFilter
+    public class WebHookVerifyRequiredValueFilter : IResourceFilter, IOrderedFilter
     {
-        private readonly IReadOnlyList<IWebHookBindingMetadata> _bindingMetadata;
+        private readonly IWebHookBindingMetadata _bindingMetadata;
         private readonly ILogger _logger;
+        private readonly WebHookMetadataProvider _metadataProvider;
 
         /// <summary>
-        /// Instantiates a new <see cref="WebHookVerifyRequiredValueFilter"/> instance.
+        /// Instantiates a new <see cref="WebHookVerifyRequiredValueFilter"/> instance to verify the given
+        /// <paramref name="bindingMetadata"/>.
         /// </summary>
-        /// <param name="bindingMetadata">The collection of <see cref="IWebHookBindingMetadata"/> services.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="bindingMetadata">The receiver's <see cref="IWebHookBindingMetadata"/>.</param>
         public WebHookVerifyRequiredValueFilter(
-            IEnumerable<IWebHookBindingMetadata> bindingMetadata,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IWebHookBindingMetadata bindingMetadata)
         {
-            _bindingMetadata = bindingMetadata.ToArray();
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
+            if (bindingMetadata == null)
+            {
+                throw new ArgumentNullException(nameof(bindingMetadata));
+            }
+
+            _bindingMetadata = bindingMetadata;
             _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
+        }
+
+        /// <summary>
+        /// Instantiates a new <see cref="WebHookVerifyRequiredValueFilter"/> instance to verify the receiver's
+        /// <see cref="IWebHookBindingMetadata"/>. That metadata is found in <paramref name="metadataProvider"/>.
+        /// </summary>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="metadataProvider">
+        /// The <see cref="WebHookMetadataProvider"/> service. Searched for applicable metadata per-request.
+        /// </param>
+        /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
+        public WebHookVerifyRequiredValueFilter(
+            ILoggerFactory loggerFactory,
+            WebHookMetadataProvider metadataProvider)
+        {
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
+            if (metadataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(metadataProvider));
+            }
+
+            _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
+            _metadataProvider = metadataProvider;
         }
 
         /// <summary>
         /// Gets the <see cref="IOrderedFilter.Order"/> recommended for all
         /// <see cref="WebHookVerifyRequiredValueFilter"/> instances. The recommended filter sequence is
         /// <list type="number">
+        /// <item>
+        /// Confirm WebHooks configuration is set up correctly (in <see cref="WebHookReceiverExistsFilter"/>).
+        /// </item>
         /// <item>
         /// Confirm signature or <c>code</c> query parameter e.g. in <see cref="WebHookVerifyCodeFilter"/> or other
         /// <see cref="WebHookSecurityFilter"/> subclass.
@@ -69,8 +107,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <item>Confirm it's a POST request (in <see cref="WebHookVerifyMethodFilter"/>).</item>
         /// <item>Confirm body type (in <see cref="WebHookVerifyBodyTypeFilter"/>).</item>
         /// <item>
-        /// Map event name(s), if not done in <see cref="Routing.WebHookEventMapperConstraint"/> for this receiver (in
-        /// <see cref="WebHookEventMapperFilter"/>).
+        /// Map event name(s), if not done in <see cref="Routing.WebHookEventNameMapperConstraint"/> for this receiver
+        /// (in <see cref="WebHookEventNameMapperFilter"/>).
         /// </item>
         /// <item>
         /// Short-circuit ping requests, if not done in <see cref="WebHookGetHeadRequestFilter"/> for this receiver (in
@@ -81,6 +119,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         public static int Order => WebHookSecurityFilter.Order + 10;
 
         /// <inheritdoc />
+        int IOrderedFilter.Order => Order;
+
+        /// <inheritdoc />
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
             if (context == null)
@@ -89,19 +130,22 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            if (!routeData.TryGetWebHookReceiverName(out var receiverName))
-            {
-                // Not a WebHook request.
-                return;
-            }
-
-            var bindingMetadata = _bindingMetadata.FirstOrDefault(metadata => metadata.IsApplicable(receiverName));
+            var bindingMetadata = _bindingMetadata;
             if (bindingMetadata == null)
             {
-                // Receiver has no additional parameters.
-                return;
+                if (!routeData.TryGetWebHookReceiverName(out var requestReceiverName))
+                {
+                    return;
+                }
+
+                bindingMetadata = _metadataProvider.GetBindingMetadata(requestReceiverName);
+                if (bindingMetadata == null)
+                {
+                    return;
+                }
             }
 
+            var receiverName = bindingMetadata.ReceiverName;
             var request = context.HttpContext.Request;
             for (var i = 0; i < bindingMetadata.Parameters.Count; i++)
             {

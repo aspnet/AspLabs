@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.WebHooks
     /// </para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public abstract class WebHookAttribute : Attribute, IAllowAnonymous, IFilterFactory
+    public abstract class WebHookAttribute : Attribute, IAllowAnonymous, IFilterFactory, IOrderedFilter
     {
         private string _id;
 
@@ -53,6 +53,9 @@ namespace Microsoft.AspNetCore.WebHooks
 
             ReceiverName = receiverName;
         }
+
+        /// <inheritdoc />
+        int IOrderedFilter.Order => WebHookReceiverExistsFilter.Order;
 
         /// <summary>
         /// Gets the name of an available <see cref="IWebHookReceiver"/>.
