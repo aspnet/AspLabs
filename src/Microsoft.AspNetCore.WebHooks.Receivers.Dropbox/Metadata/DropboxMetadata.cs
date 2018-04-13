@@ -53,9 +53,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public int SecretKeyMinLength => DropboxConstants.SecretKeyMinLength;
 
-        /// <inheritdoc />
-        public int SecretKeyMaxLength => DropboxConstants.SecretKeyMaxLength;
-
         // IWebHookFilterMetadata...
 
         /// <inheritdoc />

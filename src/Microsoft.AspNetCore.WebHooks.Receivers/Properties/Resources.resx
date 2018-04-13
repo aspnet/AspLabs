@@ -154,7 +154,7 @@
     <value>'{0}' and '{1}' were applied to the same action. '{2}' must not be combined with another attribute that provides a route template.</value>
   </data>
   <data name="Security_BadSecret" xml:space="preserve">
-    <value>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'. The value must be between {2} and {3} characters long.</value>
+    <value>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'. The value must be at least {2} characters long.</value>
   </data>
   <data name="Security_NoHttps" xml:space="preserve">
     <value>The '{0}' WebHook receiver requires {1} in order to be secure. Register a WebHook URI of type '{2}'.</value>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Microsoft.AspNetCore.WebHooks
@@ -29,12 +29,6 @@ namespace Microsoft.AspNetCore.WebHooks
         /// property configured before responding to an HTTP GET request.
         /// </summary>
         public static int SecretKeyMinLength => 15;
-
-        /// <summary>
-        /// Gets the maximum length of the secret key configured for this receiver. Used to confirm the secret key is
-        /// property configured before responding to an HTTP GET request.
-        /// </summary>
-        public static int SecretKeyMaxLength => 128;
 
         /// <summary>
         /// Gets the name of the HTTP header that contains the (hex-encoded) signature of the request.

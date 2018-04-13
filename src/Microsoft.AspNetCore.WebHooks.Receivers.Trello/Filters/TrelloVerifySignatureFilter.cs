@@ -83,11 +83,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // 3. Get the configured secret key.
-                var secretKey = GetSecretKey(
-                    ReceiverName,
-                    context.RouteData,
-                    TrelloConstants.SecretKeyMinLength,
-                    TrelloConstants.SecretKeyMaxLength);
+                var secretKey = GetSecretKey(ReceiverName, context.RouteData, TrelloConstants.SecretKeyMinLength);
                 if (secretKey == null)
                 {
                     context.Result = new NotFoundResult();

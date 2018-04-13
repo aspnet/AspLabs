@@ -119,11 +119,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // 3. Get the configured secret key.
-                var secretKey = GetSecretKey(
-                    ReceiverName,
-                    context.RouteData,
-                    GitHubConstants.SecretKeyMinLength,
-                    GitHubConstants.SecretKeyMaxLength);
+                var secretKey = GetSecretKey(ReceiverName, context.RouteData, GitHubConstants.SecretKeyMinLength);
                 if (secretKey == null)
                 {
                     context.Result = new NotFoundResult();

@@ -82,11 +82,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 // 3. Get the configured secret key.
-                var secretKey = GetSecretKey(
-                    ReceiverName,
-                    context.RouteData,
-                    DropboxConstants.SecretKeyMinLength,
-                    DropboxConstants.SecretKeyMaxLength);
+                var secretKey = GetSecretKey(ReceiverName, context.RouteData, DropboxConstants.SecretKeyMinLength);
                 if (secretKey == null)
                 {
                     context.Result = new NotFoundResult();

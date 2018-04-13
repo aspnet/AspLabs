@@ -19,13 +19,6 @@ namespace Microsoft.AspNetCore.WebHooks
         public static int CodeParameterMinLength => 32;
 
         /// <summary>
-        /// Gets the maximum length of the <see cref="CodeQueryParameterName"/> query parameter value and secret key
-        /// for receivers using such a query parameter.
-        /// </summary>
-        /// <seealso cref="Metadata.IWebHookVerifyCodeMetadata"/>
-        public static int CodeParameterMaxLength => 128;
-
-        /// <summary>
         /// Gets the name of a query parameter containing the secret key used to verify some WebHook receivers'
         /// requests.
         /// </summary>

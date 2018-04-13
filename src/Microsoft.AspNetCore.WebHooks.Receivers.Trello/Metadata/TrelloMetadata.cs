@@ -53,9 +53,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public int SecretKeyMinLength => TrelloConstants.SecretKeyMinLength;
 
-        /// <inheritdoc />
-        public int SecretKeyMaxLength => TrelloConstants.SecretKeyMaxLength;
-
         // IWebHookFilterMetadata...
 
         /// <inheritdoc />

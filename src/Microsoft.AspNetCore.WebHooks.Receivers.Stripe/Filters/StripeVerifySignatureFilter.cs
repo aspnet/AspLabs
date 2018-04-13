@@ -98,11 +98,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             var signatures = GetSignatures(header);
 
             // 4. Get the configured secret key.
-            var secretKey = GetSecretKey(
-                ReceiverName,
-                context.RouteData,
-                StripeConstants.SecretKeyMinLength,
-                StripeConstants.SecretKeyMaxLength);
+            var secretKey = GetSecretKey(ReceiverName, context.RouteData, StripeConstants.SecretKeyMinLength);
             if (secretKey == null)
             {
                 context.Result = new NotFoundResult();

@@ -156,8 +156,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 var secretKey = GetSecretKey(
                     receiverName,
                     routeData,
-                    getHeadRequestMetadata.SecretKeyMinLength,
-                    getHeadRequestMetadata.SecretKeyMaxLength);
+                    getHeadRequestMetadata.SecretKeyMinLength);
                 if (secretKey == null)
                 {
                     // Have already logged about this case.

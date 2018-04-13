@@ -102,9 +102,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 }
 
                 var secretKey = secretKeys[applicationKey];
-                if (secretKey == null ||
-                    secretKey.Length < PusherConstants.SecretKeyMinLength ||
-                    secretKey.Length > PusherConstants.SecretKeyMaxLength)
+                if (secretKey == null || secretKey.Length < PusherConstants.SecretKeyMinLength)
                 {
                     Logger.LogWarning(
                         0,

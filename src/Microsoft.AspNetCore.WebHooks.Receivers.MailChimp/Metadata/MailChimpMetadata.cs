@@ -44,8 +44,5 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public int SecretKeyMinLength => WebHookConstants.CodeParameterMinLength;
-
-        /// <inheritdoc />
-        public int SecretKeyMaxLength => WebHookConstants.CodeParameterMaxLength;
     }
 }

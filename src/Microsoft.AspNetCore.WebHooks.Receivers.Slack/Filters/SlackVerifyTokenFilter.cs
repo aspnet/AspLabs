@@ -113,12 +113,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            var secretKey = GetSecretKey(
-                ReceiverName,
-                routeData,
-                SlackConstants.SecretKeyMinLength,
-                SlackConstants.SecretKeyMaxLength);
-
+            var secretKey = GetSecretKey(ReceiverName, routeData, SlackConstants.SecretKeyMinLength);
             if (!SecretEqual(token, secretKey))
             {
                 Logger.LogWarning(

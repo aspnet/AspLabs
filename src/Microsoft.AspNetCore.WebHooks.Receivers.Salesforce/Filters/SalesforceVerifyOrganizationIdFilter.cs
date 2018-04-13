@@ -128,11 +128,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var routeData = context.RouteData;
-            var secret = GetSecretKey(
-                ReceiverName,
-                routeData,
-                SalesforceConstants.SecretKeyMinLength,
-                SalesforceConstants.SecretKeyMaxLength);
+            var secret = GetSecretKey(ReceiverName, routeData, SalesforceConstants.SecretKeyMinLength);
 
             var organizationId = GetShortOrganizationId(organizationIds[0]);
             var secretKey = GetShortOrganizationId(secret);

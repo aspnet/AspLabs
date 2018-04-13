@@ -84,11 +84,6 @@ namespace Microsoft.AspNetCore.WebHooks
         public static int SecretKeyMinLength => 16;
 
         /// <summary>
-        /// Gets the maximum length of the secret key configured for this receiver.
-        /// </summary>
-        public static int SecretKeyMaxLength => 128;
-
-        /// <summary>
         /// Gets the name of the HTTP header that contains the timestamp and signature of the request. See
         /// <see href="https://stripe.com/docs/webhooks#replay-attacks"/> and
         /// <see href="https://stripe.com/docs/webhooks#verify-manually"/> for more information about this header.

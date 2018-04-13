@@ -49,11 +49,5 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// property configured before responding to an HTTP GET or HEAD request.
         /// </summary>
         int SecretKeyMinLength { get; }
-
-        /// <summary>
-        /// Gets the maximum length of the secret key configured for this receiver. Used to confirm the secret key is
-        /// property configured before responding to an HTTP GET or HEAD request.
-        /// </summary>
-        int SecretKeyMaxLength { get; }
     }
 }

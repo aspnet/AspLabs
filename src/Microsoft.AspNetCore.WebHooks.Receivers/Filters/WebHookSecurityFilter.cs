@@ -182,15 +182,10 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <see cref="WebHookSecurityFilter"/> subclass to support multiple senders with individual configurations.
         /// </param>
         /// <param name="minLength">The minimum length of the key value.</param>
-        /// <param name="maxLength">The maximum length of the key value.</param>
         /// <returns>
         /// The configured WebHook secret key. <see langword="null"/> if the configuration value does not exist.
         /// </returns>
-        protected virtual string GetSecretKey(
-            string sectionKey,
-            RouteData routeData,
-            int minLength,
-            int maxLength)
+        protected virtual string GetSecretKey(string sectionKey, RouteData routeData, int minLength)
         {
             if (sectionKey == null)
             {
@@ -220,7 +215,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return null;
             }
 
-            if (secret.Length < minLength || secret.Length > maxLength)
+            if (secret.Length < minLength)
             {
                 // Secrete key found but it does not meet the length requirements.
                 routeData.TryGetWebHookReceiverId(out var id);
@@ -229,8 +224,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                     Resources.Security_BadSecret,
                     sectionKey,
                     id,
-                    minLength,
-                    maxLength);
+                    minLength);
                 throw new InvalidOperationException(message);
             }
 

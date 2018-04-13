@@ -187,11 +187,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
                 return noCode;
             }
 
-            var secretKey = GetSecretKey(
-                receiverName,
-                routeData,
-                WebHookConstants.CodeParameterMinLength,
-                WebHookConstants.CodeParameterMaxLength);
+            var secretKey = GetSecretKey(receiverName, routeData, WebHookConstants.CodeParameterMinLength);
             if (secretKey == null)
             {
                 return new NotFoundResult();
