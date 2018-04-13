@@ -4,17 +4,17 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Package Versions">
-    <InternalAspNetCoreSdkPackageVersion>2.1.0-preview3-17002</InternalAspNetCoreSdkPackageVersion>
-    <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCoreMvcCorePackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
-    <MicrosoftAspNetCorePackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCorePackageVersion>
-    <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCoreStaticFilesPackageVersion>
-    <MicrosoftAspNetCoreTestingPackageVersion>2.1.0-preview3-32110</MicrosoftAspNetCoreTestingPackageVersion>
-    <MicrosoftExtensionsConfigurationPackageVersion>2.1.0-preview3-32110</MicrosoftExtensionsConfigurationPackageVersion>
-    <MicrosoftExtensionsPrimitivesPackageVersion>2.1.0-preview3-32110</MicrosoftExtensionsPrimitivesPackageVersion>
+    <InternalAspNetCoreSdkPackageVersion>2.1.0-preview3-17031</InternalAspNetCoreSdkPackageVersion>
+    <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCoreMvcCorePackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
+    <MicrosoftAspNetCorePackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCorePackageVersion>
+    <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCoreStaticFilesPackageVersion>
+    <MicrosoftAspNetCoreTestingPackageVersion>2.1.0-preview3-32196</MicrosoftAspNetCoreTestingPackageVersion>
+    <MicrosoftExtensionsConfigurationPackageVersion>2.1.0-preview3-32196</MicrosoftExtensionsConfigurationPackageVersion>
+    <MicrosoftExtensionsPrimitivesPackageVersion>2.1.0-preview3-32196</MicrosoftExtensionsPrimitivesPackageVersion>
     <MicrosoftNETCoreApp20PackageVersion>2.0.0</MicrosoftNETCoreApp20PackageVersion>
-    <MicrosoftNETCoreApp21PackageVersion>2.1.0-preview3-26331-01</MicrosoftNETCoreApp21PackageVersion>
+    <MicrosoftNETCoreApp21PackageVersion>2.1.0-preview2-26406-04</MicrosoftNETCoreApp21PackageVersion>
     <MicrosoftNETTestSdkPackageVersion>15.6.1</MicrosoftNETTestSdkPackageVersion>
     <MoqPackageVersion>4.7.49</MoqPackageVersion>
     <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
