@@ -150,9 +150,6 @@
   <data name="RequestReader_ModelBindingFailed" xml:space="preserve">
     <value>The MVC model binding system failed. Model state is valid but model was not set.</value>
   </data>
-  <data name="RoutingProvider_MixedRouteWithWebHookAttribute" xml:space="preserve">
-    <value>'{0}' and '{1}' were applied to the same action. '{2}' must not be combined with another attribute that provides a route template.</value>
-  </data>
   <data name="Security_BadSecret" xml:space="preserve">
     <value>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'. The value must be at least {2} characters long.</value>
   </data>
@@ -161,6 +158,9 @@
   </data>
   <data name="Security_NoSecrets" xml:space="preserve">
     <value>Could not find a valid configuration for the '{0}' WebHook receiver. Configure secret keys for this receiver.</value>
+  </data>
+  <data name="SelectorModelProvider_MixedRouteWithWebHookAttribute" xml:space="preserve">
+    <value>'{0}' and '{1}' were applied to the same action. '{2}' must not be combined with attribute routing or non-WebHook constraints.</value>
   </data>
   <data name="VerifyBody_NoFormData" xml:space="preserve">
     <value>The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</value>

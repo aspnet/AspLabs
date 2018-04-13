@@ -160,16 +160,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; and &apos;{1}&apos; were applied to the same action. &apos;{2}&apos; must not be combined with another attribute that provides a route template..
-        /// </summary>
-        internal static string RoutingProvider_MixedRouteWithWebHookAttribute {
-            get {
-                return ResourceManager.GetString("RoutingProvider_MixedRouteWithWebHookAttribute", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;. The value must be at least {2} characters long..
+        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;. The value must be between {2} and {3} characters long..
         /// </summary>
         internal static string Security_BadSecret {
             get {
@@ -192,6 +183,15 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         internal static string Security_NoSecrets {
             get {
                 return ResourceManager.GetString("Security_NoSecrets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; and &apos;{1}&apos; were applied to the same action. &apos;{2}&apos; must not be combined with attribute routing or non-WebHook constraints..
+        /// </summary>
+        internal static string SelectorModelProvider_MixedRouteWithWebHookAttribute {
+            get {
+                return ResourceManager.GetString("SelectorModelProvider_MixedRouteWithWebHookAttribute", resourceCulture);
             }
         }
         

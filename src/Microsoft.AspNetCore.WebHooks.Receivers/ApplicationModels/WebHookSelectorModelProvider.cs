@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebHooks.Metadata;
@@ -101,29 +100,45 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 return;
             }
 
-            var template = ChooseTemplate();
-            var selectors = action.Selectors;
-            if (selectors.Count == 0)
+            // Check for conflicting attribute routing attributes and constraints. Ignore the empty SelectorModel that
+            // DefaultApplicationModelProvider always creates.
+            var selectors = action.Selectors
+                .Concat(action.Controller.Selectors)
+                .Where(selectorModel => selectorModel.ActionConstraints.Count != 0 ||
+                    selectorModel.AttributeRouteModel != null)
+                .ToArray();
+            if (selectors.Length != 0)
             {
-                var selector = new SelectorModel();
-                selectors.Add(selector);
+                // For the error message, prefer an IRouteTemplateProvider over a constraint that is an Attribute.
+                // Prefer both over other constraints.
+                var conflictingAttribute = selectors
+                        .Select(model => (object)model.AttributeRouteModel?.Attribute)
+                        .Concat(selectors.SelectMany(model => model.ActionConstraints.OfType<Attribute>()))
+                        .Concat(selectors.SelectMany(model => model.ActionConstraints))
+                        .FirstOrDefault();
 
-                AddTemplate(attribute, template, selector);
+                var message = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.SelectorModelProvider_MixedRouteWithWebHookAttribute,
+                    attribute.GetType(),
+                    conflictingAttribute?.GetType(),
+                    attribute.GetType().Name);
+                throw new InvalidOperationException(message);
             }
-            else
+
+            // Set the template for given SelectorModel. Similar result to WebHookActionAttributeBase implementing
+            // IRouteTemplateProvider.
+            var selector = action.Selectors[0];
+            selector.AttributeRouteModel = new AttributeRouteModel
             {
-                for (var i = 0; i < selectors.Count; i++)
-                {
-                    var selector = selectors[i];
-                    AddTemplate(attribute, template, selector);
-                }
-            }
+                Template = ChooseTemplate(),
+            };
 
             var properties = action.Properties;
-            AddEventMapperConstraint(properties, selectors);
-            AddEventNamesConstraint(properties, selectors);
-            AddIdConstraint(attribute, selectors);
-            AddReceiverExistsConstraint(properties, selectors);
+            AddEventNameMapperConstraint(properties, selector);
+            AddEventNamesConstraint(properties, selector);
+            AddIdConstraint(attribute, selector);
+            AddReceiverNameConstraint(properties, selector);
         }
 
         // Use a constant template since all WebHook constraints use the resulting route values and we have no
@@ -137,39 +152,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             return template;
         }
 
-        // Set the template for given SelectorModel. Similar to WebHookActionAttributeBase implementing
-        // IRouteTemplateProvider.
-        private static void AddTemplate(WebHookAttribute attribute, string template, SelectorModel selector)
-        {
-            if (selector.AttributeRouteModel?.Template != null)
-            {
-                var message = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.RoutingProvider_MixedRouteWithWebHookAttribute,
-                    attribute.GetType(),
-                    selector.AttributeRouteModel.Attribute?.GetType(),
-                    attribute.GetType().Name);
-                throw new InvalidOperationException(message);
-            }
-
-            if (selector.AttributeRouteModel == null)
-            {
-                selector.AttributeRouteModel = new AttributeRouteModel();
-            }
-
-            selector.AttributeRouteModel.Template = template;
-        }
-
-        private static void AddConstraint(IActionConstraintMetadata constraint, IList<SelectorModel> selectors)
-        {
-            for (var i = 0; i < selectors.Count; i++)
-            {
-                var selector = selectors[i];
-                selector.ActionConstraints.Add(constraint);
-            }
-        }
-
-        private void AddEventMapperConstraint(IDictionary<object, object> properties, IList<SelectorModel> selectors)
+        private void AddEventNameMapperConstraint(IDictionary<object, object> properties, SelectorModel selector)
         {
             if (properties.TryGetValue(typeof(IWebHookEventMetadata), out var eventMetadataObject))
             {
@@ -183,11 +166,11 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                     constraint = new WebHookEventNameMapperConstraint(_loggerFactory, _metadataProvider);
                 }
 
-                AddConstraint(constraint, selectors);
+                selector.ActionConstraints.Add(constraint);
             }
         }
 
-        private void AddEventNamesConstraint(IDictionary<object, object> properties, IList<SelectorModel> selectors)
+        private void AddEventNamesConstraint(IDictionary<object, object> properties, SelectorModel selector)
         {
             if (properties.TryGetValue(typeof(IWebHookEventSelectorMetadata), out var eventSourceMetadata))
             {
@@ -196,7 +179,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 {
                     properties.TryGetValue(typeof(IWebHookPingRequestMetadata), out var pingRequestMetadataObject);
 
-                    IActionConstraintMetadata constraint;
+                    WebHookEventNameConstraint constraint;
                     if (pingRequestMetadataObject == null)
                     {
                         constraint = new WebHookEventNameConstraint(eventName);
@@ -210,23 +193,21 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                         constraint = new WebHookEventNameConstraint(eventName, _metadataProvider);
                     }
 
-                    AddConstraint(constraint, selectors);
+                    selector.ActionConstraints.Add(constraint);
                 }
             }
         }
 
-        private void AddIdConstraint(WebHookAttribute attribute, IList<SelectorModel> selectors)
+        private void AddIdConstraint(WebHookAttribute attribute, SelectorModel selector)
         {
             if (attribute.Id != null)
             {
                 var constraint = new WebHookIdConstraint(attribute.Id);
-                AddConstraint(constraint, selectors);
+                selector.ActionConstraints.Add(constraint);
             }
         }
 
-        private void AddReceiverExistsConstraint(
-            IDictionary<object, object> properties,
-            IList<SelectorModel> selectors)
+        private void AddReceiverNameConstraint(IDictionary<object, object> properties, SelectorModel selector)
         {
             var bodyTypeMetadataObject = properties[typeof(IWebHookBodyTypeMetadataService)];
 
@@ -240,7 +221,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 constraint = new WebHookReceiverNameConstraint(_metadataProvider);
             }
 
-            AddConstraint(constraint, selectors);
+            selector.ActionConstraints.Add(constraint);
         }
     }
 }
