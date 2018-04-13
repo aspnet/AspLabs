@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.WebHooks;
 using Microsoft.AspNetCore.WebHooks.ApplicationModels;
 using Microsoft.AspNetCore.WebHooks.Filters;
+using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -26,6 +27,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(services));
             }
+
+            services.TryAddSingleton<WebHookMetadataProvider, DefaultWebHookMetadataProvider>();
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IApplicationModelProvider, WebHookActionModelFilterProvider>());

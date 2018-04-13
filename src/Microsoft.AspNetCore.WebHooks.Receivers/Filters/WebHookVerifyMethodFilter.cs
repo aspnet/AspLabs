@@ -81,14 +81,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var request = context.HttpContext.Request;
-            if (request.Body == null ||
-                !request.ContentLength.HasValue ||
-                request.ContentLength.Value == 0L ||
-                !HttpMethods.IsPost(request.Method))
+            if (!HttpMethods.IsPost(request.Method))
             {
                 // Log about the issue and short-circuit remainder of the pipeline.
                 context.RouteData.TryGetWebHookReceiverName(out var receiverName);
                 context.Result = CreateBadMethodResult(request.Method, receiverName);
+            }
+            else if (request.Body == null ||
+                !request.ContentLength.HasValue ||
+                request.ContentLength.Value == 0L)
+            {
+                context.RouteData.TryGetWebHookReceiverName(out var receiverName);
+                context.Result = CreateBadBodyResult(receiverName);
             }
         }
 
@@ -98,19 +102,31 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             // No-op
         }
 
+        private IActionResult CreateBadBodyResult(string receiverName)
+        {
+            _logger.LogWarning(
+                0,
+                "The '{ReceiverName}' WebHook receiver does not support an empty request body.",
+                receiverName);
+
+            var message = string.Format(CultureInfo.CurrentCulture, Resources.VerifyMethod_BadBody, receiverName);
+
+            return new BadRequestObjectResult(message);
+        }
+
         private IActionResult CreateBadMethodResult(string methodName, string receiverName)
         {
             _logger.LogWarning(
                 0,
-                "The HTTP '{RequestMethod}' method is not supported by the '{ReceiverName}' WebHook receiver.",
-                methodName,
-                receiverName);
+                "The '{ReceiverName}' WebHook receiver does not support the HTTP '{RequestMethod}' method.",
+                receiverName,
+                methodName);
 
             var message = string.Format(
                 CultureInfo.CurrentCulture,
                 Resources.VerifyMethod_BadMethod,
-                methodName,
-                receiverName);
+                receiverName,
+                methodName);
             var badMethod = new BadRequestObjectResult(message)
             {
                 StatusCode = StatusCodes.Status405MethodNotAllowed
