@@ -39,7 +39,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         public bool AllowHeadRequests => false;
 
         /// <inheritdoc />
-        /// <inheritdoc />
         public string ChallengeQueryParameterName => null;
 
         /// <inheritdoc />

@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
     {
         private readonly IWebHookBodyTypeMetadataService _bodyTypeMetadata;
         private readonly WebHookMetadataProvider _metadataProvider;
+        private readonly int _order;
 
         /// <summary>
         /// Instantiates a new <see cref="WebHookReceiverNameConstraint"/> instance to verify the request matches the
@@ -26,6 +27,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         public WebHookReceiverNameConstraint(IWebHookBodyTypeMetadataService bodyTypeMetadata)
         {
             _bodyTypeMetadata = bodyTypeMetadata;
+            _order = Order;
         }
 
         /// <summary>
@@ -39,17 +41,24 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         public WebHookReceiverNameConstraint(WebHookMetadataProvider metadataProvider)
         {
             _metadataProvider = metadataProvider;
+            _order = Order + 5;
         }
 
         /// <summary>
-        /// Gets the <see cref="IActionConstraint.Order"/> value used in all
+        /// Gets the minimum <see cref="IActionConstraint.Order"/> value used in all
         /// <see cref="WebHookReceiverNameConstraint"/> instances.
         /// </summary>
         /// <value>Chosen to run this constraint early in action selection.</value>
+        /// <remarks>
+        /// <see cref="IActionConstraint.Order"/> is <see cref="Order"/> when an instance is instantiated with the
+        /// <see cref="WebHookReceiverNameConstraint(IWebHookBodyTypeMetadataService)"/> constructor.
+        /// <see cref="IActionConstraint.Order"/> is <c>Order + 5</c> when instantiated with the
+        /// <see cref="WebHookReceiverNameConstraint(WebHookMetadataProvider)"/> constructor.
+        /// </remarks>
         public static int Order => -500;
 
         /// <inheritdoc />
-        int IActionConstraint.Order => Order;
+        int IActionConstraint.Order => _order;
 
         /// <inheritdoc />
         public bool Accept(ActionConstraintContext context)
