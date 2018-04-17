@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
@@ -8,6 +8,7 @@
     <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreMvcCorePackageVersion>
     <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
+    <MicrosoftAspNetCoreMvcTestingPackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreMvcTestingPackageVersion>
     <MicrosoftAspNetCorePackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCorePackageVersion>
     <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreStaticFilesPackageVersion>
     <MicrosoftAspNetCoreTestingPackageVersion>2.1.0-preview3-32233</MicrosoftAspNetCoreTestingPackageVersion>

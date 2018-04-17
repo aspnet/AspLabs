@@ -76,6 +76,11 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookEventMetadata), type));
             }
 
+            if (typeof(IWebHookFilterMetadata).IsAssignableFrom(type))
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookFilterMetadata), type));
+            }
+
             if (typeof(IWebHookGetHeadRequestMetadata).IsAssignableFrom(type))
             {
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IWebHookGetHeadRequestMetadata), type));

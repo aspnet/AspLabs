@@ -380,7 +380,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             {
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.MetadataProvider_MissingMetadata,
+                    Resources.PropertyProvider_MissingMetadata,
                     receiverName,
                     typeof(IWebHookBodyTypeMetadataService));
                 throw new InvalidOperationException(message);
@@ -410,7 +410,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
                 // IWebHookEventMetadata is mandatory when performing action selection using event names.
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.MetadataProvider_MissingMetadataServices,
+                    Resources.PropertyProvider_MissingMetadataServices,
                     receiverName,
                     typeof(IWebHookEventSelectorMetadata),
                     typeof(IWebHookEventMetadata));
@@ -449,7 +449,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             {
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.MetadataProvider_ConflictingMetadataServices,
+                    Resources.PropertyProvider_ConflictingMetadataServices,
                     receiverWithConflictingMetadata.ReceiverName,
                     typeof(IWebHookEventFromBodyMetadata),
                     typeof(IWebHookEventMetadata));
@@ -484,7 +484,7 @@ namespace Microsoft.AspNetCore.WebHooks.ApplicationModels
             {
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.MetadataProvider_DuplicateMetadata,
+                    Resources.PropertyProvider_DuplicateMetadata,
                     duplicateMetadataGroup.Key, // ReceiverName
                     typeof(TService));
                 throw new InvalidOperationException(message);
