@@ -6,6 +6,7 @@
   <PropertyGroup Label="Package Versions">
     <InternalAspNetCoreSdkPackageVersion>2.1.0-rc1-15774</InternalAspNetCoreSdkPackageVersion>
     <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0-rc1-30613</MicrosoftAspNetCoreMvcCorePackageVersion>
+    <MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>2.1.0-rc1-30613</MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0-rc1-30613</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0-rc1-30613</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
     <MicrosoftAspNetCoreMvcTestingPackageVersion>2.1.0-rc1-30613</MicrosoftAspNetCoreMvcTestingPackageVersion>
