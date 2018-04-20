@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +12,8 @@ namespace BitbucketStronglyTypedCoreReceiver
         {
             services
                 .AddMvcCore()
-                .AddBitbucketWebHooks();
+                .AddBitbucketWebHooks()
+                .AddDataAnnotations();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
