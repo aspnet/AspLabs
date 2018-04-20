@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -11,6 +11,6 @@ namespace BitbucketStronglyTypedCoreReceiver
     {
         [JsonProperty("changes", Required = Required.Always)]
         [MinLength(1)]
-        public IList<BitbucketChange> Changes { get; } = new List<BitbucketChange>();
+        public BitbucketChange[] Changes { get; set; } = Array.Empty<BitbucketChange>();
     }
 }

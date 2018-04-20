@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*" />
     <ProjectReference Include="..\..\samples\AzureAlertCoreReceiver\AzureAlertCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\BitbucketCoreReceiver\BitbucketCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\BitbucketStronglyTypedCoreReceiver\BitbucketStronglyTypedCoreReceiver.csproj" />

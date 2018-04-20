@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
 {
@@ -31,6 +32,17 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
                 services.Configure<MvcCompatibilityOptions>(
                     options => options.CompatibilityVersion = CompatibilityVersion.Latest);
             });
+        }
+
+        public WebApplicationFactory<TStartup> WithTestLogger(out TestSink testSink)
+        {
+            testSink = new TestSink();
+            var loggerFactory = new TestLoggerFactory(testSink, enabled: true);
+
+            // Do not use NullLoggerFactory in updated factory.
+            return WithWebHostBuilder(
+                webHostBuilder => webHostBuilder.ConfigureServices(
+                    services => services.AddSingleton<ILoggerFactory>(loggerFactory)));
         }
     }
 }
