@@ -1,9 +1,11 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 using WordPressCoreReceiver;
 using Xunit;
 
@@ -12,10 +14,12 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
     public class WordPressCoreReceiverTest : IClassFixture<WebHookTestFixture<Startup>>
     {
         private readonly HttpClient _client;
+        private readonly WebHookTestFixture<Startup> _fixture;
 
         public WordPressCoreReceiverTest(WebHookTestFixture<Startup> fixture)
         {
             _client = fixture.CreateClient();
+            _fixture = fixture;
         }
 
         [Fact]
@@ -113,6 +117,35 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             var responseText = await response.Content.ReadAsStringAsync();
             Assert.Equal(expectedErrorMessage, responseText);
+        }
+
+        [Fact]
+        public async Task WebHookAction_WithBody_Succeeds()
+        {
+            // Arrange
+            var fixture = _fixture.WithTestLogger(out var testSink);
+            var client = fixture.CreateClient();
+
+            var path = Path.Combine("Resources", "RequestBodies", "WordPress.txt");
+            var stream = await ResourceFile.GetResourceStreamAsync(path, normalizeLineEndings: true);
+            var content = new StreamContent(stream)
+            {
+                Headers =
+                {
+                    { HeaderNames.ContentLength, stream.Length.ToString() },
+                    { HeaderNames.ContentType, "application/x-www-form-urlencoded" },
+                },
+            };
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/webhooks/incoming/wordpress?code=01234567890123456789012345678901",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseText = await response.Content.ReadAsStringAsync();
+            Assert.Empty(responseText);
         }
     }
 }

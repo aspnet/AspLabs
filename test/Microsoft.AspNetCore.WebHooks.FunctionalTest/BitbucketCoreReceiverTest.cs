@@ -1,10 +1,12 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BitbucketCoreReceiver;
+using Microsoft.Net.Http.Headers;
 using Xunit;
 
 namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
@@ -12,10 +14,12 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
     public class BitbucketCoreReceiverTest : IClassFixture<WebHookTestFixture<Startup>>
     {
         private readonly HttpClient _client;
+        private readonly WebHookTestFixture<Startup> _fixture;
 
         public BitbucketCoreReceiverTest(WebHookTestFixture<Startup> fixture)
         {
             _client = fixture.CreateClient();
+            _fixture = fixture;
         }
 
         [Fact]
@@ -196,6 +200,44 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             var responseText = await response.Content.ReadAsStringAsync();
             Assert.Equal(expectedErrorMessage, responseText);
+        }
+
+        [Fact]
+        public async Task WebHookAction_WithBody_Succeeds()
+        {
+            // Arrange
+            var fixture = _fixture.WithTestLogger(out var testSink);
+            var client = fixture.CreateClient();
+
+            var path = Path.Combine("Resources", "RequestBodies", "Bitbucket.json");
+            var stream = await ResourceFile.GetResourceStreamAsync(path, normalizeLineEndings: true);
+            var content = new StreamContent(stream)
+            {
+                Headers =
+                {
+                    { HeaderNames.ContentLength, stream.Length.ToString() },
+                    { HeaderNames.ContentType, "text/json" },
+                },
+            };
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "/api/webhooks/incoming/bitbucket?code=01234567890123456789012345678901")
+            {
+                Content = content,
+                Headers =
+                {
+                    { BitbucketConstants.EventHeaderName, "repo:push" },
+                    { BitbucketConstants.WebHookIdHeaderName, "01234" },
+                },
+            };
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseText = await response.Content.ReadAsStringAsync();
+            Assert.Empty(responseText);
         }
     }
 }

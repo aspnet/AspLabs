@@ -1,10 +1,12 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AzureAlertCoreReceiver;
+using Microsoft.Net.Http.Headers;
 using Xunit;
 
 namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
@@ -12,10 +14,12 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
     public class AzureAlertCoreReceiverTest : IClassFixture<WebHookTestFixture<Startup>>
     {
         private readonly HttpClient _client;
+        private readonly WebHookTestFixture<Startup> _fixture;
 
         public AzureAlertCoreReceiverTest(WebHookTestFixture<Startup> fixture)
         {
             _client = fixture.CreateClient();
+            _fixture = fixture;
         }
 
         [Fact]
@@ -113,6 +117,39 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             var responseText = await response.Content.ReadAsStringAsync();
             Assert.Equal(expectedErrorMessage, responseText);
+        }
+
+        [Theory]
+        [InlineData("AzureAlert.Metric1.json")]
+        [InlineData("AzureAlert.Metric2.json")]
+        [InlineData("AzureAlert.Metric3.json")]
+        [InlineData("AzureAlert.WebTest.Resolved.json")]
+        public async Task WebHookAction_WithBody_Succeeds(string filename)
+        {
+            // Arrange
+            var fixture = _fixture.WithTestLogger(out var testSink);
+            var client = fixture.CreateClient();
+
+            var path = Path.Combine("Resources", "RequestBodies", filename);
+            var stream = await ResourceFile.GetResourceStreamAsync(path, normalizeLineEndings: true);
+            var content = new StreamContent(stream)
+            {
+                Headers =
+                {
+                    { HeaderNames.ContentLength, stream.Length.ToString() },
+                    { HeaderNames.ContentType, "text/json" },
+                },
+            };
+
+            // Act
+            var response = await client.PostAsync(
+                "/api/webhooks/incoming/azurealert?code=01234567890123456789012345678901",
+                content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseText = await response.Content.ReadAsStringAsync();
+            Assert.Empty(responseText);
         }
     }
 }
