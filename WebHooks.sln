@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHubCoreReceiver", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert\Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert.csproj", "{FAE4E7F8-7786-4388-802D-69C5C40DD5ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry.csproj", "{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.BitBucket", "src\Microsoft.AspNetCore.WebHooks.Receivers.BitBucket\Microsoft.AspNetCore.WebHooks.Receivers.BitBucket.csproj", "{06B0D9D1-1368-423E-B2F7-5F408423A187}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.Dropbox", "src\Microsoft.AspNetCore.WebHooks.Receivers.Dropbox\Microsoft.AspNetCore.WebHooks.Receivers.Dropbox.csproj", "{99046330-F5C1-4994-9EAC-79B2845D46D5}"
@@ -61,6 +63,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitbucketCoreReceiver", "samples\BitbucketCoreReceiver\BitbucketCoreReceiver.csproj", "{903CC30B-952F-4786-BD7B-688C65ACB8D9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureAlertCoreReceiver", "samples\AzureAlertCoreReceiver\AzureAlertCoreReceiver.csproj", "{66B213C4-0647-4E6A-9A1A-98653F60FC74}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureContainerRegistryCoreReceiver", "samples\AzureContainerRegistryCoreReceiver\AzureContainerRegistryCoreReceiver.csproj", "{34CE87FF-05A7-4463-9F43-722194FEAACF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KuduCoreReceiver", "samples\KuduCoreReceiver\KuduCoreReceiver.csproj", "{FB7E7FF1-4DAC-45D6-8128-1A528CE9A4D1}"
 EndProject
@@ -118,6 +122,10 @@ Global
 		{FAE4E7F8-7786-4388-802D-69C5C40DD5ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAE4E7F8-7786-4388-802D-69C5C40DD5ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAE4E7F8-7786-4388-802D-69C5C40DD5ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06B0D9D1-1368-423E-B2F7-5F408423A187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06B0D9D1-1368-423E-B2F7-5F408423A187}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06B0D9D1-1368-423E-B2F7-5F408423A187}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -238,6 +246,10 @@ Global
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34CE87FF-05A7-4463-9F43-722194FEAACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34CE87FF-05A7-4463-9F43-722194FEAACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34CE87FF-05A7-4463-9F43-722194FEAACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34CE87FF-05A7-4463-9F43-722194FEAACF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -247,6 +259,7 @@ Global
 		{A7E385B5-8691-402B-916A-8E791E5D62CF} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{BF3CA06F-4610-40E3-9C8F-C450486BB81C} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{FAE4E7F8-7786-4388-802D-69C5C40DD5ED} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{B4297872-1ED3-4A5D-95A8-0C1A11FDF781} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{06B0D9D1-1368-423E-B2F7-5F408423A187} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{99046330-F5C1-4994-9EAC-79B2845D46D5} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
 		{3D6713DD-940C-434E-B8F4-EE31E5F35E50} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
@@ -277,6 +290,7 @@ Global
 		{91E02D64-BA6E-473C-A250-D1051A50DDAB} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{E9E37253-3FE1-44A4-A9E7-A2B6C54EECFE} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{F42E56B7-60D4-481A-8585-04015B2B501E} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{34CE87FF-05A7-4463-9F43-722194FEAACF} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}

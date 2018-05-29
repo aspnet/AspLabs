@@ -12,6 +12,7 @@ ASP.NET Core MVC is part of ASP.NET Core. You can find samples, documentation an
 ### Samples
 - [All Samples](/samples/)
 - [Azure](/samples/AzureAlertCoreReceiver)
+- [AzureContainerRegistry](/samples/AzureContainerRegistryCoreReceiver)
 - [Bitbucket](/samples/BitbucketCoreReceiver)
 - [Dropbox](/samples/DropboxCoreReceiver)
 - [DynamicCRM](/samples/DynamicsCRMCoreReceiver)
