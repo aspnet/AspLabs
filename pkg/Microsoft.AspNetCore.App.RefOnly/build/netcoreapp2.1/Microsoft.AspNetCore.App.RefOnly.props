@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="Microsoft.AspNetCore.Mvc.Razor.Extensions.props" />
+  <Import Project="Microsoft.AspNetCore.Razor.Design.props" />
+  <Import Project="Microsoft.EntityFrameworkCore.Design.props" />
+  <Import Project="Microsoft.Extensions.Configuration.UserSecrets.props" />
+  <Import Project="Microsoft.Extensions.FileProviders.Embedded.props" />
+
+  <PropertyGroup>
+    <MicrosoftNETPlatformLibrary>Microsoft.AspNetCore.App.RefOnly</MicrosoftNETPlatformLibrary>
+  </PropertyGroup>
+</Project>

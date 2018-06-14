@@ -1,7 +1,8 @@
 <Project>
-  <PropertyGroup>
-    <MicrosoftNETPlatformLibrary>Microsoft.AspNetCore.App.RefOnly</MicrosoftNETPlatformLibrary>
-  </PropertyGroup>
+  <Import Project="Microsoft.AspNetCore.Mvc.Razor.Extensions.targets" />
+  <Import Project="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.targets" />
+  <Import Project="Microsoft.Extensions.Configuration.UserSecrets.targets" />
+  <Import Project="Microsoft.Extensions.FileProviders.Embedded.targets" />
 
   <Target Name="EnsureTFMCompatibility" BeforeTargets="_CheckForInvalidConfigurationAndPlatform">
     <Error

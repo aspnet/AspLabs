@@ -20,9 +20,9 @@ if (-not (Test-Path $dotnetInstall)) {
     iwr -o $dotnetInstall https://raw.githubusercontent.com/dotnet/cli/release/2.1.3xx/scripts/obtain/dotnet-install.ps1
 }
 & $dotnetInstall -installdir "$PSScriptRoot/.dotnet" -version 2.1.300
-Copy-Item -Recurse "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly"
-mv "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.deps.json" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.RefOnly.deps.json"
-mv "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.runtimeconfig.json" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.RefOnly.runtimeconfig.json"
+Copy-Item -Recurse "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App/*" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly" -ea Ignore
+mv "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.deps.json" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.RefOnly.deps.json" -ea Ignore
+mv "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.runtimeconfig.json" "$PSScriptRoot/.dotnet/shared/Microsoft.AspNetCore.App.RefOnly/2.1.0/Microsoft.AspNetCore.App.RefOnly.runtimeconfig.json" -ea Ignore
 $refsPublish = "$PSScriptRoot/Microsoft.AspNetCore.App.RefOnly/ref/netcoreapp2.1"
 Invoke-Block { & $dotnet publish Microsoft.AspNetCore.App.RefOnly/Microsoft.AspNetCore.App.RefOnly.csproj --output $refsPublish }
 rm "$refsPublish/Microsoft.AspNetCore.App.RefOnly.dll"

@@ -1,0 +1,4 @@
+<Project>
+  <Import Project="Microsoft.AspNetCore.Razor.Design.props" />
+  <Import Project="Microsoft.Extensions.FileProviders.Embedded.props" />
+</Project>

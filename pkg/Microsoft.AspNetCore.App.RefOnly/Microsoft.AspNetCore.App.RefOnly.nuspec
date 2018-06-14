@@ -23,5 +23,7 @@
     <file src="build\**\*" target="build" />
     <file src="ref\**\*" target="ref" />
     <file src="lib\**\*" target="lib" />
+    <file src="tasks\**\*" target="tasks" />
+    <file src="tools\**\*" target="tools" />
   </files>
 </package>
