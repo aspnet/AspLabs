@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +33,30 @@ namespace test
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            var mvcBuilder = services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            ConfigurePlugin(mvcBuilder.PartManager);
+        }
+
+        private void ConfigurePlugin(ApplicationPartManager applicationPartManager)
+        {
+            var pluginAssembly = typeof(Startup).Assembly;
+            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(pluginAssembly);
+
+            foreach (var part in partFactory.GetApplicationParts(pluginAssembly))
+            {
+                applicationPartManager.ApplicationParts.Add(part);
+            }
+
+            var relatedAssemblies = RelatedAssemblyAttribute.GetRelatedAssemblies(pluginAssembly, throwOnError: true);
+            foreach (var assembly in relatedAssemblies)
+            {
+                partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
+                foreach (var part in partFactory.GetApplicationParts(assembly))
+                {
+                    applicationPartManager.ApplicationParts.Add(part);
+                }
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
