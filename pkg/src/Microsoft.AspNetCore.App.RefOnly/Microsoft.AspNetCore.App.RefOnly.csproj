@@ -9,4 +9,11 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
     </ItemGroup>
+
+    <Target Name="PublishXmlDocsToo" AfterTargets="Publish">
+        <ItemGroup>
+            <XmlDocFile Include="%(ResolvedAssembliesToPublish.RootDir)%(ResolvedAssembliesToPublish.Directory)%(ResolvedAssembliesToPublish.FileName).xml" />
+        </ItemGroup>
+        <Copy SourceFiles="@(XmlDocFile)" DestinationFolder="$(PublishDir)" Condition="Exists('%(XmlDocFile.Identity)')" />
+    </Target>
 </Project>
