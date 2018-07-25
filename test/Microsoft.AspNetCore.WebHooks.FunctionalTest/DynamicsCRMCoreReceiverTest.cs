@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             }
         }
 
-        [Theory]
+        [Theory(Skip = "Flaky test aspnet/WebHooks#314; see also aspnet/WebHooks#318.")]
         [MemberData(nameof(NonPostDataSet))]
         public async Task WebHookAction_NonPost_IsNotAllowed(HttpMethod method)
         {
@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(expectedErrorMessage, responseText);
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky test aspnet/WebHooks#316; see also aspnet/WebHooks#318.")]
         public async Task WebHookAction_WrongCode_IsBadRequest()
         {
             // Arrange
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(expectedErrorMessage, responseText);
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky test aspnet/WebHooks#313; see also aspnet/WebHooks#318.")]
         public async Task WebHookAction_NoBody_IsBadRequest()
         {
             // Arrange
