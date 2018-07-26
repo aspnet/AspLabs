@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [Fact(Skip = "Flaky test aspnet/WebHooks#315; see also aspnet/WebHooks#318.")]
+        [Fact]
         public async Task WebHookAction_NoEventHeader_IsNotFound()
         {
             // Arrange
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.WebHooks.FunctionalTest
             }
         }
 
-        [Theory(Skip = "Flaky test aspnet/WebHooks#314; see also aspnet/WebHooks#318.")]
+        [Theory]
         [MemberData(nameof(NonPostDataSet))]
         public async Task WebHookAction_NonPost_IsNotAllowed(HttpMethod method)
         {

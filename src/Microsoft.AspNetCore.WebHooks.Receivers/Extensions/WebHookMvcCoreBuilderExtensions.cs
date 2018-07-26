@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             WebHookServiceCollectionSetup.AddWebHookServices(builder.Services);
+            builder.AddMvcOptions(options => options.EnableGlobalRouting = false);
 
             return builder;
         }
