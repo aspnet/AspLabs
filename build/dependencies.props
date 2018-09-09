@@ -4,18 +4,18 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Package Versions">
-    <InternalAspNetCoreSdkPackageVersion>3.0.0-alpha1-20180821.3</InternalAspNetCoreSdkPackageVersion>
-    <MicrosoftAspNetCoreMvcCorePackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreMvcCorePackageVersion>
-    <MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
-    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
-    <MicrosoftAspNetCoreMvcTestingPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreMvcTestingPackageVersion>
-    <MicrosoftAspNetCorePackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCorePackageVersion>
-    <MicrosoftAspNetCoreStaticFilesPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreStaticFilesPackageVersion>
-    <MicrosoftAspNetCoreTestingPackageVersion>3.0.0-alpha1-10400</MicrosoftAspNetCoreTestingPackageVersion>
-    <MicrosoftExtensionsConfigurationPackageVersion>3.0.0-alpha1-10400</MicrosoftExtensionsConfigurationPackageVersion>
-    <MicrosoftExtensionsLoggingTestingPackageVersion>3.0.0-alpha1-10400</MicrosoftExtensionsLoggingTestingPackageVersion>
-    <MicrosoftExtensionsPrimitivesPackageVersion>3.0.0-alpha1-10400</MicrosoftExtensionsPrimitivesPackageVersion>
+    <InternalAspNetCoreSdkPackageVersion>3.0.0-alpha1-20180907.9</InternalAspNetCoreSdkPackageVersion>
+    <MicrosoftAspNetCoreMvcCorePackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreMvcCorePackageVersion>
+    <MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
+    <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
+    <MicrosoftAspNetCoreMvcTestingPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreMvcTestingPackageVersion>
+    <MicrosoftAspNetCorePackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCorePackageVersion>
+    <MicrosoftAspNetCoreStaticFilesPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreStaticFilesPackageVersion>
+    <MicrosoftAspNetCoreTestingPackageVersion>3.0.0-alpha1-10419</MicrosoftAspNetCoreTestingPackageVersion>
+    <MicrosoftExtensionsConfigurationPackageVersion>3.0.0-alpha1-10419</MicrosoftExtensionsConfigurationPackageVersion>
+    <MicrosoftExtensionsLoggingTestingPackageVersion>3.0.0-alpha1-10419</MicrosoftExtensionsLoggingTestingPackageVersion>
+    <MicrosoftExtensionsPrimitivesPackageVersion>3.0.0-alpha1-10419</MicrosoftExtensionsPrimitivesPackageVersion>
     <MicrosoftNETCoreApp20PackageVersion>2.0.9</MicrosoftNETCoreApp20PackageVersion>
     <MicrosoftNETCoreApp21PackageVersion>2.1.3</MicrosoftNETCoreApp21PackageVersion>
     <MicrosoftNETCoreApp22PackageVersion>2.2.0-preview2-26905-02</MicrosoftNETCoreApp22PackageVersion>
