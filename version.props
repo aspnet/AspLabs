@@ -1,0 +1,8 @@
+﻿<Project>
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <PreReleaseLabel>alpha1</PreReleaseLabel>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">t000</BuildNumber>
+    <Version>$(Version)-$(PreReleaseLabel)-$(BuildNumber)</Version>
+  </PropertyGroup>
+</Project>
