@@ -3,10 +3,22 @@
 }
 
 <div>
-    Cool health checks status:  <strong>@ViewData["AppStatus"] </strong><br />
 
-    <br />
+    <health-check suppress-on-unhealthy="true">
+        <div style="background-color:green">
+            It's all fine with your dependent services :)
+        </div>
+    </health-check>
+    <health-check>
+        <div style="background-color:red">
+            Something went wrong in your dependent services :(
+        </div>
+    </health-check>
+
+    Cool health checks status: <strong>@ViewData["AppStatus"] </strong><br/>
+
+    <br/>
 
     @ViewData["Results"]
-    
+
 </div>
