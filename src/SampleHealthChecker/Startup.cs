@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +30,7 @@ namespace SampleHealthChecker
                 checks.AddPrivateMemorySizeCheck(1);
                 checks.AddVirtualMemorySizeCheck(2);
                 checks.AddWorkingSetCheck(1);
-                checks.AddUrlChecks(new List<string> { "https://github.com", "https://google.com", "https://twitddter.com" }, "servers");
+                checks.AddUrlChecks(new List<string> { "https://github.com", "https://google.com", "https://twitddter.com" }, "servers", true);
 
                 /*
                 // add valid storage account credentials first
