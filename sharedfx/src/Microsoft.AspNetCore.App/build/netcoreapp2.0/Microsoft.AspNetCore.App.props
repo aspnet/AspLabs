@@ -1,5 +1,0 @@
-<Project>
-  <PropertyGroup>
-     <MicrosoftNETPlatformLibrary>Microsoft.AspNetCore.App</MicrosoftNETPlatformLibrary>
-  </PropertyGroup>
-</Project>

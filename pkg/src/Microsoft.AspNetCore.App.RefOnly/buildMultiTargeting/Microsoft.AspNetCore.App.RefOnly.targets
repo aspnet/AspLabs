@@ -1,3 +1,0 @@
-<Project>
-  <Import Project="Microsoft.Extensions.FileProviders.Embedded.targets" />
-</Project>
