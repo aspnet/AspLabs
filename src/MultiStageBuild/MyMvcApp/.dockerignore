@@ -1,5 +1,0 @@
-.dockerignore
-.vscode
-bin
-Dockerfile
-obj

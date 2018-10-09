@@ -1,7 +1,0 @@
-version: "2"
-services:
-  my-mvc-app:
-    # This needs docker/compose issue #4790
-    # build:
-    #   target: production
-    image: my-mvc-app
