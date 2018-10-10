@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFrameworks>$(StandardTestWebsiteTfms)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="$(MicrosoftAspNetCorePackageVersion)" />
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Slack\Microsoft.AspNetCore.WebHooks.Receivers.Slack.csproj" />
+  </ItemGroup>
+</Project>

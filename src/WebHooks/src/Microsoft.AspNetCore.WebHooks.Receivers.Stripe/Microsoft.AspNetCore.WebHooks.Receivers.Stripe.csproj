@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ASP.NET Core Stripe WebHooks infrastructure. Contains the StripeWebHookAttribute class and AddStripeWebHooks method.</Description>
+    <PackageTags>aspnetcore;webhook;receiver;stripe</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\shared\Utilities\TrimmingTokenizer.cs">
+      <Link>Utilities\TrimmingTokenizer.cs</Link>
+    </Compile>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="$(MicrosoftAspNetCoreMvcFormattersJsonPackageVersion)" />
+    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+  </ItemGroup>
+</Project>

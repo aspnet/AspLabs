@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ASP.NET Core WebHooks abstractions and infrastructure components for receivers. Contains constraints, filters, metadata, and the application models to apply them.</Description>
+    <PackageTags>aspnetcore;webhook;receiver</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\shared\Utilities\ObjectPathUtilities.cs">
+      <Link>Utilities\ObjectPathUtilities.cs</Link>
+    </Compile>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="$(MicrosoftAspNetCoreMvcCorePackageVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
+  </ItemGroup>
+</Project>

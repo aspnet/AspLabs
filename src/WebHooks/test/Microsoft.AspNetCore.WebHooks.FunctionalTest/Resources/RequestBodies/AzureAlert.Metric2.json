@@ -1,0 +1,30 @@
+﻿{
+  "status": "Activated",
+  "context": {
+    "id": "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/WebHookReceivers/providers/microsoft.insights/alertrules/henrikntest01",
+    "name": "henrikntest01",
+    "description": "Requests",
+    "conditionType": "Metric",
+    "condition": {
+      "metricName": "Http 2xx",
+      "metricUnit": "Count",
+      "metricValue": "8",
+      "threshold": "1",
+      "windowSize": "5",
+      "timeAggregation": "Total",
+      "operator": "GreaterThan"
+    },
+    "subscriptionId": "aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee",
+    "resourceGroupName": "WebHookReceivers",
+    "timestamp": "2015-09-30T03:02:33.4147662Z",
+    "resourceName": "webhookreceivers",
+    "resourceType": "microsoft.web/sites",
+    "resourceId": "/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/WebHookReceivers/providers/Microsoft.Web/sites/WebHookReceivers",
+    "resourceRegion": "West US",
+    "portalLink": "https://portal.azure.com/#resource/subscriptions/aaaaaaa-bbbb-cccc-ddd-eeeeeeeeeeeee/resourceGroups/WebHookReceivers/providers/Microsoft.Web/sites/WebHookReceivers"
+  },
+  "properties": {
+    "prop1": "value1",
+    "prop2": 12345.00
+  }
+}

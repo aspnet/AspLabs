@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Microsoft.AspNetCore.WebHooks.FunctionalTest</RootNamespace>
+    <TargetFrameworks>$(StandardTestTfms)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*" />
+    <ProjectReference Include="..\..\samples\AzureAlertCoreReceiver\AzureAlertCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\AzureContainerRegistryCoreReceiver\AzureContainerRegistryCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\BitbucketCoreReceiver\BitbucketCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\BitbucketStronglyTypedCoreReceiver\BitbucketStronglyTypedCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\DropboxCoreReceiver\DropboxCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\DynamicsCRMCoreReceiver\DynamicsCRMCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\GitHubCoreReceiver\GitHubCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\KuduCoreReceiver\KuduCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\MailChimpCoreReceiver\MailChimpCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\PusherCoreReceiver\PusherCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\SalesforceCoreReceiver\SalesforceCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\SlackCoreReceiver\SlackCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\StripeCoreReceiver\StripeCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\TrelloCoreReceiver\TrelloCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\WordPressCoreReceiver\WordPressCoreReceiver.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftAspNetCoreMvcTestingPackageVersion)" />
+  </ItemGroup>
+
+</Project>
