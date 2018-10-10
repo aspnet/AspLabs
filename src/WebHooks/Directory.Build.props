@@ -1,0 +1,16 @@
+﻿<Project>
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.props))\Directory.Build.props"
+          Condition="Exists('$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.props))\Directory.Build.props')" />
+
+  <Import Project="dependencies.props" />
+
+  <!-- Ensure changes to this file cause project rebuilds. -->
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>Microsoft ASP.NET Core WebHooks</Product>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+</Project>
