@@ -1,6 +1,5 @@
 <Project>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.targets))\Directory.Build.targets"
-          Condition="Exists('$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.targets))\Directory.Build.targets')" />
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.targets))\Directory.Build.targets" />
 
   <!-- In Directory.Build.targets because default items are added after Directory.Build.props is imported, causing invalid duplicate entries. -->
   <ItemGroup Condition="Exists( '$(MSBuildProjectDirectory)\Properties\Resources.resx' )">
