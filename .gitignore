@@ -26,4 +26,4 @@ _ReSharper.*
 *.orig
 *.user*.userprefs
 *DS_Store
-
+launchSettings.json
