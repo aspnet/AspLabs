@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Trace
 {

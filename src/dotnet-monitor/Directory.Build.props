@@ -1,6 +1,5 @@
 <Project>
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
-        <RuntimeFrameworkVersion>2.2.0-preview3-26913-03</RuntimeFrameworkVersion>
     </PropertyGroup>
 </Project>

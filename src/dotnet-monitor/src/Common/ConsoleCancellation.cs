@@ -3,15 +3,16 @@
 
 using System;
 using System.Threading;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace Microsoft.Internal.Utilities
 {
     public static class ConsoleCancellationExtensions
     {
-        public static CancellationToken GetCtrlCToken()
+        public static CancellationToken GetCtrlCToken(this IConsole console)
         {
             var cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (sender, args) =>
+            console.CancelKeyPress += (sender, args) =>
             {
                 if (cts.IsCancellationRequested)
                 {

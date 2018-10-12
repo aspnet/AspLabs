@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Diagnostics.Transport.Protocol;
+using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Trace
 {
