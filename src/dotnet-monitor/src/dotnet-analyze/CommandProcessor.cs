@@ -14,7 +14,9 @@ namespace Microsoft.Diagnostics.Tools.Analyze
     internal static class CommandProcessor
     {
         private static readonly IDictionary<string, IAnalysisCommand> _commands = BuildCommandList(
-            new HelpCommand());
+            new HelpCommand(),
+            new ThreadsCommand(),
+            new DumpStackCommand());
 
         public static async Task RunAsync(IConsole console, AnalysisSession session, CancellationToken cancellationToken = default)
         {
@@ -27,7 +29,7 @@ namespace Microsoft.Diagnostics.Tools.Analyze
 
                 // Naive arg parsing
                 var args = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if(string.Equals(args[0], "quit", StringComparison.OrdinalIgnoreCase) || string.Equals(args[0], "exit", StringComparison.OrdinalIgnoreCase))
+                if(string.Equals(args[0], "quit", StringComparison.OrdinalIgnoreCase) || string.Equals(args[0], "q", StringComparison.OrdinalIgnoreCase) || string.Equals(args[0], "exit", StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
@@ -44,7 +46,15 @@ namespace Microsoft.Diagnostics.Tools.Analyze
 
         private static IDictionary<string, IAnalysisCommand> BuildCommandList(params IAnalysisCommand[] commands)
         {
-            return commands.ToDictionary(c => c.Name, StringComparer.OrdinalIgnoreCase);
+            var dict = new Dictionary<string, IAnalysisCommand>(StringComparer.OrdinalIgnoreCase);
+            foreach(var command in commands)
+            {
+                foreach(var name in command.Names)
+                {
+                    dict[name] = command;
+                }
+            }
+            return dict;
         }
     }
 }
