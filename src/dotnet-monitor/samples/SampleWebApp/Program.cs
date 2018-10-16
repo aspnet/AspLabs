@@ -14,6 +14,7 @@ namespace SampleWebApp
         public static void Main(string[] args)
         {
             Console.WriteLine($"Process ID: {Process.GetCurrentProcess().Id}");
+            Console.WriteLine($"AppBase: {AppContext.BaseDirectory}");
             CreateWebHostBuilder(args).Build().Run();
         }
 
