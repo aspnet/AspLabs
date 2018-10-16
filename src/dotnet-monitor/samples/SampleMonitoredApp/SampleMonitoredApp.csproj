@@ -9,8 +9,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging.EventSource" Version="2.2.0-preview1-35029" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.Diagnostics.Server\Microsoft.Diagnostics.Server.csproj" />
-  </ItemGroup>
-
 </Project>

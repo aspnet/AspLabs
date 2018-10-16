@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Diagnostics.Server;
 using Microsoft.Extensions.Logging;
 
 namespace SampleWebApp
@@ -14,7 +13,6 @@ namespace SampleWebApp
     {
         public static void Main(string[] args)
         {
-            DiagnosticServer.Start();
             Console.WriteLine($"Process ID: {Process.GetCurrentProcess().Id}");
             CreateWebHostBuilder(args).Build().Run();
         }

@@ -12,21 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-trace", "src\dotnet-trace\dotnet-trace.csproj", "{2105C212-F043-43ED-8D18-30FFF0B37E1A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleMonitoredApp", "samples\SampleMonitoredApp\SampleMonitoredApp.csproj", "{2908A261-3FC7-45A2-BA61-192318E9179A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Diagnostics.Transport", "src\Microsoft.Diagnostics.EventPipe.Protocol\Microsoft.Diagnostics.Transport.csproj", "{A5C10E59-5B55-4445-A939-A0AA0E156EC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleWebApp", "samples\SampleWebApp\SampleWebApp.csproj", "{993C97DD-A837-4C8B-97DA-6F11AD797485}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Diagnostics.Server", "src\Microsoft.Diagnostics.Server\Microsoft.Diagnostics.Server.csproj", "{B140A95D-4488-4AD9-9F29-AD321B558D01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-analyze", "src\dotnet-analyze\dotnet-analyze.csproj", "{D894FA6D-6B63-450B-93A7-4120C2CDC147}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Diagnostics.Client", "src\Microsoft.Diagnostics.Client\Microsoft.Diagnostics.Client.csproj", "{820A83F4-832E-4984-9E43-C631C356A004}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebApp", "samples\SampleWebApp\SampleWebApp.csproj", "{993C97DD-A837-4C8B-97DA-6F11AD797485}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-analyze", "src\dotnet-analyze\dotnet-analyze.csproj", "{D894FA6D-6B63-450B-93A7-4120C2CDC147}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-dump", "src\dotnet-dump\dotnet-dump.csproj", "{933327B7-87FC-4D1B-8AF4-C6A07DE30AA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-dump", "src\dotnet-dump\dotnet-dump.csproj", "{933327B7-87FC-4D1B-8AF4-C6A07DE30AA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,26 +26,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2105C212-F043-43ED-8D18-30FFF0B37E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2105C212-F043-43ED-8D18-30FFF0B37E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2105C212-F043-43ED-8D18-30FFF0B37E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2105C212-F043-43ED-8D18-30FFF0B37E1A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2908A261-3FC7-45A2-BA61-192318E9179A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2908A261-3FC7-45A2-BA61-192318E9179A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2908A261-3FC7-45A2-BA61-192318E9179A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2908A261-3FC7-45A2-BA61-192318E9179A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5C10E59-5B55-4445-A939-A0AA0E156EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5C10E59-5B55-4445-A939-A0AA0E156EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5C10E59-5B55-4445-A939-A0AA0E156EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5C10E59-5B55-4445-A939-A0AA0E156EC6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B140A95D-4488-4AD9-9F29-AD321B558D01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B140A95D-4488-4AD9-9F29-AD321B558D01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B140A95D-4488-4AD9-9F29-AD321B558D01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B140A95D-4488-4AD9-9F29-AD321B558D01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{820A83F4-832E-4984-9E43-C631C356A004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{820A83F4-832E-4984-9E43-C631C356A004}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{820A83F4-832E-4984-9E43-C631C356A004}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{820A83F4-832E-4984-9E43-C631C356A004}.Release|Any CPU.Build.0 = Release|Any CPU
 		{993C97DD-A837-4C8B-97DA-6F11AD797485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{993C97DD-A837-4C8B-97DA-6F11AD797485}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{993C97DD-A837-4C8B-97DA-6F11AD797485}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,11 +47,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2105C212-F043-43ED-8D18-30FFF0B37E1A} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 		{2908A261-3FC7-45A2-BA61-192318E9179A} = {2AB63881-E835-4F6C-9362-4A16156A3F2D}
-		{A5C10E59-5B55-4445-A939-A0AA0E156EC6} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
-		{B140A95D-4488-4AD9-9F29-AD321B558D01} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
-		{820A83F4-832E-4984-9E43-C631C356A004} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 		{993C97DD-A837-4C8B-97DA-6F11AD797485} = {2AB63881-E835-4F6C-9362-4A16156A3F2D}
 		{D894FA6D-6B63-450B-93A7-4120C2CDC147} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 		{933327B7-87FC-4D1B-8AF4-C6A07DE30AA4} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}

@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Threading.Tasks;
-using Microsoft.Diagnostics.Server;
 using Microsoft.Extensions.Logging;
 
 namespace SampleMonitoredApp
@@ -21,8 +20,6 @@ namespace SampleMonitoredApp
 
         private static void Main(string[] args)
         {
-            DiagnosticServer.Start();
-
             var logging = new LoggerFactory();
             logging.AddEventSourceLogger();
 
