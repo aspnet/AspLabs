@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +26,12 @@ namespace SampleMonitoredApp
 
             var logger = logging.CreateLogger<Program>();
 
+            DumpEventPipeInfo();
+
             Console.WriteLine($"Process ID: {Process.GetCurrentProcess().Id}");
+            Console.WriteLine($"AppName: {Assembly.GetEntryAssembly().GetName().Name}");
+            Console.WriteLine($"AppDomain Base: {AppDomain.CurrentDomain.BaseDirectory}");
+            Console.WriteLine($"AppBase: {AppContext.BaseDirectory}");
             Console.WriteLine("Ready to start emitting events.");
             Console.WriteLine("Press X to quit.");
             Console.WriteLine("Press A to allocate 100 MB.");
@@ -60,6 +66,35 @@ namespace SampleMonitoredApp
                         break;
                 }
             }
+        }
+
+        private static void DumpEventPipeInfo()
+        {
+            var type = typeof(ValueType).Assembly.GetType("System.Diagnostics.Tracing.EventPipeController");
+            if (type == null)
+            {
+                throw new InvalidOperationException("Could not find EventPipeController type!");
+            }
+
+            var instanceField = type.GetField("s_controllerInstance", BindingFlags.NonPublic | BindingFlags.Static);
+            if (instanceField == null)
+            {
+                throw new InvalidOperationException("Could not find EventPipeController.s_controllerInstance field!");
+            }
+
+            var instance = instanceField.GetValue(null);
+            if (instance == null)
+            {
+                throw new InvalidOperationException("EventPipeController.s_controllerInstance is null!");
+            }
+
+            var pathField = type.GetField("m_configFilePath", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (pathField == null)
+            {
+                throw new InvalidOperationException("Could not find EventPipeController.m_configFilePath field!");
+            }
+
+            Console.WriteLine($"EventPipe Config File Path: {pathField.GetValue(instance)}");
         }
 
         private static void SpawnTasks()
