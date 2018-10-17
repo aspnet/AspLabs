@@ -2,79 +2,53 @@
 
 This repository contains tools for collecting diagnostics from .NET applications.
 
-## Microsoft.Diagnostics.Server
+## [dotnet-dump](src/dotnet-dump)
 
-Install this package in a .NET application and add the following to your Program.cs to start a server that will listen for monitoring tools to connect and control diagnostic services:
+A cross-platform tool to collect memory dumps of .NET processes:
 
-```csharp
-using Microsoft.Diagnostics.Server;
+```
+Captures memory dumps of .NET processes
 
-namespace SampleMonitoredApp
-{
-    internal class Program
-    {
-        private static void Main(string[] args)
-        {
-            DiagnosticServer.Start();
+Usage: dotnet-dump [options]
 
-            // The rest of your app...
-        }
-    }
-}
+Options:
+  -p|--process-id <PROCESS_ID>    The ID of the process to collect a memory dump for
+  -o|--output <OUTPUT_DIRECTORY>  The directory to write the dump to. Defaults to the current working directory.
+  -?|-h|--help                    Show help information
 ```
 
-With no arguments, the default behavior is to start the server on a Named Pipe with a name based on the process ID. This allows monitoring tools to easily connect, knowing only the process ID. It is also possible to start the server on a Named Pipe specified by the user, a TCP port, or HTTP endpoint in an ASP.NET Core application (coming later).
+This tool collects dumps of .NET processes. Currently supports Windows and Linux (using the `createdump` command). The tool currently supports capturing a dump immediately (when invoked). We plan to add support for "daemonizing" (running the tool the in the background) and having it capture a dump on certain conditions:
 
-## Microsoft.Diagnostics.Client
+* When the CPU usage goes over a certain amount
+* When memory usage goes over a certain amount
+* When a certain EventPipe event is emitted (this will inherently "lag" a bit since the events are buffered)
 
-This package contains the Client API for the Diagnostics Protocol. Use the `DiagnosticsClient` class to start a connection to an application:
+## [dotnet-collect](src/dotnet-collect)
 
-```csharp
-// Connect to process 1234
-var client = new DiagnosticsClient("process://1234");
+A cross-platform tool for collecting data from Managed EventSources and .NET Runtime events using EventPipe
 
-// Connect to named pipe "MyDiagnosticPipe"
-var client = new DiagnosticsClient("pipe://MyDiagnosticPipe");
-
-// Connect to TCP endpoint "127.0.0.1:8888"
-var client = new DiagnosticsClient("tcp://127.0.0.1:8888");
-
-// Connect to HTTP endpoint "http://localhost:5000/myapp" (Coming later)
-var client = new DiagnosticsClient("http://localhost:5000/myapp");
 ```
+Collects Event Traces from .NET processes
 
-Once connected, hook the `OnEventSourceCreated` event to be notified of all `EventSource`s in the application at the time you connect, and to be notified when any new `EventSource`s are created. Hook the `OnEventWritten` event to be notified any time an event is written to an **enable** event source (see below). Hook the `OnEventCounterUpdated` to be notified when an EventCounter update is received.
+Usage: dotnet-collect [options]
 
-The Diagnostics Client **automatically** unwraps events that come from the `Microsoft-Extensions-Logging` (MEL) EventSource into a simulated event that appears to come from the MEL Logger itself. See the section on `dotnet-trace` for an example.
+Options:
+  -p|--process-id <PROCESS_ID>    Filter to only the process with the specified process ID.
+  -c|--config-path <CONFIG_PATH>  The path of the EventPipe config file to write, must be named [AppName].eventpipeconfig and be in the base directory for a managed app.
+  -o|--output <OUTPUT_DIRECTORY>  The directory to write the trace to. Defaults to the current working directory.
+  --buffer <BUFFER_SIZE_IN_MB>    The size of the in-memory circular buffer in megabytes.
+  --provider <PROVIDER_SPEC>      An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>'.
+  -?|-h|--help                    Show help information
+ ```
 
-See [CollectCommand](src/dotnet-trace/CollectCommand.cs) in `dotnet-trace` for an example.
+ This tool collects EventPipe traces. Currently it is limited to using the file-based configuration added in .NET Core 2.2. To use it, you must manually provide the destination path for the `eventpipeconfig` file. For example:
+ 
+ ```
+ dotnet-collect -c ./path/to/my/app/MyApp.eventpipeconfig --provider Microsoft-Windows-DotNETRuntime
+ ```
 
-## dotnet-trace
+ The default behavior is to put traces in the directory from which you launched `dotnet-collect`. Traces are in files of the form `[appname].[processId].netperf` and can be viewed with [PerfView](https://github.com/Microsoft/PerfView).
 
-The `dotnet-trace` tool allows a user to connect to a Diagnostics Server, enable EventSource providers, EventCounter providers, and Microsoft.Extensions.Logging (MEL) loggers, and collect the events they trigger.
+ ## [dotnet-analyze](src/dotnet-analyze)
 
-The [SampleMonitoredApp](samples/SampleMonitoredApp) sample provides a simple UI to emit some test diagnostics data:
-
-![SampleMonitoredApp](docs/MonitoredApp.png)
-
-On startup, a Named Pipe is created based on the process ID (the PID in the below example doesn't match the one above because it was taken at a different time and I'm lazy ;), ditto some of the `dotnet-trace` commands below...)
-
-![Diagnostic Pipe](docs/DiagPipe.png)
-
-For example, to collect from an EventSource, use the `--provider` option to specify each provider:
-
-![Collecting from an EventSource](docs/CollectingFromEventSource.png)
-
-(TODO: Configure levels, keywords, arguments, etc.)
-
-To collect EventCounters, use the `--counter` option (currently, this also enables the Events from that source):
-
-![Collecting EventCounter values from an EventSource](docs/CollectingFromEventCounter.png)
-
-To collect MEL loggers, use the `--logger` option and specify a wildcard match (i.e. `Microsoft.AspNetCore.*`):
-
-![Collecting from MEL loggers](docs/CollectingFromMel.png)
-
-## dotnet-analyze
-
-A tool for analyzing dump files and traces.
+ A tool to analyze crash dumps, event traces, etc. for useful information. Right now it just has an analyzer that looks for incomplete async state machines (like DumpAsync in SOS). We are exploring providing more SOS-like functionality here (perhaps a managed SOS-style repl?)
