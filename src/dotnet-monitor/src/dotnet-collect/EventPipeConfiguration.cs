@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,19 +14,19 @@ namespace Microsoft.Diagnostics.Tools.Collect
         internal string ToConfigString()
         {
             var builder = new StringBuilder();
-            if(ProcessId != null)
+            if (ProcessId != null)
             {
                 builder.AppendLine($"ProcessId={ProcessId.Value}");
             }
-            if(!string.IsNullOrEmpty(OutputPath))
+            if (!string.IsNullOrEmpty(OutputPath))
             {
                 builder.AppendLine($"OutputPath={OutputPath}");
             }
-            if(CircularMB != null)
+            if (CircularMB != null)
             {
                 builder.AppendLine($"CircularMB={CircularMB}");
             }
-            if(Providers != null && Providers.Count > 0)
+            if (Providers != null && Providers.Count > 0)
             {
                 builder.AppendLine($"Providers={SerializeProviders(Providers)}");
             }

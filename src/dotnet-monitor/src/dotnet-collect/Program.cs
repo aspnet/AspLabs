@@ -29,7 +29,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
         public async Task<int> OnExecute(IConsole console, CommandLineApplication app)
         {
-            if(File.Exists(ConfigPath))
+            if (File.Exists(ConfigPath))
             {
                 console.Error.WriteLine("Config file already exists, tracing is already underway by a different consumer.");
                 return 1;

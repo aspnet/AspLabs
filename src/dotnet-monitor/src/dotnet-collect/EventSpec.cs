@@ -39,9 +39,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 }
             }
 
-            if(splat.Length > 2)
+            if (splat.Length > 2)
             {
-                if(!TryParseLevel(splat[1], out level))
+                if (!TryParseLevel(splat[1], out level))
                 {
                     return false;
                 }

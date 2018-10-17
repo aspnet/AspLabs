@@ -89,7 +89,7 @@ namespace SampleMonitoredApp
             }
 
             var pathField = type.GetField("m_configFilePath", BindingFlags.NonPublic | BindingFlags.Instance);
-            if(pathField == null)
+            if (pathField == null)
             {
                 throw new InvalidOperationException("Could not find EventPipeController.m_configFilePath field!");
             }
