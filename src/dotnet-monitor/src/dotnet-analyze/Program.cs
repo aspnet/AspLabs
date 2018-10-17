@@ -10,7 +10,7 @@ using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Analyze
 {
-    [Command(Name = "dotnet-analyze", Description = "Analyzes a crash dump for known issues")]
+    [Command(Name = "dotnet-analyze", Description = "Inspect a crash dump using interactive commands")]
     internal class Program
     {
         [FileExists(ErrorMessage = "The dump file could not be found.")]

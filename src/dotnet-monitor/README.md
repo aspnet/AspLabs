@@ -49,6 +49,34 @@ Options:
 
  The default behavior is to put traces in the directory from which you launched `dotnet-collect`. Traces are in files of the form `[appname].[processId].netperf` and can be viewed with [PerfView](https://github.com/Microsoft/PerfView).
 
- ## [dotnet-analyze](src/dotnet-analyze)
+## [dotnet-analyze](src/dotnet-analyze)
 
- A tool to analyze crash dumps, event traces, etc. for useful information. Right now it just has an analyzer that looks for incomplete async state machines (like DumpAsync in SOS). We are exploring providing more SOS-like functionality here (perhaps a managed SOS-style repl?)
+An SOS-like "REPL" for exploring .NET memory dumps (based on [CLRMD](https://github.com/Microsoft/clrmd)).
+
+```
+Inspect a crash dump using interactive commands
+
+Usage: dotnet-analyze [arguments] [options]
+
+Arguments:
+<DUMP>        The path to the dump file to analyze.
+
+Options:
+  -?|-h|--help  Show help information
+```
+
+When you launch this command, a REPL prompt is provided:
+
+```
+Loading crash dump C:\Users\anurse\Desktop\dotnet-18956-20181012-153829-088.dmp...
+Ready to process analysis commands. Type 'help' to list available commands or 'help [command]' to get detailed help on a command.
+Type 'quit' or 'exit' to exit the analysis session.
+>
+```
+
+The following commands are available:
+* `quit` (alias `exit`) - Exit the tool
+* `help` - List commands and help information (not yet implemented ;))
+* `threads` (alias `~`) - List thread
+* `DumpStack` - Dump managed stack trace for the current thread. A little like SOS's `!DumpStack`
+* `DumpHeap` - Dump information about objects on the heap, grouped by type. A little like SOS's `!DumpHeap -stat`

@@ -8,7 +8,7 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 {
     public class DumpStackCommand : IAnalysisCommand
     {
-        public IEnumerable<string> Names { get; } = new List<string>() { "dumpstack" };
+        public IEnumerable<string> Names { get; } = new [] { "dumpstack" };
 
         public async Task RunAsync(IConsole console, string[] args, AnalysisSession session)
         {
