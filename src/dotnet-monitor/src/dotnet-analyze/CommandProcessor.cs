@@ -16,6 +16,7 @@ namespace Microsoft.Diagnostics.Tools.Analyze
         private static readonly IDictionary<string, IAnalysisCommand> _commands = BuildCommandList(
             new HelpCommand(),
             new ThreadsCommand(),
+            new DumpHeapCommand(),
             new DumpStackCommand());
 
         public static async Task RunAsync(IConsole console, AnalysisSession session, CancellationToken cancellationToken = default)

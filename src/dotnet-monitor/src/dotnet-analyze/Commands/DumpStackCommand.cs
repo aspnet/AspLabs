@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Diagnostics.Runtime;
 
 namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 {
@@ -12,8 +14,14 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
         {
             foreach(var frame in session.ActiveThread.EnumerateStackTrace())
             {
-                await console.Out.WriteLineAsync($"{frame.StackPointer:x16}");
+                var methodInfo = frame.Method == null ? "<Unknown Method>" : GenerateMethodInfo(frame.Method);
+                await console.Out.WriteLineAsync($"{frame.StackPointer:x16} {frame.InstructionPointer:x16} {methodInfo}");
             }
+        }
+
+        private string GenerateMethodInfo(ClrMethod method)
+        {
+            return $"{method.Type.Name}.{method.Name}";
         }
     }
 }
