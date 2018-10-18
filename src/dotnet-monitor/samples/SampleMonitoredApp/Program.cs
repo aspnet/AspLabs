@@ -73,25 +73,29 @@ namespace SampleMonitoredApp
             var type = typeof(ValueType).Assembly.GetType("System.Diagnostics.Tracing.EventPipeController");
             if (type == null)
             {
-                throw new InvalidOperationException("Could not find EventPipeController type!");
+                Console.Error.WriteLine("Could not find EventPipeController type!");
+                return;
             }
 
             var instanceField = type.GetField("s_controllerInstance", BindingFlags.NonPublic | BindingFlags.Static);
             if (instanceField == null)
             {
-                throw new InvalidOperationException("Could not find EventPipeController.s_controllerInstance field!");
+                Console.Error.WriteLine("Could not find EventPipeController.s_controllerInstance field!");
+                return;
             }
 
             var instance = instanceField.GetValue(null);
             if (instance == null)
             {
-                throw new InvalidOperationException("EventPipeController.s_controllerInstance is null!");
+                Console.Error.WriteLine("EventPipeController.s_controllerInstance is null!");
+                return;
             }
 
             var pathField = type.GetField("m_configFilePath", BindingFlags.NonPublic | BindingFlags.Instance);
             if (pathField == null)
             {
-                throw new InvalidOperationException("Could not find EventPipeController.m_configFilePath field!");
+                Console.Error.WriteLine("Could not find EventPipeController.m_configFilePath field!");
+                return;
             }
 
             Console.WriteLine($"EventPipe Config File Path: {pathField.GetValue(instance)}");
