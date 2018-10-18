@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Internal.Utilities;
@@ -11,9 +11,11 @@ namespace Microsoft.Diagnostics.Tools.Collect
     [Command(Name = "dotnet-collect", Description = "Collects Event Traces from .NET processes")]
     internal class Program
     {
-        [Required(ErrorMessage = "You must provide the path of the EventPipe config file to write")]
         [Option("-c|--config-path <CONFIG_PATH>", Description = "The path of the EventPipe config file to write, must be named [AppName].eventpipeconfig and be in the base directory for a managed app.")]
         public string ConfigPath { get; set; }
+
+        [Option("--etw", Description = "Specify this flag to use ETW to collect events rather than using EventPipe (Windows only).")]
+        public bool Etw { get; set; }
 
         [Option("-p|--process-id <PROCESS_ID>", Description = "Filter to only the process with the specified process ID.")]
         public int? ProcessId { get; set; }
@@ -27,18 +29,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>'. Can be specified multiple times to enable multiple providers.")]
         public IList<string> Providers { get; set; }
 
-        public async Task<int> OnExecute(IConsole console, CommandLineApplication app)
+        public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
-            if (File.Exists(ConfigPath))
-            {
-                console.Error.WriteLine("Config file already exists, tracing is already underway by a different consumer.");
-                return 1;
-            }
-
-            var appBase = Path.GetDirectoryName(ConfigPath);
-            var appName = Path.GetFileNameWithoutExtension(ConfigPath);
-
-            var config = new EventPipeConfiguration()
+            var config = new CollectionConfiguration()
             {
                 ProcessId = ProcessId,
                 CircularMB = CircularMB,
@@ -66,17 +59,53 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 }
             }
 
+            if(!TryCreateCollector(console, config, out var collector))
+            {
+                return 1;
+            }
+
             // Write the config file contents
-            var configContent = config.ToConfigString();
-            File.WriteAllText(ConfigPath, configContent);
+            await collector.StartCollectingAsync();
             console.WriteLine("Tracing has started. Press Ctrl-C to stop.");
 
             await console.WaitForCtrlCAsync();
 
-            File.Delete(ConfigPath);
+            await collector.StopCollectingAsync();
             console.WriteLine($"Tracing stopped. Trace files written to {config.OutputPath}");
 
             return 0;
+        }
+
+        private bool TryCreateCollector(IConsole console, CollectionConfiguration config, out EventCollector collector)
+        {
+            collector = null;
+
+            if (Etw)
+            {
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    console.Error.WriteLine("Error: ETW-based collection is only supported on Windows.");
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(ConfigPath))
+                {
+                    console.Error.WriteLine("WARNING: The '-c' option is ignored when using ETW-based collection.");
+                }
+                collector = new EtwCollector(config);
+                return true;
+            }
+            else
+            {
+                if (File.Exists(ConfigPath))
+                {
+                    console.Error.WriteLine("Config file already exists, tracing is already underway by a different consumer.");
+                    return false;
+                }
+
+                collector = new EventPipeCollector(config, ConfigPath);
+                return true;
+            }
         }
 
         private static int Main(string[] args)
