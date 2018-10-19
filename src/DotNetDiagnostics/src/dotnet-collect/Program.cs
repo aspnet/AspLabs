@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
@@ -11,6 +12,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
     [Command(Name = "dotnet-collect", Description = "Collects Event Traces from .NET processes")]
     internal class Program
     {
+
         [Option("-c|--config-path <CONFIG_PATH>", Description = "The path of the EventPipe config file to write, must be named [AppName].eventpipeconfig and be in the base directory for a managed app.")]
         public string ConfigPath { get; set; }
 
@@ -29,8 +31,27 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>'. Can be specified multiple times to enable multiple providers.")]
         public IList<string> Providers { get; set; }
 
+        [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
+        public IList<string> Profiles { get; set; }
+
+        [Option("--keywords-for <PROVIDER_NAME>", Description = "Gets a list of known keywords (if any) for the specified provider.")]
+        public string KeywordsForProvider { get; set; }
+
+        [Option("--list-profiles", Description = "Gets a list of predefined collection profiles.")]
+        public bool ListProfiles { get; set; }
+
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
+            if (ListProfiles)
+            {
+                WriteProfileList(console.Out);
+                return 0;
+            }
+            if (!string.IsNullOrEmpty(KeywordsForProvider))
+            {
+                return ExecuteKeywordsForAsync(console);
+            }
+
             var config = new CollectionConfiguration()
             {
                 ProcessId = ProcessId,
@@ -38,28 +59,44 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 OutputPath = string.IsNullOrEmpty(OutputDir) ? Directory.GetCurrentDirectory() : OutputDir
             };
 
+            if (Profiles != null && Profiles.Count > 0)
+            {
+                foreach (var profile in Profiles)
+                {
+                    if (!KnownData.TryGetProfile(profile, out var collectionProfile))
+                    {
+                        console.Error.WriteLine($"Unknown profile name: '{profile}'. See 'dotnet-collect --list-profiles' to get a list of profiles.");
+                        return 1;
+                    }
+                    config.AddProfile(collectionProfile);
+                }
+            }
+
             if (Providers != null && Providers.Count > 0)
             {
                 foreach (var provider in Providers)
                 {
                     if (!EventSpec.TryParse(provider, out var spec))
                     {
-                        console.Error.WriteLine($"Invalid provider specification: '{provider}'. A provider specification must be in one of the following formats:");
-                        console.Error.WriteLine(" <providerName>                       - Enable all events at all levels for the provider.");
-                        console.Error.WriteLine(" <providerName>:<keywords>            - Enable events matching the specified keywords for the specified provider.");
-                        console.Error.WriteLine(" <providerName>:<level>               - Enable events at the specified level for the provider.");
-                        console.Error.WriteLine(" <providerName>:<keywords>:<level>    - Enable events matching the specified keywords, at the specified level for the specified provider.");
-                        console.Error.WriteLine("");
-                        console.Error.WriteLine("'<provider>' must be the name of the EventSource.");
-                        console.Error.WriteLine("'<level>' can be one of: Critical (1), Error (2), Warning (3), Informational (4), Verbose (5). Either the name or number can be specified.");
-                        console.Error.WriteLine("'<keywords>' is a hexadecimal number, starting with '0x', defining the keywords to enable.");
+                        console.Error.WriteLine($"Invalid provider specification: '{provider}'. See 'dotnet-collect --help' for more information.");
                         return 1;
                     }
                     config.Providers.Add(spec);
                 }
             }
 
-            if(!TryCreateCollector(console, config, out var collector))
+            if (config.Providers.Count == 0)
+            {
+                // Enable the default profile if nothing is specified
+                if (!KnownData.TryGetProfile(CollectionProfile.DefaultProfileName, out var defaultProfile))
+                {
+                    console.Error.WriteLine("No providers or profiles were specified and there is no default profile available.");
+                    return 1;
+                }
+                config.AddProfile(defaultProfile);
+            }
+
+            if (!TryCreateCollector(console, config, out var collector))
             {
                 return 1;
             }
@@ -74,6 +111,35 @@ namespace Microsoft.Diagnostics.Tools.Collect
             console.WriteLine($"Tracing stopped. Trace files written to {config.OutputPath}");
 
             return 0;
+        }
+
+        private static void WriteProfileList(TextWriter console)
+        {
+            var profiles = KnownData.GetAllProfiles();
+            var maxNameLength = profiles.Max(p => p.Name.Length);
+            console.WriteLine("Available profiles:");
+            foreach (var profile in profiles)
+            {
+                console.WriteLine($"* {profile.Name.PadRight(maxNameLength)}  {profile.Description}");
+            }
+        }
+
+        private int ExecuteKeywordsForAsync(IConsole console)
+        {
+            if (KnownData.TryGetProvider(KeywordsForProvider, out var provider))
+            {
+                console.WriteLine($"Known keywords for {provider.Name} ({provider.Guid}):");
+                foreach (var keyword in provider.Keywords.Values)
+                {
+                    console.WriteLine($"* 0x{keyword.Value:x16} {keyword.Name}");
+                }
+                return 0;
+            }
+            else
+            {
+                console.WriteLine($"There are no known keywords for {KeywordsForProvider}.");
+                return 1;
+            }
         }
 
         private bool TryCreateCollector(IConsole console, CollectionConfiguration config, out EventCollector collector)
@@ -114,16 +180,50 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
             try
             {
-                return CommandLineApplication.Execute<Program>(args);
+                var app = new CommandLineApplication<Program>();
+                app.Conventions.UseDefaultConventions();
+                app.ExtendedHelpText = GetExtendedHelp();
+                return app.Execute(args);
             }
             catch (PlatformNotSupportedException ex)
             {
                 Console.Error.WriteLine(ex.Message);
                 return 1;
             }
+            catch (CommandLineException clex)
+            {
+                Console.Error.WriteLine(clex.Message);
+                return 1;
+            }
             catch (OperationCanceledException)
             {
                 return 0;
+            }
+        }
+
+        private static string GetExtendedHelp()
+        {
+            using (var writer = new StringWriter())
+            {
+                writer.WriteLine();
+                writer.WriteLine("Profiles");
+                writer.WriteLine("  Profiles are sets of well-defined provider configurations that provide useful information.");
+                writer.WriteLine();
+                WriteProfileList(writer);
+                writer.WriteLine();
+                writer.WriteLine("Specifying Providers:");
+                writer.WriteLine("  Use one of the following formats to specify a provider in '--provider'");
+                writer.WriteLine("    <providerName>                       - Enable all events at all levels for the provider.");
+                writer.WriteLine("    <providerName>:<keywords>            - Enable events matching the specified keywords for the specified provider.");
+                writer.WriteLine("    <providerName>:<keywords>:<level>    - Enable events matching the specified keywords, at the specified level for the specified provider.");
+                writer.WriteLine("");
+                writer.WriteLine("  '<provider>' must be the name of the EventSource.");
+                writer.WriteLine("  '<level>' can be one of: Critical (1), Error (2), Warning (3), Informational (4), Verbose (5). Either the name or number can be specified.");
+                writer.WriteLine("  '<keywords>' is one of the following:");
+                writer.WriteLine("    A '*' character, indicating ALL keywords should be enabled (this can be very costly for some providers!)");
+                writer.WriteLine("    A comma-separated list of known keywords for a provider (use 'dotnet collect --keywords-for [providerName]' to get a list of known keywords for a provider)");
+                writer.WriteLine("    A 64-bit hexadecimal number, starting with '0x' indicating the keywords to enable");
+                return writer.GetStringBuilder().ToString();
             }
         }
     }

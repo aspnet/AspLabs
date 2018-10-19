@@ -33,6 +33,14 @@ namespace Microsoft.Diagnostics.Tools.Collect
             return builder.ToString();
         }
 
+        public void AddProfile(CollectionProfile profile)
+        {
+            foreach (var spec in profile.EventSpecs)
+            {
+                Providers.Add(spec);
+            }
+        }
+
         private string SerializeProviders(IList<EventSpec> providers) => string.Join(",", providers.Select(s => s.ToConfigString()));
     }
 }
