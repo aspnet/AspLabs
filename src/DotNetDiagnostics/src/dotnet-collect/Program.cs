@@ -40,6 +40,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--list-profiles", Description = "Gets a list of predefined collection profiles.")]
         public bool ListProfiles { get; set; }
 
+        [Option("--no-default", Description = "Don't enable the default profile.")]
+        public bool NoDefault { get; set; }
+
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
             if (ListProfiles)
@@ -85,7 +88,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 }
             }
 
-            if (config.Providers.Count == 0)
+            if (!NoDefault)
             {
                 // Enable the default profile if nothing is specified
                 if (!KnownData.TryGetProfile(CollectionProfile.DefaultProfileName, out var defaultProfile))
