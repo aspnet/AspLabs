@@ -10,11 +10,13 @@ namespace SampleWebApp.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly ReallyWeirdAsyncService _service;
         private static readonly Random _rando = new Random();
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, ReallyWeirdAsyncService service)
         {
             _logger = logger;
+            _service = service;
         }
 
         public IActionResult OnGetLogMessage()
@@ -37,6 +39,20 @@ namespace SampleWebApp.Pages
             await Task.Delay(5000);
 
             GC.Collect();
+
+            return Page();
+        }
+
+        public IActionResult OnGetAsyncRelease()
+        {
+            _service.Release();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetAsyncHang()
+        {
+            await _service.WaitAsync();
 
             return Page();
         }
