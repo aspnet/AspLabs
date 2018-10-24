@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,7 +13,6 @@ namespace Microsoft.Diagnostics.Tools.Collect
     [Command(Name = "dotnet-collect", Description = "Collects Event Traces from .NET processes")]
     internal class Program
     {
-
         [Option("-c|--config-path <CONFIG_PATH>", Description = "The path of the EventPipe config file to write, must be named [AppName].eventpipeconfig and be in the base directory for a managed app.")]
         public string ConfigPath { get; set; }
 

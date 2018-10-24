@@ -19,7 +19,7 @@ namespace SampleMonitoredApp
 
         private static readonly Random _rando = new Random();
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var logging = new LoggerFactory();
             logging.AddEventSourceLogger();
@@ -36,9 +36,10 @@ namespace SampleMonitoredApp
             Console.WriteLine("Press X to quit.");
             Console.WriteLine("Press A to allocate 100 MB.");
             Console.WriteLine("Press G to force a GC.");
-            Console.WriteLine("Press T to spawn parallel tasks.");
             Console.WriteLine("Press L to log a Microsoft.Extensions.Logging message to 'SampleMonitoredApp.Program'.");
             Console.WriteLine("Press E to write a random value to an EventSource/EventCounter.");
+            Console.WriteLine("Press H to simulate an async hang.");
+            Console.WriteLine("Press T to throw an exception.");
 
             while (true)
             {
@@ -56,7 +57,7 @@ namespace SampleMonitoredApp
                         Console.WriteLine($"Total Memory after collection: {FormatSize(GC.GetTotalMemory(forceFullCollection: false))}");
                         break;
                     case ConsoleKey.T:
-                        SpawnTasks();
+                        ThrowException();
                         break;
                     case ConsoleKey.L:
                         logger.Log(LogLevel.Information, new EventId(42, "SampleEvent"), "This is a sample event with an argument: {rando}", _rando.Next(0, 100));
@@ -64,8 +65,35 @@ namespace SampleMonitoredApp
                     case ConsoleKey.E:
                         SampleEventSource.Log.MyEvent(_rando.Next(0, 100));
                         break;
+                    case ConsoleKey.H:
+                        await AsyncHangAsync();
+                        break;
                 }
             }
+        }
+
+        private static void ThrowException()
+        {
+            try
+            {
+                Thrower();
+            }
+            catch (SampleException)
+            {
+                Console.WriteLine("Caught a SampleException");
+            }
+        }
+
+        private static void Thrower()
+        {
+            Console.WriteLine("Throwing a SampleException");
+            throw new SampleException();
+        }
+
+        private static async Task AsyncHangAsync()
+        {
+            var tcs = new TaskCompletionSource<object>();
+            await tcs.Task;
         }
 
         private static void DumpEventPipeInfo()
