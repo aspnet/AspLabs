@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.Tracing;
 using System.Globalization;
+using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Collect
 {
@@ -33,7 +34,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
             if (splat.Length > 1)
             {
-                if (!TryParseKeywords(splat[1], out keywords) && !TryParseLevel(splat[1], out level))
+                if (!TryParseKeywords(splat[1], provider, out keywords))
                 {
                     return false;
                 }
@@ -71,15 +72,37 @@ namespace Microsoft.Diagnostics.Tools.Collect
             return false;
         }
 
-        private static bool TryParseKeywords(string input, out ulong keywords)
+        private static bool TryParseKeywords(string input, string provider, out ulong keywords)
         {
-            if (input.StartsWith("0x"))
+            if (string.Equals("*", input, StringComparison.Ordinal))
+            {
+                keywords = ulong.MaxValue;
+                return true;
+            }
+            else if (input.StartsWith("0x"))
             {
                 // Keywords
                 if (ulong.TryParse(input, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out keywords))
                 {
                     return true;
                 }
+            }
+            else if(KnownData.TryGetProvider(provider, out var knownProvider))
+            {
+                var splat = input.Split(',');
+                keywords = 0;
+                foreach(var item in splat)
+                {
+                    if(knownProvider.Keywords.TryGetValue(item, out var knownKeyword))
+                    {
+                        keywords |= knownKeyword.Value;
+                    }
+                    else
+                    {
+                        throw new CommandLineException($"Keyword '{item}' is not a well-known keyword for '{provider}'");
+                    }
+                }
+                return true;
             }
 
             keywords = ulong.MaxValue;
