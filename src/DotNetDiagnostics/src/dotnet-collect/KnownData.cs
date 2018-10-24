@@ -34,6 +34,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 new[]
                 {
                     new EventSpec("Microsoft-AspNetCore-Hosting", ulong.MaxValue, EventLevel.Informational),
+                    new EventSpec("Microsoft-Extensions-Logging", ulong.MaxValue, EventLevel.Informational),
                 });
 
             yield return new CollectionProfile(

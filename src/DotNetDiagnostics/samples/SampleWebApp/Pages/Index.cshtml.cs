@@ -1,22 +1,44 @@
+using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace SampleWebApp.Pages
 {
     public class IndexModel : PageModel
     {
-        public IEnumerable<int> SelfInvokedValues { get; set; }
+        private readonly ILogger<IndexModel> _logger;
+        private static readonly Random _rando = new Random();
 
-        public async Task OnGetAsync()
+        public IndexModel(ILogger<IndexModel> logger)
         {
-            // This is a no-no but it's nice for illustration :).
-            var client = new HttpClient();
-            var resp = await client.GetAsync($"https://{HttpContext.Request.Host}/api/values");
-            resp.EnsureSuccessStatusCode();
-            SelfInvokedValues = JsonConvert.DeserializeObject<List<int>>(await resp.Content.ReadAsStringAsync());
+            _logger = logger;
+        }
+
+        public IActionResult OnGetLogMessage()
+        {
+            using (_logger.BeginScope("Scope"))
+            {
+                _logger.LogInformation(new EventId(1, "MyEvent"), "The next random value is: {rando}", _rando.Next());
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetGarbageCollectAsync()
+        {
+            var arrays = new List<byte[]>();
+            for(var i = 0; i < 1000; i ++)
+            {
+                arrays.Add(new byte[1024]);
+            }
+            await Task.Delay(5000);
+
+            GC.Collect();
+
+            return Page();
         }
     }
 }

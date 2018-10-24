@@ -41,6 +41,6 @@ namespace Microsoft.Diagnostics.Tools.Collect
             }
         }
 
-        private string SerializeProviders(IList<EventSpec> providers) => string.Join(",", providers.Select(s => s.ToConfigString()));
+        private string SerializeProviders(IEnumerable<EventSpec> providers) => string.Join(",", providers.Select(s => s.ToConfigString()));
     }
 }
