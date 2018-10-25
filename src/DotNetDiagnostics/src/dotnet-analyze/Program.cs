@@ -13,19 +13,19 @@ namespace Microsoft.Diagnostics.Tools.Analyze
     [Command(Name = "dotnet-analyze", Description = "Inspect a crash dump using interactive commands")]
     internal class Program
     {
-        [FileExists(ErrorMessage = "The dump file could not be found.")]
-        [Required(ErrorMessage = "You must provide a dump file to be analyzed.")]
-        [Argument(0, "<DUMP>", Description = "The path to the dump file to analyze.")]
-        public string DumpPath { get; set; }
+        [FileExists(ErrorMessage = "The file could not be found.")]
+        [Required(ErrorMessage = "You must provide a file to be analyzed.")]
+        [Argument(0, "<ANALYSIS_FILE>", Description = "The path to the file to analyze.")]
+        public string AnalysisFile { get; set; }
 
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
             // Load the dump
-            console.WriteLine($"Loading crash dump {DumpPath}...");
-            using (var target = DataTarget.LoadCrashDump(DumpPath))
+            console.WriteLine($"Loading crash dump {AnalysisFile}...");
+            using (var target = DataTarget.LoadCrashDump(AnalysisFile))
             {
                 // Assume there's only one
-                if(target.ClrVersions.Count > 1)
+                if (target.ClrVersions.Count > 1)
                 {
                     console.Error.WriteLine("Multiple CLR versions are present!");
                     return 1;

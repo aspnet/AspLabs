@@ -23,6 +23,7 @@ namespace SampleWebApp
         {
             var tcs = _asyncTask;
             tcs.TrySetResult(null);
+            Reset();
         }
     }
 }

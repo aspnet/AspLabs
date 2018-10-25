@@ -44,12 +44,6 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
-            // The hackiest!
-            if (string.IsNullOrEmpty(ConfigPath))
-            {
-                ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".dotnet", "x64", "SampleWebApp.eventpipeconfig");
-            }
-
             if (ListProfiles)
             {
                 WriteProfileList(console.Out);

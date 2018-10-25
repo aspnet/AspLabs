@@ -25,7 +25,8 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 CollectionProfile.DefaultProfileName,
                 "A default set of event providers useful for diagosing problems in any .NET application.",
                 new[] {
-                    new EventSpec(ClrTraceEventParser.ProviderName, (ulong)ClrTraceEventParser.Keywords.Default, EventLevel.Informational)
+                    new EventSpec(ClrTraceEventParser.ProviderName, (ulong)ClrTraceEventParser.Keywords.Default, EventLevel.Informational),
+                    new EventSpec(TplEtwProviderTraceEventParser.ProviderName, (ulong)TplEtwProviderTraceEventParser.Keywords.Default, EventLevel.Verbose),
                 });
 
             yield return new CollectionProfile(
