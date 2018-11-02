@@ -1,9 +1,8 @@
 <Project>
-  <Import Project="..\Directory.Build.props" />
+  <!-- Chain up to the next file (can be copy-pasted to either Directory.Build.props or Directory.Build.targets) -->
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory).., '$(MSBuildThisFileName)$(MSBuildThisFileExtension)'))\$(MSBuildThisFileName)$(MSBuildThisFileExtension)" />
 
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
-
     <DeveloperBuildTestWebsiteTfms Condition=" '$(DeveloperBuildTestWebsiteTfms)' == '' ">netcoreapp2.1</DeveloperBuildTestWebsiteTfms>
     <StandardTestWebsiteTfms>$(DeveloperBuildTestWebsiteTfms)</StandardTestWebsiteTfms>
     <StandardTestWebsiteTfms Condition=" '$(DeveloperBuild)' != 'true' ">netcoreapp2.1</StandardTestWebsiteTfms>

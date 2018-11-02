@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx">
+    <body>
+      <trans-unit id="EventConstraints_NoReceiverName">
+        <source>Invalid WebHook constraint configuration encountered. Request contained no receiver name and '{0}' should have disallowed the request.</source>
+        <target state="new">Invalid WebHook constraint configuration encountered. Request contained no receiver name and '{0}' should have disallowed the request.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="EventMapper_NoBodyProperty">
+        <source>A '{0}' WebHook request must contain a match for '{1}' in the HTTP request entity body indicating the type or types of event.</source>
+        <target state="new">A '{0}' WebHook request must contain a match for '{1}' in the HTTP request entity body indicating the type or types of event.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="General_ArgumentCannotBeNullOrEmpty">
+        <source>Value cannot be null or empty.</source>
+        <target state="new">Value cannot be null or empty.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="General_InvalidEnumValue">
+        <source>Enum type '{0}' has no defined '{1}' value.</source>
+        <target state="new">Enum type '{0}' has no defined '{1}' value.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="General_NoQueryParameter">
+        <source>A '{0}' WebHook request must contain a '{1}' query parameter.</source>
+        <target state="new">A '{0}' WebHook request must contain a '{1}' query parameter.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="GetRequest_NoQueryParameter">
+        <source>A '{0}' WebHook verification request must contain a '{1}' query parameter.</source>
+        <target state="new">A '{0}' WebHook verification request must contain a '{1}' query parameter.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PropertyProvider_ConflictingMetadataServices">
+        <source>Invalid metadata services found for the '{0}' WebHook receiver. Receivers must not provide both '{1}' and '{2}' services.</source>
+        <target state="new">Invalid metadata services found for the '{0}' WebHook receiver. Receivers must not provide both '{1}' and '{2}' services.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PropertyProvider_DuplicateMetadata">
+        <source>Invalid metadata services found for the '{0}' WebHook receiver. Receivers must not have more than one '{1}' registration.</source>
+        <target state="new">Invalid metadata services found for the '{0}' WebHook receiver. Receivers must not have more than one '{1}' registration.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PropertyProvider_MissingMetadata">
+        <source>Invalid metadata services found for the '{0}' WebHook receiver. Receiver must have an '{1}' implementation.</source>
+        <target state="new">Invalid metadata services found for the '{0}' WebHook receiver. Receiver must have an '{1}' implementation.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PropertyProvider_MissingMetadataServices">
+        <source>Invalid metadata services found for the '{0}' WebHook receiver. Receivers with attributes implementing '{1}' must also provide a '{2}' service.</source>
+        <target state="new">Invalid metadata services found for the '{0}' WebHook receiver. Receivers with attributes implementing '{1}' must also provide a '{2}' service.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="RequestReader_ModelBindingFailed">
+        <source>The MVC model binding system failed. Model state is valid but model was not set.</source>
+        <target state="new">The MVC model binding system failed. Model state is valid but model was not set.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Security_BadSecret">
+        <source>Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'. The value must be at least {2} characters long.</source>
+        <target state="new">Could not find a valid configuration for the '{0}' WebHook receiver, instance '{1}'. The value must be at least {2} characters long.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Security_NoHttps">
+        <source>The '{0}' WebHook receiver requires {1} in order to be secure. Register a WebHook URI of type '{2}'.</source>
+        <target state="new">The '{0}' WebHook receiver requires {1} in order to be secure. Register a WebHook URI of type '{2}'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Security_NoSecrets">
+        <source>Could not find a valid configuration for the '{0}' WebHook receiver. Configure secret keys for this receiver.</source>
+        <target state="new">Could not find a valid configuration for the '{0}' WebHook receiver. Configure secret keys for this receiver.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SelectorModelProvider_MixedRouteWithWebHookAttribute">
+        <source>'{0}' and '{1}' were applied to the same action. '{2}' must not be combined with attribute routing or non-WebHook constraints.</source>
+        <target state="new">'{0}' and '{1}' were applied to the same action. '{2}' must not be combined with attribute routing or non-WebHook constraints.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyBody_NoFormData">
+        <source>The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</source>
+        <target state="new">The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as HTML form URL-encoded data.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyBody_NoJson">
+        <source>The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as JSON.</source>
+        <target state="new">The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as JSON.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyBody_NoXml">
+        <source>The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as XML.</source>
+        <target state="new">The '{0}' WebHook receiver does not support content type '{1}'. The WebHook request must contain an entity body formatted as XML.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyCode_BadCode">
+        <source>The '{0}' query parameter provided in the HTTP request did not match the expected value.</source>
+        <target state="new">The '{0}' query parameter provided in the HTTP request did not match the expected value.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyMethod_BadBody">
+        <source>The '{0}' WebHook receiver does not support an empty request body.</source>
+        <target state="new">The '{0}' WebHook receiver does not support an empty request body.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyMethod_BadMethod">
+        <source>The '{0}' WebHook receiver does not support the HTTP '{1}' method.</source>
+        <target state="new">The '{0}' WebHook receiver does not support the HTTP '{1}' method.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyRequiredValue_NoHeader">
+        <source>A '{0}' WebHook request must contain a '{1}' HTTP header.</source>
+        <target state="new">A '{0}' WebHook request must contain a '{1}' HTTP header.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyRequiredValue_NoRouteValue">
+        <source>A '{0}' WebHook request must contain a '{1}' value in the route data.</source>
+        <target state="new">A '{0}' WebHook request must contain a '{1}' value in the route data.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifySignature_BadBase64Encoding">
+        <source>The '{0}' header value is invalid. The '{1}' WebHook receiver requires a valid Base64-encoded string.</source>
+        <target state="new">The '{0}' header value is invalid. The '{1}' WebHook receiver requires a valid Base64-encoded string.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifySignature_BadHeader">
+        <source>Expecting exactly one '{0}' header field in the WebHook request but found {1}. Ensure the request contains exactly one '{0}' header field.</source>
+        <target state="new">Expecting exactly one '{0}' header field in the WebHook request but found {1}. Ensure the request contains exactly one '{0}' header field.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifySignature_BadHexEncoding">
+        <source>The '{0}' header value is invalid. The '{1}' WebHook receiver requires a valid hex-encoded string.</source>
+        <target state="new">The '{0}' header value is invalid. The '{1}' WebHook receiver requires a valid hex-encoded string.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifySignature_BadSignature">
+        <source>The signature provided by the '{0}' header field does not match the value expected by the '{1}' WebHook receiver. WebHook request is invalid.</source>
+        <target state="new">The signature provided by the '{0}' header field does not match the value expected by the '{1}' WebHook receiver. WebHook request is invalid.</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

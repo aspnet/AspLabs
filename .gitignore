@@ -27,3 +27,4 @@ _ReSharper.*
 *.user*.userprefs
 *DS_Store
 launchSettings.json
+*.binlog

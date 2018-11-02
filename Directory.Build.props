@@ -1,25 +1,16 @@
-﻿<Project>
-  <Import Project="version.props" />
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
   <PropertyGroup>
-    <Product>Microsoft ASP.NET Core</Product>
-    <RepositoryUrl>https://github.com/aspnet/AspLabs</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <ImportNetSdkFromRepoToolset>false</ImportNetSdkFromRepoToolset>
+
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\AspNetCore.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>7.3</LangVersion>
-
-    <!-- Suppress the message about using a preview version of the .NET Core SDK -->
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-    <!-- By default, disable packing all .csproj files into .nupkgs. Projects which should be packed opt-in by setting this to true. -->
-    <IsPackable>false</IsPackable>
-
-    <ArtifactsDir>$(RepositoryRoot)artifacts\</ArtifactsDir>
-    <PackageOutputPath>$(ArtifactsDir)packages\</PackageOutputPath>
-    <BaseIntermediateOutputPath>$(ArtifactsDir)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <BaseOutputPath>$(ArtifactsDir)bin\$(MSBuildProjectName)\</BaseOutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Label="Package and Assembly Metadata">
+    <Product>Microsoft ASP.NET Core</Product>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>

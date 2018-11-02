@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ru" original="../Resources.resx">
+    <body>
+      <trans-unit id="Command_ContainsUnmatchedQuote">
+        <source>Unmatched quote ({0}) discovered at position {1}.</source>
+        <target state="new">Unmatched quote ({0}) discovered at position {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Command_NameInvalid">
+        <source>Parameter name cannot contain ';' characters. Unexpected escape sequence ({0}) discovered at position {1}.</source>
+        <target state="new">Parameter name cannot contain ';' characters. Unexpected escape sequence ({0}) discovered at position {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Command_NameIsQuotedString">
+        <source>Parameter name cannot be a quoted string. Unexpected character ({0}) discovered at position {1}.</source>
+        <target state="new">Parameter name cannot be a quoted string. Unexpected character ({0}) discovered at position {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Command_ValueInvalid">
+        <source>Parameter value contains text after a quoted string. Unexpected character ({0}) discovered at position {1}.</source>
+        <target state="new">Parameter value contains text after a quoted string. Unexpected character ({0}) discovered at position {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyToken_BadValue">
+        <source>The '{0}' value provided in the HTTP request body did not match the expected value.</source>
+        <target state="new">The '{0}' value provided in the HTTP request body did not match the expected value.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyToken_MissingValue">
+        <source>The HTTP request body did not contain a required '{0}' property.</source>
+        <target state="new">The HTTP request body did not contain a required '{0}' property.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyToken_MissingValues">
+        <source>The HTTP request body did not contain a required '{0}', '{1}', or '{2}' property.</source>
+        <target state="new">The HTTP request body did not contain a required '{0}', '{1}', or '{2}' property.</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

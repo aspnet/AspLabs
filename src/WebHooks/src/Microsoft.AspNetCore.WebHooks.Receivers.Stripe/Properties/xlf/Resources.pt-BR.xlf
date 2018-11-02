@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx">
+    <body>
+      <trans-unit id="DateTime_BadFormat">
+        <source>Cannot read value '{0}' as type '{1}'.</source>
+        <target state="new">Cannot read value '{0}' as type '{1}'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DateTime_NullError">
+        <source>Cannot convert null value to type '{0}'.</source>
+        <target state="new">Cannot convert null value to type '{0}'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SignatureFilter_HeaderMissingValue">
+        <source>The '{0}' header value is invalid. It must contain timestamp ('{1}') and signature ('{2}') values.</source>
+        <target state="new">The '{0}' header value is invalid. It must contain timestamp ('{1}') and signature ('{2}') values.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SignatureFilter_InvalidHeaderFormat">
+        <source>The '{0}' header value is invalid. It must be formatted as key=value pairs separated by commas.</source>
+        <target state="new">The '{0}' header value is invalid. It must be formatted as key=value pairs separated by commas.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VerifyNotification_MissingValue">
+        <source>The HTTP request body did not contain a required '{0}' property.</source>
+        <target state="new">The HTTP request body did not contain a required '{0}' property.</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
