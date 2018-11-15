@@ -22,8 +22,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-dump", "src\dotnet-d
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-collect", "src\dotnet-collect\dotnet-collect.csproj", "{7950F785-5724-4BE4-98FC-52BE1BD8E04B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Analyzer", "src\DotNet.Analyzer\DotNet.Analyzer.csproj", "{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,10 +48,6 @@ Global
 		{7950F785-5724-4BE4-98FC-52BE1BD8E04B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7950F785-5724-4BE4-98FC-52BE1BD8E04B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7950F785-5724-4BE4-98FC-52BE1BD8E04B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,7 +58,6 @@ Global
 		{D894FA6D-6B63-450B-93A7-4120C2CDC147} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 		{933327B7-87FC-4D1B-8AF4-C6A07DE30AA4} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 		{7950F785-5724-4BE4-98FC-52BE1BD8E04B} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
-		{9F1C9B1E-45E6-4EB6-B9CB-9E15F14D4667} = {A9AE5A6B-48A3-424D-BD94-1A7E10921551}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0491437C-33E9-4E6E-967C-65A7875110CE}

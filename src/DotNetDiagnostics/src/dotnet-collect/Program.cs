@@ -28,8 +28,11 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--buffer <BUFFER_SIZE_IN_MB>", Description = "The size of the in-memory circular buffer in megabytes.")]
         public int? CircularMB { get; set; }
 
-        [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>'. Can be specified multiple times to enable multiple providers.")]
+        [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>:<parameters>'. Can be specified multiple times to enable multiple providers.")]
         public IList<string> Providers { get; set; }
+
+        [Option("--counter <COUNTER_SPEC>", Description = "An EventPipe provider to enable counters for. A string in the form '<provider name>:<counter interval in sec>'. Can be specified multiple times to enable multiple counters.")]
+        public IList<string> Counter { get; set; }
 
         [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
         public IList<string> Profiles { get; set; }
@@ -216,9 +219,10 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 writer.WriteLine();
                 writer.WriteLine("Specifying Providers:");
                 writer.WriteLine("  Use one of the following formats to specify a provider in '--provider'");
-                writer.WriteLine("    <providerName>                       - Enable all events at all levels for the provider.");
-                writer.WriteLine("    <providerName>:<keywords>            - Enable events matching the specified keywords for the specified provider.");
-                writer.WriteLine("    <providerName>:<keywords>:<level>    - Enable events matching the specified keywords, at the specified level for the specified provider.");
+                writer.WriteLine("    <providerName>                                    - Enable all events at all levels for the provider.");
+                writer.WriteLine("    <providerName>:<keywords>                         - Enable events matching the specified keywords for the specified provider.");
+                writer.WriteLine("    <providerName>:<keywords>:<level>                 - Enable events matching the specified keywords, at the specified level for the specified provider.");
+                writer.WriteLine("    <providerName>:<keywords>:<level>:<parameters>    - Enable events matching the specified keywords, at the specified level for the specified provider and provide key-value parameters.");
                 writer.WriteLine("");
                 writer.WriteLine("  '<provider>' must be the name of the EventSource.");
                 writer.WriteLine("  '<level>' can be one of: Critical (1), Error (2), Warning (3), Informational (4), Verbose (5). Either the name or number can be specified.");
@@ -226,6 +230,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 writer.WriteLine("    A '*' character, indicating ALL keywords should be enabled (this can be very costly for some providers!)");
                 writer.WriteLine("    A comma-separated list of known keywords for a provider (use 'dotnet collect --keywords-for [providerName]' to get a list of known keywords for a provider)");
                 writer.WriteLine("    A 64-bit hexadecimal number, starting with '0x' indicating the keywords to enable");
+                writer.WriteLine("  '<parameters>' is an optional list of key-value parameters to provide to the EventPipe provider. The expected values depend on the provider you are enabling.");
+                writer.WriteLine("    This should be a list of key-value pairs, in the form: '<key1>=<value1>;<key2>=<value2>;...'. Note that some shells, such as PowerShell, require that you");
+                writer.WriteLine("    quote or escape the ';' character.");
                 return writer.GetStringBuilder().ToString();
             }
         }

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Globalization;
+using System.Text;
 using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Collect
@@ -10,12 +12,19 @@ namespace Microsoft.Diagnostics.Tools.Collect
         public string Provider { get; }
         public ulong Keywords { get; }
         public EventLevel Level { get; }
+        public IDictionary<string, string> Parameters { get; }
 
         public EventSpec(string provider, ulong keywords, EventLevel level)
+            : this(provider, keywords, level, new Dictionary<string, string>())
+        {
+        }
+
+        public EventSpec(string provider, ulong keywords, EventLevel level, IDictionary<string, string> parameters)
         {
             Provider = provider;
             Keywords = keywords;
             Level = level;
+            Parameters = parameters;
         }
 
         public static bool TryParse(string input, out EventSpec spec)
@@ -31,6 +40,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
             var provider = splat[0];
             var keywords = ulong.MaxValue;
             var level = EventLevel.Verbose;
+            var parameters = new Dictionary<string, string>();
 
             if (splat.Length > 1)
             {
@@ -42,17 +52,64 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
             if (splat.Length > 2)
             {
-                if (!TryParseLevel(splat[1], out level))
+                if (!TryParseLevel(splat[2], out level))
                 {
                     return false;
                 }
             }
 
-            spec = new EventSpec(provider, keywords, level);
+            if (splat.Length > 3)
+            {
+                if (!TryParseParameters(splat[3], parameters))
+                {
+                    return false;
+                }
+            }
+
+            spec = new EventSpec(provider, keywords, level, parameters);
             return true;
         }
 
-        public string ToConfigString() => $"{Provider}:0x{Keywords:X}:{(int)Level}";
+        public string ToConfigString()
+        {
+            var config = $"{Provider}:0x{Keywords:X}:{(int)Level}";
+            if(Parameters.Count > 0)
+            {
+                config += $":{FormatParameters(Parameters)}";
+            }
+            return config;
+        }
+
+        private static string FormatParameters(IDictionary<string, string> parameters)
+        {
+            var builder = new StringBuilder();
+            foreach(var (key, value) in parameters)
+            {
+                builder.Append($"{key}={value};");
+            }
+
+            // Remove the trailing ';'
+            builder.Length -= 1;
+
+            return builder.ToString();
+        }
+
+        private static bool TryParseParameters(string input, IDictionary<string, string> parameters)
+        {
+            var splat = input.Split(';');
+            foreach(var item in splat)
+            {
+                var splot = item.Split('=');
+                if(splot.Length != 2)
+                {
+                    return false;
+                }
+
+                parameters[splot[0]] = splot[1];
+            }
+
+            return true;
+        }
 
         private static bool TryParseLevel(string input, out EventLevel level)
         {
