@@ -35,15 +35,19 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 _session.CircularBufferMB = circularMb;
             }
 
-            var options = new TraceEventProviderOptions();
-            if (_config.ProcessId is int pid)
-            {
-                options.ProcessIDFilter = new List<int>() { pid };
-            }
-
             // Enable the providers requested
             foreach (var provider in _config.Providers)
             {
+                var options = new TraceEventProviderOptions();
+                if (_config.ProcessId is int pid)
+                {
+                    options.ProcessIDFilter = new List<int>() { pid };
+                }
+
+                foreach (var (key, value) in provider.Parameters)
+                {
+                    options.AddArgument(key, value);
+                }
                 _session.EnableProvider(provider.Provider, ConvertLevel(provider.Level), provider.Keywords, options);
             }
 
