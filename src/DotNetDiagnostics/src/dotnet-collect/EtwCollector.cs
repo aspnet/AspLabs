@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -73,6 +74,11 @@ namespace Microsoft.Diagnostics.Tools.Collect
         {
             _session.Dispose();
             return Task.CompletedTask;
+        }
+
+        public override Task<IEnumerable<TraceEvent>> ReadLatestEventsAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

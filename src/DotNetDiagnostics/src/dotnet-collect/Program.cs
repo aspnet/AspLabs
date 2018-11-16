@@ -46,6 +46,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--no-default", Description = "Don't enable the default profile.")]
         public bool NoDefault { get; set; }
 
+        [Option("--live")]
+        public bool Live { get; set; }
+
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
             if (ListProfiles)
@@ -62,8 +65,13 @@ namespace Microsoft.Diagnostics.Tools.Collect
             {
                 ProcessId = ProcessId,
                 CircularMB = CircularMB,
-                OutputPath = string.IsNullOrEmpty(OutputDir) ? Directory.GetCurrentDirectory() : OutputDir
+                OutputPath = string.IsNullOrEmpty(OutputDir) ? Directory.GetCurrentDirectory() : OutputDir,
             };
+
+            if(Live)
+            {
+                config.FlushInterval = TimeSpan.FromSeconds(1);
+            }
 
             if (Profiles != null && Profiles.Count > 0)
             {
@@ -111,7 +119,18 @@ namespace Microsoft.Diagnostics.Tools.Collect
             await collector.StartCollectingAsync();
             console.WriteLine("Tracing has started. Press Ctrl-C to stop.");
 
-            await console.WaitForCtrlCAsync();
+            if (Live)
+            {
+                var token = console.GetCtrlCToken();
+                while(!token.IsCancellationRequested)
+                {
+                    _ = await collector.ReadLatestEventsAsync(token);
+                }
+            }
+            else
+            {
+                await console.WaitForCtrlCAsync();
+            }
 
             await collector.StopCollectingAsync();
             console.WriteLine($"Tracing stopped. Trace files written to {config.OutputPath}");
