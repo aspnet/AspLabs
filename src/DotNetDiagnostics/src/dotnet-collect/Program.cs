@@ -32,7 +32,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
         public IList<string> Providers { get; set; }
 
         // TODO: Placeholder until EventCounters work in live mode.
-        [Option("-c|--count <COUNTER_SPEC>", Description = "An Event to count the occurences of.")]
+        [Option("--count <COUNTER_SPEC>", Description = "An Event to count the occurences of.")]
         public IList<string> EventsToCount { get; set; }
 
         [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
@@ -68,11 +68,11 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 return 1;
             }
 
-            if (Live && EventsToCount.Count == 0)
-            {
-                console.Error.WriteLine("The '--live' option isn't useful without '-c' options!");
-                return 1;
-            }
+            //if (Live && EventsToCount.Count == 0)
+            //{
+            //    console.Error.WriteLine("The '--live' option isn't useful without '-c' options!");
+            //    return 1;
+            //}
 
             var config = new CollectionConfiguration()
             {
@@ -90,7 +90,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
             if (Live)
             {
-                config.FlushInterval = TimeSpan.FromSeconds(1);
+                config.FlushInterval = TimeSpan.FromSeconds(5);
             }
 
             if (Profiles != null && Profiles.Count > 0)
