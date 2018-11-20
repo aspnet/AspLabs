@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Etlx;
 
 namespace Microsoft.Diagnostics.Tools.Collect
 {
@@ -42,15 +43,27 @@ namespace Microsoft.Diagnostics.Tools.Collect
             {
                 if (File.Exists(_nextFile))
                 {
-                    // Read the current file
-                    var events = await ReadEventsAsync(_currentFile);
+                    // Try a few times
+                    var tries = 0;
+                    while (true)
+                    {
+                        try
+                        {
+                            // Read the current file
+                            var events = await ReadEventsAsync(_currentFile);
 
-                    // Update the file paths
-                    _counter += 1;
-                    _currentFile = _nextFile;
-                    _nextFile = GetFilePath(_counter + 1);
+                            // Update the file paths
+                            _counter += 1;
+                            _currentFile = _nextFile;
+                            _nextFile = GetFilePath(_counter + 1);
 
-                    return events;
+                            return events;
+                        }
+                        catch (Exception) when (tries < 5)
+                        {
+                            tries += 1;
+                        }
+                    }
                 }
                 else
                 {
@@ -63,10 +76,40 @@ namespace Microsoft.Diagnostics.Tools.Collect
             return Enumerable.Empty<TraceEvent>();
         }
 
-        private Task<IEnumerable<TraceEvent>> ReadEventsAsync(string currentFile)
+        private Task<List<TraceEvent>> ReadEventsAsync(string currentFile)
         {
-            Console.WriteLine($"Reading file: {currentFile}");
-            return Task.FromResult(Enumerable.Empty<TraceEvent>());
+            return Task.Run(() =>
+            {
+                var events = new List<TraceEvent>();
+                var etlx = TraceLog.CreateFromEventPipeDataFile(currentFile);
+                using (var trace = TraceLog.OpenOrConvert(etlx))
+                {
+                    try
+                    {
+                        foreach (var evt in trace.Events)
+                        {
+                            events.Add(evt.Clone());
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Just stop reading this file.
+                    }
+                }
+
+                // Delete the file
+                try
+                {
+                    File.Delete(currentFile);
+                    File.Delete(etlx);
+                }
+                catch
+                {
+                    // Suppress the exception
+                    // TODO: Logging
+                }
+                return events;
+            });
         }
 
         public override Task StartCollectingAsync()

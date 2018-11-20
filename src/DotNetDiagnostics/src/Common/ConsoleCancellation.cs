@@ -14,17 +14,9 @@ namespace Microsoft.Internal.Utilities
             var cts = new CancellationTokenSource();
             console.CancelKeyPress += (sender, args) =>
             {
-                if (cts.IsCancellationRequested)
-                {
-                    // Terminate forcibly, the user pressed Ctrl-C a second time
-                    args.Cancel = false;
-                }
-                else
-                {
-                    // Don't terminate, just trip the token
-                    args.Cancel = true;
-                    cts.Cancel();
-                }
+                // Don't terminate, just trip the token
+                args.Cancel = true;
+                cts.Cancel();
             };
             return cts.Token;
         }

@@ -31,8 +31,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>:<parameters>'. Can be specified multiple times to enable multiple providers.")]
         public IList<string> Providers { get; set; }
 
-        [Option("--counter <COUNTER_SPEC>", Description = "An EventPipe provider to enable counters for. A string in the form '<provider name>:<counter interval in sec>'. Can be specified multiple times to enable multiple counters.")]
-        public IList<string> Counter { get; set; }
+        // TODO: Placeholder until EventCounters work in live mode.
+        [Option("-c|--count <COUNTER_SPEC>", Description = "An Event to count the occurences of.")]
+        public IList<string> EventsToCount { get; set; }
 
         [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
         public IList<string> Profiles { get; set; }
@@ -61,6 +62,18 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 return ExecuteKeywordsForAsync(console);
             }
 
+            if (Live && !ProcessId.HasValue)
+            {
+                console.Error.WriteLine("The '-p' option must be specified when '--live' is specified!");
+                return 1;
+            }
+
+            if (Live && EventsToCount.Count == 0)
+            {
+                console.Error.WriteLine("The '--live' option isn't useful without '-c' options!");
+                return 1;
+            }
+
             var config = new CollectionConfiguration()
             {
                 ProcessId = ProcessId,
@@ -68,7 +81,14 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 OutputPath = string.IsNullOrEmpty(OutputDir) ? Directory.GetCurrentDirectory() : OutputDir,
             };
 
-            if(Live)
+            if (!Directory.Exists(config.OutputPath))
+            {
+                Directory.CreateDirectory(config.OutputPath);
+            }
+
+            config.OutputPath = Path.GetFullPath(config.OutputPath);
+
+            if (Live)
             {
                 config.FlushInterval = TimeSpan.FromSeconds(1);
             }
@@ -117,23 +137,41 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
             // Write the config file contents
             await collector.StartCollectingAsync();
-            console.WriteLine("Tracing has started. Press Ctrl-C to stop.");
-
-            if (Live)
+            try
             {
-                var token = console.GetCtrlCToken();
-                while(!token.IsCancellationRequested)
+                console.WriteLine("Tracing has started. Press Ctrl-C to stop.");
+
+                if (Live)
                 {
-                    _ = await collector.ReadLatestEventsAsync(token);
+                    var token = console.GetCtrlCToken();
+                    while (!token.IsCancellationRequested)
+                    {
+                        var events = await collector.ReadLatestEventsAsync(token);
+                        foreach (var evt in events)
+                        {
+                            console.WriteLine($"* {evt.ProviderName}/{evt.EventName}");
+                        }
+                    }
                 }
+                else
+                {
+                    await console.WaitForCtrlCAsync();
+                }
+
             }
-            else
+            catch (OperationCanceledException)
             {
-                await console.WaitForCtrlCAsync();
+            }
+            finally
+            {
+                await collector.StopCollectingAsync();
             }
 
-            await collector.StopCollectingAsync();
-            console.WriteLine($"Tracing stopped. Trace files written to {config.OutputPath}");
+            console.WriteLine("Tracing stopped.");
+            if (!Live)
+            {
+                console.WriteLine($"Trace files written to {config.OutputPath}");
+            }
 
             return 0;
         }
