@@ -1,5 +1,9 @@
 <Project>
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
+        <RestoreSources>
+            $(RestoreSources);
+            https://www.myget.org/F/anurse-clrmd/api/v3/index.json
+        </RestoreSources>
     </PropertyGroup>
 </Project>

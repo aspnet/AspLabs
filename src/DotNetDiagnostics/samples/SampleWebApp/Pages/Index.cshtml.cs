@@ -1,22 +1,20 @@
+﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json;
+using SampleWebApp.Services;
 
 namespace SampleWebApp.Pages
 {
     public class IndexModel : PageModel
     {
-        public IEnumerable<int> SelfInvokedValues { get; set; }
+        public IList<string> Items { get; private set; }
 
-        public async Task OnGetAsync()
+        public void OnGet([FromServices] DataService dataService)
         {
-            // This is a no-no but it's nice for illustration :).
-            var client = new HttpClient();
-            var resp = await client.GetAsync($"https://{HttpContext.Request.Host}/api/values");
-            resp.EnsureSuccessStatusCode();
-            SelfInvokedValues = JsonConvert.DeserializeObject<List<int>>(await resp.Content.ReadAsStringAsync());
+            Items = dataService.GetItems();
         }
     }
 }

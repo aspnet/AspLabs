@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,8 +21,9 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--etw", Description = "Specify this flag to use ETW to collect events rather than using EventPipe (Windows only).")]
         public bool Etw { get; set; }
 
+        [Required]
         [Option("-p|--process-id <PROCESS_ID>", Description = "Filter to only the process with the specified process ID.")]
-        public int? ProcessId { get; set; }
+        public int ProcessId { get; set; }
 
         [Option("-o|--output <OUTPUT_DIRECTORY>", Description = "The directory to write the trace to. Defaults to the current working directory.")]
         public string OutputDir { get; set; }
@@ -54,6 +57,13 @@ namespace Microsoft.Diagnostics.Tools.Collect
             {
                 return ExecuteKeywordsForAsync(console);
             }
+
+            if (string.IsNullOrEmpty(ConfigPath))
+            {
+                // HAAAAAACK
+                ConfigPath = "/home/anurse/Code/aspnet/AspLabs/src/DotNetDiagnostics/samples/SampleWebApp/bin/Debug/netcoreapp2.2/SampleWebApp.eventpipeconfig";
+            }
+            console.WriteLine($"Using config path: {ConfigPath}");
 
             var config = new CollectionConfiguration()
             {
