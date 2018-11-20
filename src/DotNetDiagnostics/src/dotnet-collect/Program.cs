@@ -32,8 +32,8 @@ namespace Microsoft.Diagnostics.Tools.Collect
         public IList<string> Providers { get; set; }
 
         // TODO: Placeholder until EventCounters work in live mode.
-        [Option("--count <COUNTER_SPEC>", Description = "An Event to count the occurences of.")]
-        public IList<string> EventsToCount { get; set; }
+        [Option("--counter <COUNTER_SPEC>", Description = "An EventCounter to enable. A string in the form '<provider name>:<counter name>'. Can be specified multiple times.")]
+        public IList<string> Counters { get; set; }
 
         [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
         public IList<string> Profiles { get; set; }
@@ -67,12 +67,6 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 console.Error.WriteLine("The '-p' option must be specified when '--live' is specified!");
                 return 1;
             }
-
-            //if (Live && EventsToCount.Count == 0)
-            //{
-            //    console.Error.WriteLine("The '--live' option isn't useful without '-c' options!");
-            //    return 1;
-            //}
 
             var config = new CollectionConfiguration()
             {
