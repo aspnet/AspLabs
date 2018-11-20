@@ -24,7 +24,7 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
             console.WriteLine("HTTP requests:");
             foreach (var request in requests)
             {
-                console.WriteLine($"* [{request.TimeStamp:0}] {request.PayloadString(0)} {request.PayloadString(1)}");
+                console.WriteLine($"* ({((int)request.EventIndex).ToString("X4")}) [{request.TimeStamp:O}] {request.PayloadString(0)} {request.PayloadString(1)}");
             }
 
             return Task.CompletedTask;

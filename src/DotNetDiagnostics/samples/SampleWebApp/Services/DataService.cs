@@ -1,16 +1,18 @@
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace SampleWebApp.Services
 {
     public class DataService
     {
+        private static int _count;
         private readonly ILogger<DataService> _logger;
         private List<byte[]> _data = new List<byte[]>();
 
         public DataService(ILogger<DataService> logger)
         {
-            logger.LogInformation("Data service initialized");
+            logger.LogInformation("Data service initialized. Count = {Count}", Interlocked.Increment(ref _count));
             _logger = logger;
 
             // Simulate allocating a bunch of memory.

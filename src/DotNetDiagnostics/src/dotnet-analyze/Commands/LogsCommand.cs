@@ -16,9 +16,16 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 
         protected override Task RunAsyncCore(IConsole console, string[] args, AnalysisSession session, TraceLog trace)
         {
+            var prefix = string.Empty;
+            if(args.Length > 0) {
+                prefix = args[0];
+            }
             console.WriteLine("Scanning log events...");
             var events = trace.Events
-                .Where(t => string.Equals(t.ProviderName, "Microsoft-Extensions-Logging") && string.Equals(t.EventName, "MessageJson"))
+                .Where(t => 
+                    string.Equals(t.ProviderName, "Microsoft-Extensions-Logging") &&
+                    string.Equals(t.EventName, "MessageJson") &&
+                    ((string)t.PayloadByName("LoggerName")).StartsWith(prefix))
                 .Select(e => e.Clone())
                 .ToList();
             console.WriteLine("Logs:");

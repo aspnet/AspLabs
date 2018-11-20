@@ -73,7 +73,7 @@ namespace Microsoft.Diagnostics.Tools.Analyze
         {
             foreach (var (key, value) in arguments)
             {
-                format = format.Replace($"{key}", value);
+                format = format.Replace($"{{{key}}}", value);
             }
             return format;
         }
