@@ -34,11 +34,11 @@ namespace Microsoft.Diagnostics.Tools.Collect
         [Option("--provider <PROVIDER_SPEC>", Description = "An EventPipe provider to enable. A string in the form '<provider name>:<keywords>:<level>:<parameters>'. Can be specified multiple times to enable multiple providers.")]
         public IList<string> Providers { get; set; }
 
-        [Option("--counter <COUNTER_SPEC>", Description = "An EventPipe provider to enable counters for. A string in the form '<provider name>:<counter interval in sec>'. Can be specified multiple times to enable multiple counters.")]
-        public IList<string> Counter { get; set; }
-
         [Option("--profile <PROFILE_NAME>", Description = "A collection profile to enable. Use '--list-profiles' to get a list of all available profiles. Can be mixed with '--provider' and specified multiple times.")]
         public IList<string> Profiles { get; set; }
+
+        [Option("--logger <LOGGER_NAME>", Description = "A Microsoft.Extensions.Logging logger to enable. A string in the form '<logger prefix>:<level>'. Can be specified multiple times to enable multiple loggers.")]
+        public IList<string> Loggers { get; set; }
 
         [Option("--keywords-for <PROVIDER_NAME>", Description = "Gets a list of known keywords (if any) for the specified provider.")]
         public string KeywordsForProvider { get; set; }
@@ -92,12 +92,25 @@ namespace Microsoft.Diagnostics.Tools.Collect
             {
                 foreach (var provider in Providers)
                 {
-                    if (!EventSpec.TryParse(provider, out var spec))
+                    if (!EventSpec.TryParse(provider, out var providerSpec))
                     {
                         console.Error.WriteLine($"Invalid provider specification: '{provider}'. See 'dotnet-collect --help' for more information.");
                         return 1;
                     }
-                    config.Providers.Add(spec);
+                    config.Providers.Add(providerSpec);
+                }
+            }
+
+            if (Loggers != null && Loggers.Count > 0)
+            {
+                foreach (var logger in Loggers)
+                {
+                    if (!LoggerSpec.TryParse(logger, out var loggerSpec))
+                    {
+                        console.Error.WriteLine($"Invalid logger specification: '{logger}'. See 'dotnet-collect --help' for more information.");
+                        return 1;
+                    }
+                    config.Loggers.Add(loggerSpec);
                 }
             }
 
@@ -227,13 +240,23 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 writer.WriteLine();
                 WriteProfileList(writer);
                 writer.WriteLine();
+                writer.WriteLine("Specifying Loggers:");
+                writer.WriteLine("  Use one of the following formats to specify a logger in '--logger'");
+                writer.WriteLine("    *                                                 - Enable all messages at all levels from all loggers.");
+                writer.WriteLine("    *:<level>                                         - Enable messages at the specified '<level>' or higher from all loggers.");
+                writer.WriteLine("    <loggerPrefix>                                    - Enable all messages at all levels from all loggers starting with '<loggerPrefix>'.");
+                writer.WriteLine("    <loggerPrefix>:<level>                            - Enable messages at the specified '<level>' or higher from all loggers starting with '<loggerPrefix>'.");
+                writer.WriteLine();
+                writer.WriteLine("  '<loggerPrefix>' is the prefix for a logger to enable. For example 'Microsoft.AspNetCore' to enable all ASP.NET Core loggers.");
+                writer.WriteLine("  '<level>' can be one of: Critical, Error, Warning, Informational, Debug, or Trace.");
+                writer.WriteLine();
                 writer.WriteLine("Specifying Providers:");
                 writer.WriteLine("  Use one of the following formats to specify a provider in '--provider'");
                 writer.WriteLine("    <providerName>                                    - Enable all events at all levels for the provider.");
                 writer.WriteLine("    <providerName>:<keywords>                         - Enable events matching the specified keywords for the specified provider.");
                 writer.WriteLine("    <providerName>:<keywords>:<level>                 - Enable events matching the specified keywords, at the specified level for the specified provider.");
                 writer.WriteLine("    <providerName>:<keywords>:<level>:<parameters>    - Enable events matching the specified keywords, at the specified level for the specified provider and provide key-value parameters.");
-                writer.WriteLine("");
+                writer.WriteLine();
                 writer.WriteLine("  '<provider>' must be the name of the EventSource.");
                 writer.WriteLine("  '<level>' can be one of: Critical (1), Error (2), Warning (3), Informational (4), Verbose (5). Either the name or number can be specified.");
                 writer.WriteLine("  '<keywords>' is one of the following:");
