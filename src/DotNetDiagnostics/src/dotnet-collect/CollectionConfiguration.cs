@@ -74,7 +74,7 @@ namespace Microsoft.Diagnostics.Tools.Collect
 
                 yield return new EventSpec(
                     provider: "Microsoft-Extensions-Logging",
-                    keywords: 0x04, // FormattedMessage (source: https://github.com/aspnet/Extensions/blob/aa7fa91cfc8f6ff078b020a428bcad71ae7a32ab/src/Logging/Logging.EventSource/src/LoggingEventSource.cs#L95)
+                    keywords: 0x04 | 0x08, // FormattedMessage | JsonMessage (source: https://github.com/aspnet/Extensions/blob/aa7fa91cfc8f6ff078b020a428bcad71ae7a32ab/src/Logging/Logging.EventSource/src/LoggingEventSource.cs#L95)
                     level: EventLevel.LogAlways,
                     parameters: new Dictionary<string, string>() {
                     { "FilterSpecs", filterSpec.ToString() }
