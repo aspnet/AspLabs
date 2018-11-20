@@ -2,10 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Internal.Utilities;
 
 namespace Microsoft.Diagnostics.Tools.Analyze
@@ -13,30 +15,72 @@ namespace Microsoft.Diagnostics.Tools.Analyze
     [Command(Name = "dotnet-analyze", Description = "Inspect a crash dump using interactive commands")]
     internal class Program
     {
-        [FileExists(ErrorMessage = "The dump file could not be found.")]
-        [Required(ErrorMessage = "You must provide a dump file to be analyzed.")]
-        [Argument(0, "<DUMP>", Description = "The path to the dump file to analyze.")]
-        public string DumpPath { get; set; }
+        [Argument(0, "<DIAG_FILES>", Description = "The path to the diagnostic files to analyze.")]
+        public IList<string> Files { get; set; }
 
         public async Task<int> OnExecuteAsync(IConsole console, CommandLineApplication app)
         {
-            // Load the dump
-            console.WriteLine($"Loading crash dump {DumpPath}...");
-            using (var target = DataTarget.LoadCrashDump(DumpPath))
+            var cleanupFiles = new List<string>();
+
+            MemoryDump dump = null;
+            TraceLog trace = null;
+
+            if (Files == null || Files.Count == 0)
             {
-                // Assume there's only one
-                if(target.ClrVersions.Count > 1)
+                console.Error.WriteLine("No files were provided!");
+                return 1;
+            }
+
+            try
+            {
+                foreach (var file in Files)
                 {
-                    console.Error.WriteLine("Multiple CLR versions are present!");
-                    return 1;
+                    if (file.EndsWith(".netperf"))
+                    {
+                        console.WriteLine($"Loading trace: {file} ...");
+                        var etlx = TraceLog.CreateFromEventPipeDataFile(file);
+                        console.WriteLine($"Convert trace to: {etlx}.");
+                        cleanupFiles.Add(etlx);
+                        trace = TraceLog.OpenOrConvert(etlx);
+                    }
+                    else
+                    {
+                        console.WriteLine($"Loading crash dump: {file} ...");
+                        var target = DataTarget.LoadCrashDump(file);
+                        // Assume there's only one
+                        if (target.ClrVersions.Count > 1)
+                        {
+                            console.Error.WriteLine("Multiple CLR versions are present!");
+                            return 1;
+                        }
+
+                        var runtime = target.ClrVersions[0].CreateRuntime();
+                        dump = new MemoryDump(target, runtime);
+                    }
                 }
 
-                var runtime = target.ClrVersions[0].CreateRuntime();
-
-                var session = new AnalysisSession(target, runtime);
-                await CommandProcessor.RunAsync(console, session);
+                if (dump == null && trace == null)
+                {
+                    console.Error.WriteLine("A dump or trace could not be loaded from the provided files");
+                    return 1;
+                }
+                var session = new AnalysisSession(dump, trace);
+                await (new CommandProcessor()).RunAsync(console, session, console.GetCtrlCToken());
+                return 0;
             }
-            return 0;
+            finally
+            {
+                dump?.Dispose();
+                trace?.Dispose();
+
+                foreach (var file in cleanupFiles)
+                {
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
+                }
+            }
         }
 
         private static int Main(string[] args)

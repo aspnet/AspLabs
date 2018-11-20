@@ -6,8 +6,10 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 {
     public interface IAnalysisCommand
     {
-        IEnumerable<string> Names { get; }
+        IReadOnlyList<string> Names { get; }
+        string Description { get; }
 
         Task RunAsync(IConsole console, string[] args, AnalysisSession session);
+        Task WriteHelpAsync(IConsole console);
     }
 }

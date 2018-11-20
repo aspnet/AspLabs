@@ -26,7 +26,8 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 "A default set of event providers useful for diagosing problems in any .NET application.",
                 new[] {
                     new EventSpec(ClrTraceEventParser.ProviderName, (ulong)ClrTraceEventParser.Keywords.Default, EventLevel.Informational)
-                });
+                },
+                Array.Empty<LoggerSpec>());
 
             yield return new CollectionProfile(
                 "AspNetCore",
@@ -34,7 +35,8 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 new[]
                 {
                     new EventSpec("Microsoft-AspNetCore-Hosting", ulong.MaxValue, EventLevel.Informational),
-                });
+                },
+                Array.Empty<LoggerSpec>());
 
             yield return new CollectionProfile(
                 "Kestrel",
@@ -42,7 +44,8 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 new[]
                 {
                     new EventSpec("Microsoft-AspNetCore-Server-Kestrel", ulong.MaxValue, EventLevel.Verbose),
-                });
+                },
+                Array.Empty<LoggerSpec>());
         }
 
         private static KnownProvider CreateClrProvider()

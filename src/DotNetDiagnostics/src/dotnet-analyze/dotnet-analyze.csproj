@@ -3,8 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
 
-    <!-- CLRMD is .NET Framework only currently. See https://github.com/Microsoft/clrmd/issues/122 -->
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <RootNamespace>Microsoft.Diagnostics.Tools.Analyze</RootNamespace>
   </PropertyGroup>
@@ -16,7 +15,10 @@
 
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="0.9.180305.01" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.0.0-preview1-18569-05" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.30" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0-preview3-35497" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
 </Project>

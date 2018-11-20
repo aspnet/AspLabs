@@ -4,17 +4,25 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 {
-    public class ThreadsCommand : IAnalysisCommand
+    public class ThreadsCommand : DumpCommandBase
     {
-        public IEnumerable<string> Names { get; } = new List<string>() { "~", "threads" };
+        public override IReadOnlyList<string> Names { get; } = new List<string>() { "threads", "~"};
 
-        public async Task RunAsync(IConsole console, string[] args, AnalysisSession session)
+        public override string Description => "Lists threads in the current dump.";
+
+        protected override async Task RunAsyncCoreAsync(IConsole console, string[] args, AnalysisSession session, MemoryDump dump)
         {
-            foreach(var thread in session.Runtime.Threads)
+            foreach(var thread in dump.Runtime.Threads)
             {
-                var isActive = session.ActiveThreadId == thread.ManagedThreadId ? "." : " ";
+                var isActive = dump.ActiveThreadId == thread.ManagedThreadId ? "." : " ";
                 await console.Out.WriteLineAsync($"{isActive}{thread.ManagedThreadId.ToString().PadLeft(2)} Id: {Utils.FormatAddress(thread.OSThreadId)} Teb: {Utils.FormatAddress(thread.Teb)}");
             }
+        }
+
+        public override Task WriteHelpAsync(IConsole console)
+        {
+            console.WriteLine("TODO");
+            return Task.CompletedTask;
         }
     }
 }
