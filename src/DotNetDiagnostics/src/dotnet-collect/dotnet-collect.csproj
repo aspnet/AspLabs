@@ -6,6 +6,10 @@
     <RootNamespace>Microsoft.Diagnostics.Tools.Collect</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\Common\CommandLineException.cs" Link="CommandLineException.cs" />
     <Compile Include="..\Common\ConsoleCancellation.cs" Link="ConsoleCancellation.cs" />
