@@ -23,9 +23,8 @@ resources:
 trigger:
 - master
 
-# To be added in the future when VSTS supports this feature
-# pr:
-# - master
+pr:
+- master
 
 # Three phases for each of the three OSes we want to run on
 phases:
