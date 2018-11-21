@@ -30,7 +30,7 @@ resources:
 phases:
 - template: /eng/common/templates/phases/base.yml
   parameters:
-    name: Windows_NT
+    name: Windows
     # enableMicrobuild and enableTelemetry can't be read from a user-defined variable (Azure DevOps limitation)
     ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'official')) }}:
       enableMicrobuild: true
@@ -84,10 +84,48 @@ phases:
 
 - template: /eng/common/templates/phases/base.yml
   parameters:
+    name: macOS
+    enableTelemetry: true
+    queue:
+      name: macOS-10.13
+      parallel: 99
+      container: LinuxContainer
+      matrix:
+        debug:
+          _BuildConfig: Debug
+        release:
+          _BuildConfig: Release
+    steps:
+    - script: eng/common/cibuild.sh
+        --configuration $(_BuildConfig)
+        --prepareMachine
+      name: Build
+      displayName: Build
+      condition: succeeded()
+    - task: PublishTestResults@2
+      displayName: Publish xUnit Test Results
+      condition: always()
+      continueOnError: true
+      inputs:
+        testRunner: xunit
+        testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Logs
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+        PublishLocation: Container
+        ArtifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+      continueOnError: true
+      condition: always()
+    variables:
+      _HelixBuildConfig: $(_BuildConfig)
+
+- template: /eng/common/templates/phases/base.yml
+  parameters:
     name: Linux
     enableTelemetry: true
     queue:
-      name: Hosted Ubuntu 1604
+      name: ubuntu-16.04
       parallel: 99
       container: LinuxContainer
       matrix:
