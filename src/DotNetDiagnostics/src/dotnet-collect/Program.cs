@@ -56,17 +56,22 @@ namespace Microsoft.Diagnostics.Tools.Collect
                 WriteProfileList(console.Out);
                 return 0;
             }
+
             if (!string.IsNullOrEmpty(KeywordsForProvider))
             {
                 return ExecuteKeywordsForAsync(console);
             }
 
-            if (string.IsNullOrEmpty(ConfigPath))
+            if(string.IsNullOrEmpty(ConfigPath))
             {
-                // HAAAAAACK
-                ConfigPath = "/home/anurse/Code/aspnet/AspLabs/src/DotNetDiagnostics/samples/SampleWebApp/bin/Debug/netcoreapp2.2/SampleWebApp.eventpipeconfig";
+                ConfigPath = ConfigPathDetector.TryDetectConfigPath(ProcessId);
+                if(string.IsNullOrEmpty(ConfigPath))
+                {
+                    console.Error.WriteLine("Couldn't determine the path for the eventpipeconfig file from the process ID. Specify the '--config-path' option to provide it manually.");
+                    return 1;
+                }
+                console.WriteLine($"Detected config file path: {ConfigPath}");
             }
-            console.WriteLine($"Using config path: {ConfigPath}");
 
             var config = new CollectionConfiguration()
             {
