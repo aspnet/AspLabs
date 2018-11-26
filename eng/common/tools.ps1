@@ -34,7 +34,8 @@ function InitializeDotNetCli([bool]$install) {
 
   # Find the first path on %PATH% that contains the dotnet.exe
   if ($useInstalledDotNetCli -and ($env:DOTNET_INSTALL_DIR -eq $null)) {
-    $env:DOTNET_INSTALL_DIR = ${env:PATH}.Split(';') | where { ($_ -ne "") -and (Test-Path (Join-Path $_ "dotnet.exe")) }
+    # PATCH: Fix https://github.com/dotnet/arcade/issues/1251
+    $env:DOTNET_INSTALL_DIR = ${env:PATH}.Split(';') | where { ($_ -ne "") -and (Test-Path (Join-Path $_ "dotnet.exe")) } | select -first 1
   }
 
   $dotnetSdkVersion = $GlobalJson.tools.dotnet
