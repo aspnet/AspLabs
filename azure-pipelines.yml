@@ -89,7 +89,6 @@ phases:
     queue:
       name: Hosted macOS
       parallel: 99
-      container: LinuxContainer
       matrix:
         debug:
           _BuildConfig: Debug
