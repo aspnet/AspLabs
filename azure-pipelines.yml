@@ -41,7 +41,6 @@ phases:
         name: dotnet-external-temp
       ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'official')) }}:
         name: dotnet-internal-temp
-      parallel: 99
       matrix:
         debug:
           _BuildConfig: Debug
@@ -88,7 +87,6 @@ phases:
     enableTelemetry: true
     queue:
       name: Hosted macOS
-      parallel: 99
       matrix:
         debug:
           _BuildConfig: Debug
@@ -125,7 +123,6 @@ phases:
     enableTelemetry: true
     queue:
       name: Hosted Ubuntu 1604
-      parallel: 99
       container: LinuxContainer
       matrix:
         debug:
