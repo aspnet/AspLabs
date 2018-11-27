@@ -3,7 +3,6 @@
     <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory).., '$(MSBuildThisFileName)$(MSBuildThisFileExtension)'))\$(MSBuildThisFileName)$(MSBuildThisFileExtension)" />
 
     <PropertyGroup>
-        <LangVersion>latest</LangVersion>
         <RestoreSources>
           $(RestoreSources);
           http://api.nuget.org/v3/index.json;
