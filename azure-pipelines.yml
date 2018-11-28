@@ -6,6 +6,9 @@ variables:
   ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'github')) }}:
     _HelixType: build/product
     _HelixSource: pr/aspnet/AspLabs/$(Build.SourceBranch)
+    # These are needed to suppress a warning in the cibuild invocation since AzDO leaves the `$(_SignArgs)` in place and it fails to resolve.
+    _SignArgs: ''
+    _OfficialBuildIdArgs: ''
 
   # Variables for internal Official builds
   ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'official')) }}:
