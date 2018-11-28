@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy.csproj", "{01C51C11-BDCD-4D69-A829-2BA3846D431C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy.csproj", "{01C51C11-BDCD-4D69-A829-2BA3846D431C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy.Samples", "sample\Microsoft.AspNetCore.Proxy.Samples.csproj", "{9EA6AF75-6D14-46D8-9002-30E2EAFBEC31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy.Samples", "sample\Microsoft.AspNetCore.Proxy.Samples.csproj", "{9EA6AF75-6D14-46D8-9002-30E2EAFBEC31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test.csproj", "{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test.csproj", "{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7B36FA7E-3D3E-4D24-9690-8EBD66C23039}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B07F3593-F5C6-4101-BF97-1E4E58ABC22A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F2DEA5D2-835F-4FE9-B231-DF0DAFAB04C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,9 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{01C51C11-BDCD-4D69-A829-2BA3846D431C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +61,16 @@ Global
 		{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}.Release|x64.Build.0 = Release|Any CPU
 		{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}.Release|x86.ActiveCfg = Release|Any CPU
 		{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{01C51C11-BDCD-4D69-A829-2BA3846D431C} = {7B36FA7E-3D3E-4D24-9690-8EBD66C23039}
+		{9EA6AF75-6D14-46D8-9002-30E2EAFBEC31} = {B07F3593-F5C6-4101-BF97-1E4E58ABC22A}
+		{FCD0F93A-9683-42DD-BE8E-2240F4DB403E} = {F2DEA5D2-835F-4FE9-B231-DF0DAFAB04C6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED16A561-5A6A-421E-8C8E-83423ACEF2EB}
 	EndGlobalSection
 EndGlobal

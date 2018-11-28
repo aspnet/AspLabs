@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.WebHooks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;. The value must be between {2} and {3} characters long..
+        ///   Looks up a localized string similar to Could not find a valid configuration for the &apos;{0}&apos; WebHook receiver, instance &apos;{1}&apos;. The value must be at least {2} characters long..
         /// </summary>
         internal static string Security_BadSecret {
             get {

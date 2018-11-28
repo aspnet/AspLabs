@@ -13,18 +13,18 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
 
         public override string Description => "Dumps the stack trace associated with an event, if there is one.";
 
-        protected override async Task RunAsyncCore(IConsole console, string[] args, AnalysisSession session, TraceLog trace)
+        protected override Task RunAsyncCore(IConsole console, string[] args, AnalysisSession session, TraceLog trace)
         {
             if (args.Length < 1)
             {
                 console.Error.WriteLine("Usage: eventstack <eventIndex>");
-                return;
+                return Task.CompletedTask;
             }
 
             if (!int.TryParse(args[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var eventIndex))
             {
                 console.Error.WriteLine("Usage: eventstack <eventIndex>");
-                return;
+                return Task.CompletedTask;
             }
 
             var evt = trace.Events.ElementAt(eventIndex);
@@ -37,6 +37,8 @@ namespace Microsoft.Diagnostics.Tools.Analyze.Commands
             {
                 console.Error.WriteLine($"Unable to find any call stacks for event {eventIndex:X4}!");
             }
+
+            return Task.CompletedTask;
         }
 
         private void WriteStack(TraceCallStack stack, IConsole console)

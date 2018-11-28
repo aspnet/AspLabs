@@ -1,5 +1,6 @@
 <Project>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.targets))\Directory.Build.targets" />
+  <!-- Chain up to the next file (can be copy-pasted to either Directory.Build.props or Directory.Build.targets) -->
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory).., '$(MSBuildThisFileName)$(MSBuildThisFileExtension)'))\$(MSBuildThisFileName)$(MSBuildThisFileExtension)" />
 
   <!-- In Directory.Build.targets because default items are added after Directory.Build.props is imported, causing invalid duplicate entries. -->
   <ItemGroup Condition="Exists( '$(MSBuildProjectDirectory)\Properties\Resources.resx' )">

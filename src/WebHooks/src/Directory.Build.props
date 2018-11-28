@@ -1,10 +1,11 @@
 <Project>
-  <Import Project="..\Directory.Build.props" />
+  <!-- Chain up to the next file (can be copy-pasted to either Directory.Build.props or Directory.Build.targets) -->
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory).., '$(MSBuildThisFileName)$(MSBuildThisFileExtension)'))\$(MSBuildThisFileName)$(MSBuildThisFileExtension)" />
 
   <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Microsoft.AspNetCore.WebHooks</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
 </Project>
