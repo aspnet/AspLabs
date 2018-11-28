@@ -8,6 +8,14 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+      <!-- <RestoreSources>$(RestoreSources);http://api.nuget.org/v3/index.json;</RestoreSources> -->
+
+      <!-- aspnetcore-dev feed for internal packages like Microsoft.Extensions.Logging.Testing -->
+      <RestoreSources>$(RestoreSources);https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json</RestoreSources>
+      <RestoreSources>$(RestoreSources);https://dotnet.myget.org/F/dotnet-core/api/v3/index.json</RestoreSources>
+  </PropertyGroup>
+
   <PropertyGroup Label="Package and Assembly Metadata">
     <Product>Microsoft ASP.NET Core</Product>
   </PropertyGroup>

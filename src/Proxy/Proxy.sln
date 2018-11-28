@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj", "{01C51C11-BDCD-4D69-A829-2BA3846D431C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy", "src\Microsoft.AspNetCore.Proxy.csproj", "{01C51C11-BDCD-4D69-A829-2BA3846D431C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy.Samples", "sample\Microsoft.AspNetCore.Proxy.Samples.csproj", "{9EA6AF75-6D14-46D8-9002-30E2EAFBEC31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test\Microsoft.AspNetCore.Proxy.Test.csproj", "{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Proxy.Test", "test\Microsoft.AspNetCore.Proxy.Test.csproj", "{FCD0F93A-9683-42DD-BE8E-2240F4DB403E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7B36FA7E-3D3E-4D24-9690-8EBD66C23039}"
 EndProject
