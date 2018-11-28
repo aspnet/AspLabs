@@ -31,10 +31,10 @@ phases:
 - template: /eng/common/templates/phases/base.yml
   parameters:
     name: Windows
-    # enableMicrobuild and enableTelemetry can't be read from a user-defined variable (Azure DevOps limitation)
+    enableTelemetry: true
+    # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
     ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'official')) }}:
       enableMicrobuild: true
-      enableTelemetry: true
     queue:
       # agent pool can't be read from a user-defined variable (Azure DevOps limitation)
       ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.DefinitionName'], 'github')) }}:
