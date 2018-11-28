@@ -2,6 +2,18 @@
 
 This repository contains tools for collecting diagnostics from .NET applications.
 
+Nightly builds of these tools are available on https://dotnet.myget.org/gallery/aspnetcore-dev. To install, use one of the following command lines:
+
+* `dotnet tool install -g dotnet-dump --add-source https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json --version [version]`
+* `dotnet tool install -g dotnet-collect --add-source https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json --version [version]`
+* `dotnet tool install -g dotnet-analyze --add-source https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json --version [version]`
+
+You **must** specify an exact version to install. You can find the latest versions of these packages at https://dotnet.myget.org/gallery/aspnetcore-dev . They are also listed below:
+
+* `dotnet-collect`: ![dotnet-collect](https://img.shields.io/dotnet.myget/aspnetcore-dev/v/dotnet-collect.svg)
+* `dotnet-dump`: ![dotnet-dump](https://img.shields.io/dotnet.myget/aspnetcore-dev/v/dotnet-dump.svg)
+* `dotnet-analyze`: ![dotnet-analyze](https://img.shields.io/dotnet.myget/aspnetcore-dev/v/dotnet-analyze.svg)
+
 ## [dotnet-dump](src/dotnet-dump)
 
 A cross-platform tool to collect memory dumps of .NET processes:
@@ -51,7 +63,7 @@ Options:
 
 ## [dotnet-analyze](src/dotnet-analyze)
 
-An SOS-like "REPL" for exploring .NET memory dumps (based on [CLRMD](https://github.com/Microsoft/clrmd)).
+An SOS-like "REPL" for exploring .NET memory dumps (based on [CLRMD](https://github.com/Microsoft/clrmd)) as well as `.netperf` event traces collected by `dotnet-collect`.
 
 ```
 Inspect a crash dump using interactive commands
