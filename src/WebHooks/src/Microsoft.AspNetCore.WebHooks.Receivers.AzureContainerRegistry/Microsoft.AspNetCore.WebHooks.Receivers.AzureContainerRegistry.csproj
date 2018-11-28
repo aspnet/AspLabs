@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>ASP.NET Core AzureContainerRegistry WebHooks infrastructure. Contains the AzureContainerRegistryWebHookAttribute class and AddAzureContainerRegistryWebHooks method.</Description>
     <PackageTags>aspnetcore;webhook;receiver;azurecontainerregistry</PackageTags>
