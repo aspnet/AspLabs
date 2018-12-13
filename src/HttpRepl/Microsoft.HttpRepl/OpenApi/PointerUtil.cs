@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -14,18 +15,23 @@ namespace Microsoft.HttpRepl.OpenApi
     {
         public static Task<JToken> ResolvePointersAsync(Uri loadLocation, JToken root, HttpClient client)
         {
-            return ResolvePointersAsync(loadLocation, root, root, client);
+            return ResolvePointersAsync(loadLocation, root, root, client, new HashSet<JToken>());
         }
 
-        private static async Task<JToken> ResolvePointersAsync(Uri loadLocation, JToken root, JToken toResolve, HttpClient client)
+        private static async Task<JToken> ResolvePointersAsync(Uri loadLocation, JToken root, JToken toResolve, HttpClient client, HashSet<JToken> alreadyResolving)
         {
+            if (!alreadyResolving.Add(toResolve))
+            {
+                return toResolve;
+            }
+
             JToken cursor = root;
 
             if (toResolve is JArray arr)
             {
                 for (int i = 0; i < arr.Count; ++i)
                 {
-                    arr[i] = await ResolvePointersAsync(loadLocation, root, arr[i], client).ConfigureAwait(false);
+                    arr[i] = await ResolvePointersAsync(loadLocation, root, arr[i], client, alreadyResolving).ConfigureAwait(false);
                 }
             }
             else if (toResolve is JObject obj)
@@ -37,7 +43,7 @@ namespace Microsoft.HttpRepl.OpenApi
                         //TODO: Error resolving pointer (pointer must be a valid URI)
                         return new JValue((object)null);
                     }
-                    
+
                     if (!loadTarget.IsAbsoluteUri)
                     {
                         if (!Uri.TryCreate(loadLocation, loadTarget, out loadTarget))
@@ -71,7 +77,7 @@ namespace Microsoft.HttpRepl.OpenApi
                             return new JValue((object)null);
                         }
 
-                        cursor = await ResolvePointersAsync(loadTarget, newRoot, newRoot, client).ConfigureAwait(false);
+                        cursor = await ResolvePointersAsync(loadTarget, newRoot, newRoot, client, alreadyResolving).ConfigureAwait(false);
                     }
 
                     //We're in the right document, grab the bookmark (fragment) of the URI and get the element at that path
@@ -103,7 +109,8 @@ namespace Microsoft.HttpRepl.OpenApi
                             JToken val = ca[index];
                             if (val is JObject vo && vo.TryGetValue("$ref", out JToken vor) && vor is JValue vorv && vorv.Type == JTokenType.String)
                             {
-                                cursor = await ResolvePointersAsync(loadLocation, root, val, client).ConfigureAwait(false);
+                                cursor = await ResolvePointersAsync(loadLocation, root, val, client, alreadyResolving).ConfigureAwait(false);
+                                ca[index] = cursor;
                             }
                             else
                             {
@@ -120,7 +127,7 @@ namespace Microsoft.HttpRepl.OpenApi
 
                             if (val is JObject vo && vo.TryGetValue("$ref", out JToken vor) && vor is JValue vorv && vorv.Type == JTokenType.String)
                             {
-                                cursor = await ResolvePointersAsync(loadLocation, root, val, client).ConfigureAwait(false);
+                                cursor = await ResolvePointersAsync(loadLocation, root, val, client, alreadyResolving).ConfigureAwait(false);
                             }
                             else
                             {
@@ -134,13 +141,13 @@ namespace Microsoft.HttpRepl.OpenApi
                         }
                     }
 
-                    cursor = await ResolvePointersAsync(loadLocation, root, cursor, client);
-                    return cursor.DeepClone();
+                    cursor = await ResolvePointersAsync(loadLocation, root, cursor, client, alreadyResolving);
+                    return cursor;
                 }
 
                 foreach (JProperty property in obj.Properties().ToList())
                 {
-                    obj[property.Name] = await ResolvePointersAsync(loadLocation, root, property.Value, client).ConfigureAwait(false);
+                    obj[property.Name] = await ResolvePointersAsync(loadLocation, root, property.Value, client, alreadyResolving).ConfigureAwait(false);
                 }
             }
 
