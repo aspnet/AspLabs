@@ -8,5 +8,6 @@
     <MajorVersion>0</MajorVersion>
     <MinorVersion>1</MinorVersion>
     <PreReleaseVersionLabel>alpha</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel Condition="'$(MSBuildProjectName)' == 'Microsoft.HttpRepl'">preview</PreReleaseVersionLabel>
   </PropertyGroup>
 </Project>

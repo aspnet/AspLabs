@@ -10,7 +10,6 @@
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <PackAsToolShimRuntimeIdentifiers>win-x64;win-x86</PackAsToolShimRuntimeIdentifiers>
-    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
   </PropertyGroup>
 
   <ItemGroup>
