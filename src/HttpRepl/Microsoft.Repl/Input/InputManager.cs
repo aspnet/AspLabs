@@ -116,13 +116,13 @@ namespace Microsoft.Repl.Input
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
             {
                 _ttyState = GetTtyState();
-                sttyFlags = "gfmt1:erase=08:werase=08 -echo";
+                sttyFlags = "gfmt1:erase=08:werase=08 -echo -icanon";
             }
             //If it's any of the ubuntu variants on 18.x, stty tweaks are required
             else if (System.Runtime.InteropServices.RuntimeInformation.OSDescription.IndexOf("buntu", StringComparison.OrdinalIgnoreCase) > -1)
             {
                 _ttyState = GetTtyState();
-                sttyFlags = "erase 0x08 werase 0x08 -echo";
+                sttyFlags = "erase 0x08 werase 0x08 -echo -icanon";
             }
 
             if (!string.IsNullOrEmpty(sttyFlags))
