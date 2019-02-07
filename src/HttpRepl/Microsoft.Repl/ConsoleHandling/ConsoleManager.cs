@@ -14,7 +14,14 @@ namespace Microsoft.Repl.ConsoleHandling
 
         public Point Caret => new Point(Console.CursorLeft, Console.CursorTop);
 
-        public Point CommandStart => new Point(Caret.X - CaretPosition % Console.BufferWidth, Caret.Y - CaretPosition / Console.BufferWidth);
+        public Point CommandStart
+        {
+            get
+            {
+                Point c = Caret;
+                return new Point(c.X - CaretPosition % Console.BufferWidth, c.Y - CaretPosition / Console.BufferWidth);
+            }
+        }
 
         public int CaretPosition { get; private set; }
 
@@ -190,8 +197,9 @@ namespace Microsoft.Repl.ConsoleHandling
             Point currentCaret = Caret;
             return new Disposable(() =>
             {
-                int y = Caret.Y - currentCaret.Y;
-                int x = Caret.X - currentCaret.X;
+                Point c = Caret;
+                int y = c.Y - currentCaret.Y;
+                int x = c.X - currentCaret.X;
                 CaretPosition += y * Console.BufferWidth + x;
             });
         }
