@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.HttpRepl.Preferences;
@@ -37,6 +38,7 @@ namespace Microsoft.HttpRepl.Commands
                 else
                 {
                     bool anyHelp = false;
+                    var output = new StringBuilder();
 
                     if (parseResult.Slice(1) is ICoreParseResult continuationParseResult)
                     {
@@ -47,14 +49,14 @@ namespace Microsoft.HttpRepl.Commands
                             if (!string.IsNullOrEmpty(help))
                             {
                                 anyHelp = true;
-                                shellState.ConsoleManager.WriteLine();
-                                shellState.ConsoleManager.WriteLine(help);
+                                output.AppendLine();
+                                output.AppendLine(help);
 
                                 var structuredCommand = command as CommandWithStructuredInputBase<HttpState, ICoreParseResult>;
                                 if (structuredCommand != null && structuredCommand.InputSpec.Options.Any())
                                 {
-                                    shellState.ConsoleManager.WriteLine();
-                                    shellState.ConsoleManager.WriteLine("Options:".Bold());
+                                    output.AppendLine();
+                                    output.AppendLine("Options:".Bold());
                                     foreach (var option in structuredCommand.InputSpec.Options)
                                     {
                                         var optionText = string.Empty;
@@ -66,7 +68,7 @@ namespace Microsoft.HttpRepl.Commands
                                             }
                                             optionText += form;
                                         }
-                                        shellState.ConsoleManager.WriteLine($"    {optionText}");
+                                        output.AppendLine($"    {optionText}");
                                     }
                                 }
 
@@ -97,11 +99,11 @@ namespace Microsoft.HttpRepl.Commands
                                 IDirectoryStructure structure = programState.Structure.TraverseTo(parseResult.Sections[1]);
                                 if (structure.DirectoryNames.Any())
                                 {
-                                    shellState.ConsoleManager.WriteLine("Child directories:");
+                                    output.AppendLine("Child directories:");
 
                                     foreach (string name in structure.DirectoryNames)
                                     {
-                                        shellState.ConsoleManager.WriteLine("  " + name + "/");
+                                        output.AppendLine("  " + name + "/");
                                     }
                                     anyHelp = true;
                                 }
@@ -112,20 +114,20 @@ namespace Microsoft.HttpRepl.Commands
                                     {
                                         if (anyHelp)
                                         {
-                                            shellState.ConsoleManager.WriteLine();
+                                            output.AppendLine();
                                         }
 
                                         anyHelp = true;
-                                        shellState.ConsoleManager.WriteLine("Available methods:");
+                                        output.AppendLine("Available methods:");
 
                                         foreach (string method in structure.RequestInfo.Methods)
                                         {
-                                            shellState.ConsoleManager.WriteLine("  " + method.ToUpperInvariant());
+                                            output.AppendLine("  " + method.ToUpperInvariant());
                                             IReadOnlyList<string> accepts = structure.RequestInfo.ContentTypesByMethod[method];
                                             string acceptsString = string.Join(", ", accepts.Where(x => !string.IsNullOrEmpty(x)));
                                             if (!string.IsNullOrEmpty(acceptsString))
                                             {
-                                                shellState.ConsoleManager.WriteLine("    Accepts: " + acceptsString);
+                                                output.AppendLine("    Accepts: " + acceptsString);
                                             }
                                         }
                                     }
@@ -135,9 +137,11 @@ namespace Microsoft.HttpRepl.Commands
 
                         if (!anyHelp)
                         {
-                            shellState.ConsoleManager.WriteLine("Unable to locate any help information for the specified command");
+                            output.AppendLine("Unable to locate any help information for the specified command");
                         }
                     }
+
+                    shellState.ConsoleManager.Write(output.ToString());
                 }
             }
         }
@@ -203,54 +207,58 @@ namespace Microsoft.HttpRepl.Commands
 
         public void CoreGetHelp(IShellState shellState, ICommandDispatcher<HttpState, ICoreParseResult> dispatcher, HttpState programState)
         {
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine("HTTP Commands:".Bold().Cyan());
-            shellState.ConsoleManager.WriteLine("Use these commands to execute requests against your application.");
-            shellState.ConsoleManager.WriteLine();
+            var output = new StringBuilder();
+
+            output.AppendLine();
+            output.AppendLine("HTTP Commands:".Bold().Cyan());
+            output.AppendLine("Use these commands to execute requests against your application.");
+            output.AppendLine();
 
             const int navCommandColumn = -15;
 
-            shellState.ConsoleManager.WriteLine($"{"GET",navCommandColumn}{"Issues a GET request."}");
-            shellState.ConsoleManager.WriteLine($"{"POST",navCommandColumn}{"Issues a POST request."}");
-            shellState.ConsoleManager.WriteLine($"{"PUT",navCommandColumn}{"Issues a PUT request."}");
-            shellState.ConsoleManager.WriteLine($"{"DELETE",navCommandColumn}{"Issues a DELETE request."}");
-            shellState.ConsoleManager.WriteLine($"{"PATCH",navCommandColumn}{"Issues a PATCH request."}");
-            shellState.ConsoleManager.WriteLine($"{"HEAD",navCommandColumn}{"Issues a HEAD request."}");
-            shellState.ConsoleManager.WriteLine($"{"OPTIONS",navCommandColumn}{"Issues an OPTIONS request."}");
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine($"{"set header",navCommandColumn}{"Sets or clears a header for all requests. e.g. `set header content-type application/json`"}");
-            shellState.ConsoleManager.WriteLine();
+            output.AppendLine($"{"GET",navCommandColumn}{"Issues a GET request."}");
+            output.AppendLine($"{"POST",navCommandColumn}{"Issues a POST request."}");
+            output.AppendLine($"{"PUT",navCommandColumn}{"Issues a PUT request."}");
+            output.AppendLine($"{"DELETE",navCommandColumn}{"Issues a DELETE request."}");
+            output.AppendLine($"{"PATCH",navCommandColumn}{"Issues a PATCH request."}");
+            output.AppendLine($"{"HEAD",navCommandColumn}{"Issues a HEAD request."}");
+            output.AppendLine($"{"OPTIONS",navCommandColumn}{"Issues an OPTIONS request."}");
+            output.AppendLine();
+            output.AppendLine($"{"set header",navCommandColumn}{"Sets or clears a header for all requests. e.g. `set header content-type application/json`"}");
+            output.AppendLine();
 
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine("Navigation Commands:".Bold().Cyan());
-            shellState.ConsoleManager.WriteLine("The REPL allows you to navigate your URL space and focus on specific APIS that you are working on.");
-            shellState.ConsoleManager.WriteLine();
+            output.AppendLine();
+            output.AppendLine("Navigation Commands:".Bold().Cyan());
+            output.AppendLine("The REPL allows you to navigate your URL space and focus on specific APIS that you are working on.");
+            output.AppendLine();
 
-            shellState.ConsoleManager.WriteLine($"{"set base",navCommandColumn}{"Set the base URI. e.g. `set base http://locahost:5000`"}");
-            shellState.ConsoleManager.WriteLine($"{"set swagger",navCommandColumn}{"Set the URI, relative to your base if set, of the Swagger document for this API. e.g. `set swagger /swagger/v1/swagger.json`"}");
-            shellState.ConsoleManager.WriteLine($"{"ls",navCommandColumn}{"Show all endpoints for the current path."}");
-            shellState.ConsoleManager.WriteLine($"{"cd",navCommandColumn}{"Append the given directory to the currently selected path, or move up a path when using `cd ..`."}");
+            output.AppendLine($"{"set base",navCommandColumn}{"Set the base URI. e.g. `set base http://locahost:5000`"}");
+            output.AppendLine($"{"set swagger",navCommandColumn}{"Set the URI, relative to your base if set, of the Swagger document for this API. e.g. `set swagger /swagger/v1/swagger.json`"}");
+            output.AppendLine($"{"ls",navCommandColumn}{"Show all endpoints for the current path."}");
+            output.AppendLine($"{"cd",navCommandColumn}{"Append the given directory to the currently selected path, or move up a path when using `cd ..`."}");
 
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine("Shell Commands:".Bold().Cyan());
-            shellState.ConsoleManager.WriteLine("Use these commands to interact with the REPL shell.");
-            shellState.ConsoleManager.WriteLine();
+            output.AppendLine();
+            output.AppendLine("Shell Commands:".Bold().Cyan());
+            output.AppendLine("Use these commands to interact with the REPL shell.");
+            output.AppendLine();
 
-            shellState.ConsoleManager.WriteLine($"{"clear",navCommandColumn}{"Removes all text from the shell."}");
-            shellState.ConsoleManager.WriteLine($"{"echo [on/off]",navCommandColumn}{"Turns request echoing on or off, show the request that was mode when using request commands."}");
-            shellState.ConsoleManager.WriteLine($"{"exit",navCommandColumn}{"Exit the shell."}");
+            output.AppendLine($"{"clear",navCommandColumn}{"Removes all text from the shell."}");
+            output.AppendLine($"{"echo [on/off]",navCommandColumn}{"Turns request echoing on or off, show the request that was mode when using request commands."}");
+            output.AppendLine($"{"exit",navCommandColumn}{"Exit the shell."}");
 
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine("REPL Customization Commands:".Bold().Cyan());
-            shellState.ConsoleManager.WriteLine("Use these commands to customize the REPL behavior..");
-            shellState.ConsoleManager.WriteLine();
+            output.AppendLine();
+            output.AppendLine("REPL Customization Commands:".Bold().Cyan());
+            output.AppendLine("Use these commands to customize the REPL behavior..");
+            output.AppendLine();
 
-            shellState.ConsoleManager.WriteLine($"{"pref [get/set]",navCommandColumn}{"Allows viewing or changing preferences, e.g. 'pref set editor.command.default 'C:\\Program Files\\Microsoft VS Code\\Code.exe'`"}");
-            shellState.ConsoleManager.WriteLine($"{"run",navCommandColumn}{"Runs the script at the given path. A script is a set of commands that can be typed with one command per line."}");
-            shellState.ConsoleManager.WriteLine($"{"ui",navCommandColumn}{"Displays the swagger UI page, if available, in the default browser."}");
-            shellState.ConsoleManager.WriteLine();
-            shellState.ConsoleManager.WriteLine("Use help <COMMAND> to learn more details about individual commands. e.g. `help get`".Bold().Cyan());
-            shellState.ConsoleManager.WriteLine();
+            output.AppendLine($"{"pref [get/set]",navCommandColumn}{"Allows viewing or changing preferences, e.g. 'pref set editor.command.default 'C:\\Program Files\\Microsoft VS Code\\Code.exe'`"}");
+            output.AppendLine($"{"run",navCommandColumn}{"Runs the script at the given path. A script is a set of commands that can be typed with one command per line."}");
+            output.AppendLine($"{"ui",navCommandColumn}{"Displays the swagger UI page, if available, in the default browser."}");
+            output.AppendLine();
+            output.AppendLine("Use help <COMMAND> to learn more details about individual commands. e.g. `help get`".Bold().Cyan());
+            output.AppendLine();
+
+            shellState.ConsoleManager.Write(output.ToString());
         }
     }
 }
