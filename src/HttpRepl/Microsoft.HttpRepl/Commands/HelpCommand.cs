@@ -195,7 +195,12 @@ namespace Microsoft.HttpRepl.Commands
                     if (continuationParseResult.SelectedSection == 0)
                     {
                         string normalizedCompletionText = continuationParseResult.Sections[0].Substring(0, continuationParseResult.CaretPositionWithinSelectedSection);
-                        suggestions.UnionWith(ServerPathCompletion.GetCompletions(programState, normalizedCompletionText));
+                        IEnumerable<string> completions = ServerPathCompletion.GetCompletions(programState, normalizedCompletionText);
+
+                        if (completions != null)
+                        {
+                            suggestions.UnionWith(completions);
+                        }
                     }
 
                     return suggestions.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
