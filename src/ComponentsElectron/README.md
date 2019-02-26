@@ -13,4 +13,4 @@ If you want to try building a Razor Components + Electron app:
  * Then, build and run `SampleApp.csproj`.
    * You can do this either in Visual Studio (Windows) or via `dotnet run` (command line)
 
-The contents of `src/Components/src` are only intended for people working on the `ComponentsElectron` experimental infrastructure itself.
+The contents of `src/ComponentsElectron/src` are only intended for people working on the `ComponentsElectron` experimental infrastructure itself.
