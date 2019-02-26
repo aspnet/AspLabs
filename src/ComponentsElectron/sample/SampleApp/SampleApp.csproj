@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <ComponentsVersion>3.0.0-preview3-19122-14</ComponentsVersion>
+    <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
+    <RestoreAdditionalProjectSources>
+      https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
+      https://dotnet.myget.org/F/dotnet-core/api/v3/index.json;
+      https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Electron" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Server" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Build" Version="$(ComponentsVersion)" />
+  </ItemGroup>
+
+  <Target Name="EnsureNpmRestored" BeforeTargets="CoreBuild" Condition="!Exists('node_modules')">
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec Command="npm install" />
+  </Target>
+
+</Project>

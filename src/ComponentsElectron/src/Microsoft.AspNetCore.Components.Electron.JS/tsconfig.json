@@ -1,0 +1,9 @@
+{
+  "extends": "../../upstream/aspnetcore/browser.js/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@browserjs/*": [ "../../upstream/aspnetcore/browser.js/*" ]
+    }
+  }
+}
