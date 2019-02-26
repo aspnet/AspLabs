@@ -4,8 +4,12 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <ComponentsVersion>3.0.0-preview3-19122-14</ComponentsVersion>
+    <IsPackable>true</IsPackable>
     <PackageVersion>$(ComponentsVersion)</PackageVersion>
     <RestoreAdditionalProjectSources>https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;</RestoreAdditionalProjectSources>
+
+    <!-- ElectronNET.API is not strong-named signed -->
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>

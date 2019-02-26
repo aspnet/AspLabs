@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
     <LangVersion>7.3</LangVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
     <ComponentsVersion>3.0.0-preview3-19122-14</ComponentsVersion>
@@ -25,10 +26,6 @@
     <Exec Command="npm install" />
   </Target>
 
-  <!--
-    If you re-integrate this project into the labs repo build system, it will initially break
-    because of a conflict with SourceLink. Re-enable the follow to work around that.
-    See also: https://github.com/aspnet/AspNetCore/issues/7503
-    <Target Name="_EnsureSourceLinkHappensBeforeRazorComponentGeneration" BeforeTargets="PrepareForRazorComponentGenerate" DependsOnTargets="GenerateSourceLinkFile" />
-  -->
+  <Target Name="_EnsureSourceLinkHappensBeforeRazorComponentGeneration" BeforeTargets="PrepareForRazorComponentGenerate" DependsOnTargets="GenerateSourceLinkFile" />
+
 </Project>
