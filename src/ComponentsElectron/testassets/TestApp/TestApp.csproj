@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <OutputType Condition="'$(OS)'=='Windows_NT'">WinExe</OutputType>
+    <OutputType>WinExe</OutputType>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <SignAssembly>false</SignAssembly>
@@ -26,7 +25,5 @@
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec Command="npm install" />
   </Target>
-
-  <Target Name="_EnsureSourceLinkHappensBeforeRazorComponentGeneration" BeforeTargets="PrepareForRazorComponentGenerate" DependsOnTargets="GenerateSourceLinkFile" />
 
 </Project>
