@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
+
+  <PropertyGroup>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
 </Project>
