@@ -101,15 +101,16 @@ namespace Microsoft.AspNetCore.Components.Electron
             return Task.CompletedTask;
         }
 
-        private void CaptureAsyncExceptions(Task task)
+        private async void CaptureAsyncExceptions(Task task)
         {
-            task.ContinueWith(t =>
+            try
             {
-                if (t.IsFaulted)
-                {
-                    UnhandledException?.Invoke(this, t.Exception);
-                }
-            });
+                await task;
+            }
+            catch (Exception ex)
+            {
+                UnhandledException?.Invoke(this, ex);
+            }
         }
 
         protected override void HandleException(Exception exception)
