@@ -13,7 +13,7 @@
   <PropertyGroup>
     <RestoreSources>
       $(RestoreSources);
-      https://www.myget.org/F/anurse-clrmd/api/v3/index.json
+      https://www.myget.org/F/anurse-clrmd/api/v3/index.json;
       <!-- aspnetcore-dev feed for internal packages like Microsoft.Extensions.Logging.Testing -->
       https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
       https://dotnet.myget.org/F/dotnet-core/api/v3/index.json;

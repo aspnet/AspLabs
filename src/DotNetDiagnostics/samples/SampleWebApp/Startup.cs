@@ -33,13 +33,15 @@ namespace SampleWebApp
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddTransient<DataService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+#pragma warning disable 0618
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+#pragma warning restore 0618
         {
             if (env.IsDevelopment())
             {

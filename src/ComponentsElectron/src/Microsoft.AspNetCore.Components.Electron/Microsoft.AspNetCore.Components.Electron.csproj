@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <ComponentsVersion>3.0.0-preview3-19122-14</ComponentsVersion>
+    <IsPackable>true</IsPackable>
+    <RestoreAdditionalProjectSources>https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;</RestoreAdditionalProjectSources>
+
+    <!-- ElectronNET.API is not strong-named signed -->
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ElectronNET.API" Version="0.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Server" Version="$(ComponentsVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="$(ComponentsVersion)" />
+    <ProjectReference Include="..\Microsoft.AspNetCore.Components.Electron.JS\Microsoft.AspNetCore.Components.Electron.JS.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="GetJsFiles" BeforeTargets="CoreBuild">
+    <Copy SourceFiles="..\Microsoft.AspNetCore.Components.Electron.JS\dist\components.electron.js" DestinationFolder="js" />
+  </Target>
+
+  <ItemGroup>
+    <Content Include="js\**" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />
+  </ItemGroup>
+
+</Project>

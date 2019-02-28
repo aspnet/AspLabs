@@ -66,6 +66,9 @@ phases:
       ${{ insert }}: ${{ parameters.variables }}
 
   steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '10.x'
   - checkout: self
     clean: ${{ parameters.clean }}
     ${{ if ne(parameters.fetchDepth, '') }}:
