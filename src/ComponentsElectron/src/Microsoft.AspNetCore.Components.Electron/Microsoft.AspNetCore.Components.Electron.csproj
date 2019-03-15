@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
-    <ComponentsVersion>3.0.0-preview3-19122-14</ComponentsVersion>
+    <ComponentsVersion>3.0.0-preview3-19153-02</ComponentsVersion>
     <IsPackable>true</IsPackable>
     <RestoreAdditionalProjectSources>https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;</RestoreAdditionalProjectSources>
 

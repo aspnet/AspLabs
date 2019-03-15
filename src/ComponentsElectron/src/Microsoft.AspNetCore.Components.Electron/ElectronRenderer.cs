@@ -10,6 +10,7 @@ using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Components.Browser;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Server;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 
 // Many aspects of the layering here are not what we really want, but it won't affect
@@ -21,6 +22,8 @@ namespace Microsoft.AspNetCore.Components.Electron
     internal class ElectronRenderer : Renderer
     {
         private readonly BrowserWindow _window;
+        private readonly IJSRuntime _jsRuntime;
+
         public int RendererId { get; }
 
         static Func<Renderer, int> _addToRendererRegistry;
@@ -47,6 +50,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             : base(serviceProvider)
         {
             _window = window ?? throw new ArgumentNullException(nameof(window));
+            _jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
             RendererId = _addToRendererRegistry(this);
         }
 
@@ -78,7 +82,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             var component = InstantiateComponent(componentType);
             var componentId = AssignRootComponentId(component);
 
-            var attachComponentTask = JSRuntime.Current.InvokeAsync<object>(
+            var attachComponentTask = _jsRuntime.InvokeAsync<object>(
                 "Blazor._internal.attachRootComponentToElement",
                 RendererId,
                 domElementSelector,
