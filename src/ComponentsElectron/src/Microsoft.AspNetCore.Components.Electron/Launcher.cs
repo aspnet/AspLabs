@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             var applicationBaseDir = Path.GetDirectoryName(typeof(Launcher).Assembly.Location);
             var electronEntryPoint = Path.Combine(
                 applicationBaseDir,
-                "js",
+                "electron-js",
                 "main.js");
             var electronPort = SelectPort();
 

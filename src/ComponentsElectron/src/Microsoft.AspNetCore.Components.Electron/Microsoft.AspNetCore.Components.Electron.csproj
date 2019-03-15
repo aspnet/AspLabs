@@ -19,11 +19,14 @@
   </ItemGroup>
 
   <Target Name="GetJsFiles" BeforeTargets="CoreBuild">
-    <Copy SourceFiles="..\Microsoft.AspNetCore.Components.Electron.JS\dist\components.electron.js" DestinationFolder="js" />
+    <Copy SourceFiles="..\Microsoft.AspNetCore.Components.Electron.JS\dist\components.electron.js" DestinationFolder="electron-js" />
+    <ItemGroup>
+      <Content Include="electron-js\components.electron.js" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />
+    </ItemGroup>
   </Target>
 
   <ItemGroup>
-    <Content Include="js\**" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />
+    <Content Include="electron-js\**" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />    
   </ItemGroup>
 
 </Project>
