@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Components.Services;
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             SetAbsoluteUri(uriAbsolute);
             TriggerOnLocationChanged();
 
-            JSRuntime.Current.InvokeAsync<object>(
+            Launcher.ElectronJSRuntime.InvokeAsync<object>(
                 InteropEnableNavigationInterception,
                 typeof(ElectronUriHelper).Assembly.GetName().Name,
                 nameof(NotifyLocationChanged));
@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.Components.Electron
 
         protected override void NavigateToCore(string uri, bool forceLoad)
         {
-            JSRuntime.Current.InvokeAsync<object>(InteropNavigateTo, uri, forceLoad);
+            Launcher.ElectronJSRuntime.InvokeAsync<object>(InteropNavigateTo, uri, forceLoad);
         }
     }
 }
