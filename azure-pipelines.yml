@@ -86,6 +86,9 @@ jobs:
       steps:
       - checkout: self
         clean: true
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
       - script: eng\common\cibuild.cmd
           -configuration $(_BuildConfig)
           -prepareMachine
