@@ -9,7 +9,7 @@ variables:
     value: build/product
 
   # Variables for public PR builds
-  ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+  - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
     - name: _HelixSource
       value: pr/aspnet/AspLabs/$(Build.SourceBranch)
     # These are needed to suppress a warning in the cibuild invocation since AzDO leaves the `$(_SignArgs)` in place and it fails to resolve.
@@ -19,7 +19,7 @@ variables:
       value: ''
 
   # Variables for internal Official builds
-  ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - name: _HelixSource
       value: official/aspnet/AspLabs/$(Build.SourceBranch)
     - name: _SignType
