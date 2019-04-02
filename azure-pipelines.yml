@@ -70,18 +70,15 @@ jobs:
             Debug:
               _BuildConfig: Debug
               _SignType: test
-              _DotNetPublishToBlobFeed: false
               _BuildArgs:
           Release:
             _BuildConfig: Release
             # PRs and external builds are not signed.
             ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
               _SignType: test
-              _DotNetPublishToBlobFeed: false
               _BuildArgs:
             ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
               _SignType: real
-              _DotNetPublishToBlobFeed: true
               _BuildArgs: $(SignArgs) $(_OfficialBuildIdArgs)
       steps:
       - checkout: self
