@@ -46,7 +46,6 @@ jobs:
   parameters:
     enablePublishBuildArtifacts: true
     enablePublishTestResults: true
-    enablePublishBuildAssets: true
     enableTelemetry: true
     helixRepo: aspnet/AspLabs
     # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
