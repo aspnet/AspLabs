@@ -12,22 +12,11 @@ variables:
   - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
     - name: _HelixSource
       value: pr/aspnet/AspLabs/$(Build.SourceBranch)
-    # These are needed to suppress a warning in the cibuild invocation since AzDO leaves the `$(_SignArgs)` in place and it fails to resolve.
-    - name: _SignArgs
-      value: ''
-    - name: _OfficialBuildIdArgs
-      value: ''
 
   # Variables for internal Official builds
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - name: _HelixSource
       value: official/aspnet/AspLabs/$(Build.SourceBranch)
-    - name: _SignType
-      value: real
-    - name: _SignArgs
-      value: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-    - name: _OfficialBuildIdArgs
-      value: /p:OfficialBuildId=$(Build.BuildNumber)
 
 resources:
   containers:
@@ -54,10 +43,10 @@ jobs:
     jobs:
     - job: Windows
       pool:
-        ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+        ${{ if eq(variables['System.TeamProject'], 'public') }}:
           name: NetCorePublic-Int-Pool
           queue: BuildPool.Windows.10.Amd64.VS2017.Open
-        ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+        ${{ if ne(variables['System.TeamProject'], 'public') }}:
           name: NetCoreInternal-Int-Pool
           queue: BuildPool.Windows.10.Amd64.VS2017
       variables:
@@ -69,16 +58,16 @@ jobs:
             Debug:
               _BuildConfig: Debug
               _SignType: test
-              _BuildArgs:
+              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
           Release:
             _BuildConfig: Release
             # PRs and external builds are not signed.
             ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
               _SignType: test
-              _BuildArgs:
+              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
             ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
               _SignType: real
-              _BuildArgs: $(SignArgs) $(_OfficialBuildIdArgs)
+              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
       steps:
       - checkout: self
         clean: true
