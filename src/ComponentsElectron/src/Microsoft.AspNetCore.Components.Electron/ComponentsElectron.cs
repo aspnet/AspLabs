@@ -1,10 +1,9 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Components.Services;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
-using System;
 
 namespace Microsoft.AspNetCore.Components.Electron
 {
@@ -34,7 +33,7 @@ namespace Microsoft.AspNetCore.Components.Electron
                 var builder = new ElectronApplicationBuilder(services);
                 startup.Configure(builder, services);
 
-                ElectronUriHelper.Instance.Initialize(
+                ElectronUriHelper.Instance.InitializeState(
                     Launcher.InitialUriAbsolute,
                     Launcher.BaseUriAbsolute);
 

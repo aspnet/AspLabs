@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using ElectronNET.API;
@@ -23,6 +24,8 @@ namespace Microsoft.AspNetCore.Components.Electron
     {
         private readonly BrowserWindow _window;
         private readonly IJSRuntime _jsRuntime;
+        private static readonly Type _writer;
+        private static readonly MethodInfo _writeMethod;
 
         public int RendererId { get; }
 
@@ -30,10 +33,9 @@ namespace Microsoft.AspNetCore.Components.Electron
 
         static ElectronRenderer()
         {
-            var resolverType = typeof(ComponentHub).Assembly
-                .GetType("Microsoft.AspNetCore.Components.Server.Circuits.RenderBatchFormatterResolver", true);
-            var resolver = (IFormatterResolver)Activator.CreateInstance(resolverType);
-            CompositeResolver.RegisterAndSetAsDefault(resolver, StandardResolver.Instance);
+            _writer = typeof(ComponentHub).Assembly
+                .GetType("Microsoft.AspNetCore.Components.Server.Circuits.RenderBatchWriter");
+            _writeMethod = _writer.GetMethod("Write", new[] { typeof(RenderBatch).MakeByRefType() });
 
             // Need to access Microsoft.AspNetCore.Components.Browser.RendererRegistry.Current.Add
             var rendererRegistryType = typeof(RendererRegistryEventDispatcher).Assembly
@@ -66,7 +68,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         /// <typeparam name="TComponent">The type of the component.</typeparam>
         /// <param name="domElementSelector">A CSS selector that uniquely identifies a DOM element.</param>
         public Task AddComponentAsync<TComponent>(string domElementSelector)
-            where TComponent: IComponent
+            where TComponent : IComponent
         {
             return AddComponentAsync(typeof(TComponent), domElementSelector);
         }
@@ -94,8 +96,19 @@ namespace Microsoft.AspNetCore.Components.Electron
         /// <inheritdoc />
         protected override Task UpdateDisplayAsync(in RenderBatch batch)
         {
-            var bytes = MessagePackSerializer.Serialize(batch);
-            var base64 = Convert.ToBase64String(bytes);
+            string base64;
+            using (var memoryStream = new MemoryStream())
+            {
+                object renderBatchWriter = Activator.CreateInstance(_writer, new object[] { memoryStream, false });
+                using (renderBatchWriter as IDisposable)
+                {
+                    _writeMethod.Invoke(renderBatchWriter, new object[] { batch });
+                }
+
+                var batchBytes = memoryStream.ToArray();
+                base64 = Convert.ToBase64String(batchBytes);
+            }
+
             ElectronNET.API.Electron.IpcMain.Send(_window, "JS.RenderBatch", RendererId, base64);
 
             // TODO: Consider finding a way to get back a completion message from the Electron side
