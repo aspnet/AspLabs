@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -7,14 +7,12 @@
     <SignAssembly>false</SignAssembly>
     <LangVersion>7.3</LangVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
-    <ComponentsVersion>3.0.0-preview3-19153-02</ComponentsVersion>
-    <RestoreAdditionalProjectSources>https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;</RestoreAdditionalProjectSources>
+    <ComponentsVersion>3.0.0-preview5-19153-02</ComponentsVersion>
+    <RazorLangVersion>3.0</RazorLangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Server" Version="$(ComponentsVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Build" Version="$(ComponentsVersion)" />
   </ItemGroup>
 
   <ItemGroup>
