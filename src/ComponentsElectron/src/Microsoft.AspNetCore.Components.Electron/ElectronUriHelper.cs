@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Components.Services;
 using Microsoft.JSInterop;
 
 namespace Microsoft.AspNetCore.Components.Electron
@@ -24,11 +23,10 @@ namespace Microsoft.AspNetCore.Components.Electron
         {
         }
 
-        /// <summary>
-        /// Initializes the instance.
-        /// </summary>
-        public void Initialize(string uriAbsolute, string baseUriAbsolute)
+        public override void InitializeState(string uriAbsolute, string baseUriAbsolute)
         {
+            base.InitializeState(uriAbsolute, baseUriAbsolute);
+
             SetAbsoluteBaseUri(baseUriAbsolute);
             SetAbsoluteUri(uriAbsolute);
             TriggerOnLocationChanged();

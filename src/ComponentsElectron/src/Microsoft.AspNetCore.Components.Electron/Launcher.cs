@@ -46,8 +46,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             });
 
             // TODO - this is a gross hack because Electron.NET's bridge connector doesn't let us configure the port any other way.
-            WebHostBuilderExtensions.UseElectron(new FakeWebHostBuilder(), new[] { $"/electronport={electronPort}" });
-
+            ElectronNET.API.WebHostBuilderExtensions.UseElectron(new FakeWebHostBuilder(), new[] { $"/electronport={electronPort}" });
 
             var current = SynchronizationContext.Current;
             var electronSynchronizationContext = new ElectronSynchronizationContext();
