@@ -13,6 +13,7 @@ namespace SampleSite
     {
         public static void Main(string[] args)
         {
+            throw new InvalidOperationException("Boom!");
             CreateHostBuilder(args).Build().Run();
         }
 

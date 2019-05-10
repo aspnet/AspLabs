@@ -24,3 +24,19 @@ Options:
   --iis-express <IIS_EXPRESS_PATH>  Path to the root directory for IIS Express. Defaults to '%ProgramFiles%\IIS Express'
   -?|--help                         Show help information
 ```
+
+## `dotnet iis logs`
+
+Fetches Windows Event Log entries related to ASP.NET Core applications hosted in IIS and IIS Express
+
+```
+〉 dotnet iis logs --help
+Fetches the most recent events in the Windows Event Log for ASP.NET Core Module
+
+Usage: dotnet-iis logs [options]
+
+Options:
+  -n|--count <COUNT>        The number of events to fetch. Defaults to '10', specify '0' to fetch ALL events in the event log
+  --machine <MACHINE_NAME>  A remote machine to retrieve logs for. Requires the ability to remotely access the Windows Event Log. Defaults to '.', the local machine.
+  -?|-h|--help              Show help information
+```

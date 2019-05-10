@@ -7,6 +7,7 @@ namespace Microsoft.DotNet.IIS
 {
     [Command(Description = "Launches and manages ASP.NET Core applications hosted in IIS.")]
     [Subcommand(typeof(RunCommand))]
+    [Subcommand(typeof(LogsCommand))]
     internal class Program
     {
         private static int Main(string[] args)
