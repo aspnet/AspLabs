@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.Components.Electron
 
             SetAbsoluteBaseUri(baseUriAbsolute);
             SetAbsoluteUri(uriAbsolute);
-            TriggerOnLocationChanged();
+            TriggerOnLocationChanged(false);
 
             Launcher.ElectronJSRuntime.InvokeAsync<object>(
                 InteropEnableNavigationInterception,
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         public static void NotifyLocationChanged(string uriAbsolute)
         {
             Instance.SetAbsoluteUri(uriAbsolute);
-            Instance.TriggerOnLocationChanged();
+            Instance.TriggerOnLocationChanged(false);
         }
 
         protected override void NavigateToCore(string uri, bool forceLoad)
