@@ -8,6 +8,7 @@
     <!-- ElectronNET.API is not strong-named signed -->
     <SignAssembly>false</SignAssembly>
     <RestoreAdditionalProjectSources>
+      https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json;
       https://dotnetfeed.blob.core.windows.net/aspnet-blazor/index.json;
     </RestoreAdditionalProjectSources>
   </PropertyGroup>
