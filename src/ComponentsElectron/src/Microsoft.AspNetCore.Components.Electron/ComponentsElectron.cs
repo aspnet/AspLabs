@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 
@@ -25,6 +26,8 @@ namespace Microsoft.AspNetCore.Components.Electron
                 var serviceCollection = new ServiceCollection();
                 serviceCollection.AddSingleton<IUriHelper>(ElectronUriHelper.Instance);
                 serviceCollection.AddSingleton<IJSRuntime>(Launcher.ElectronJSRuntime);
+                serviceCollection.AddSingleton<INavigationInterception, ElectronNavigationInterception>();
+                serviceCollection.AddSingleton<IComponentContext, ElectronComponentContext>();
 
                 var startup = new ConventionBasedStartup(Activator.CreateInstance(typeof(TStartup)));
                 startup.ConfigureServices(serviceCollection);

@@ -6,11 +6,9 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using ElectronNET.API;
-using MessagePack;
-using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Components.Browser;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 
@@ -33,7 +31,7 @@ namespace Microsoft.AspNetCore.Components.Electron
 
         static ElectronRenderer()
         {
-            _writer = typeof(ComponentHub).Assembly
+            _writer = typeof(Circuit).Assembly
                 .GetType("Microsoft.AspNetCore.Components.Server.Circuits.RenderBatchWriter");
             _writeMethod = _writer.GetMethod("Write", new[] { typeof(RenderBatch).MakeByRefType() });
 
