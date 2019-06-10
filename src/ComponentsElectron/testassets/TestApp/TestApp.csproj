@@ -7,7 +7,7 @@
     <SignAssembly>false</SignAssembly>
     <LangVersion>7.3</LangVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
-    <ComponentsVersion>3.0.0-preview5-19153-02</ComponentsVersion>
+    <ComponentsVersion>3.0.0-preview6.19305.13</ComponentsVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
   </PropertyGroup>
 
