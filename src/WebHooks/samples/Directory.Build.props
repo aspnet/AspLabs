@@ -7,5 +7,6 @@
     <StandardTestWebsiteTfms>$(DeveloperBuildTestWebsiteTfms)</StandardTestWebsiteTfms>
     <StandardTestWebsiteTfms Condition=" '$(DeveloperBuild)' != 'true' ">netcoreapp2.1</StandardTestWebsiteTfms>
     <StandardTestWebsiteTfms Condition=" '$(DeveloperBuild)' != 'true' AND '$(OS)' == 'Windows_NT' ">$(StandardTestWebsiteTfms);net461</StandardTestWebsiteTfms>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 </Project>
