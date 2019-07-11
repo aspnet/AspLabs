@@ -20,6 +20,9 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
     // Perhaps GetAsync/SetAsync should accept an optional "scope" or "purpose" string
     // that, if given, gets combined with the purpose we'd auto-generate anyway.
 
+    /// <summary>
+    /// Provides mechanisms for storing and retrieving data in the browser storage.
+    /// </summary>
     public abstract class ProtectedBrowserStorage
     {
         private readonly string _storeName;
@@ -34,6 +37,12 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         // maximize the ability to round-trip .NET objects reliably. 
         private readonly static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions();
 
+        /// <summary>
+        /// Constructs an instance of <see cref="ProtectedBrowserStorage"/>.
+        /// </summary>
+        /// <param name="storeName">The name of the store in which the data should be stored.</param>
+        /// <param name="jsRuntime">The <see cref="IJSRuntime"/>.</param>
+        /// <param name="dataProtectionProvider">The <see cref="IDataProtectionProvider"/>.</param>
         public ProtectedBrowserStorage(string storeName, IJSRuntime jsRuntime, IDataProtectionProvider dataProtectionProvider)
         {
             if (string.IsNullOrEmpty(storeName))
@@ -46,6 +55,12 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
             _dataProtectionProvider = dataProtectionProvider ?? throw new ArgumentNullException(nameof(dataProtectionProvider));
         }
 
+        /// <summary>
+        /// Asynchronously stores the supplied data.
+        /// </summary>
+        /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
+        /// <param name="value">A JSON-serializable value to be stored.</param>
+        /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
         public Task SetAsync(string key, object value)
         {
             var json = JsonSerializer.Serialize(value, SerializerOptions);
@@ -58,6 +73,12 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
                 key,
                 protectedJson);
         }
+
+        /// <summary>
+        /// Asynchronously retrieves the specified data.
+        /// </summary>
+        /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
+        /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
 
         public async Task<T> GetAsync<T>(string key)
         {
