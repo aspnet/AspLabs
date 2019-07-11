@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             // Assert
             Assert.Same(jsResultTask, result);
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("blazorBrowserStorage.set", invocation.Identifier);
+            Assert.Equal("protectedBrowserStorage.set", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg),
@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             // Assert
             Assert.Same(jsResultTask, result);
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("blazorBrowserStorage.set", invocation.Identifier);
+            Assert.Equal("protectedBrowserStorage.set", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg),
@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             Assert.Equal(123, result.IntProperty);
 
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("blazorBrowserStorage.get", invocation.Identifier);
+            Assert.Equal("protectedBrowserStorage.get", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg));
@@ -216,7 +216,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             // Assert
             Assert.Same(nextTask, result);
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("blazorBrowserStorage.delete", invocation.Identifier);
+            Assert.Equal("protectedBrowserStorage.delete", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg));

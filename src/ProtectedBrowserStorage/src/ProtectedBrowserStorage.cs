@@ -25,6 +25,8 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
     /// </summary>
     public abstract class ProtectedBrowserStorage
     {
+        private const string JsFunctionsPrefix = "protectedBrowserStorage";
+
         private readonly string _storeName;
         private readonly IJSRuntime _jsRuntime;
         private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -68,7 +70,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
             var protector = GetOrCreateCachedProtector(key);
             var protectedJson = protector.Protect(json);
             return _jsRuntime.InvokeAsync<object>(
-                "blazorBrowserStorage.set",
+                $"{JsFunctionsPrefix}.set",
                 _storeName,
                 key,
                 protectedJson);
@@ -83,7 +85,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         public async Task<T> GetAsync<T>(string key)
         {
             var protectedJson = await _jsRuntime.InvokeAsync<string>(
-                "blazorBrowserStorage.get",
+                $"{JsFunctionsPrefix}.get",
                 _storeName,
                 key);
 
@@ -110,7 +112,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         public Task DeleteAsync(string key)
         {
             return _jsRuntime.InvokeAsync<object>(
-                "blazorBrowserStorage.delete",
+                $"{JsFunctionsPrefix}.delete",
                 _storeName,
                 key);
         }
