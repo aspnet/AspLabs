@@ -201,7 +201,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
         }
 
         [Fact]
-        public async Task DeleteAsync_InvokesJS()
+        public void DeleteAsync_InvokesJS()
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
