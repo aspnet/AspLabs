@@ -81,7 +81,6 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// </summary>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-
         public async Task<T> GetAsync<T>(string key)
         {
             var protectedJson = await _jsRuntime.InvokeAsync<string>(
