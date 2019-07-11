@@ -102,6 +102,19 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
             return JsonSerializer.Deserialize<T>(json, SerializerOptions);
         }
 
+        /// <summary>
+        /// Asynchronously deletes any data stored for the specified key.
+        /// </summary>
+        /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot whose value should be deleted.</param>
+        /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
+        public Task DeleteAsync(string key)
+        {
+            return _jsRuntime.InvokeAsync<object>(
+                "blazorBrowserStorage.delete",
+                _storeName,
+                key);
+        }
+
         // IDataProtect isn't disposable, so we're fine holding these indefinitely.
         // Only a bounded number of them will be created, as the 'key' values should
         // come from a bounded set known at compile-time. There's no use case for

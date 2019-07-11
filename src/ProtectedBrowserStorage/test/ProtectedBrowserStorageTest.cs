@@ -201,6 +201,28 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
         }
 
         [Fact]
+        public async Task DeleteAsync_InvokesJS()
+        {
+            // Arrange
+            var jsRuntime = new TestJSRuntime();
+            var dataProtectionProvider = new TestDataProtectionProvider();
+            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var nextTask = Task.FromResult((object)null);
+            jsRuntime.NextInvocationResult = nextTask;
+
+            // Act
+            var result = protectedBrowserStorage.DeleteAsync("test key");
+
+            // Assert
+            Assert.Same(nextTask, result);
+            var invocation = jsRuntime.Invocations.Single();
+            Assert.Equal("blazorBrowserStorage.delete", invocation.Identifier);
+            Assert.Collection(invocation.Args,
+                arg => Assert.Equal("test store", arg),
+                arg => Assert.Equal("test key", arg));
+        }
+
+        [Fact]
         public async Task ReusesCachedProtectorsByPurpose()
         {
             // Arrange
