@@ -11,8 +11,18 @@
     <base href="~/" />
 </head>
 <body>
-    <app>@(await Html.RenderComponentAsync<App>())</app>
+    <app>
+        @if (Startup.EnablePrerendering)
+        {
+            @(await Html.RenderComponentAsync<App>())
+        }
+        else
+        {
+            <text>Loading...</text>
+        }
+    </app>
 
     <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Microsoft.AspNetCore.ProtectedBrowserStorage/protectedBrowserStorage.js"></script>
 </body>
 </html>
