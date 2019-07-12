@@ -58,16 +58,41 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         }
 
         /// <summary>
-        /// Asynchronously stores the supplied data.
+        /// <para>
+        /// Asynchronously stores the specified data.
+        /// </para>
+        /// <para>
+        /// Since no data protection purpose is specified with this overload, the purpose is derived from <paramref name="key"/> and the store name. This is a good default purpose to use if the keys come from a fixed set known at compile-time.
+        /// </para>
         /// </summary>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <param name="value">A JSON-serializable value to be stored.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
         public Task SetAsync(string key, object value)
+            => SetAsync(CreatePurposeFromKey(key), key, value);
+
+        /// <summary>
+        /// Asynchronously stores the supplied data.
+        /// </summary>
+        /// <param name="purpose">A string that defines a scope for the data protection. The protected data can only be unprotected by code that specifies the same purpose.</param>
+        /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
+        /// <param name="value">A JSON-serializable value to be stored.</param>
+        /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
+        public Task SetAsync(string purpose, string key, object value)
         {
+            if (string.IsNullOrEmpty(purpose))
+            {
+                throw new ArgumentException("Cannot be null or empty", nameof(purpose));
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentException("Cannot be null or empty", nameof(key));
+            }
+
             var json = JsonSerializer.Serialize(value, SerializerOptions);
 
-            var protector = GetOrCreateCachedProtector(key);
+            var protector = GetOrCreateCachedProtector(purpose);
             var protectedJson = protector.Protect(json);
             return _jsRuntime.InvokeAsync<object>(
                 $"{JsFunctionsPrefix}.set",
@@ -77,11 +102,25 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         }
 
         /// <summary>
+        /// <para>
         /// Asynchronously retrieves the specified data.
+        /// </para>
+        /// <para>
+        /// Since no data protection purpose is specified with this overload, the purpose is derived from <paramref name="key"/> and the store name. This is a good default purpose to use if the keys come from a fixed set known at compile-time.
+        /// </para>
         /// </summary>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public async Task<T> GetAsync<T>(string key)
+        public Task<T> GetAsync<T>(string key)
+            => GetAsync<T>(CreatePurposeFromKey(key), key);
+
+        /// <summary>
+        /// Asynchronously retrieves the specified data.
+        /// </summary>
+        /// <param name="purpose">A string that defines a scope for the data protection. The protected data can only be unprotected if the same purpose was previously specified when calling <see cref="SetAsync(string, string, object)"/>.</param>
+        /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
+        /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
+        public async Task<T> GetAsync<T>(string purpose, string key)
         {
             var protectedJson = await _jsRuntime.InvokeAsync<string>(
                 $"{JsFunctionsPrefix}.get",
@@ -98,7 +137,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
                 return default;
             }
 
-            var protector = GetOrCreateCachedProtector(key);
+            var protector = GetOrCreateCachedProtector(purpose);
             var json = protector.Unprotect(protectedJson);
             return JsonSerializer.Deserialize<T>(json, SerializerOptions);
         }
@@ -120,12 +159,12 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         // Only a bounded number of them will be created, as the 'key' values should
         // come from a bounded set known at compile-time. There's no use case for
         // letting runtime data determine the 'key' values.
-        private IDataProtector GetOrCreateCachedProtector(string key)
+        private IDataProtector GetOrCreateCachedProtector(string purpose)
             => _cachedDataProtectorsByPurpose.GetOrAdd(
-                CreatePurpose(key),
+                purpose,
                 _dataProtectionProvider.CreateProtector);
 
-        private string CreatePurpose(string key)
+        private string CreatePurposeFromKey(string key)
             => $"{GetType().FullName}:{_storeName}:{key}";
     }
 }

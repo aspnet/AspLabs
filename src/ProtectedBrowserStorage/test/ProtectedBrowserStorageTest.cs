@@ -41,8 +41,10 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             Assert.Equal("dataProtectionProvider", ex.ParamName);
         }
 
-        [Fact]
-        public void SetAsync_ProtectsAndInvokesJS()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("my custom purpose")]
+        public void SetAsync_ProtectsAndInvokesJS(string customPurpose)
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
@@ -50,11 +52,16 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
             var jsResultTask = Task.FromResult((object)null);
             var data = new TestModel { StringProperty = "Hello", IntProperty = 123 };
-            var expectedPurpose = $"{typeof(TestProtectedBrowserStorage).FullName}:test store:test key";
+            var keyName = "test key";
+            var expectedPurpose = customPurpose == null
+                ? $"{typeof(TestProtectedBrowserStorage).FullName}:test store:{keyName}"
+                : customPurpose;
 
             // Act
             jsRuntime.NextInvocationResult = jsResultTask;
-            var result = protectedBrowserStorage.SetAsync("test key", data);
+            var result = customPurpose == null
+                ? protectedBrowserStorage.SetAsync(keyName, data)
+                : protectedBrowserStorage.SetAsync(customPurpose, keyName, data);
 
             // Assert
             Assert.Same(jsResultTask, result);
@@ -62,7 +69,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             Assert.Equal("protectedBrowserStorage.set", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
-                arg => Assert.Equal("test key", arg),
+                arg => Assert.Equal(keyName, arg),
                 arg => Assert.Equal(
                     "{\"StringProperty\":\"Hello\",\"IntProperty\":123}",
                     TestDataProtectionProvider.Unprotect(expectedPurpose, (string)arg)));
@@ -94,21 +101,28 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
                     TestDataProtectionProvider.Unprotect(expectedPurpose, (string)arg)));
         }
 
-        [Fact]
-        public async Task GetAsync_InvokesJSAndUnprotects_ValidData()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("my custom purpose")]
+        public async Task GetAsync_InvokesJSAndUnprotects_ValidData(string customPurpose)
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
             var dataProtectionProvider = new TestDataProtectionProvider();
             var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
             var data = new TestModel { StringProperty = "Hello", IntProperty = 123 };
-            var expectedPurpose = $"{typeof(TestProtectedBrowserStorage).FullName}:test store:test key";
+            var keyName = "test key";
+            var expectedPurpose = customPurpose == null
+                ? $"{typeof(TestProtectedBrowserStorage).FullName}:test store:{keyName}"
+                : customPurpose;
             var storedJson = "{\"StringProperty\":\"Hello\",\"IntProperty\":123}";
             jsRuntime.NextInvocationResult = Task.FromResult(
                 TestDataProtectionProvider.Protect(expectedPurpose, storedJson));
 
             // Act
-            var result = await protectedBrowserStorage.GetAsync<TestModel>("test key");
+            var result = customPurpose == null
+                ? await protectedBrowserStorage.GetAsync<TestModel>(keyName)
+                : await protectedBrowserStorage.GetAsync<TestModel>(customPurpose, keyName);
 
             // Assert
             Assert.Equal("Hello", result.StringProperty);
@@ -118,7 +132,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             Assert.Equal("protectedBrowserStorage.get", invocation.Identifier);
             Assert.Collection(invocation.Args,
                 arg => Assert.Equal("test store", arg),
-                arg => Assert.Equal("test key", arg));
+                arg => Assert.Equal(keyName, arg));
         }
 
         [Fact]
