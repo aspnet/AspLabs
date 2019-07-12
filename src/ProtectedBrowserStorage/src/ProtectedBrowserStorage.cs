@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// <param name="storeName">The name of the store in which the data should be stored.</param>
         /// <param name="jsRuntime">The <see cref="IJSRuntime"/>.</param>
         /// <param name="dataProtectionProvider">The <see cref="IDataProtectionProvider"/>.</param>
-        public ProtectedBrowserStorage(string storeName, IJSRuntime jsRuntime, IDataProtectionProvider dataProtectionProvider)
+        protected ProtectedBrowserStorage(string storeName, IJSRuntime jsRuntime, IDataProtectionProvider dataProtectionProvider)
         {
             if (string.IsNullOrEmpty(storeName))
             {
