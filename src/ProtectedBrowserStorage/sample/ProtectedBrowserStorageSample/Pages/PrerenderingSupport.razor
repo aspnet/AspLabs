@@ -1,0 +1,89 @@
+@page "/prerendering-support"
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IComponentContext ComponentContext
+
+<h1>Prerendering support</h1>
+
+<p>
+    If you need to support prerendering while using browser-based storage, things are
+    a little more complicated. It's impossible to access browser-based storage during
+    prerendering, because there is no browser connection at that stage. So you need to avoid
+    calling <code>GetAsync</code> during prerendering, and defer the loading operation until
+    the client has connected back to the server.
+</p>
+
+<p>
+    This component demonstrates how to work with prerendering. To test this out, change
+    the value of <code>EnablePrerendering</code> to <code>true</code> inside <code>Startup.cs</code>,
+    then restart your application. You <strong>must</strong> then navigate directly to
+    this page's URL, otherwise you'll get an error, because the other pages don't support
+    prerendering.
+</p>
+
+<p>
+    Tip: In most cases, if you application is heavily built around use of browser-based storage,
+    it's better not to enable prerendering, since it adds complexity and doesn't really offer
+    any value, since you can't render a useful UI until the data has been loaded.
+</p>
+
+<fieldset>
+    @if (currentCount.HasValue)
+    {
+        <p>Current count: <strong>@currentCount</strong></p>
+        <button @onclick="@IncrementCount">Increment</button>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</fieldset>
+
+@functions {
+    int? currentCount;
+    bool isWaitingForConnection;
+
+    protected override async Task OnInitAsync()
+    {
+        if (ComponentContext.IsConnected)
+        {
+            // Looks like we're not prerendering, so we can immediately load
+            // the data from browser storage
+            await LoadStateAsync();
+        }
+        else
+        {
+            // We are prerendering, so have to defer the load operation until later
+            isWaitingForConnection = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        // By this stage we know the client has connected back to the server, and
+        // browser services are available. So if we didn't load the data earlier,
+        // we should do so now, then trigger a new render.
+        if (isWaitingForConnection)
+        {
+            isWaitingForConnection = false;
+            await LoadStateAsync();
+            StateHasChanged();
+        }
+    }
+
+    async Task LoadStateAsync()
+    {
+        currentCount = await ProtectedLocalStore.GetAsync<int>("prerenderedCount");
+    }
+
+    async Task SaveStateAsync()
+    {
+        await ProtectedLocalStore.SetAsync("prerenderedCount", currentCount);
+    }
+
+    Task IncrementCount()
+    {
+        currentCount++;
+        return SaveStateAsync();
+    }
+}
