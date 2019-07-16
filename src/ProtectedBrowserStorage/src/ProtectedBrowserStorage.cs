@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.JSInterop;
@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
                 throw new ArgumentException("Cannot be null or empty", nameof(key));
             }
 
-            var json = JsonSerializer.Serialize(value, SerializerOptions);
+            var json = JsonSerializer.ToString(value, options: SerializerOptions);
 
             var protector = GetOrCreateCachedProtector(purpose);
             var protectedJson = protector.Protect(json);
@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
 
             var protector = GetOrCreateCachedProtector(purpose);
             var json = protector.Unprotect(protectedJson);
-            return JsonSerializer.Deserialize<T>(json, SerializerOptions);
+            return JsonSerializer.Parse<T>(json, options: SerializerOptions);
         }
 
         /// <summary>
