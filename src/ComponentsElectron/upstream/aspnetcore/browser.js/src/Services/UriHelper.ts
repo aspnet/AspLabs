@@ -1,4 +1,4 @@
-import '@dotnet/jsinterop';
+//import '@dotnet/jsinterop';
 import { resetScrollAfterNextBatch } from '../Rendering/Renderer';
 
 let hasRegisteredNavigationInterception = false;
