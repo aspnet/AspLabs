@@ -28,9 +28,11 @@ namespace Microsoft.AspNetCore.Components.Electron
 
         public int RendererId { get; }
 
-        public override Dispatcher Dispatcher => NullDispatcher.Instance;
+        public override Dispatcher Dispatcher { get; } = NullDispatcher.Instance;
 
         static Func<Renderer, int> _addToRendererRegistry;
+
+        public static Action ResetCurrentRendererRegistry;
 
         static ElectronRenderer()
         {
@@ -44,8 +46,14 @@ namespace Microsoft.AspNetCore.Components.Electron
             var rendererRegistryCurrent = rendererRegistryType
                     .GetProperty("Current", BindingFlags.Static | BindingFlags.Public)
                     .GetValue(null);
+            var setCurrentRendererRegistry = rendererRegistryType
+                    .GetMethod("SetCurrentRendererRegistry", BindingFlags.Static | BindingFlags.Public);
             var rendererRegistryAddMethod = rendererRegistryType
                 .GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
+            ResetCurrentRendererRegistry = () =>
+            {
+                setCurrentRendererRegistry.Invoke(null, new[] { rendererRegistryCurrent });
+            };
             _addToRendererRegistry = renderer => (int)rendererRegistryAddMethod.Invoke(rendererRegistryCurrent, new[] { renderer });
         }
 

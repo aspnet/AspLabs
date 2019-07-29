@@ -58,6 +58,7 @@ namespace Microsoft.AspNetCore.Components.Electron
                 electronSynchronizationContext.Send(state =>
                 {
                     JSRuntime.SetCurrentJSRuntime(ElectronJSRuntime);
+                    ElectronRenderer.ResetCurrentRendererRegistry();
 
                     var argsArray = (JArray)state;
                     JSInterop.DotNetDispatcher.BeginInvoke(
