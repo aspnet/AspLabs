@@ -79,6 +79,11 @@ namespace Microsoft.AspNetCore.Components.Electron
                     }
                     catch (Exception ex)
                     {
+                        while (ex.InnerException != null)
+                        {
+                            ex = ex.InnerException;
+                        }
+
                         Console.WriteLine(ex.Message);
                         Console.WriteLine(ex.StackTrace);
                         //Electron.App.Exit(1);

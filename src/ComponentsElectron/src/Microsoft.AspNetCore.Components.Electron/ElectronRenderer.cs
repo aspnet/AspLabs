@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Browser;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 // Many aspects of the layering here are not what we really want, but it won't affect
@@ -27,12 +28,14 @@ namespace Microsoft.AspNetCore.Components.Electron
 
         public int RendererId { get; }
 
+        public override Dispatcher Dispatcher => NullDispatcher.Instance;
+
         static Func<Renderer, int> _addToRendererRegistry;
 
         static ElectronRenderer()
         {
             _writer = typeof(Circuit).Assembly
-                .GetType("Microsoft.AspNetCore.Components.Server.Circuits.RenderBatchWriter");
+                .GetType("Microsoft.AspNetCore.Components.Web.Rendering.RenderBatchWriter");
             _writeMethod = _writer.GetMethod("Write", new[] { typeof(RenderBatch).MakeByRefType() });
 
             // Need to access Microsoft.AspNetCore.Components.Browser.RendererRegistry.Current.Add
@@ -46,8 +49,8 @@ namespace Microsoft.AspNetCore.Components.Electron
             _addToRendererRegistry = renderer => (int)rendererRegistryAddMethod.Invoke(rendererRegistryCurrent, new[] { renderer });
         }
 
-        public ElectronRenderer(IServiceProvider serviceProvider, BrowserWindow window)
-            : base(serviceProvider)
+        public ElectronRenderer(IServiceProvider serviceProvider, BrowserWindow window, ILoggerFactory loggerFactory)
+            : base(serviceProvider, loggerFactory)
         {
             _window = window ?? throw new ArgumentNullException(nameof(window));
             _jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>();

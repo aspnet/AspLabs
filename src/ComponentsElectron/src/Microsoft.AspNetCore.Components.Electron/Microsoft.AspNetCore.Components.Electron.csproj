@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>library</OutputType>
-    <ComponentsVersion>3.0.0-preview6.19305.13</ComponentsVersion>
+    <ComponentsVersion>3.0.0-preview7.19365.7</ComponentsVersion>
     <IsPackable>true</IsPackable>
     <!-- ElectronNET.API is not strong-named signed -->
     <SignAssembly>false</SignAssembly>

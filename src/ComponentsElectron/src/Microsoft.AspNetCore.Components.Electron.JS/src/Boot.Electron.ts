@@ -26,6 +26,10 @@ function boot() {
     DotNet.jsCallDispatcher.beginInvokeJSFromDotNet(asyncHandle, identifier, argsJson);
   });
 
+  electron.ipcRenderer.on('JS.EndInvokeDotNet', (callId, success, resultOrError) => {
+    DotNet.jsCallDispatcher.endInvokeDotNetFromJS(callId, success, resultOrError);
+  });
+
   electron.ipcRenderer.on('JS.RenderBatch', (_, rendererId, batchBase64) => {
     var batchData = new Uint8Array(decode(batchBase64));
     renderBatch(rendererId, new OutOfProcessRenderBatch(batchData));

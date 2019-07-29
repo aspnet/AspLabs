@@ -4,6 +4,8 @@
 using System;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.JSInterop;
 
 namespace Microsoft.AspNetCore.Components.Electron
@@ -24,6 +26,7 @@ namespace Microsoft.AspNetCore.Components.Electron
                 JSRuntime.SetCurrentJSRuntime(Launcher.ElectronJSRuntime);
 
                 var serviceCollection = new ServiceCollection();
+                serviceCollection.AddLogging(configure => configure.AddConsole());
                 serviceCollection.AddSingleton<IUriHelper>(ElectronUriHelper.Instance);
                 serviceCollection.AddSingleton<IJSRuntime>(Launcher.ElectronJSRuntime);
                 serviceCollection.AddSingleton<INavigationInterception, ElectronNavigationInterception>();
@@ -40,7 +43,9 @@ namespace Microsoft.AspNetCore.Components.Electron
                     Launcher.InitialUriAbsolute,
                     Launcher.BaseUriAbsolute);
 
-                var renderer = new ElectronRenderer(services, window);
+                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+                var renderer = new ElectronRenderer(services, window, loggerFactory);
                 foreach (var rootComponent in builder.Entries)
                 {
                     _ = renderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector);
