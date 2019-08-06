@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>true</IsPackable>
+    <PackageDescription>Provides services for storing data in the browser's localStorage and sessionStorage collections via JS interop. The stored data is protected using ASP.NET Core's Data Protection capabilities.</PackageDescription>
   </PropertyGroup>
 
   <ItemGroup>
