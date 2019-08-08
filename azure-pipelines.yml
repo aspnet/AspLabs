@@ -30,162 +30,172 @@ trigger:
 pr:
 - "*"
 
-jobs:
-- template: /eng/common/templates/jobs/jobs.yml
-  parameters:
-    enablePublishBuildArtifacts: true
-    enablePublishTestResults: true
-    enableTelemetry: true
-    helixRepo: aspnet/AspLabs
-    # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
-    ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-      enableMicrobuild: true
-    jobs:
-    - job: Windows
-      pool:
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          name: NetCorePublic-Pool
-          queue: BuildPool.Windows.10.Amd64.VS2017.Open
-        ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          name: NetCoreInternal-Pool
-          queue: BuildPool.Windows.10.Amd64.VS2017
-      variables:
-      - name: _HelixBuildConfig
-        value: $(_BuildConfig)
-      strategy:
-        matrix:
-          ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-            Debug:
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+  - template: /eng/common/templates/jobs/jobs.yml
+    parameters:
+      enablePublishBuildArtifacts: true
+      enablePublishTestResults: true
+      enableTelemetry: true
+      helixRepo: aspnet/AspLabs
+      # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
+      ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+        enableMicrobuild: true
+      jobs:
+      - job: Windows
+        pool:
+          ${{ if eq(variables['System.TeamProject'], 'public') }}:
+            name: NetCorePublic-Pool
+            queue: BuildPool.Windows.10.Amd64.VS2017.Open
+          ${{ if ne(variables['System.TeamProject'], 'public') }}:
+            name: NetCoreInternal-Pool
+            queue: BuildPool.Windows.10.Amd64.VS2017
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        strategy:
+          matrix:
+            ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+              Debug:
+                _BuildConfig: Debug
+                _SignType: test
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+            Release:
+              _BuildConfig: Release
+              # PRs and external builds are not signed.
+              ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+                _SignType: test
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+                _SignType: real
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
+        steps:
+        - checkout: self
+          clean: true
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+        - task: NuGetCommand@2
+          displayName: 'Clear NuGet caches'
+          condition: succeeded()
+          inputs:
+            command: custom
+            arguments: 'locals all -clear'
+        - script: eng\common\cibuild.cmd
+            -configuration $(_BuildConfig)
+            -prepareMachine
+            $(_BuildArgs)
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Packages
+          condition: and(eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
+          continueOnError: true
+          inputs:
+            artifactName: Packages_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)'
+            publishLocation: Container
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
+
+      - job: macOS
+        pool:
+          vmImage: macOS-10.13
+        strategy:
+          matrix:
+            debug:
               _BuildConfig: Debug
-              _SignType: test
-              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-          Release:
-            _BuildConfig: Release
-            # PRs and external builds are not signed.
-            ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-              _SignType: test
-              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-            ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-              _SignType: real
-              _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
-      steps:
-      - checkout: self
-        clean: true
-      - task: NodeTool@0
-        inputs:
-          versionSpec: '10.x'
-      - task: NuGetCommand@2
-        displayName: 'Clear NuGet caches'
-        condition: succeeded()
-        inputs:
-          command: custom
-          arguments: 'locals all -clear'
-      - script: eng\common\cibuild.cmd
-          -configuration $(_BuildConfig)
-          -prepareMachine
-          $(_BuildArgs)
-        name: Build
-        displayName: Build
-        condition: succeeded()
-      - task: PublishTestResults@2
-        displayName: Publish xUnit Test Results
-        condition: always()
-        continueOnError: true
-        inputs:
-          testRunner: xunit
-          testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
-      - task: PublishBuildArtifacts@1
-        displayName: Publish Packages
-        condition: and(eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
-        continueOnError: true
-        inputs:
-          artifactName: Packages_$(Agent.Os)_$(Agent.JobName)
-          parallel: true
-          pathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)'
-          publishLocation: Container
-      - task: PublishBuildArtifacts@1
-        displayName: Publish Logs
-        condition: always()
-        continueOnError: true
-        inputs:
-          artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
-          parallel: true
-          pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
-          publishLocation: Container
+            release:
+              _BuildConfig: Release
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        steps:
+        - checkout: self
+          clean: true
+        - script: eng/common/cibuild.sh
+            --configuration $(_BuildConfig)
+            --prepareMachine
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
 
-    - job: macOS
-      pool:
-        vmImage: macOS-10.13
-      strategy:
-        matrix:
-          debug:
-            _BuildConfig: Debug
-          release:
-            _BuildConfig: Release
-      variables:
-      - name: _HelixBuildConfig
-        value: $(_BuildConfig)
-      steps:
-      - checkout: self
-        clean: true
-      - script: eng/common/cibuild.sh
-          --configuration $(_BuildConfig)
-          --prepareMachine
-        name: Build
-        displayName: Build
-        condition: succeeded()
-      - task: PublishTestResults@2
-        displayName: Publish xUnit Test Results
-        condition: always()
-        continueOnError: true
-        inputs:
-          testRunner: xunit
-          testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
-      - task: PublishBuildArtifacts@1
-        displayName: Publish Logs
-        condition: always()
-        continueOnError: true
-        inputs:
-          artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
-          parallel: true
-          pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
-          publishLocation: Container
+      - job: Linux
+        pool:
+          vmImage: ubuntu-16.04
+          container: LinuxContainer
+        strategy:
+          matrix:
+            debug:
+              _BuildConfig: Debug
+            release:
+              _BuildConfig: Release
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        steps:
+        - checkout: self
+          clean: true
+        - script: eng/common/cibuild.sh
+            --configuration $(_BuildConfig)
+            --prepareMachine
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
 
-    - job: Linux
-      pool:
-        vmImage: ubuntu-16.04
-        container: LinuxContainer
-      strategy:
-        matrix:
-          debug:
-            _BuildConfig: Debug
-          release:
-            _BuildConfig: Release
-      variables:
-      - name: _HelixBuildConfig
-        value: $(_BuildConfig)
-      steps:
-      - checkout: self
-        clean: true
-      - script: eng/common/cibuild.sh
-          --configuration $(_BuildConfig)
-          --prepareMachine
-        name: Build
-        displayName: Build
-        condition: succeeded()
-      - task: PublishTestResults@2
-        displayName: Publish xUnit Test Results
-        condition: always()
-        continueOnError: true
-        inputs:
-          testRunner: xunit
-          testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
-      - task: PublishBuildArtifacts@1
-        displayName: Publish Logs
-        condition: always()
-        continueOnError: true
-        inputs:
-          artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
-          parallel: true
-          pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
-          publishLocation: Container
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+  - template: eng\common\templates\post-build\post-build.yml
+    parameters:
+      # Symbol validation isn't being very reliable lately. This should be enabled back
+      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+      enableSymbolValidation: false
