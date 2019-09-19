@@ -17,8 +17,11 @@ function boot() {
 
   // Configure the mechanism for JS<->NET calls
   DotNet.attachDispatcher({
-    beginInvokeDotNetFromJS: (callId, assemblyName, methodIdentifier, dotNetObjectId, argsJson) => {
+    beginInvokeDotNetFromJS: (callId: number, assemblyName: string | null, methodIdentifier: string, dotNetObjectId: number | null, argsJson: string) => {
       electron.ipcRenderer.send('BeginInvokeDotNetFromJS', [callId ? callId.toString() : null, assemblyName, methodIdentifier, dotNetObjectId || 0, argsJson]);
+    },
+    endInvokeJSFromDotNet: (callId: number, succeeded: boolean, resultOrError: any) => {
+      electron.ipcRenderer.send('EndInvokeJSFromDotNet', [callId, succeeded, resultOrError]);
     }
   });
 
