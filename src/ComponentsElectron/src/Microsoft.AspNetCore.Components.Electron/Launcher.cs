@@ -24,6 +24,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         public static IJSRuntime ElectronJSRuntime { get; private set; }
         public static string InitialUriAbsolute { get; private set; }
         public static string BaseUriAbsolute { get; private set; }
+        public static ElectronRenderer ElectronRenderer { get; set; }
 
         public static void StartElectronProcess(Func<Task> callback)
         {

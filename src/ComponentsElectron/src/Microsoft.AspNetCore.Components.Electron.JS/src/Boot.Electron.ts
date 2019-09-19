@@ -13,7 +13,7 @@ function boot() {
   //  - WebAssemblyEventDispatcher.DispatchEvent
   //  - JSInteropMethods.NotifyLocationChanged
   // ... and remove the following line
-  setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.Web', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
+  setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.Electron', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
 
   // Configure the mechanism for JS<->NET calls
   DotNet.attachDispatcher({

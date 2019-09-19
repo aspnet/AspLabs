@@ -5,12 +5,15 @@ using ElectronNET.API;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using System;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Components.Electron
 {
     internal class ElectronJSRuntime : JSRuntime
     {
         private readonly BrowserWindow _window;
+        private static Type VoidTaskResultType = typeof(Task).Assembly
+            .GetType("System.Threading.Tasks.VoidTaskResult", true);
 
         public ElectronJSRuntime(BrowserWindow window)
         {
@@ -25,8 +28,22 @@ namespace Microsoft.AspNetCore.Components.Electron
         protected override void EndInvokeDotNet(DotNetInvocationInfo invocationInfo, in DotNetInvocationResult invocationResult)
         {
             // The other params aren't strictly required and are only used for logging
-            var resultOrError = invocationResult.Success ? invocationResult.Result : invocationResult.Exception.ToString();
-            ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", invocationInfo.CallId, invocationResult.Success, resultOrError);
+            var resultOrError = invocationResult.Success ? HandlePossibleVoidTaskResult(invocationResult.Result) : invocationResult.Exception.ToString();
+            if (resultOrError != null)
+            {
+                ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", invocationInfo.CallId, invocationResult.Success, resultOrError);
+            }
+            else
+            {
+                ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", invocationInfo.CallId, invocationResult.Success);
+            }
+        }
+
+        private static object HandlePossibleVoidTaskResult(object result)
+        {
+            // Looks like the TaskGenericsUtil logic in Microsoft.JSInterop doesn't know how to
+            // understand System.Threading.Tasks.VoidTaskResult
+            return result?.GetType() == VoidTaskResultType ? null : result;
         }
     }
 }
