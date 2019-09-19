@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         static ElectronRenderer()
         {
             _writer = typeof(Circuit).Assembly
-                .GetType("Microsoft.AspNetCore.Components.Web.Rendering.RenderBatchWriter");
+                .GetType("Microsoft.AspNetCore.Components.Server.Circuits.RenderBatchWriter");
             _writeMethod = _writer.GetMethod("Write", new[] { typeof(RenderBatch).MakeByRefType() });
         }
 

@@ -39,6 +39,11 @@ namespace Microsoft.AspNetCore.Components.Electron
                 var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
                 var renderer = new ElectronRenderer(services, window, loggerFactory);
+                renderer.UnhandledException += (sender, exception) =>
+                {
+                    Console.Error.WriteLine(exception);
+                };
+
                 foreach (var rootComponent in builder.Entries)
                 {
                     _ = renderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector);

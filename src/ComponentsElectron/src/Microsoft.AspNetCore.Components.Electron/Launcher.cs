@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using Microsoft.JSInterop.Infrastructure;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.Components.Electron
@@ -57,16 +58,26 @@ namespace Microsoft.AspNetCore.Components.Electron
             {
                 electronSynchronizationContext.Send(state =>
                 {
-                    throw new NotImplementedException("Not sure what to do here yet");
-                    /*
                     var argsArray = (JArray)state;
-                    JSInterop.DotNetDispatcher.BeginInvoke(
-                        (string)argsArray[0],
-                        (string)argsArray[1],
-                        (string)argsArray[2],
-                        (long)argsArray[3],
+                    DotNetDispatcher.BeginInvokeDotNet(
+                        (JSRuntime)ElectronJSRuntime,
+                        new DotNetInvocationInfo(
+                            assemblyName: (string)argsArray[1],
+                            methodIdentifier: (string)argsArray[2],
+                            dotNetObjectId: (long)argsArray[3],
+                            callId: (string)argsArray[0]),
                         (string)argsArray[4]);
-                        */
+                }, args);
+            });
+
+            ElectronNET.API.Electron.IpcMain.On("EndInvokeJSFromDotNet", args =>
+            {
+                electronSynchronizationContext.Send(state =>
+                {
+                    var argsArray = (JArray)state;
+                    DotNetDispatcher.EndInvokeJS(
+                        (JSRuntime)ElectronJSRuntime,
+                        (string)argsArray[2]);
                 }, args);
             });
 
