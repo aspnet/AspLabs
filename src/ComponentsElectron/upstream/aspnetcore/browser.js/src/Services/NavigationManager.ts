@@ -1,4 +1,4 @@
-import '@dotnet/jsinterop';
+// import '@dotnet/jsinterop'; Not needed here, because it's imported from a different location by Boot.Electron.ts
 import { resetScrollAfterNextBatch } from '../Rendering/Renderer';
 
 let hasRegisteredNavigationInterception = false;
