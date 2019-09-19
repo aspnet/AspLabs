@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Components.Electron
     /// </summary>
     internal class ElectronNavigationManager : NavigationManager
     {
-        private static readonly string InteropPrefix = "Blazor._internal.uriHelper.";
+        private static readonly string InteropPrefix = "Blazor._internal.navigationManager.";
         private static readonly string InteropNavigateTo = InteropPrefix + "navigateTo";
 
         /// <summary>

@@ -1,4 +1,5 @@
 @page "/counter"
+@inject NavigationManager NavigationManager
 
 <h1>Counter</h1>
 
@@ -12,5 +13,6 @@
     void IncrementCount()
     {
         currentCount++;
+        NavigationManager.NavigateTo("fetchdata");
     }
 }
