@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         protected override void EndInvokeDotNet(DotNetInvocationInfo invocationInfo, in DotNetInvocationResult invocationResult)
         {
             // The other params aren't strictly required and are only used for logging
-            var resultOrError = invocationResult.Success ? invocationResult.Result : invocationResult.Exception;
+            var resultOrError = invocationResult.Success ? invocationResult.Result : invocationResult.Exception.ToString();
             ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", invocationInfo.CallId, invocationResult.Success, resultOrError);
         }
     }

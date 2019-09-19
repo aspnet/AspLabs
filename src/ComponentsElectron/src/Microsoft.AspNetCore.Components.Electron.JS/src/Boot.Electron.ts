@@ -37,7 +37,7 @@ function boot() {
     DotNet.jsCallDispatcher.beginInvokeJSFromDotNet(asyncHandle, identifier, argsJson);
   });
 
-  electron.ipcRenderer.on('JS.EndInvokeDotNet', (callId, success, resultOrError) => {
+  electron.ipcRenderer.on('JS.EndInvokeDotNet', (_, callId, success, resultOrError) => {
     DotNet.jsCallDispatcher.endInvokeDotNetFromJS(callId, success, resultOrError);
   });
 
