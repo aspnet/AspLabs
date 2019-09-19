@@ -57,9 +57,8 @@ namespace Microsoft.AspNetCore.Components.Electron
             {
                 electronSynchronizationContext.Send(state =>
                 {
-                    JSRuntime.SetCurrentJSRuntime(ElectronJSRuntime);
-                    ElectronRenderer.ResetCurrentRendererRegistry();
-
+                    throw new NotImplementedException("Not sure what to do here yet");
+                    /*
                     var argsArray = (JArray)state;
                     JSInterop.DotNetDispatcher.BeginInvoke(
                         (string)argsArray[0],
@@ -67,6 +66,7 @@ namespace Microsoft.AspNetCore.Components.Electron
                         (string)argsArray[2],
                         (long)argsArray[3],
                         (string)argsArray[4]);
+                        */
                 }, args);
             });
 

@@ -6,8 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using ElectronNET.API;
-using Microsoft.AspNetCore.Components.Browser;
-using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,40 +20,19 @@ namespace Microsoft.AspNetCore.Components.Electron
 {
     internal class ElectronRenderer : Renderer
     {
+        private const int RendererId = 0; // Not relevant, since we have only one renderer in Electron
         private readonly BrowserWindow _window;
         private readonly IJSRuntime _jsRuntime;
         private static readonly Type _writer;
         private static readonly MethodInfo _writeMethod;
 
-        public int RendererId { get; }
-
         public override Dispatcher Dispatcher { get; } = NullDispatcher.Instance;
-
-        static Func<Renderer, int> _addToRendererRegistry;
-
-        public static Action ResetCurrentRendererRegistry;
 
         static ElectronRenderer()
         {
             _writer = typeof(Circuit).Assembly
                 .GetType("Microsoft.AspNetCore.Components.Web.Rendering.RenderBatchWriter");
             _writeMethod = _writer.GetMethod("Write", new[] { typeof(RenderBatch).MakeByRefType() });
-
-            // Need to access Microsoft.AspNetCore.Components.Browser.RendererRegistry.Current.Add
-            var rendererRegistryType = typeof(RendererRegistryEventDispatcher).Assembly
-                .GetType("Microsoft.AspNetCore.Components.Browser.RendererRegistry", true);
-            var rendererRegistryCurrent = rendererRegistryType
-                    .GetProperty("Current", BindingFlags.Static | BindingFlags.Public)
-                    .GetValue(null);
-            var setCurrentRendererRegistry = rendererRegistryType
-                    .GetMethod("SetCurrentRendererRegistry", BindingFlags.Static | BindingFlags.Public);
-            var rendererRegistryAddMethod = rendererRegistryType
-                .GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
-            ResetCurrentRendererRegistry = () =>
-            {
-                setCurrentRendererRegistry.Invoke(null, new[] { rendererRegistryCurrent });
-            };
-            _addToRendererRegistry = renderer => (int)rendererRegistryAddMethod.Invoke(rendererRegistryCurrent, new[] { renderer });
         }
 
         public ElectronRenderer(IServiceProvider serviceProvider, BrowserWindow window, ILoggerFactory loggerFactory)
@@ -62,7 +40,6 @@ namespace Microsoft.AspNetCore.Components.Electron
         {
             _window = window ?? throw new ArgumentNullException(nameof(window));
             _jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
-            RendererId = _addToRendererRegistry(this);
         }
 
         /// <summary>
@@ -127,7 +104,7 @@ namespace Microsoft.AspNetCore.Components.Electron
             return Task.CompletedTask;
         }
 
-        private async void CaptureAsyncExceptions(Task task)
+        private async void CaptureAsyncExceptions(ValueTask<object> task)
         {
             try
             {

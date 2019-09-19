@@ -3,11 +3,12 @@
 
 using ElectronNET.API;
 using Microsoft.JSInterop;
+using Microsoft.JSInterop.Infrastructure;
 using System;
 
 namespace Microsoft.AspNetCore.Components.Electron
 {
-    internal class ElectronJSRuntime : JSRuntimeBase
+    internal class ElectronJSRuntime : JSRuntime
     {
         private readonly BrowserWindow _window;
 
@@ -21,10 +22,11 @@ namespace Microsoft.AspNetCore.Components.Electron
             ElectronNET.API.Electron.IpcMain.Send(_window, "JS.BeginInvokeJS", asyncHandle, identifier, argsJson);
         }
 
-        protected override void EndInvokeDotNet(string callId, bool success, object resultOrError, string assemblyName, string methodIdentifier, long dotNetObjectId)
+        protected override void EndInvokeDotNet(DotNetInvocationInfo invocationInfo, in DotNetInvocationResult invocationResult)
         {
             // The other params aren't strictly required and are only used for logging
-            ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", callId, success, resultOrError);
+            var resultOrError = invocationResult.Success ? invocationResult.Result : invocationResult.Exception;
+            ElectronNET.API.Electron.IpcMain.Send(_window, "JS.EndInvokeDotNet", invocationInfo.CallId, invocationResult.Success, resultOrError);
         }
     }
 }

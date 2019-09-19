@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,13 +7,9 @@
     <SignAssembly>false</SignAssembly>
     <LangVersion>7.3</LangVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
-    <ComponentsVersion>3.0.0-preview7.19365.7</ComponentsVersion>
+    <ComponentsVersion>3.0.0-preview9.19424.4</ComponentsVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Components.Electron\Microsoft.AspNetCore.Components.Electron.csproj" />
