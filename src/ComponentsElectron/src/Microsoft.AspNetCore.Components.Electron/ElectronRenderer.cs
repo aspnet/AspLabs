@@ -72,9 +72,9 @@ namespace Microsoft.AspNetCore.Components.Electron
 
             var attachComponentTask = _jsRuntime.InvokeAsync<object>(
                 "Blazor._internal.attachRootComponentToElement",
-                RendererId,
                 domElementSelector,
-                componentId);
+                componentId,
+                RendererId);
             CaptureAsyncExceptions(attachComponentTask);
             return RenderRootComponentAsync(componentId);
         }
