@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Components.Electron
     /// <summary>
     /// Provides an implementation of <see cref="IUriHelper"/> that interacts with an Electron shell.
     /// </summary>
-    public class ElectronNavigationManager : NavigationManager
+    internal class ElectronNavigationManager : NavigationManager
     {
         private static readonly string InteropPrefix = "Blazor._internal.uriHelper.";
         private static readonly string InteropNavigateTo = InteropPrefix + "navigateTo";
@@ -30,6 +30,12 @@ namespace Microsoft.AspNetCore.Components.Electron
         protected override void NavigateToCore(string uri, bool forceLoad)
         {
             Launcher.ElectronJSRuntime.InvokeAsync<object>(InteropNavigateTo, uri, forceLoad);
+        }
+
+        public void SetLocation(string uri, bool isInterceptedLink)
+        {
+            Uri = uri;
+            NotifyLocationChanged(isInterceptedLink);
         }
     }
 }

@@ -25,8 +25,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         [JSInvokable(nameof(NotifyLocationChanged))]
         public static void NotifyLocationChanged(string uri, bool isInterceptedLink)
         {
-            throw new NotImplementedException("TODO: NotifyLocationChanged");
-            //WebAssemblyNavigationManager.Instance.SetLocation(uri, isInterceptedLink);
+            ElectronNavigationManager.Instance.SetLocation(uri, isInterceptedLink);
         }
     }
 }
