@@ -1,4 +1,4 @@
-﻿@page "/fetchdata"
+@page "/fetchdata"
 @using System.IO
 @using Newtonsoft.Json
 
@@ -38,7 +38,7 @@ else
 @functions {
     WeatherForecast[] forecasts;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         var forecastsJson = await File.ReadAllTextAsync("wwwroot/sample-data/weather.json");
         forecasts = JsonConvert.DeserializeObject<WeatherForecast[]>(forecastsJson);

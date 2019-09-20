@@ -1,18 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>library</OutputType>
-    <ComponentsVersion>3.0.0-preview5-19227-01</ComponentsVersion>
+    <BlazorPackageVersion>3.0.0-preview9.19457.4</BlazorPackageVersion>
     <IsPackable>true</IsPackable>
     <!-- ElectronNET.API is not strong-named signed -->
     <SignAssembly>false</SignAssembly>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="0.0.9" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(BlazorPackageVersion)" />
     <ProjectReference Include="..\Microsoft.AspNetCore.Components.Electron.JS\Microsoft.AspNetCore.Components.Electron.JS.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 

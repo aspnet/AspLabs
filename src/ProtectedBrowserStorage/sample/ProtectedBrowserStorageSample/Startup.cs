@@ -8,8 +8,6 @@ namespace ProtectedBrowserStorageSample
 {
     public class Startup
     {
-        public readonly static bool EnablePrerendering = false;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -47,15 +45,7 @@ namespace ProtectedBrowserStorageSample
 
             app.UseEndpoints(endpoints =>
             {
-                if (EnablePrerendering)
-                {
-                    endpoints.MapBlazorHub();
-                }
-                else
-                {
-                    endpoints.MapBlazorHub<App>("app");
-                }
-
+                endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

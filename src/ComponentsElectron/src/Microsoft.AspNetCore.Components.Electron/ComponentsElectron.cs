@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace Microsoft.AspNetCore.Components.Electron
@@ -20,11 +22,12 @@ namespace Microsoft.AspNetCore.Components.Electron
             Launcher.StartElectronProcess(async () =>
             {
                 var window = await Launcher.CreateWindowAsync(hostJsPath);
-                JSRuntime.SetCurrentJSRuntime(Launcher.ElectronJSRuntime);
 
                 var serviceCollection = new ServiceCollection();
-                serviceCollection.AddSingleton<IUriHelper>(ElectronUriHelper.Instance);
+                serviceCollection.AddLogging(configure => configure.AddConsole());
+                serviceCollection.AddSingleton<NavigationManager>(ElectronNavigationManager.Instance);
                 serviceCollection.AddSingleton<IJSRuntime>(Launcher.ElectronJSRuntime);
+                serviceCollection.AddSingleton<INavigationInterception, ElectronNavigationInterception>();
 
                 var startup = new ConventionBasedStartup(Activator.CreateInstance(typeof(TStartup)));
                 startup.ConfigureServices(serviceCollection);
@@ -33,14 +36,17 @@ namespace Microsoft.AspNetCore.Components.Electron
                 var builder = new ElectronApplicationBuilder(services);
                 startup.Configure(builder, services);
 
-                ElectronUriHelper.Instance.InitializeState(
-                    Launcher.InitialUriAbsolute,
-                    Launcher.BaseUriAbsolute);
+                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
-                var renderer = new ElectronRenderer(services, window);
+                Launcher.ElectronRenderer = new ElectronRenderer(services, window, loggerFactory);
+                Launcher.ElectronRenderer.UnhandledException += (sender, exception) =>
+                {
+                    Console.Error.WriteLine(exception);
+                };
+
                 foreach (var rootComponent in builder.Entries)
                 {
-                    _ = renderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector);
+                    _ = Launcher.ElectronRenderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector);
                 }
             });
         }
