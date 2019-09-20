@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.JSInterop;
@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         // Stylistically, it doesn't matter at all what options we choose, since the values
         // will be opaque after data protection. All that matters is that some fixed set of
         // options exists and remains constant forever. We should choose whatever options
-        // maximize the ability to round-trip .NET objects reliably. 
+        // maximize the ability to round-trip .NET objects reliably.
         private readonly static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions();
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <param name="value">A JSON-serializable value to be stored.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public Task SetAsync(string key, object value)
+        public ValueTask SetAsync(string key, object value)
             => SetAsync(CreatePurposeFromKey(key), key, value);
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <param name="value">A JSON-serializable value to be stored.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public Task SetAsync(string purpose, string key, object value)
+        public ValueTask SetAsync(string purpose, string key, object value)
         {
             if (string.IsNullOrEmpty(purpose))
             {
@@ -90,11 +90,11 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
                 throw new ArgumentException("Cannot be null or empty", nameof(key));
             }
 
-            var json = JsonSerializer.ToString(value, options: SerializerOptions);
+            var json = JsonSerializer.Serialize(value, options: SerializerOptions);
 
             var protector = GetOrCreateCachedProtector(purpose);
             var protectedJson = protector.Protect(json);
-            return _jsRuntime.InvokeAsync<object>(
+            return _jsRuntime.InvokeVoidAsync(
                 $"{JsFunctionsPrefix}.set",
                 _storeName,
                 key,
@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// </summary>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public Task<T> GetAsync<T>(string key)
+        public ValueTask<T> GetAsync<T>(string key)
             => GetAsync<T>(CreatePurposeFromKey(key), key);
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// <param name="purpose">A string that defines a scope for the data protection. The protected data can only be unprotected if the same purpose was previously specified when calling <see cref="SetAsync(string, string, object)"/>.</param>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public async Task<T> GetAsync<T>(string purpose, string key)
+        public async ValueTask<T> GetAsync<T>(string purpose, string key)
         {
             var protectedJson = await _jsRuntime.InvokeAsync<string>(
                 $"{JsFunctionsPrefix}.get",
@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
 
             var protector = GetOrCreateCachedProtector(purpose);
             var json = protector.Unprotect(protectedJson);
-            return JsonSerializer.Parse<T>(json, options: SerializerOptions);
+            return JsonSerializer.Deserialize<T>(json, options: SerializerOptions);
         }
 
         /// <summary>
@@ -147,9 +147,9 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         /// </summary>
         /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot whose value should be deleted.</param>
         /// <returns>A <see cref="Task"/> representing the completion of the operation.</returns>
-        public Task DeleteAsync(string key)
+        public ValueTask DeleteAsync(string key)
         {
-            return _jsRuntime.InvokeAsync<object>(
+            return _jsRuntime.InvokeVoidAsync(
                 $"{JsFunctionsPrefix}.delete",
                 _storeName,
                 key);

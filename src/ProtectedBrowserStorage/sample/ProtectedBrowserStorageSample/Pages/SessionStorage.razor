@@ -23,7 +23,7 @@
 @functions {
     int? currentCount;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         currentCount = await ProtectedSessionStore.GetAsync<int>("sessionCount");
     }

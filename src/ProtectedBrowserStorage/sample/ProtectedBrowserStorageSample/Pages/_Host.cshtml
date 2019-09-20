@@ -12,14 +12,7 @@
 </head>
 <body>
     <app>
-        @if (Startup.EnablePrerendering)
-        {
-            @(await Html.RenderComponentAsync<App>())
-        }
-        else
-        {
-            <text>Loading...</text>
-        }
+        @(await Html.RenderComponentAsync<App>(RenderMode.Server))
     </app>
 
     <script src="_framework/blazor.server.js"></script>

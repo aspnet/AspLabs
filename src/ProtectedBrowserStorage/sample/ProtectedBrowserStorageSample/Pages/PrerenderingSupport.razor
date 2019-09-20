@@ -1,7 +1,6 @@
 @page "/prerendering-support"
 @using Microsoft.AspNetCore.ProtectedBrowserStorage
 @inject ProtectedLocalStorage ProtectedLocalStore
-@inject IComponentContext ComponentContext
 
 <h1>Prerendering support</h1>
 
@@ -15,7 +14,7 @@
 
 <p>
     This component demonstrates how to work with prerendering. To test this out, change
-    the value of <code>EnablePrerendering</code> to <code>true</code> inside <code>Startup.cs</code>,
+    the value of <code>RenderMode</code> to <code>RenderMode.ServerPrerendered</code> inside <code>_Host.cshtml</code>,
     then restart your application. You <strong>must</strong> then navigate directly to
     this page's URL, otherwise you'll get an error, because the other pages don't support
     prerendering.
@@ -41,31 +40,11 @@
 
 @functions {
     int? currentCount;
-    bool isWaitingForConnection;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (ComponentContext.IsConnected)
+        if (firstRender)
         {
-            // Looks like we're not prerendering, so we can immediately load
-            // the data from browser storage
-            await LoadStateAsync();
-        }
-        else
-        {
-            // We are prerendering, so have to defer the load operation until later
-            isWaitingForConnection = true;
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync()
-    {
-        // By this stage we know the client has connected back to the server, and
-        // browser services are available. So if we didn't load the data earlier,
-        // we should do so now, then trigger a new render.
-        if (isWaitingForConnection)
-        {
-            isWaitingForConnection = false;
             await LoadStateAsync();
             StateHasChanged();
         }
