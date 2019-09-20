@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using Microsoft.JSInterop.Infrastructure;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNetCore.Components.Electron
@@ -23,6 +24,7 @@ namespace Microsoft.AspNetCore.Components.Electron
         public static IJSRuntime ElectronJSRuntime { get; private set; }
         public static string InitialUriAbsolute { get; private set; }
         public static string BaseUriAbsolute { get; private set; }
+        public static ElectronRenderer ElectronRenderer { get; set; }
 
         public static void StartElectronProcess(Func<Task> callback)
         {
@@ -57,15 +59,26 @@ namespace Microsoft.AspNetCore.Components.Electron
             {
                 electronSynchronizationContext.Send(state =>
                 {
-                    JSRuntime.SetCurrentJSRuntime(ElectronJSRuntime);
-
                     var argsArray = (JArray)state;
-                    JSInterop.DotNetDispatcher.BeginInvoke(
-                        (string)argsArray[0],
-                        (string)argsArray[1],
-                        (string)argsArray[2],
-                        (long)argsArray[3],
+                    DotNetDispatcher.BeginInvokeDotNet(
+                        (JSRuntime)ElectronJSRuntime,
+                        new DotNetInvocationInfo(
+                            assemblyName: (string)argsArray[1],
+                            methodIdentifier: (string)argsArray[2],
+                            dotNetObjectId: (long)argsArray[3],
+                            callId: (string)argsArray[0]),
                         (string)argsArray[4]);
+                }, args);
+            });
+
+            ElectronNET.API.Electron.IpcMain.On("EndInvokeJSFromDotNet", args =>
+            {
+                electronSynchronizationContext.Send(state =>
+                {
+                    var argsArray = (JArray)state;
+                    DotNetDispatcher.EndInvokeJS(
+                        (JSRuntime)ElectronJSRuntime,
+                        (string)argsArray[2]);
                 }, args);
             });
 
@@ -79,6 +92,11 @@ namespace Microsoft.AspNetCore.Components.Electron
                     }
                     catch (Exception ex)
                     {
+                        while (ex.InnerException != null)
+                        {
+                            ex = ex.InnerException;
+                        }
+
                         Console.WriteLine(ex.Message);
                         Console.WriteLine(ex.StackTrace);
                         //Electron.App.Exit(1);

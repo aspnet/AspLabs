@@ -7,13 +7,8 @@
     <SignAssembly>false</SignAssembly>
     <LangVersion>7.3</LangVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
-    <ComponentsVersion>3.0.0-preview5-19153-02</ComponentsVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Components.Electron\Microsoft.AspNetCore.Components.Electron.csproj" />
