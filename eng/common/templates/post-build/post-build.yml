@@ -101,6 +101,12 @@ stages:
     artifactsPublishingAdditionalParameters: ${{ parameters.artifactsPublishingAdditionalParameters }}
     publishInstallersAndChecksums: ${{ parameters.publishInstallersAndChecksums }}
 
+- template: \eng\common\templates\post-build\channels\netcore-dev-30.yml
+  parameters:
+    symbolPublishingAdditionalParameters: ${{ parameters.symbolPublishingAdditionalParameters }}
+    artifactsPublishingAdditionalParameters: ${{ parameters.artifactsPublishingAdditionalParameters }}
+    publishInstallersAndChecksums: ${{ parameters.publishInstallersAndChecksums }}
+
 - template: \eng\common\templates\post-build\channels\netcore-dev-31.yml
   parameters:
     symbolPublishingAdditionalParameters: ${{ parameters.symbolPublishingAdditionalParameters }}
