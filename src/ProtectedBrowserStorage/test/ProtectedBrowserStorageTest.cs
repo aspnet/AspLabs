@@ -48,13 +48,14 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
+            var storeName = "test store";
             var dataProtectionProvider = new TestDataProtectionProvider();
-            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var protectedBrowserStorage = new TestProtectedBrowserStorage(storeName, jsRuntime, dataProtectionProvider);
             var jsResultTask = new ValueTask<object>((object)null);
             var data = new TestModel { StringProperty = "Hello", IntProperty = 123 };
             var keyName = "test key";
             var expectedPurpose = customPurpose == null
-                ? $"{typeof(TestProtectedBrowserStorage).FullName}:test store:{keyName}"
+                ? $"{typeof(TestProtectedBrowserStorage).FullName}:{storeName}:{keyName}"
                 : customPurpose;
 
             // Act
@@ -65,9 +66,8 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
 
             // Assert
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("protectedBrowserStorage.set", invocation.Identifier);
+            Assert.Equal($"{storeName}.setItem", invocation.Identifier);
             Assert.Collection(invocation.Args,
-                arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal(keyName, arg),
                 arg => Assert.Equal(
                     "{\"StringProperty\":\"Hello\",\"IntProperty\":123}",
@@ -79,10 +79,11 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
+            var storeName = "test store";
             var dataProtectionProvider = new TestDataProtectionProvider();
-            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var protectedBrowserStorage = new TestProtectedBrowserStorage(storeName, jsRuntime, dataProtectionProvider);
             var jsResultTask = new ValueTask<object>((object)null);
-            var expectedPurpose = $"{typeof(TestProtectedBrowserStorage).FullName}:test store:test key";
+            var expectedPurpose = $"{typeof(TestProtectedBrowserStorage).FullName}:{storeName}:test key";
 
             // Act
             jsRuntime.NextInvocationResult = jsResultTask;
@@ -90,9 +91,8 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
 
             // Assert
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("protectedBrowserStorage.set", invocation.Identifier);
+            Assert.Equal($"{storeName}.setItem", invocation.Identifier);
             Assert.Collection(invocation.Args,
-                arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg),
                 arg => Assert.Equal(
                     "null",
@@ -107,11 +107,12 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             // Arrange
             var jsRuntime = new TestJSRuntime();
             var dataProtectionProvider = new TestDataProtectionProvider();
-            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var storeName = "test store";
+            var protectedBrowserStorage = new TestProtectedBrowserStorage(storeName, jsRuntime, dataProtectionProvider);
             var data = new TestModel { StringProperty = "Hello", IntProperty = 123 };
             var keyName = "test key";
             var expectedPurpose = customPurpose == null
-                ? $"{typeof(TestProtectedBrowserStorage).FullName}:test store:{keyName}"
+                ? $"{typeof(TestProtectedBrowserStorage).FullName}:{storeName}:{keyName}"
                 : customPurpose;
             var storedJson = "{\"StringProperty\":\"Hello\",\"IntProperty\":123}";
             jsRuntime.NextInvocationResult = new ValueTask<string>(
@@ -127,9 +128,8 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             Assert.Equal(123, result.IntProperty);
 
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("protectedBrowserStorage.get", invocation.Identifier);
+            Assert.Equal($"{storeName}.getItem", invocation.Identifier);
             Assert.Collection(invocation.Args,
-                arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal(keyName, arg));
         }
 
@@ -217,8 +217,9 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
         {
             // Arrange
             var jsRuntime = new TestJSRuntime();
+            var storeName = "test store";
             var dataProtectionProvider = new TestDataProtectionProvider();
-            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var protectedBrowserStorage = new TestProtectedBrowserStorage(storeName, jsRuntime, dataProtectionProvider);
             var nextTask = new ValueTask<object>((object)null);
             jsRuntime.NextInvocationResult = nextTask;
 
@@ -227,9 +228,8 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
 
             // Assert
             var invocation = jsRuntime.Invocations.Single();
-            Assert.Equal("protectedBrowserStorage.delete", invocation.Identifier);
+            Assert.Equal($"{storeName}.removeItem", invocation.Identifier);
             Assert.Collection(invocation.Args,
-                arg => Assert.Equal("test store", arg),
                 arg => Assert.Equal("test key", arg));
         }
 
@@ -239,8 +239,9 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             // Arrange
             var jsRuntime = new TestJSRuntime();
             jsRuntime.NextInvocationResult = new ValueTask<object>((object)null);
+            var storeName = "test store";
             var dataProtectionProvider = new TestDataProtectionProvider();
-            var protectedBrowserStorage = new TestProtectedBrowserStorage("test store", jsRuntime, dataProtectionProvider);
+            var protectedBrowserStorage = new TestProtectedBrowserStorage(storeName, jsRuntime, dataProtectionProvider);
 
             // Act
             await protectedBrowserStorage.SetAsync("key 1", null);
@@ -252,17 +253,17 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage.Tests
             var typeName = typeof(TestProtectedBrowserStorage).FullName;
             var expectedPurposes = new[]
             {
-                $"{typeName}:test store:key 1",
-                $"{typeName}:test store:key 2",
-                $"{typeName}:test store:key 3"
+                $"{typeName}:{storeName}:key 1",
+                $"{typeName}:{storeName}:key 2",
+                $"{typeName}:{storeName}:key 3"
             };
             Assert.Equal(expectedPurposes, dataProtectionProvider.ProtectorsCreated.ToArray());
 
             Assert.Collection(jsRuntime.Invocations,
-                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[0], "null"), invocation.Args[2]),
-                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[1], "null"), invocation.Args[2]),
-                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[0], "null"), invocation.Args[2]),
-                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[2], "null"), invocation.Args[2]));
+                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[0], "null"), invocation.Args[1]),
+                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[1], "null"), invocation.Args[1]),
+                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[0], "null"), invocation.Args[1]),
+                invocation => Assert.Equal(TestDataProtectionProvider.Protect(expectedPurposes[2], "null"), invocation.Args[1]));
         }
 
         class TestModel
