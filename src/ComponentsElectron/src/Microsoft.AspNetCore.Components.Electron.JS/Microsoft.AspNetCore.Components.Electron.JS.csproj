@@ -6,7 +6,7 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**</DefaultItemExcludes>
     <IsPackable>false</IsPackable>
-    
+
     <!-- VS's FastUpToDateCheck doesn't consider .ts file changes, so it's necessary to disable it to get incremental builds to work correctly (albeit not as fast as if FastUpToDateCheck did work for them) -->
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
@@ -15,14 +15,14 @@
     <WebpackInputs Include="**\*.ts" Exclude="node_modules\**" />
   </ItemGroup>
 
-  <Target Name="EnsureNpmRestored" Condition="!Exists('node_modules')">
-    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-    <Exec Command="npm install" />
+  <Target Name="EnsureDependenciesRestored" Condition="!Exists('node_modules')">
+    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
+    <Exec Command="yarn install" />
   </Target>
 
-  <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\components.electron.js" DependsOnTargets="EnsureNpmRestored">
+  <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\components.electron.js" DependsOnTargets="EnsureDependenciesRestored">
     <RemoveDir Directories="dist" />
-    <Exec Command="npm run build:debug" Condition="'$(Configuration)' == 'Debug'" />
-    <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />
+    <Exec Command="yarn run build:debug" Condition="'$(Configuration)' == 'Debug'" />
+    <Exec Command="yarn run build:production" Condition="'$(Configuration)' != 'Debug'" />
   </Target>
 </Project>
