@@ -14,9 +14,9 @@
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Components.Electron\Microsoft.AspNetCore.Components.Electron.csproj" />
   </ItemGroup>
 
-  <Target Name="EnsureNpmRestored" BeforeTargets="CoreBuild" Condition="!Exists('node_modules')">
-    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-    <Exec Command="npm install" />
+  <Target Name="EnsureDependenciesRestored" BeforeTargets="CoreBuild" Condition="!Exists('node_modules')">
+    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
+    <Exec Command="yarn install" />
   </Target>
 
 </Project>
