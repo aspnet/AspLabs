@@ -19,9 +19,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Build" Version="$(ComponentsVersion)" />
   </ItemGroup>
 
-  <Target Name="EnsureDependenciesRestored" BeforeTargets="CoreBuild" Condition="!Exists('node_modules')">
-    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
-    <Exec Command="yarn install" />
+  <Target Name="EnsureNpmRestored" BeforeTargets="CoreBuild" Condition="!Exists('node_modules')">
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec Command="npm install" />
   </Target>
 
 </Project>
