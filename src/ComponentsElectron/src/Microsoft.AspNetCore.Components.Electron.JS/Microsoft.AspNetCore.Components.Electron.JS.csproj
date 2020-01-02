@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Version of this SDK is set in global.json -->
+  <Sdk Name="Yarn.MSBuild" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
@@ -17,12 +20,12 @@
 
   <Target Name="EnsureDependenciesRestored" Condition="!Exists('node_modules')">
     <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
-    <Exec Command="yarn install" />
+    <Yarn Command="install --mutex network" StandardOutputImportance="High" StandardErrorImportance="High" />
   </Target>
 
   <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\components.electron.js" DependsOnTargets="EnsureDependenciesRestored">
     <RemoveDir Directories="dist" />
-    <Exec Command="yarn run build:debug" Condition="'$(Configuration)' == 'Debug'" />
-    <Exec Command="yarn run build:production" Condition="'$(Configuration)' != 'Debug'" />
+    <Yarn Command="run build:debug" StandardOutputImportance="High" StandardErrorImportance="High" Condition="'$(Configuration)' == 'Debug'" />
+    <Yarn Command="run build:production" StandardOutputImportance="High" StandardErrorImportance="High" Condition="'$(Configuration)' != 'Debug'" />
   </Target>
 </Project>
