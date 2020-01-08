@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\Proto\greet.proto" GrpcServices="Server" Link="Protos\greet.proto" />
+    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
+
+    <PackageReference Include="Grpc.Tools" Version="2.26.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.27.0-dev202001070801" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
+  </ItemGroup>
+
+</Project>
