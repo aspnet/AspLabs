@@ -43,7 +43,20 @@ message HelloReply {
 }
 ```
 
-The `SayHello` gRPC method can now be invoked as gRPC+Protobuf and as an HTTP API.
+The `SayHello` gRPC method can now be invoked as gRPC+Protobuf and as an HTTP API:
+
+```
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 GET https://localhost:5001/v1/greeter/world
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - v1/greeter/{name}'
+info: Server.GreeterService[0]
+      Sending hello to world
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - v1/greeter/{name}'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished in 1.996ms 200 application/json
+```
 
 * Request: `HTTP/1.1 GET /v1/greeter/world`
 * Response: `{ "message": "Hello world" }`.
