@@ -15,7 +15,7 @@ HTTP+JSON APIs for your gRPC services. No duplication!
 
 1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`.
 2. Register services in *Startup.cs* with `AddGrpcHttpApi()`.
-2. Include `<Protobuf>` reference to *google/api/http.proto* and *google/api/http.proto*.
+2. Include `<Protobuf>` reference to *google/api/http.proto* and *google/api/annotations.proto*.
 3. Annotate gRPC methods in your *.proto* file with your HTTP bindings and routes:
 
 ```protobuf
