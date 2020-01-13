@@ -67,7 +67,7 @@ This is a simple example. See [HttpRule](https://cloud.google.com/service-infras
 
 ### gRPC Gateway
 
-[grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same feature but without the deployment cost and performance overhead of requiring an additional proxy server.
+[grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same features as grpc-gateway but **without** a proxy.
 
 ### Known issues:
 
