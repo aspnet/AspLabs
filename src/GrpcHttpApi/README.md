@@ -45,6 +45,11 @@ message HelloReply {
 
 The `SayHello` gRPC method can now be invoked as gRPC+Protobuf and as an HTTP API:
 
+* Request: `HTTP/1.1 GET /v1/greeter/world`
+* Response: `{ "message": "Hello world" }`
+
+Server logs:
+
 ```
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET https://localhost:5001/v1/greeter/world
@@ -57,9 +62,6 @@ info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
       Request finished in 1.996ms 200 application/json
 ```
-
-* Request: `HTTP/1.1 GET /v1/greeter/world`
-* Response: `{ "message": "Hello world" }`.
 
 This is a simple example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
 
