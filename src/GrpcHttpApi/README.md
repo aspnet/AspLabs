@@ -75,4 +75,4 @@ This is a simple example. See [HttpRule](https://cloud.google.com/service-infras
 
 This project is experimental. It has known issues, it is not complete and it is not supported. We are interested in this technology but there is no commitment to completing it.
 
-We want to gauge developer interest in gRPC+HTTP API. If gRPC+HTTP API is interesting to you then please give feedback.
+We want to gauge developer interest in gRPC+HTTP API. If gRPC+HTTP API is interesting to you then please [give feedback](https://github.com/grpc/grpc-dotnet/issues/167).
