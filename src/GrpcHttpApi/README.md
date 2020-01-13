@@ -65,6 +65,10 @@ info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
 
 This is a simple example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
 
+### gRPC Gateway
+
+[grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same feature but without the deployment cost and performance overhead of requiring an additional proxy server.
+
 ### Known issues:
 
 1. `Google.Protobuf` has a bug in the latest version that prevents it from loading annotations. Bug is worked around by using version 3.8.0. GitHub issue: https://github.com/protocolbuffers/protobuf/issues/6956
