@@ -4,6 +4,7 @@
   <ItemGroup>
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ComponentsElectron\ComponentsElectron.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\DotNetDiagnostics\dotnet-monitor.sln" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\GrpcHttpApi\GrpcHttpApi.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ProtectedBrowserStorage\ProtectedBrowserStorage.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Proxy\Proxy.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\WebHooks\WebHooks.sln" />
