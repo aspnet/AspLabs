@@ -205,6 +205,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         private bool TryGetHttpRule(MethodDescriptor methodDescriptor, [NotNullWhen(true)]out HttpRule? httpRule)
         {
+            // CustomOptions is obsolete
+            // We can use `methodDescriptor.GetOption(AnnotationsExtensions.Http)` but there
+            // is an error thrown when there is no option on the method. Remove obsolete code when issue is fixed.
+            // https://github.com/protocolbuffers/protobuf/issues/7127
             return methodDescriptor.CustomOptions.TryGetMessage<HttpRule>(HttpRuleFieldId, out httpRule);
         }
 
