@@ -209,7 +209,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             // We can use `methodDescriptor.GetOption(AnnotationsExtensions.Http)` but there
             // is an error thrown when there is no option on the method. Remove obsolete code when issue is fixed.
             // https://github.com/protocolbuffers/protobuf/issues/7127
+
+#pragma warning disable CS0618 // Type or member is obsolete
             return methodDescriptor.CustomOptions.TryGetMessage<HttpRule>(HttpRuleFieldId, out httpRule);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private bool TryResolvePattern(HttpRule http, [NotNullWhen(true)]out string? pattern, [NotNullWhen(true)]out string? verb)
