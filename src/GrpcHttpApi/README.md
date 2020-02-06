@@ -71,9 +71,11 @@ This is a simple example. See [HttpRule](https://cloud.google.com/service-infras
 
 ### Known issues:
 
-1. `Google.Protobuf` has a bug in the latest version that prevents it from loading annotations. Bug is worked around by using version 3.8.0. GitHub issue: https://github.com/protocolbuffers/protobuf/issues/6956
-2. Protobuf JSON serialization uses the JSON support in `Google.Protobuf`. Its serializer is blocking (i.e. not async), which requires the input and output to be cached in memory so as not to block ASP.NET Core. Improvement would be to write a new serializer with the same behavior that is async and uses `System.Text.Json`.
-3. `google/api/annotations.proto` and `google/api/http.proto` need to be added in the end-user's source code so the Protobuf compiler can load them along with the user's proto files. It would be a nicer developer experience if the user somehow didn't need to worry about those files.
+1. Protobuf JSON serialization uses the JSON support in `Google.Protobuf`. Issues with this JSON implementation:
+  * It's blocking (i.e. not async), which requires the input and output to be cached in memory so as not to block ASP.NET Core.
+  * It's not optimized for performance.
+Improvement would be to write a new runtime serializer for protobuf types with the same behavior. It would be async, use `System.Text.Json` and cache necessary reflection. An alternative approach would be to write a `protoc` plugin that generates the JSON serialization code.
+2. `google/api/annotations.proto` and `google/api/http.proto` need to be added in the end-user's source code so the Protobuf compiler can load them along with the user's proto files. It would be a nicer developer experience if the user somehow didn't need to worry about those files.
 
 ### Experimental project
 
