@@ -38,7 +38,8 @@ stages:
     parameters:
       enablePublishBuildArtifacts: true
       enablePublishTestResults: true
-      enableTelemetry: true
+      enablePublishBuildAssets: true
+      enablePublishUsingPipelines: true
       helixRepo: aspnet/AspLabs
       # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
       ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
