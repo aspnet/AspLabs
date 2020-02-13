@@ -13,7 +13,7 @@ HTTP+JSON APIs for your gRPC services. No duplication!
 
 ### Usage
 
-1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`. Instructions for setting up the custom NuGet feed [here](#nuget-feed).
+1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`.
 2. Register services in *Startup.cs* with `AddGrpcHttpApi()`.
 2. Add *google/api/http.proto* and *google/api/annotations.proto* files to your project.
 3. Annotate gRPC methods in your *.proto* files with HTTP bindings and routes:
@@ -65,6 +65,8 @@ info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
 
 This is a simple example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
 
+Currently `Microsoft.AspNetCore.Grpc.HttpApi` is not published to NuGet.org and is instead available on a custom NuGet feed. Follow instructions for [setting up the custom NuGet feed in your solution](#nuget-feed).
+
 ### gRPC Gateway
 
 [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same features as grpc-gateway but **without** a proxy.
@@ -86,7 +88,7 @@ Improvement would be to write a new runtime serializer for protobuf types with t
 
 ### NuGet feed
 
-The `Microsoft.AspNetCore.Grpc.HttpApi` package is published at https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json
+The `Microsoft.AspNetCore.Grpc.HttpApi` package is published at [https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json](https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json)
 
 To use this NuGet repository and get the latest package from it, place a `NuGet.config` file with the repository setup in your solution folder:
 
