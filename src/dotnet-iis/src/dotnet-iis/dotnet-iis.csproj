@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>Microsoft.DotNet.IIS</RootNamespace>
+    <IsShipping>false</IsShipping>
   </PropertyGroup>
 
   <ItemGroup>
