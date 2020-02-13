@@ -11,9 +11,9 @@ HTTP+JSON APIs for your gRPC services. No duplication!
 
 ![gRPC loves REST](grpc-rest-logo.png "gRPC loves REST")
 
-### Usage:
+### Usage
 
-1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`.
+1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`. Instructions for setting up the custom NuGet feed [here](#nuget-feed).
 2. Register services in *Startup.cs* with `AddGrpcHttpApi()`.
 2. Add *google/api/http.proto* and *google/api/annotations.proto* files to your project.
 3. Annotate gRPC methods in your *.proto* files with HTTP bindings and routes:
@@ -69,9 +69,9 @@ This is a simple example. See [HttpRule](https://cloud.google.com/service-infras
 
 [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same features as grpc-gateway but **without** a proxy.
 
-### Known issues:
+### Known issues
 
-##### Protobuf JSON serialization uses the JSON support in `Google.Protobuf`.
+##### Protobuf JSON serialization uses the JSON support in `Google.Protobuf`
 
 Issues with this JSON implementation:
 
@@ -83,6 +83,24 @@ Improvement would be to write a new runtime serializer for protobuf types with t
 ##### `google/api/annotations.proto` and `google/api/http.proto` need to be added to source code
 
 `google/api/annotations.proto` and `google/api/http.proto` need to be added in the end-user's source code so the Protobuf compiler can load them along with the user's proto files. It would be a nicer developer experience if the user somehow didn't need to worry about those files.
+
+### NuGet feed
+
+The `Microsoft.AspNetCore.Grpc.HttpApi` package is published at https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json
+
+To use this NuGet repository and get the latest package from it, place a `NuGet.config` file with the repository setup in your solution folder:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <packageSources>
+        <!-- Add this repository to the list of available repositories -->
+        <add key="DotNet5 dev repository" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" />
+    </packageSources>
+</configuration>
+```
+
+Additional instructions for configuring a project to use a custom NuGet repository are available at [Changing NuGet configuration settings](https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#changing-config-settings).
 
 ### Experimental project
 
