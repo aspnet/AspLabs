@@ -4,6 +4,7 @@
     <Description>HTTP API for gRPC ASP.NET Core</Description>
     <PackageTags>gRPC RPC HTTP/2 REST</PackageTags>
     <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TargetFramework>netcoreapp3.0</TargetFramework>
 
