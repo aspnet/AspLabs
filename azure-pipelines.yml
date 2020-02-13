@@ -7,6 +7,8 @@ variables:
     value: true
   - name: _HelixType
     value: build/product
+  - name: _DotNetArtifactsCategory
+    value: .NETCore
 
   # Variables for public PR builds
   - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
@@ -71,7 +73,11 @@ stages:
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
               ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: real
-                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber) 
+                  /p:DotNetPublishUsingPipelines=true 
+                  /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)         
+                  /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
+                  /p:DotNetPublishToBlobFeed=true
         steps:
         - checkout: self
           clean: true
@@ -87,7 +93,6 @@ stages:
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
-            /p:AssetManifestFileName=asplabs-assetmanifest.xml
             $(_BuildArgs)
           name: Build
           displayName: Build
