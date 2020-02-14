@@ -26,7 +26,7 @@ namespace Server
         public override Task<HelloReply> SayHelloFrom(HelloRequestFrom request, ServerCallContext context)
         {
             _logger.LogInformation($"Sending hello to {request.To} from {request.From}");
-            return Task.FromResult(new HelloReply { Message = $"Hello {request.To}  from {request.From}" });
+            return Task.FromResult(new HelloReply { Message = $"Hello {request.To} from {request.From}" });
         }
     }
 }
