@@ -22,6 +22,11 @@ namespace Server
                 app.UseDeveloperExceptionPage();
             }
 
+            // For static content
+            app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>gRPC HTTP API example</title>
+    <style type="text/css">
+        field {
+            display: inline-block;
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h2>gRPC HTTP API example</h2>
+    <fieldset>
+        <legend>GET</legend>
+        <div>
+            <field>Hello:</field>
+            <input id="nameGet" type="text" />
+            <input id="sendGet" type="button" value="Send" />
+        </div>
+        <div>
+            <p id="resultGet"></p>
+        </div>
+    </fieldset>
+    <br />
+    <fieldset>
+        <legend>POST</legend>
+        <div>
+            <field>From:</field>
+            <input id="fromPost" type="text" /><br />
+            <field>To:</field>
+            <input id="toPost" type="text" /><br />
+            <input id="sendPost" type="button" value="Send" />
+        </div>
+        <div>
+            <p id="resultPost"></p>
+        </div>
+    </fieldset>
+    <script type="text/javascript">
+        var nameGetInput = document.getElementById('nameGet');
+        var sendGetInput = document.getElementById('sendGet');
+        var resultGetText = document.getElementById('resultGet');
+
+        sendGetInput.onclick = function () {
+            resultGetText.innerHTML = '';
+
+            fetch('/v1/greeter/' + encodeURIComponent(nameGetInput.value)).then(function (response) {
+                response.json().then(function (data) {
+                    resultGetText.innerHTML = data.message;
+                });
+            });
+        };
+
+        var fromPostInput = document.getElementById('fromPost');
+        var toPostInput = document.getElementById('toPost');
+        var sendPostInput = document.getElementById('sendPost');
+        var resultPostText = document.getElementById('resultPost');
+
+        sendPostInput.onclick = function () {
+            resultPostText.innerHTML = '';
+
+            var content = JSON.stringify({ from: fromPostInput.value, to: toPostInput.value });
+            fetch('/v1/greeter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: content
+            }).then(function (response) {
+                response.json().then(function (data) {
+                    resultPostText.innerHTML = data.message;
+                });
+            });
+        };
+
+        function htmlEscape(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/'/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+    </script>
+</body>
+</html>

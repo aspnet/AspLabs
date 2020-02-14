@@ -13,12 +13,21 @@ service Greeter {
       get: "v1/greeter/{name}"
     };
   }
-  rpc SayHellos (HelloRequest) returns (stream HelloReply);
+  rpc SayHelloFrom (HelloRequestFrom) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "v1/greeter"
+      body: "*"
+    };
+  }
 }
 
 message HelloRequest {
   string name = 1;
-  string test_name = 2;
+}
+
+message HelloRequestFrom {
+  string from = 1;
+  string to = 2;
 }
 
 message HelloReply {

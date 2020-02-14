@@ -121,7 +121,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
             if (_bodyDescriptor != null)
             {
-                if (string.Equals(httpContext.Request.ContentType, "application/json", StringComparison.OrdinalIgnoreCase))
+                if (httpContext.Request.ContentType == null ||
+                    !httpContext.Request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidOperationException("Request content-type of application/json is required.");
                 }

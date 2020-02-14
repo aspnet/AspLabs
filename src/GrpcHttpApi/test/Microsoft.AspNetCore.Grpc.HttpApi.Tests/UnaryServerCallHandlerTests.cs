@@ -151,6 +151,7 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
                 ["name"] = "QueryStringTestName!",
                 ["sub.subfield"] = "QueryStringTestSubfield!"
             });
+            httpContext.Request.ContentType = "application/json";
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -187,6 +188,7 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
                 ["sub.subfield"] = "QueryStringTestSubfield!",
                 ["sub.subfields"] = "QueryStringTestSubfields!"
             });
+            httpContext.Request.ContentType = "application/json";
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
