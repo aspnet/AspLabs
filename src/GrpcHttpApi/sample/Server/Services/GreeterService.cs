@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using Greet;
-using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +20,13 @@ namespace Server
         public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
         {
             _logger.LogInformation($"Sending hello to {request.Name}");
-            return Task.FromResult(new HelloReply { Message = "Hello " + request.Name });
+            return Task.FromResult(new HelloReply { Message = $"Hello {request.Name}" });
+        }
+
+        public override Task<HelloReply> SayHelloFrom(HelloRequestFrom request, ServerCallContext context)
+        {
+            _logger.LogInformation($"Sending hello to {request.To} from {request.From}");
+            return Task.FromResult(new HelloReply { Message = $"Hello {request.To}  from {request.From}" });
         }
     }
 }
