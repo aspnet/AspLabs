@@ -4,12 +4,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
@@ -42,29 +46,108 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         public async Task HandleCallAsync(HttpContext httpContext)
         {
-            var requestMessage = await CreateMessage(httpContext);
+            var requestMessage = await CreateMessage(httpContext.Request);
 
             var serverCallContext = new HttpApiServerCallContext();
 
-            var response = await _unaryMethodInvoker.Invoke(httpContext, serverCallContext, (TRequest)requestMessage);
+            var responseMessage = await _unaryMethodInvoker.Invoke(httpContext, serverCallContext, (TRequest)requestMessage);
 
-            await SendResponse(httpContext, response);
+            var selectedEncoding = ResponseEncoding.SelectCharacterEncoding(httpContext.Request);
+            await SendResponse(httpContext.Response, selectedEncoding, responseMessage);
         }
 
-        private async Task SendResponse(HttpContext httpContext, TResponse response)
+        private async Task<IMessage> CreateMessage(HttpRequest request)
         {
-            object responseBody = response;
+            IMessage? requestMessage;
+
+            if (_bodyDescriptor != null)
+            {
+                if (request.ContentType == null ||
+                    !request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Request content-type of application/json is required.");
+                }
+
+                if (!request.Body.CanSeek)
+                {
+                    // JsonParser does synchronous reads. In order to avoid blocking on the stream, we asynchronously
+                    // read everything into a buffer, and then seek back to the beginning.
+                    request.EnableBuffering();
+                    Debug.Assert(request.Body.CanSeek);
+
+                    await request.Body.DrainAsync(CancellationToken.None);
+                    request.Body.Seek(0L, SeekOrigin.Begin);
+                }
+
+                var encoding = RequestEncoding.SelectCharacterEncoding(request);
+                // TODO: Handle unsupported encoding
+
+                IMessage bodyContent;
+                using (var requestReader = new HttpRequestStreamReader(request.Body, encoding))
+                {
+                    bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
+                }
+
+                if (_bodyFieldDescriptor != null)
+                {
+                    requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                    _bodyFieldDescriptor.Accessor.SetValue(requestMessage, bodyContent);
+                }
+                else
+                {
+                    requestMessage = bodyContent;
+                }
+            }
+            else
+            {
+                requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+            }
+
+            foreach (var parameterDescriptor in _routeParameterDescriptors)
+            {
+                var routeValue = request.RouteValues[parameterDescriptor.Key];
+                if (routeValue != null)
+                {
+                    ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, parameterDescriptor.Value, routeValue);
+                }
+            }
+
+            foreach (var item in request.Query)
+            {
+                if (CanBindQueryStringVariable(item.Key))
+                {
+                    if (!_queryParameterDescriptors.TryGetValue(item.Key, out var pathDescriptors))
+                    {
+                        if (ServiceDescriptorHelpers.TryResolveDescriptors(requestMessage.Descriptor, item.Key, out pathDescriptors))
+                        {
+                            _queryParameterDescriptors[item.Key] = pathDescriptors;
+                        }
+                    }
+
+                    if (pathDescriptors != null)
+                    {
+                        object value = item.Value.Count == 1 ? (object)item.Value[0] : item.Value;
+                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, pathDescriptors, value);
+                    }
+                }
+            }
+
+            return requestMessage;
+        }
+
+        private async Task SendResponse(HttpResponse response, Encoding encoding, TResponse message)
+        {
+            object responseBody = message;
 
             if (_responseBodyDescriptor != null)
             {
                 responseBody = _responseBodyDescriptor.Accessor.GetValue((IMessage)responseBody);
             }
 
-            httpContext.Response.StatusCode = StatusCodes.Status200OK;
-            httpContext.Response.ContentType = "application/json";
+            response.StatusCode = StatusCodes.Status200OK;
+            response.ContentType = "application/json";
 
-            var ms = new MemoryStream();
-            using (var writer = new StreamWriter(ms, leaveOpen: true))
+            using (var writer = new HttpResponseStreamWriter(response.Body, encoding))
             {
                 if (responseBody is IMessage responseMessage)
                 {
@@ -75,12 +158,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     JsonFormatter.Default.WriteValue(writer, responseBody);
                 }
 
-                writer.Flush();
+                // Perf: call FlushAsync to call WriteAsync on the stream with any content left in the TextWriter's
+                // buffers. This is better than just letting dispose handle it (which would result in a synchronous
+                // write).
+                await writer.FlushAsync();
             }
-            ms.Seek(0, SeekOrigin.Begin);
-
-            await ms.CopyToAsync(httpContext.Response.Body);
-            await httpContext.Response.Body.FlushAsync();
         }
 
         private bool CanBindQueryStringVariable(string variable)
@@ -113,70 +195,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
 
             return true;
-        }
-
-        private async Task<IMessage> CreateMessage(HttpContext httpContext)
-        {
-            IMessage? requestMessage;
-
-            if (_bodyDescriptor != null)
-            {
-                if (httpContext.Request.ContentType == null ||
-                    !httpContext.Request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new InvalidOperationException("Request content-type of application/json is required.");
-                }
-
-                var ms = new MemoryStream();
-                await httpContext.Request.Body.CopyToAsync(ms);
-                ms.Seek(0, SeekOrigin.Begin);
-
-                var bodyContent = JsonParser.Default.Parse(new StreamReader(ms), _bodyDescriptor);
-                if (_bodyFieldDescriptor != null)
-                {
-                    requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                    _bodyFieldDescriptor.Accessor.SetValue(requestMessage, bodyContent);
-                }
-                else
-                {
-                    requestMessage = bodyContent;
-                }
-            }
-            else
-            {
-                requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-            }
-
-            foreach (var parameterDescriptor in _routeParameterDescriptors)
-            {
-                var routeValue = httpContext.Request.RouteValues[parameterDescriptor.Key];
-                if (routeValue != null)
-                {
-                    ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, parameterDescriptor.Value, routeValue);
-                }
-            }
-
-            foreach (var item in httpContext.Request.Query)
-            {
-                if (CanBindQueryStringVariable(item.Key))
-                {
-                    if (!_queryParameterDescriptors.TryGetValue(item.Key, out var pathDescriptors))
-                    {
-                        if (ServiceDescriptorHelpers.TryResolveDescriptors(requestMessage.Descriptor, item.Key, out pathDescriptors))
-                        {
-                            _queryParameterDescriptors[item.Key] = pathDescriptors;
-                        }
-                    }
-
-                    if (pathDescriptors != null)
-                    {
-                        object value = item.Value.Count == 1 ? (object)item.Value[0] : item.Value;
-                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, pathDescriptors, value);
-                    }
-                }
-            }
-
-            return requestMessage;
         }
     }
 }
