@@ -13,7 +13,10 @@
 <body>
     <h2>gRPC HTTP API example</h2>
     <fieldset>
-        <legend>GET</legend>
+        <legend>GET request to gRPC method</legend>
+        <p>
+            Input is sent in a URL parameter.
+        </p>
         <div>
             <field>Hello:</field>
             <input id="nameGet" type="text" />
@@ -25,12 +28,15 @@
     </fieldset>
     <br />
     <fieldset>
-        <legend>POST</legend>
+        <legend>POST request to gRPC method</legend>
+        <p>
+            Input is sent in request body as JSON.
+        </p>
         <div>
             <field>Hello:</field>
             <input id="toPost" type="text" /><br />
             <field>From:</field>
-            <input id="fromPost" type="text" /><br />
+            <input id="fromPost" type="text" />
             <input id="sendPost" type="button" value="Send" />
         </div>
         <div>
