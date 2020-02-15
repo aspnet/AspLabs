@@ -26,8 +26,8 @@ message HelloRequest {
 }
 
 message HelloRequestFrom {
-  string from = 1;
-  string to = 2;
+  string name = 1;
+  string from = 2;
 }
 
 message HelloReply {

@@ -35,7 +35,6 @@ service Greeter {
 
 message HelloRequest {
   string name = 1;
-  string test_name = 2;
 }
 
 message HelloReply {
