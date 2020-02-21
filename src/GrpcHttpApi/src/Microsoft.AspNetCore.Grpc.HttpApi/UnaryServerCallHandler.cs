@@ -6,12 +6,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Shared.Server;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -25,23 +27,36 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly UnaryServerMethodInvoker<TService, TRequest, TResponse> _unaryMethodInvoker;
         private readonly FieldDescriptor? _responseBodyDescriptor;
         private readonly MessageDescriptor? _bodyDescriptor;
-        private readonly FieldDescriptor? _bodyFieldDescriptor;
+        private readonly bool _bodyDescriptorRepeated;
+        private readonly List<FieldDescriptor>? _bodyFieldDescriptors;
+        private readonly string? _bodyFieldDescriptorsPath;
         private readonly Dictionary<string, List<FieldDescriptor>> _routeParameterDescriptors;
-        private readonly ConcurrentDictionary<string, List<FieldDescriptor>> _queryParameterDescriptors;
+        private readonly ConcurrentDictionary<string, List<FieldDescriptor>?> _pathDescriptorsCache;
+        private readonly List<FieldDescriptor>? _resolvedBodyFieldDescriptors;
 
         public UnaryServerCallHandler(
             UnaryServerMethodInvoker<TService, TRequest, TResponse> unaryMethodInvoker,
             FieldDescriptor? responseBodyDescriptor,
             MessageDescriptor? bodyDescriptor,
-            FieldDescriptor? bodyFieldDescriptor,
+            bool bodyDescriptorRepeated,
+            List<FieldDescriptor>? bodyFieldDescriptors,
             Dictionary<string, List<FieldDescriptor>> routeParameterDescriptors)
         {
             _unaryMethodInvoker = unaryMethodInvoker;
             _responseBodyDescriptor = responseBodyDescriptor;
             _bodyDescriptor = bodyDescriptor;
-            _bodyFieldDescriptor = bodyFieldDescriptor;
+            _bodyDescriptorRepeated = bodyDescriptorRepeated;
+            _bodyFieldDescriptors = bodyFieldDescriptors;
+            if (_bodyFieldDescriptors != null)
+            {
+                _bodyFieldDescriptorsPath = string.Join('.', _bodyFieldDescriptors.Select(d => d.Name));
+            }
+            if (_bodyDescriptorRepeated && _bodyFieldDescriptors != null)
+            {
+                _resolvedBodyFieldDescriptors = _bodyFieldDescriptors.Take(_bodyFieldDescriptors.Count - 1).ToList();
+            }
             _routeParameterDescriptors = routeParameterDescriptors;
-            _queryParameterDescriptors = new ConcurrentDictionary<string, List<FieldDescriptor>>(StringComparer.Ordinal);
+            _pathDescriptorsCache = new ConcurrentDictionary<string, List<FieldDescriptor>?>(StringComparer.Ordinal);
         }
 
         public async Task HandleCallAsync(HttpContext httpContext)
@@ -82,20 +97,36 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 var encoding = RequestEncoding.SelectCharacterEncoding(request);
                 // TODO: Handle unsupported encoding
 
-                IMessage bodyContent;
                 using (var requestReader = new HttpRequestStreamReader(request.Body, encoding))
                 {
-                    bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
-                }
+                    if (_bodyDescriptorRepeated)
+                    {
+                        var containingMessage = ParseRepeatedContent(requestReader);
 
-                if (_bodyFieldDescriptor != null)
-                {
-                    requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                    _bodyFieldDescriptor.Accessor.SetValue(requestMessage, bodyContent);
-                }
-                else
-                {
-                    requestMessage = bodyContent;
+                        if (_resolvedBodyFieldDescriptors!.Count > 0)
+                        {
+                            requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _resolvedBodyFieldDescriptors, containingMessage);
+                        }
+                        else
+                        {
+                            requestMessage = containingMessage;
+                        }                        
+                    }
+                    else
+                    {
+                        var bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
+
+                        if (_bodyFieldDescriptors != null)
+                        {
+                            requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _bodyFieldDescriptors, bodyContent);
+                        }
+                        else
+                        {
+                            requestMessage = bodyContent;
+                        }
+                    }
                 }
             }
             else
@@ -116,13 +147,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             {
                 if (CanBindQueryStringVariable(item.Key))
                 {
-                    if (!_queryParameterDescriptors.TryGetValue(item.Key, out var pathDescriptors))
-                    {
-                        if (ServiceDescriptorHelpers.TryResolveDescriptors(requestMessage.Descriptor, item.Key, out pathDescriptors))
-                        {
-                            _queryParameterDescriptors[item.Key] = pathDescriptors;
-                        }
-                    }
+                    var pathDescriptors = GetPathDescriptors(requestMessage, item.Key);
 
                     if (pathDescriptors != null)
                     {
@@ -133,6 +158,32 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
 
             return requestMessage;
+        }
+
+        private List<FieldDescriptor>? GetPathDescriptors(IMessage requestMessage, string path)
+        {
+            return _pathDescriptorsCache.GetOrAdd(path, p =>
+            {
+                ServiceDescriptorHelpers.TryResolveDescriptors(requestMessage.Descriptor, p, out var pathDescriptors);
+                return pathDescriptors;
+            });
+        }
+
+        private IMessage ParseRepeatedContent(HttpRequestStreamReader requestReader)
+        {
+            // The following code is SUPER hacky.
+            //
+            // Problem:
+            // JsonParser doesn't provide a way to directly parse a JSON array to repeated fields.
+            // JsonParser's Parse methods only support reading JSON objects as methods.
+            //
+            // Solution:
+            // To get around this limitation a wrapping TextReader is created that inserts a wrapping
+            // object into the JSON passed to the parser. The parser returns the containing message
+            // with the repeated fields set on it.
+            var containingType = _bodyFieldDescriptors.Last()!.ContainingType;
+
+            return JsonParser.Default.Parse(new PropertyWrappingTextReader(requestReader, _bodyFieldDescriptors.Last().JsonName), containingType);
         }
 
         private async Task SendResponse(HttpResponse response, Encoding encoding, TResponse message)
@@ -169,23 +220,19 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         {
             if (_bodyDescriptor != null)
             {
-                if (_bodyFieldDescriptor == null)
+                if (_bodyFieldDescriptors == null || _bodyFieldDescriptors.Count == 0)
                 {
                     return false;
                 }
 
-                if (variable == _bodyFieldDescriptor.Name)
+                if (variable == _bodyFieldDescriptorsPath)
                 {
                     return false;
                 }
 
-                var separator = variable.IndexOf('.', StringComparison.Ordinal);
-                if (separator > -1)
+                if (variable.StartsWith(_bodyFieldDescriptorsPath!, StringComparison.Ordinal))
                 {
-                    if (variable.AsSpan(0, separator).Equals(_bodyFieldDescriptor.Name.AsSpan(), StringComparison.Ordinal))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 

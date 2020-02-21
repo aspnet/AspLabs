@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using Google.Protobuf.Collections;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
@@ -173,10 +174,12 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
                 return Task.FromResult(new HelloReply { Message = $"Hello {r.Name}" });
             };
 
+            ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "sub", out var bodyFieldDescriptors);
+
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
                 bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
-                bodyFieldDescriptor: HelloRequest.Descriptor.FindFieldByName("sub"));
+                bodyFieldDescriptors: bodyFieldDescriptors);
             var httpContext = CreateHttpContext();
             httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(JsonFormatter.Default.Format(new HelloRequest.Types.SubMessage
             {
@@ -198,6 +201,106 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             Assert.AreEqual("QueryStringTestName!", request!.Name);
             Assert.AreEqual("Subfield!", request!.Sub.Subfield);
             Assert.AreEqual(0, request!.Sub.Subfields.Count);
+        }
+
+        [Test]
+        public async Task HandleCallAsync_SubRepeatedBodySet_SetOnRequestMessage()
+        {
+            // Arrange
+            HelloRequest? request = null;
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                request = r;
+                return Task.FromResult(new HelloReply { Message = $"Hello {r.Name}" });
+            };
+
+            ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "repeated_strings", out var bodyFieldDescriptors);
+
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
+                bodyDescriptorRepeated: true,
+                bodyFieldDescriptors: bodyFieldDescriptors);
+            var httpContext = CreateHttpContext();
+
+            var sdf = new RepeatedField<string>
+            {
+                "One",
+                "Two",
+                "Three"
+            };
+
+            var sw = new StringWriter();
+            JsonFormatter.Default.WriteValue(sw, sdf);
+
+            httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(sw.ToString()));
+            httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+            {
+                ["name"] = "QueryStringTestName!",
+                ["sub.subfield"] = "QueryStringTestSubfield!",
+                ["sub.subfields"] = "QueryStringTestSubfields!"
+            });
+            httpContext.Request.ContentType = "application/json";
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.IsNotNull(request);
+            Assert.AreEqual("QueryStringTestName!", request!.Name);
+            Assert.AreEqual("QueryStringTestSubfield!", request!.Sub.Subfield);
+            Assert.AreEqual(3, request!.RepeatedStrings.Count);
+            Assert.AreEqual("One", request!.RepeatedStrings[0]);
+            Assert.AreEqual("Two", request!.RepeatedStrings[1]);
+            Assert.AreEqual("Three", request!.RepeatedStrings[2]);
+        }
+
+        [Test]
+        public async Task HandleCallAsync_SubSubRepeatedBodySet_SetOnRequestMessage()
+        {
+            // Arrange
+            HelloRequest? request = null;
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                request = r;
+                return Task.FromResult(new HelloReply { Message = $"Hello {r.Name}" });
+            };
+
+            ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "sub.subfields", out var bodyFieldDescriptors);
+
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
+                bodyDescriptorRepeated: true,
+                bodyFieldDescriptors: bodyFieldDescriptors);
+            var httpContext = CreateHttpContext();
+
+            var sdf = new RepeatedField<string>
+            {
+                "One",
+                "Two",
+                "Three"
+            };
+
+            var sw = new StringWriter();
+            JsonFormatter.Default.WriteValue(sw, sdf);
+
+            httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(sw.ToString()));
+            httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+            {
+                ["name"] = "QueryStringTestName!",
+                ["sub.subfield"] = "QueryStringTestSubfield!" // Not bound because query can't be applied to fields that are covered by body
+            });
+            httpContext.Request.ContentType = "application/json";
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.IsNotNull(request);
+            Assert.AreEqual("QueryStringTestName!", request!.Name);
+            Assert.AreEqual("QueryStringTestSubfield!", request!.Sub.Subfield);
+            Assert.AreEqual(3, request!.Sub.Subfields.Count);
         }
 
         [Test]
@@ -286,7 +389,8 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
                 ["data.single_bool"] = "true",
                 ["data.single_string"] = "A string",
                 ["data.single_bytes"] = Convert.ToBase64String(new byte[] { 1, 2, 3 }),
-                ["data.single_enum"] = "FOO"
+                ["data.single_enum"] = "FOO",
+                ["data.single_message.subfield"] = "Nested string"
             });
 
             // Act
@@ -310,6 +414,7 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             Assert.AreEqual("A string", request!.Data.SingleString);
             Assert.AreEqual(new byte[] { 1, 2, 3 }, request!.Data.SingleBytes.ToByteArray());
             Assert.AreEqual(HelloRequest.Types.DataTypes.Types.NestedEnum.Foo, request!.Data.SingleEnum);
+            Assert.AreEqual("Nested string", request!.Data.SingleMessage.Subfield);
         }
 
         [Test]
@@ -370,7 +475,8 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             FieldDescriptor? responseBodyDescriptor = null,
             Dictionary<string, List<FieldDescriptor>>? routeParameterDescriptors = null,
             MessageDescriptor? bodyDescriptor = null,
-            FieldDescriptor? bodyFieldDescriptor = null)
+            bool? bodyDescriptorRepeated = null,
+            List<FieldDescriptor>? bodyFieldDescriptors = null)
         {
             var unaryServerCallInvoker = new UnaryServerMethodInvoker<HttpApiGreeterService, HelloRequest, HelloReply>(
                 invoker,
@@ -382,7 +488,8 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
                 unaryServerCallInvoker,
                 responseBodyDescriptor,
                 bodyDescriptor,
-                bodyFieldDescriptor,
+                bodyDescriptorRepeated ?? false,
+                bodyFieldDescriptors,
                 routeParameterDescriptors ?? new Dictionary<string, List<FieldDescriptor>>());
         }
 

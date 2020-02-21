@@ -125,6 +125,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         {
             try
             {
+                if (!pattern.StartsWith('/'))
+                {
+                    // This validation is consistent with grpc-gateway code generation.
+                    // We should match their validation to be a good member of the eco-system.
+                    throw new InvalidOperationException($"Path template must start with /: {pattern}");
+                }
+
                 var (invoker, metadata) = CreateModelCore<UnaryServerMethod<TService, TRequest, TResponse>>(
                     method.Name,
                     new[] { typeof(TRequest), typeof(ServerCallContext) },
@@ -135,17 +142,28 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 var routeParameterDescriptors = ResolveRouteParameterDescriptors(pattern, methodDescriptor.InputType);
 
                 MessageDescriptor? bodyDescriptor = null;
-                FieldDescriptor? bodyFieldDescriptor = null;
+                List<FieldDescriptor>? bodyFieldDescriptors = null;
+                var bodyDescriptorRepeated = false;
                 if (!string.IsNullOrEmpty(body))
                 {
                     if (!string.Equals(body, "*", StringComparison.Ordinal))
                     {
-                        bodyFieldDescriptor = methodDescriptor.InputType.FindFieldByName(body);
-                        if (bodyFieldDescriptor == null)
+                        if (!ServiceDescriptorHelpers.TryResolveDescriptors(methodDescriptor.InputType, body, out bodyFieldDescriptors))
                         {
                             throw new InvalidOperationException($"Couldn't find matching field for body '{body}' on {methodDescriptor.InputType.Name}.");
                         }
-                        bodyDescriptor = bodyFieldDescriptor.ContainingType;
+                        var leafDescriptor = bodyFieldDescriptors.Last();
+                        if (leafDescriptor.IsRepeated)
+                        {
+                            // A repeating field isn't a message type. The JSON parser will parse using the containing
+                            // type to get the repeating collection.
+                            bodyDescriptor = leafDescriptor.ContainingType;
+                            bodyDescriptorRepeated = true;
+                        }
+                        else
+                        {
+                            bodyDescriptor = leafDescriptor.MessageType;
+                        }
                     }
                     else
                     {
@@ -168,7 +186,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     unaryInvoker,
                     responseBodyDescriptor,
                     bodyDescriptor,
-                    bodyFieldDescriptor,
+                    bodyDescriptorRepeated,
+                    bodyFieldDescriptors,
                     routeParameterDescriptors);
 
                 _context.AddMethod<TRequest, TResponse>(method, RoutePatternFactory.Parse(pattern), metadata, unaryServerCallHandler.HandleCallAsync);
