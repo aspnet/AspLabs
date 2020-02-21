@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
             }
 
-            return true;
+            return fieldDescriptors != null;
         }
 
         private static object ConvertValue(object value, FieldDescriptor descriptor)
@@ -171,6 +171,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                                 throw new InvalidOperationException("Can't set multiple values onto a non-repeating field.");
                             }
                         }
+                        else if (values is IMessage message)
+                        {
+                            field.Accessor.SetValue(currentValue, message);
+                        }
                         else
                         {
                             field.Accessor.SetValue(currentValue, ConvertValue(values, field));
@@ -179,7 +183,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 }
                 else
                 {
-
                     var fieldMessage = (IMessage)field.Accessor.GetValue(currentValue);
 
                     if (fieldMessage == null)

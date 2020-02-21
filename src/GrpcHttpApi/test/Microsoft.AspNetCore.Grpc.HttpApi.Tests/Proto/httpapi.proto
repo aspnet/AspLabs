@@ -54,6 +54,12 @@ service HttpApiGreeter {
       body: "sub"
     };
   }
+  rpc SubRepeatedBody (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "/v1/greeter"
+      body: "repeated_strings"
+    };
+  }
 }
 
 service HttpApiInvalidResponseBodyGreeter {
@@ -74,6 +80,15 @@ service HttpApiInvalidBodyGreeter {
   }
 }
 
+service HttpApiInvalidPatternGreeter {
+  rpc BadPattern (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      get: "v1/greeter/{name}"
+      body: "NoMatch"
+    };
+  }
+}
+
 message HelloRequest {
   message SubMessage {
     string subfield = 1;
@@ -86,6 +101,9 @@ message HelloRequest {
       BAR = 2;
       BAZ = 3;
       NEG = -1;  // Intentionally negative.
+    }
+    message NestedMessage {
+      string subfield = 1;
     }
     int32 single_int32 = 1;
     int64 single_int64 = 2;
@@ -103,6 +121,7 @@ message HelloRequest {
     string single_string = 14;
     bytes single_bytes = 15;
     NestedEnum single_enum = 16;
+    NestedMessage single_message = 17;
   }
   message Wrappers {
     google.protobuf.StringValue string_value = 1;
@@ -119,6 +138,7 @@ message HelloRequest {
   SubMessage sub = 2;
   DataTypes data = 3;
   Wrappers wrappers = 4;
+  repeated string repeated_strings = 5;
 }
 
 message HelloReply {

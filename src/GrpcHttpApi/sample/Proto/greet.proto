@@ -10,12 +10,12 @@ package greet;
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "v1/greeter/{name}"
+      get: "/v1/greeter/{name}"
     };
   }
   rpc SayHelloFrom (HelloRequestFrom) returns (HelloReply) {
     option (google.api.http) = {
-      post: "v1/greeter"
+      post: "/v1/greeter"
       body: "*"
     };
   }

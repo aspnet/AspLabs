@@ -104,6 +104,18 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             Assert.AreEqual("Couldn't find matching field for body 'NoMatch' on HelloRequest.", ex.InnerException!.InnerException!.InnerException!.Message);
         }
 
+        [Test]
+        public void AddMethod_BadPattern_ThrowError()
+        {
+            // Arrange & Act
+            var ex = Assert.Throws<InvalidOperationException>(() => MapEndpoints<HttpApiInvalidPatternGreeterService>());
+
+            // Assert
+            Assert.AreEqual("Error binding gRPC service 'HttpApiInvalidPatternGreeterService'.", ex.Message);
+            Assert.AreEqual("Error binding BadPattern on HttpApiInvalidPatternGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
+            Assert.AreEqual("Path template must start with /: v1/greeter/{name}", ex.InnerException!.InnerException!.InnerException!.Message);
+        }
+
         private static RouteEndpoint FindGrpcEndpoint(IReadOnlyList<Endpoint> endpoints, string methodName)
         {
             var e = FindGrpcEndpoints(endpoints, methodName).SingleOrDefault();
