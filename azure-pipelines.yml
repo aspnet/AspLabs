@@ -33,7 +33,7 @@ pr:
 - "*"
 
 stages:
-- stage: build  
+- stage: build
   displayName: Build
   jobs:
   - template: /eng/common/templates/jobs/jobs.yml
@@ -51,10 +51,10 @@ stages:
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: NetCorePublic-Pool
-            queue: BuildPool.Windows.10.Amd64.VS2017.Open
+            queue: BuildPool.Server.Amd64.VS2017.Open
           ${{ if ne(variables['System.TeamProject'], 'public') }}:
             name: NetCoreInternal-Pool
-            queue: BuildPool.Windows.10.Amd64.VS2017
+            queue: BuildPool.Server.Amd64.VS2017
         variables:
         - name: _HelixBuildConfig
           value: $(_BuildConfig)
@@ -73,9 +73,9 @@ stages:
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
               ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: real
-                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber) 
-                  /p:DotNetPublishUsingPipelines=true 
-                  /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)         
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
+                  /p:DotNetPublishUsingPipelines=true
+                  /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
                   /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
                   /p:DotNetPublishToBlobFeed=true
         steps:
@@ -125,7 +125,7 @@ stages:
 
       - job: macOS
         pool:
-          vmImage: macOS-10.13
+          vmImage: macOS-10.14
         strategy:
           matrix:
             debug:
