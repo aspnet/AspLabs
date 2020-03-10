@@ -138,6 +138,9 @@ stages:
         steps:
         - checkout: self
           clean: true
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
         - script: eng/common/cibuild.sh
             --configuration $(_BuildConfig)
             --prepareMachine
