@@ -332,6 +332,107 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
         }
 
         [Test]
+        public async Task HandleCallAsync_RpcExceptionReturned_StatusReturned()
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                return Task.FromException<HelloReply>(new RpcException(new Status(StatusCode.Unauthenticated, "Detail!"), "Message!"));
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(401, httpContext.Response.StatusCode);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
+        [Test]
+        public async Task HandleCallAsync_RpcExceptionThrown_StatusReturned()
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Detail!"), "Message!");
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(401, httpContext.Response.StatusCode);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
+        [Test]
+        public async Task HandleCallAsync_StatusSet_StatusReturned()
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                c.Status = new Status(StatusCode.Unauthenticated, "Detail!");
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(401, httpContext.Response.StatusCode);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.AreEqual(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.AreEqual(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
+        [Test]
+        public async Task HandleCallAsync_ExceptionThrown_StatusReturned()
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                throw new InvalidOperationException("Exception!");
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(500, httpContext.Response.StatusCode);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.AreEqual("Exception was thrown by handler.", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.AreEqual("Exception was thrown by handler.", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.AreEqual((int)StatusCode.Unknown, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
+        [Test]
         public async Task HandleCallAsync_MatchingRepeatedQueryStringValues_SetOnRequestMessage()
         {
             // Arrange
@@ -512,6 +613,5 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
         {
             return new Method<TRequest, TResponse>(MethodType.Unary, "ServiceName", methodName, GetMarshaller(requestParser), GetMarshaller(responseParser));
         }
-
     }
 }

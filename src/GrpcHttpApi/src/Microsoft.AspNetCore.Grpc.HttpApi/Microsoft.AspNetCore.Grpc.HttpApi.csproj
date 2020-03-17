@@ -22,6 +22,8 @@
     <Compile Include="..\Shared\ServerMethodInvokerBase.cs" Link="Internal\ServerMethodInvokerBase.cs" />
     <Compile Include="..\Shared\ServerStreamingServerMethodInvoker.cs" Link="Internal\ServerStreamingServerMethodInvoker.cs" />
     <Compile Include="..\Shared\UnaryServerMethodInvoker.cs" Link="Internal\UnaryServerMethodInvoker.cs" />
+
+    <Protobuf Include="Internal\Protos\errors.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +32,10 @@
     <PackageReference Include="Google.Api.CommonProtos" Version="2.0.0-beta01" />
     <PackageReference Include="Google.Protobuf" Version="3.11.2" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="2.27.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.27.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

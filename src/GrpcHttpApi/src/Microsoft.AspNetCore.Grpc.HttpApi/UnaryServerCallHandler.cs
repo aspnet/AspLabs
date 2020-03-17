@@ -12,6 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using Grpc.Gateway.Runtime;
 using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Http;
@@ -65,9 +68,40 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
             var serverCallContext = new HttpApiServerCallContext();
 
-            var responseMessage = await _unaryMethodInvoker.Invoke(httpContext, serverCallContext, (TRequest)requestMessage);
-
             var selectedEncoding = ResponseEncoding.SelectCharacterEncoding(httpContext.Request);
+
+            TResponse responseMessage;
+            try
+            {
+                responseMessage = await _unaryMethodInvoker.Invoke(httpContext, serverCallContext, (TRequest)requestMessage);
+            }
+            catch (Exception ex)
+            {
+                StatusCode statusCode;
+                string message;
+
+                if (ex is RpcException rpcException)
+                {
+                    message = rpcException.Message;
+                    statusCode = rpcException.StatusCode;
+                }
+                else
+                {
+                    // TODO - Add option for detailed error messages
+                    message = "Exception was thrown by handler.";
+                    statusCode = StatusCode.Unknown;
+                }
+
+                await SendErrorResponse(httpContext.Response, selectedEncoding, message, statusCode);
+                return;
+            }
+
+            if (serverCallContext.Status.StatusCode != StatusCode.OK)
+            {
+                await SendErrorResponse(httpContext.Response, selectedEncoding, serverCallContext.Status.ToString(), serverCallContext.Status.StatusCode);
+                return;
+            }
+
             await SendResponse(httpContext.Response, selectedEncoding, responseMessage);
         }
 
@@ -198,6 +232,26 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             response.StatusCode = StatusCodes.Status200OK;
             response.ContentType = "application/json";
 
+            await WriteResponseMessage(response, encoding, responseBody);
+        }
+
+        private async Task SendErrorResponse(HttpResponse response, Encoding encoding, string message, StatusCode statusCode)
+        {
+            var e = new Error
+            {
+                Error_ = message,
+                Message = message,
+                Code = (int)statusCode
+            };
+
+            response.StatusCode = MapStatusCodeToHttpStatus(statusCode);
+            response.ContentType = "application/json";
+
+            await WriteResponseMessage(response, encoding, e);
+        }
+
+        private static async Task WriteResponseMessage(HttpResponse response, Encoding encoding, object responseBody)
+        {
             using (var writer = new HttpResponseStreamWriter(response.Body, encoding))
             {
                 if (responseBody is IMessage responseMessage)
@@ -214,6 +268,50 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 // write).
                 await writer.FlushAsync();
             }
+        }
+
+        private static int MapStatusCodeToHttpStatus(StatusCode statusCode)
+        {
+            switch (statusCode)
+            {
+                case StatusCode.OK:
+                    return StatusCodes.Status200OK;
+                case StatusCode.Cancelled:
+                    return StatusCodes.Status408RequestTimeout;
+                case StatusCode.Unknown:
+                    return StatusCodes.Status500InternalServerError;
+                case StatusCode.InvalidArgument:
+                    return StatusCodes.Status400BadRequest;
+                case StatusCode.DeadlineExceeded:
+                    return StatusCodes.Status504GatewayTimeout;
+                case StatusCode.NotFound:
+                    return StatusCodes.Status404NotFound;
+                case StatusCode.AlreadyExists:
+                    return StatusCodes.Status409Conflict;
+                case StatusCode.PermissionDenied:
+                    return StatusCodes.Status403Forbidden;
+                case StatusCode.Unauthenticated:
+                    return StatusCodes.Status401Unauthorized;
+                case StatusCode.ResourceExhausted:
+                    return StatusCodes.Status429TooManyRequests;
+                case StatusCode.FailedPrecondition:
+                    // Note, this deliberately doesn't translate to the similarly named '412 Precondition Failed' HTTP response status.
+                    return StatusCodes.Status400BadRequest;
+                case StatusCode.Aborted:
+                    return StatusCodes.Status409Conflict;
+                case StatusCode.OutOfRange:
+                    return StatusCodes.Status400BadRequest;
+                case StatusCode.Unimplemented:
+                    return StatusCodes.Status501NotImplemented;
+                case StatusCode.Internal:
+                    return StatusCodes.Status500InternalServerError;
+                case StatusCode.Unavailable:
+                    return StatusCodes.Status503ServiceUnavailable;
+                case StatusCode.DataLoss:
+                    return StatusCodes.Status500InternalServerError;
+            }
+
+            return StatusCodes.Status500InternalServerError;
         }
 
         private bool CanBindQueryStringVariable(string variable)
