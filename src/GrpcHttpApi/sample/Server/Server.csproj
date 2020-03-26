@@ -9,10 +9,7 @@
 
     <PackageReference Include="Grpc.Tools" Version="2.27.0" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="2.27.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.HttpApi" Version="0.1.0-alpha.20166.1" />
   </ItemGroup>
 
 </Project>
