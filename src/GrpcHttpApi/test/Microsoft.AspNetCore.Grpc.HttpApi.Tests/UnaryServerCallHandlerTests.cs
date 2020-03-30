@@ -412,6 +412,28 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
         }
 
         [Test]
+        public async Task HandleCallAsync_UserState_HttpContextInUserState()
+        {
+            object? requestHttpContext = null;
+
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                c.UserState.TryGetValue("__HttpContext", out requestHttpContext);
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(httpContext, requestHttpContext);
+        }
+
+        [Test]
         public async Task HandleCallAsync_GetHostAndMethodAndPeer_MatchHandler()
         {
             string? peer = null;
