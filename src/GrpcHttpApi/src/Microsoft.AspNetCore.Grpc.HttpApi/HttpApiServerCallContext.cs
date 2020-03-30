@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Http;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
@@ -16,6 +17,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly HttpContext _httpContext;
         private readonly string _methodFullName;
         private string? _peer;
+        private Metadata? _requestHeaders;
 
         public HttpApiServerCallContext(HttpContext httpContext, string methodFullName)
         {
@@ -27,6 +29,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         }
 
         protected override string MethodCore => _methodFullName;
+
         protected override string HostCore => _httpContext.Request.Host.Value;
 
         protected override string? PeerCore
@@ -60,16 +63,52 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         }
 
         protected override DateTime DeadlineCore { get; }
-        protected override Metadata RequestHeadersCore => throw new NotImplementedException();
+
+        protected override Metadata RequestHeadersCore
+        {
+            get
+            {
+                if (_requestHeaders == null)
+                {
+                    _requestHeaders = new Metadata();
+
+                    foreach (var header in _httpContext.Request.Headers)
+                    {
+                        // gRPC metadata contains a subset of the request headers
+                        // Filter out pseudo headers (start with :) and other known headers
+                        if (header.Key.StartsWith(':') || GrpcProtocolConstants.FilteredHeaders.Contains(header.Key))
+                        {
+                            continue;
+                        }
+                        else if (header.Key.EndsWith(Metadata.BinaryHeaderSuffix, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _requestHeaders.Add(header.Key, GrpcProtocolHelpers.ParseBinaryHeader(header.Value));
+                        }
+                        else
+                        {
+                            _requestHeaders.Add(header.Key, header.Value);
+                        }
+                    }
+                }
+
+                return _requestHeaders;
+            }
+        }
+
         protected override CancellationToken CancellationTokenCore => _httpContext.RequestAborted;
+
         protected override Metadata ResponseTrailersCore => throw new NotImplementedException();
+
         protected override Status StatusCore { get; set; }
+
         protected override WriteOptions WriteOptionsCore
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
+
         protected override AuthContext AuthContextCore => throw new NotImplementedException();
+
         protected override IDictionary<object, object> UserStateCore => _httpContext.Items;
 
         protected override ContextPropagationToken CreatePropagationTokenCore(ContextPropagationOptions options)

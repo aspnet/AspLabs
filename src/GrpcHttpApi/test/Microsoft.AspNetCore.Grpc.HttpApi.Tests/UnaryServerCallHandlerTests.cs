@@ -462,29 +462,6 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
         }
 
         [Test]
-        public async Task HandleCallAsync_GetCancellationToken_MatchHttpContextRequestAborted()
-        {
-            var cts = new CancellationTokenSource();
-            CancellationToken serverCallContextCt = default;
-
-            // Arrange
-            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
-            {
-                serverCallContextCt = c.CancellationToken;
-                return Task.FromResult(new HelloReply());
-            };
-
-            var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext(cancellationToken: cts.Token);
-
-            // Act
-            await unaryServerCallHandler.HandleCallAsync(httpContext);
-
-            // Assert
-            Assert.AreEqual(cts.Token, serverCallContextCt);
-        }
-
-        [Test]
         public async Task HandleCallAsync_ExceptionThrown_StatusReturned()
         {
             // Arrange
