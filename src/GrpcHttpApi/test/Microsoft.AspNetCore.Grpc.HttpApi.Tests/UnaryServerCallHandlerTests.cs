@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
@@ -17,7 +19,9 @@ using Grpc.Tests.Shared;
 using HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 
@@ -408,6 +412,56 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
         }
 
         [Test]
+        public async Task HandleCallAsync_UserState_HttpContextInUserState()
+        {
+            object? requestHttpContext = null;
+
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                c.UserState.TryGetValue("__HttpContext", out requestHttpContext);
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(httpContext, requestHttpContext);
+        }
+
+        [Test]
+        public async Task HandleCallAsync_GetHostAndMethodAndPeer_MatchHandler()
+        {
+            string? peer = null;
+            string? host = null;
+            string? method = null;
+
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                peer = c.Peer;
+                host = c.Host;
+                method = c.Method;
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual("ipv4:127.0.0.1:0", peer);
+            Assert.AreEqual("localhost", host);
+            Assert.AreEqual("/ServiceName/TestMethodName", method);
+        }
+
+        [Test]
         public async Task HandleCallAsync_ExceptionThrown_StatusReturned()
         {
             // Arrange
@@ -560,15 +614,32 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             Assert.AreEqual(new byte[] { 1, 2, 3 }, request!.Wrappers.BytesValue.ToByteArray());
         }
 
-        private static DefaultHttpContext CreateHttpContext()
+        private static DefaultHttpContext CreateHttpContext(CancellationToken cancellationToken = default)
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<HttpApiGreeterService>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var httpContext = new DefaultHttpContext();
+            httpContext.Request.Host = new HostString("localhost");
             httpContext.RequestServices = serviceProvider;
             httpContext.Response.Body = new MemoryStream();
+            httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
+            httpContext.Features.Set<IHttpRequestLifetimeFeature>(new HttpRequestLifetimeFeature(cancellationToken));
             return httpContext;
+        }
+
+        private class HttpRequestLifetimeFeature : IHttpRequestLifetimeFeature
+        {
+            public HttpRequestLifetimeFeature(CancellationToken cancellationToken)
+            {
+                RequestAborted = cancellationToken;
+            }
+
+            public CancellationToken RequestAborted { get; set; }
+
+            public void Abort()
+            {
+            }
         }
 
         private static UnaryServerCallHandler<HttpApiGreeterService, HelloRequest, HelloReply> CreateCallHandler(
