@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         {
             var requestMessage = await CreateMessage(httpContext.Request);
 
-            var serverCallContext = new HttpApiServerCallContext();
+            var serverCallContext = new HttpApiServerCallContext(httpContext, _unaryMethodInvoker.Method.FullName);
 
             var selectedEncoding = ResponseEncoding.SelectCharacterEncoding(httpContext.Request);
 
