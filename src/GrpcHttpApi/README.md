@@ -1,13 +1,13 @@
-ASP.NET Core gRPC HTTP API
-==========================
+gRPC HTTP API
+=============
 
-This project is an extension for ASP.NET Core gRPC server that creates RESTful HTTP APIs for gRPC services. Once configured, gRPC HTTP API allows you call gRPC methods with familiar HTTP concepts:
+gRPC HTTP API is an extension for ASP.NET Core that creates RESTful HTTP APIs for gRPC services. Once configured, gRPC HTTP API allows you call gRPC methods with familiar HTTP concepts:
 
 * HTTP verbs
 * URL parameter binding
 * JSON requests/responses
 
-HTTP+JSON APIs for your gRPC services. No duplication!
+Of course gRPC can continue to be used as well. RESTful APIs for your gRPC services. No duplication!
 
 ![gRPC loves REST](grpc-rest-logo.png "gRPC loves REST")
 
@@ -107,4 +107,4 @@ Additional instructions for configuring a project to use a custom NuGet reposito
 
 This project is experimental. It has known issues, it is not complete and it is not supported. We are interested in this technology but there is no commitment to completing it.
 
-We want to gauge developer interest in gRPC+HTTP API. If gRPC+HTTP API is interesting to you then please [give feedback](https://github.com/grpc/grpc-dotnet/issues/167).
+We want to gauge developer interest in gRPC HTTP API. If gRPC HTTP API is interesting to you then please [give feedback](https://github.com/grpc/grpc-dotnet/issues/167).
