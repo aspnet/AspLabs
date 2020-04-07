@@ -14,6 +14,7 @@ using Google.Protobuf.Collections;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
+using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Grpc.Tests.Shared;
 using HttpApi;

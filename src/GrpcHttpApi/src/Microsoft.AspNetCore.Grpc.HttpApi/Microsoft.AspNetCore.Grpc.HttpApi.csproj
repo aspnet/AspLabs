@@ -14,14 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Shared\BindMethodFinder.cs" Link="Internal\BindMethodFinder.cs" />
-    <Compile Include="..\Shared\ClientStreamingServerMethodInvoker.cs" Link="Internal\ClientStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\DuplexStreamingServerMethodInvoker.cs" Link="Internal\DuplexStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\InterceptorPipelineBuilder.cs" Link="Internal\InterceptorPipelineBuilder.cs" />
-    <Compile Include="..\Shared\MethodOptions.cs" Link="Internal\MethodOptions.cs" />
-    <Compile Include="..\Shared\ServerMethodInvokerBase.cs" Link="Internal\ServerMethodInvokerBase.cs" />
-    <Compile Include="..\Shared\ServerStreamingServerMethodInvoker.cs" Link="Internal\ServerStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\UnaryServerMethodInvoker.cs" Link="Internal\UnaryServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\BindMethodFinder.cs" Link="Internal\Shared\Server\BindMethodFinder.cs" />
+    <Compile Include="..\Shared\Server\ClientStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\ClientStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\DuplexStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\DuplexStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\InterceptorPipelineBuilder.cs" Link="Internal\Shared\Server\InterceptorPipelineBuilder.cs" />
+    <Compile Include="..\Shared\Server\MethodOptions.cs" Link="Internal\Shared\Server\MethodOptions.cs" />
+    <Compile Include="..\Shared\Server\ServerMethodInvokerBase.cs" Link="Internal\Shared\Server\ServerMethodInvokerBase.cs" />
+    <Compile Include="..\Shared\Server\ServerStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\ServerStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\UnaryServerMethodInvoker.cs" Link="Internal\Shared\Server\UnaryServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\ServiceDescriptorHelpers.cs" Link="Internal\Shared\ServiceDescriptorHelpers.cs" />
 
     <Protobuf Include="Internal\Protos\errors.proto" />
   </ItemGroup>

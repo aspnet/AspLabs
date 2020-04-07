@@ -15,6 +15,7 @@ using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Gateway.Runtime;
+using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Http;

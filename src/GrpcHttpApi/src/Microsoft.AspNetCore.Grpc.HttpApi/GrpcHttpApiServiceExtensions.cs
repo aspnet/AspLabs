@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Grpc.HttpApi;
 using Grpc.AspNetCore.Server.Model;
+using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection

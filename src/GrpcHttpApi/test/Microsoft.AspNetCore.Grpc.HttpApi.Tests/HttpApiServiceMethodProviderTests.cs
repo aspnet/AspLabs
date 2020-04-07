@@ -60,24 +60,24 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
 
             var getMethodModel = matchedEndpoints[0];
             Assert.AreEqual("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.AreEqual("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Get);
             Assert.AreEqual("/v1/additional_bindings/{name}", getMethodModel.RoutePattern.RawText);
 
             var additionalMethodModel = matchedEndpoints[1];
             Assert.AreEqual("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.AreEqual("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Delete);
             Assert.AreEqual("/v1/additional_bindings/{name}", additionalMethodModel.RoutePattern.RawText);
         }
 
         [Test]
-        public void AddMethod_NoOption_ResolveMethod()
+        public void AddMethod_NoHttpRuleInProto_ThrowNotFoundError()
         {
             // Arrange & Act
             var endpoints = MapEndpoints<HttpApiGreeterService>();
 
             // Assert
-            var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.NoOption));
-
-            Assert.AreEqual("/http_api.HttpApiGreeter/NoOption", endpoint.RoutePattern.RawText);
-            Assert.AreEqual("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            var ex = Assert.Throws<InvalidOperationException>(() => FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.NoOption)));
+            Assert.AreEqual("Couldn't find gRPC endpoint for method NoOption.", ex.Message);
         }
 
         [Test]
