@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Protobuf Include="Proto\httpapi.proto" GrpcServices="Both" />
-    <Protobuf Include="Proto\greet.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>
