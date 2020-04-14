@@ -1,0 +1,15 @@
+﻿<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GoogleApiCommonProtosPackageVersion>2.0.0-beta01</GoogleApiCommonProtosPackageVersion>
+    <GoogleProtobufPackageVersion>3.11.2</GoogleProtobufPackageVersion>
+    <GrpcAspNetCoreServerPackageVersion>2.27.0</GrpcAspNetCoreServerPackageVersion>
+    <GrpcCorePackageVersion>2.27.0</GrpcCorePackageVersion>
+    <NUnitPackageVersion>3.12.0</NUnitPackageVersion>
+    <NUnit3TestAdapterPackageVersion>3.13.0</NUnit3TestAdapterPackageVersion>
+    <SwashbuckleAspNetCorePackageVersion>5.3.1</SwashbuckleAspNetCorePackageVersion>
+  </PropertyGroup>
+</Project>

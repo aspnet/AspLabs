@@ -6,6 +6,7 @@ using System.Reflection;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
+using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

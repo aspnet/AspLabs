@@ -14,14 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Shared\BindMethodFinder.cs" Link="Internal\BindMethodFinder.cs" />
-    <Compile Include="..\Shared\ClientStreamingServerMethodInvoker.cs" Link="Internal\ClientStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\DuplexStreamingServerMethodInvoker.cs" Link="Internal\DuplexStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\InterceptorPipelineBuilder.cs" Link="Internal\InterceptorPipelineBuilder.cs" />
-    <Compile Include="..\Shared\MethodOptions.cs" Link="Internal\MethodOptions.cs" />
-    <Compile Include="..\Shared\ServerMethodInvokerBase.cs" Link="Internal\ServerMethodInvokerBase.cs" />
-    <Compile Include="..\Shared\ServerStreamingServerMethodInvoker.cs" Link="Internal\ServerStreamingServerMethodInvoker.cs" />
-    <Compile Include="..\Shared\UnaryServerMethodInvoker.cs" Link="Internal\UnaryServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\BindMethodFinder.cs" Link="Internal\Shared\Server\BindMethodFinder.cs" />
+    <Compile Include="..\Shared\Server\ClientStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\ClientStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\DuplexStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\DuplexStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\InterceptorPipelineBuilder.cs" Link="Internal\Shared\Server\InterceptorPipelineBuilder.cs" />
+    <Compile Include="..\Shared\Server\MethodOptions.cs" Link="Internal\Shared\Server\MethodOptions.cs" />
+    <Compile Include="..\Shared\Server\ServerMethodInvokerBase.cs" Link="Internal\Shared\Server\ServerMethodInvokerBase.cs" />
+    <Compile Include="..\Shared\Server\ServerStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\ServerStreamingServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\Server\UnaryServerMethodInvoker.cs" Link="Internal\Shared\Server\UnaryServerMethodInvoker.cs" />
+    <Compile Include="..\Shared\ServiceDescriptorHelpers.cs" Link="Internal\Shared\ServiceDescriptorHelpers.cs" />
 
     <Protobuf Include="Internal\Protos\errors.proto" />
   </ItemGroup>
@@ -29,10 +30,10 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     
-    <PackageReference Include="Google.Api.CommonProtos" Version="2.0.0-beta01" />
-    <PackageReference Include="Google.Protobuf" Version="3.11.2" />
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.27.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.27.0">
+    <PackageReference Include="Google.Api.CommonProtos" Version="$(GoogleApiCommonProtosPackageVersion)" />
+    <PackageReference Include="Google.Protobuf" Version="$(GoogleProtobufPackageVersion)" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="$(GrpcAspNetCoreServerPackageVersion)" />
+    <PackageReference Include="Grpc.Tools" Version="$(GrpcCorePackageVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

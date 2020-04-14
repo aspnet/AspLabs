@@ -7,13 +7,12 @@
 
   <ItemGroup>
     <Protobuf Include="Proto\httpapi.proto" GrpcServices="Both" />
-    <Compile Include="..\Shared\TestGrpcServiceActivator.cs" Link="Infrastructure\TestGrpcServiceActivator.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.Swagger\Microsoft.AspNetCore.Grpc.Swagger.csproj" />
 
     <PackageReference Include="Grpc.Tools" Version="$(GrpcCorePackageVersion)">
       <PrivateAssets>all</PrivateAssets>

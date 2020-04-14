@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Protobuf Include="greet.proto" GrpcServices="Server" />
+    <Protobuf Include="httpapi.proto" GrpcServices="Server" />
+
+    <PackageReference Include="Grpc.Tools" Version="$(GrpcCorePackageVersion)" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="$(GrpcAspNetCoreServerPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.Grpc.Swagger\Microsoft.AspNetCore.Grpc.Swagger.csproj" />
+  </ItemGroup>
+
+</Project>
