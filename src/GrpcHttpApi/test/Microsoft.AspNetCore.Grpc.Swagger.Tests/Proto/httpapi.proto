@@ -169,3 +169,18 @@ message EnumMessage {
   }
   NestedEnum enum_value = 1;
 }
+
+message OneOfMessage {
+  oneof First {
+    string first_one = 1;
+    string first_two = 2;
+  }
+  oneof Second {
+    string second_one = 3;
+    string second_two = 4;
+  }
+}
+
+message MapMessage {
+  map<string, double> map_value = 1;
+}

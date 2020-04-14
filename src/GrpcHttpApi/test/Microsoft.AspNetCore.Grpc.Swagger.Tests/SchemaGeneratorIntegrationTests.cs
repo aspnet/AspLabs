@@ -2,10 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Text.Json;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using HttpApi;
-using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.AspNetCore.Grpc.Swagger;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -114,6 +112,8 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             // Assert
             Assert.AreEqual("object", schema.Type);
             Assert.AreEqual(0, schema.Properties.Count);
+            Assert.IsNotNull(schema.AdditionalProperties);
+            Assert.AreEqual(null, schema.AdditionalProperties.Type);
         }
 
         [Test]
@@ -125,6 +125,42 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             // Assert
             schema = repository.Schemas[schema.Reference.Id];
             Assert.AreEqual("object", schema.Type);
+            Assert.IsNotNull(schema.AdditionalProperties);
+            Assert.AreEqual(null, schema.AdditionalProperties.Type);
+            Assert.AreEqual(1, schema.Properties.Count);
+            Assert.AreEqual("string", schema.Properties["@type"].Type);
+        }
+
+        [Test]
+        public void GenerateSchema_OneOf_ReturnSchema()
+        {
+            // Arrange & Act
+            var (schema, repository) = GenerateSchema(typeof(OneOfMessage));
+
+            // Assert
+            schema = repository.Schemas[schema.Reference.Id];
+            Assert.AreEqual("object", schema.Type);
+            Assert.AreEqual(4, schema.Properties.Count);
+            Assert.AreEqual("string", schema.Properties["firstOne"].Type);
+            Assert.AreEqual("string", schema.Properties["firstTwo"].Type);
+            Assert.AreEqual("string", schema.Properties["secondOne"].Type);
+            Assert.AreEqual("string", schema.Properties["secondTwo"].Type);
+            Assert.IsNull(schema.AdditionalProperties);
+        }
+
+        [Test]
+        public void GenerateSchema_Map_ReturnSchema()
+        {
+            // Arrange & Act
+            var (schema, repository) = GenerateSchema(typeof(MapMessage));
+
+            // Assert
+            schema = repository.Schemas[schema.Reference.Id];
+            Assert.AreEqual("object", schema.Type);
+            Assert.AreEqual(1, schema.Properties.Count);
+            Assert.AreEqual("object", schema.Properties["mapValue"].Type);
+            Assert.AreEqual("number", schema.Properties["mapValue"].AdditionalProperties.Type);
+            Assert.AreEqual("double", schema.Properties["mapValue"].AdditionalProperties.Format);
         }
     }
 }

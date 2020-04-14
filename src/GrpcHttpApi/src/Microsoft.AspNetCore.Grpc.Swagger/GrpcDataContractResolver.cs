@@ -92,10 +92,11 @@ namespace Microsoft.AspNetCore.Grpc.Swagger
                 }
                 if (messageDescriptor.FullName == Any.Descriptor.FullName)
                 {
-                    return new DataContract(DataType.Object, messageDescriptor.ClrType, properties: new List<DataProperty>
+                    var anyProperties = new List<DataProperty>
                     {
                         new DataProperty("@type", typeof(string), isRequired: true)
-                    });
+                    };
+                    return new DataContract(DataType.Object, messageDescriptor.ClrType, properties: anyProperties, additionalPropertiesType: typeof(Value));
                 }
             }
 
@@ -103,14 +104,27 @@ namespace Microsoft.AspNetCore.Grpc.Swagger
 
             foreach (var field in messageDescriptor.Fields.InFieldNumberOrder())
             {
-                var fieldType = MessageDescriptorHelpers.ResolveFieldType(field);
+                // Enum type will later be used to call this contract resolver.
+                // Register the enum type so we know to resolve its names from the descriptor.
                 if (field.FieldType == FieldType.Enum)
                 {
                     _enumTypeMapping.TryAdd(field.EnumType.ClrType, field.EnumType);
                 }
-                if (field.IsRepeated)
+
+                Type fieldType;
+                if (field.IsMap)
                 {
-                    fieldType = typeof(IList<>).MakeGenericType(fieldType);
+                    var mapFields = field.MessageType.Fields.InFieldNumberOrder();
+                    var valueType = MessageDescriptorHelpers.ResolveFieldType(mapFields[1]);
+                    fieldType = typeof(IDictionary<,>).MakeGenericType(typeof(string), valueType);
+                }
+                else if (field.IsRepeated)
+                {
+                    fieldType = typeof(IList<>).MakeGenericType(MessageDescriptorHelpers.ResolveFieldType(field));
+                }
+                else
+                {
+                    fieldType = MessageDescriptorHelpers.ResolveFieldType(field);
                 }
 
                 properties.Add(new DataProperty(field.JsonName, fieldType));
