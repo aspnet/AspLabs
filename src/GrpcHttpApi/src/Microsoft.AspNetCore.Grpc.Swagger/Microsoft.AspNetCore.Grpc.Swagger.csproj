@@ -18,14 +18,9 @@
 
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
-    <!--
-    <ProjectReference Include="..\..\..\..\..\Swashbuckle.AspNetCore\src\Swashbuckle.AspNetCore.SwaggerGen\Swashbuckle.AspNetCore.SwaggerGen.csproj" />
-    <ProjectReference Include="..\..\..\..\..\Swashbuckle.AspNetCore\src\Swashbuckle.AspNetCore.SwaggerUI\Swashbuckle.AspNetCore.SwaggerUI.csproj" />
-    <ProjectReference Include="..\..\..\..\..\Swashbuckle.AspNetCore\src\Swashbuckle.AspNetCore.Swagger\Swashbuckle.AspNetCore.Swagger.csproj" />
-    -->
-    
     <ProjectReference Include="..\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.1" />
+    
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="$(SwashbuckleAspNetCorePackageVersion)" />
   </ItemGroup>
 
 </Project>
