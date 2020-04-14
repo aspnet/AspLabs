@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
-namespace Grpc.AspNetCore.Server.Tests.HttpApi
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
     [TestFixture]
     public class HttpApiServerCallContextTests

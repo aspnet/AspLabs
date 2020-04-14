@@ -11,12 +11,12 @@ package http_api;
 service HttpApiGreeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "/v1/greeter/{name}"
+      get: "/v1/greeter/SayHello/{name}"
     };
   }
   rpc ResponseBody (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "/v1/greeter/{name}"
+      get: "/v1/greeter/ResponseBody/{name}"
       response_body: "message"
     };
   }
@@ -24,7 +24,7 @@ service HttpApiGreeter {
     option (google.api.http) = {
       custom: {
         kind: "HEAD",
-        path: "/v1/greeter/{name}"
+        path: "/v1/greeter/Custom/{name}"
       }
     };
   }
@@ -39,24 +39,24 @@ service HttpApiGreeter {
   rpc NoOption (HelloRequest) returns (HelloReply);
   rpc ServerStreamingGetOption (HelloRequest) returns (stream HelloReply) {
     option (google.api.http) = {
-      get: "/v1/greeter/{name}"
+      get: "/v1/greeter/ServerStreamingGetOption/{name}"
     };
   }
   rpc Body (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      post: "/v1/greeter"
+      post: "/v1/greeter/Body"
       body: "*"
     };
   }
   rpc SubBody (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      post: "/v1/greeter"
+      post: "/v1/greeter/SubBody"
       body: "sub"
     };
   }
   rpc SubRepeatedBody (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      post: "/v1/greeter"
+      post: "/v1/greeter/SubRepeatedBody"
       body: "repeated_strings"
     };
   }
@@ -65,7 +65,7 @@ service HttpApiGreeter {
 service HttpApiInvalidResponseBodyGreeter {
   rpc BadResponseBody (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "/v1/greeter/{name}"
+      get: "/v1/greeter/BadResponseBody/{name}"
       response_body: "NoMatch"
     };
   }
@@ -74,7 +74,7 @@ service HttpApiInvalidResponseBodyGreeter {
 service HttpApiInvalidBodyGreeter {
   rpc BadBody (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "/v1/greeter/{name}"
+      get: "/v1/greeter/BadBody/{name}"
       body: "NoMatch"
     };
   }
@@ -83,7 +83,7 @@ service HttpApiInvalidBodyGreeter {
 service HttpApiInvalidPatternGreeter {
   rpc BadPattern (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      get: "v1/greeter/{name}"
+      get: "v1/greeter/BadPattern/{name}"
       body: "NoMatch"
     };
   }

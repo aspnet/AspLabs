@@ -4,17 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
-using Grpc.AspNetCore.Server.Tests.TestObjects;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Grpc.HttpApi;
+using Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
 
-namespace Grpc.AspNetCore.Server.Tests.HttpApi
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
     [TestFixture]
     public class HttpApiServiceMethodProviderTests

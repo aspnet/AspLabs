@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Proto\greeter.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Proto\greeter.proto" GrpcServices="Both" />
     <Protobuf Include="Proto\httpapi.proto" GrpcServices="Both" />
   </ItemGroup>
 

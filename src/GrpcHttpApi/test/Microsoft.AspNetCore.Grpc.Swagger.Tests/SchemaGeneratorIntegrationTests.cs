@@ -4,13 +4,13 @@
 using System.Text.Json;
 using Google.Protobuf.WellKnownTypes;
 using HttpApi;
-using Microsoft.AspNetCore.Grpc.Swagger;
+using Microsoft.AspNetCore.Grpc.Swagger.Internal;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NUnit.Framework;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Grpc.AspNetCore.Server.Tests.HttpApi
+namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
 {
     [TestFixture]
     public class SchemaGeneratorIntegrationTests

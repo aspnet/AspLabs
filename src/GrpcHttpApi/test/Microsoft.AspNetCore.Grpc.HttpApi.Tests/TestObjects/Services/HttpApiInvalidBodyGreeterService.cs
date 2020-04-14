@@ -3,7 +3,7 @@
 
 using HttpApi;
 
-namespace Grpc.AspNetCore.Server.Tests.TestObjects
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects
 {
     public class HttpApiInvalidBodyGreeterService : HttpApiInvalidBodyGreeter.HttpApiInvalidBodyGreeterBase
     {

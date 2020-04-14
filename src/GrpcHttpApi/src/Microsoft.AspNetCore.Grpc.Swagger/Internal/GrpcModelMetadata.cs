@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 #nullable disable
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi
+namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
 {
     internal class GrpcModelMetadata : ModelMetadata
     {
