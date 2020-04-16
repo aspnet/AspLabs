@@ -4,7 +4,6 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-import "google/protobuf/wrappers.proto";
 
 package greet;
 
