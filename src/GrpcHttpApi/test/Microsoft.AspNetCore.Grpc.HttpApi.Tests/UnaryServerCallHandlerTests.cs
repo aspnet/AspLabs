@@ -12,21 +12,21 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Google.Protobuf.Reflection;
+using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Grpc.Tests.Shared;
 using HttpApi;
-using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
+using MethodOptions = Grpc.Shared.Server.MethodOptions;
 
-namespace Grpc.AspNetCore.Server.Tests.HttpApi
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
     [TestFixture]
     public class UnaryServerCallHandlerTests
@@ -654,7 +654,7 @@ namespace Grpc.AspNetCore.Server.Tests.HttpApi
             var unaryServerCallInvoker = new UnaryServerMethodInvoker<HttpApiGreeterService, HelloRequest, HelloReply>(
                 invoker,
                 CreateServiceMethod<HelloRequest, HelloReply>("TestMethodName", HelloRequest.Parser, HelloReply.Parser),
-                Shared.Server.MethodOptions.Create(new[] { new GrpcServiceOptions() }),
+                MethodOptions.Create(new[] { new GrpcServiceOptions() }),
                 new TestGrpcServiceActivator<HttpApiGreeterService>());
             
             return new UnaryServerCallHandler<HttpApiGreeterService, HelloRequest, HelloReply>(

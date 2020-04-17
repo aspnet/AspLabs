@@ -4,7 +4,7 @@
 using System;
 using Google.Protobuf.Reflection;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi
+namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
 {
     internal static class MessageDescriptorHelpers
     {

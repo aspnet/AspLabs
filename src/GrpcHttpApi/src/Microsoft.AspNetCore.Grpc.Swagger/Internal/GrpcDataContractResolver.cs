@@ -8,11 +8,10 @@ using System.Reflection;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Grpc.HttpApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Type = System.Type;
 
-namespace Microsoft.AspNetCore.Grpc.Swagger
+namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
 {
     internal class GrpcDataContractResolver : IDataContractResolver
     {
