@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>HTTP API for gRPC ASP.NET Core</Description>
-    <PackageTags>gRPC RPC HTTP/2 REST</PackageTags>
+    <Description>Swagger for gRPC ASP.NET Core</Description>
+    <PackageTags>gRPC RPC HTTP/2 REST Swagger OpenAPI</PackageTags>
     <IsPackable>true</IsPackable>
     <IsShipping>true</IsShipping>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
