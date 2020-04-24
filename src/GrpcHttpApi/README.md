@@ -64,7 +64,7 @@ info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
 
 This is a simple example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
 
-Currently `Microsoft.AspNetCore.Grpc.HttpApi` is not published to NuGet.org and is instead available on a custom NuGet feed. Follow instructions for [setting up the custom NuGet feed in your solution](#nuget-feed).
+[`Microsoft.AspNetCore.Grpc.HttpApi`](https://www.nuget.org/packages/Microsoft.AspNetCore.Grpc.HttpApi) is available on NuGet.org.
 
 ### gRPC Gateway
 
