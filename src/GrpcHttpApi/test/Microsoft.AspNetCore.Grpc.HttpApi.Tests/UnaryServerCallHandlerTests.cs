@@ -15,6 +15,7 @@ using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Grpc.Tests.Shared;
@@ -435,6 +436,40 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         }
 
         [Test]
+        public async Task HandleCallAsync_HasInterceptor_InterceptorCalled()
+        {
+            object? interceptorRun = null;
+
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                c.UserState.TryGetValue("IntercepterRun", out interceptorRun);
+                return Task.FromResult(new HelloReply());
+            };
+
+            var interceptors = new List<(Type Type, object[] Args)>();
+            interceptors.Add((typeof(TestInterceptor), Args: Array.Empty<object>()));
+
+            var unaryServerCallHandler = CreateCallHandler(invoker, interceptors: interceptors);
+            var httpContext = CreateHttpContext();
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.AreEqual(true, (bool)interceptorRun!);
+        }
+
+        public class TestInterceptor : Interceptor
+        {
+            public override Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, UnaryServerMethod<TRequest, TResponse> continuation)
+            {
+                context.UserState["IntercepterRun"] = true;
+                return base.UnaryServerHandler(request, context, continuation);
+            }
+        }
+
+        [Test]
         public async Task HandleCallAsync_GetHostAndMethodAndPeer_MatchHandler()
         {
             string? peer = null;
@@ -619,6 +654,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<HttpApiGreeterService>();
+            serviceCollection.AddSingleton(typeof(IGrpcInterceptorActivator<>), typeof(TestInterceptorActivator<>));
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Host = new HostString("localhost");
@@ -627,6 +663,19 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
             httpContext.Features.Set<IHttpRequestLifetimeFeature>(new HttpRequestLifetimeFeature(cancellationToken));
             return httpContext;
+        }
+
+        private class TestInterceptorActivator<T> : IGrpcInterceptorActivator<T> where T : Interceptor
+        {
+            public GrpcActivatorHandle<Interceptor> Create(IServiceProvider serviceProvider, InterceptorRegistration interceptorRegistration)
+            {
+                return new GrpcActivatorHandle<Interceptor>(Activator.CreateInstance<T>(), created: true, state: null);
+            }
+
+            public ValueTask ReleaseAsync(GrpcActivatorHandle<Interceptor> interceptor)
+            {
+                return default;
+            }
         }
 
         private class HttpRequestLifetimeFeature : IHttpRequestLifetimeFeature
@@ -649,12 +698,22 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Dictionary<string, List<FieldDescriptor>>? routeParameterDescriptors = null,
             MessageDescriptor? bodyDescriptor = null,
             bool? bodyDescriptorRepeated = null,
-            List<FieldDescriptor>? bodyFieldDescriptors = null)
+            List<FieldDescriptor>? bodyFieldDescriptors = null,
+            List<(Type Type, object[] Args)>? interceptors = null)
         {
+            var serviceOptions = new GrpcServiceOptions();
+            if (interceptors != null)
+            {
+                foreach (var interceptor in interceptors)
+                {
+                    serviceOptions.Interceptors.Add(interceptor.Type, interceptor.Args ?? Array.Empty<object>());
+                }
+            }
+
             var unaryServerCallInvoker = new UnaryServerMethodInvoker<HttpApiGreeterService, HelloRequest, HelloReply>(
                 invoker,
                 CreateServiceMethod<HelloRequest, HelloReply>("TestMethodName", HelloRequest.Parser, HelloReply.Parser),
-                MethodOptions.Create(new[] { new GrpcServiceOptions() }),
+                MethodOptions.Create(new[] { serviceOptions }),
                 new TestGrpcServiceActivator<HttpApiGreeterService>());
             
             return new UnaryServerCallHandler<HttpApiGreeterService, HelloRequest, HelloReply>(
