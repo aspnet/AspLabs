@@ -8,6 +8,8 @@
     <!-- ElectronNET.API is not strong-named signed -->
     <SignAssembly>false</SignAssembly>
     <LangVersion>preview</LangVersion>
+    <!-- The version included via the SDK conflicts with the analyzer included via Microsoft.AspNetCore.Blazor -->
+    <DisableImplicitComponentsAnalyzers>true</DisableImplicitComponentsAnalyzers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +27,7 @@
   </Target>
 
   <ItemGroup>
-    <Content Include="electron-js\**" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />    
+    <Content Include="electron-js\**" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />
   </ItemGroup>
 
 </Project>
