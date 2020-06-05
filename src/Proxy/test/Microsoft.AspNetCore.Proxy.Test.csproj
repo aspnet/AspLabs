@@ -12,8 +12,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Testing" Version="2.1.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="xunit" Version="2.4.0" />
   </ItemGroup>
 
 </Project>
