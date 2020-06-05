@@ -2,16 +2,16 @@
   "sdk": {
     "version": "5.0.100-preview.6.20266.3"
   },
-  "runtimes": {
-    "aspnetcore/x64": [
-      "3.1.0"
-    ],
-    "aspnetcore/x86": [
-      "3.1.0"
-    ]
-  },
   "tools": {
-    "dotnet": "5.0.100-preview.6.20266.3"
+    "dotnet": "5.0.100-preview.6.20266.3",
+    "runtimes": {
+      "aspnetcore/x64": [
+        "3.0.0"
+      ],
+      "aspnetcore/x86": [
+        "3.0.0"
+      ]
+    }
   },
   "msbuild-sdks": {
     "Yarn.MSBuild": "1.15.2",
