@@ -9,14 +9,13 @@ using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
-    [TestFixture]
     public class HttpApiServerCallContextTests
     {
-        [Test]
+        [Fact]
         public void CancellationToken_Get_MatchHttpContextRequestAborted()
         {
             // Arrange
@@ -28,10 +27,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var ct = serverCallContext.CancellationToken;
 
             // Assert
-            Assert.AreEqual(cts.Token, ct);
+            Assert.Equal(cts.Token, ct);
         }
 
-        [Test]
+        [Fact]
         public void RequestHeaders_Get_PopulatedFromHttpContext()
         {
             // Arrange
@@ -47,12 +46,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var headers = serverCallContext.RequestHeaders;
 
             // Assert
-            Assert.AreEqual(2, headers.Count);
-            Assert.AreEqual("testname", headers[0].Key);
-            Assert.AreEqual("TestValue", headers[0].Value);
-            Assert.AreEqual("hello-bin", headers[1].Key);
-            Assert.AreEqual(true, headers[1].IsBinary);
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, headers[1].ValueBytes);
+            Assert.Equal(2, headers.Count);
+            Assert.Equal("testname", headers[0].Key);
+            Assert.Equal("TestValue", headers[0].Value);
+            Assert.Equal("hello-bin", headers[1].Key);
+            Assert.True(headers[1].IsBinary);
+            Assert.Equal(new byte[] { 1, 2, 3 }, headers[1].ValueBytes);
         }
 
         private static DefaultHttpContext CreateHttpContext(CancellationToken cancellationToken = default)

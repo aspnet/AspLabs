@@ -24,15 +24,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using NUnit.Framework;
+using Xunit;
 using MethodOptions = Grpc.Shared.Server.MethodOptions;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
-    [TestFixture]
     public class UnaryServerCallHandlerTests
     {
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_MatchingRouteValue_SetOnRequestMessage()
         {
             // Arrange
@@ -61,16 +60,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("TestName!", request!.Name);
-            Assert.AreEqual("Subfield!", request!.Sub.Subfield);
+            Assert.NotNull(request);
+            Assert.Equal("TestName!", request!.Name);
+            Assert.Equal("Subfield!", request!.Sub.Subfield);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual("Hello TestName!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal("Hello TestName!", responseJson.RootElement.GetProperty("message").GetString());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_ResponseBodySet_ResponseReturned()
         {
             // Arrange
@@ -96,15 +95,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("TestName!", request!.Name);
+            Assert.NotNull(request);
+            Assert.Equal("TestName!", request!.Name);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual("Hello TestName!", responseJson.RootElement.GetString());
+            Assert.Equal("Hello TestName!", responseJson.RootElement.GetString());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_ResponseBodySetToRepeatedField_ArrayReturned()
         {
             // Arrange
@@ -124,17 +123,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
+            Assert.NotNull(request);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual(JsonValueKind.Array, responseJson.RootElement.ValueKind);
-            Assert.AreEqual("One", responseJson.RootElement[0].GetString());
-            Assert.AreEqual("Two", responseJson.RootElement[1].GetString());
-            Assert.AreEqual("Three", responseJson.RootElement[2].GetString());
+            Assert.Equal(JsonValueKind.Array, responseJson.RootElement.ValueKind);
+            Assert.Equal("One", responseJson.RootElement[0].GetString());
+            Assert.Equal("Two", responseJson.RootElement[1].GetString());
+            Assert.Equal("Three", responseJson.RootElement[2].GetString());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_RootBodySet_SetOnRequestMessage()
         {
             // Arrange
@@ -164,12 +163,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("TestName!", request!.Name);
-            Assert.AreEqual(null, request!.Sub);
+            Assert.NotNull(request);
+            Assert.Equal("TestName!", request!.Name);
+            Assert.Null(request!.Sub);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_SubBodySet_SetOnRequestMessage()
         {
             // Arrange
@@ -203,13 +202,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("QueryStringTestName!", request!.Name);
-            Assert.AreEqual("Subfield!", request!.Sub.Subfield);
-            Assert.AreEqual(0, request!.Sub.Subfields.Count);
+            Assert.NotNull(request);
+            Assert.Equal("QueryStringTestName!", request!.Name);
+            Assert.Equal("Subfield!", request!.Sub.Subfield);
+            Assert.Empty(request!.Sub.Subfields);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_SubRepeatedBodySet_SetOnRequestMessage()
         {
             // Arrange
@@ -252,16 +251,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("QueryStringTestName!", request!.Name);
-            Assert.AreEqual("QueryStringTestSubfield!", request!.Sub.Subfield);
-            Assert.AreEqual(3, request!.RepeatedStrings.Count);
-            Assert.AreEqual("One", request!.RepeatedStrings[0]);
-            Assert.AreEqual("Two", request!.RepeatedStrings[1]);
-            Assert.AreEqual("Three", request!.RepeatedStrings[2]);
+            Assert.NotNull(request);
+            Assert.Equal("QueryStringTestName!", request!.Name);
+            Assert.Equal("QueryStringTestSubfield!", request!.Sub.Subfield);
+            Assert.Equal(3, request!.RepeatedStrings.Count);
+            Assert.Equal("One", request!.RepeatedStrings[0]);
+            Assert.Equal("Two", request!.RepeatedStrings[1]);
+            Assert.Equal("Three", request!.RepeatedStrings[2]);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_SubSubRepeatedBodySet_SetOnRequestMessage()
         {
             // Arrange
@@ -303,13 +302,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("QueryStringTestName!", request!.Name);
-            Assert.AreEqual("QueryStringTestSubfield!", request!.Sub.Subfield);
-            Assert.AreEqual(3, request!.Sub.Subfields.Count);
+            Assert.NotNull(request);
+            Assert.Equal("QueryStringTestName!", request!.Name);
+            Assert.Equal("QueryStringTestSubfield!", request!.Sub.Subfield);
+            Assert.Equal(3, request!.Sub.Subfields.Count);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_MatchingQueryStringValues_SetOnRequestMessage()
         {
             // Arrange
@@ -332,12 +331,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("TestName!", request!.Name);
-            Assert.AreEqual("TestSubfield!", request!.Sub.Subfield);
+            Assert.NotNull(request);
+            Assert.Equal("TestName!", request!.Name);
+            Assert.Equal("TestSubfield!", request!.Sub.Subfield);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_RpcExceptionReturned_StatusReturned()
         {
             // Arrange
@@ -353,16 +352,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(401, httpContext.Response.StatusCode);
+            Assert.Equal(401, httpContext.Response.StatusCode);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("message").GetString());
-            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("error").GetString());
-            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+            Assert.Equal("Message!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal("Message!", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_RpcExceptionThrown_StatusReturned()
         {
             // Arrange
@@ -378,16 +377,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(401, httpContext.Response.StatusCode);
+            Assert.Equal(401, httpContext.Response.StatusCode);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("message").GetString());
-            Assert.AreEqual("Message!", responseJson.RootElement.GetProperty("error").GetString());
-            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+            Assert.Equal("Message!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal("Message!", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_StatusSet_StatusReturned()
         {
             // Arrange
@@ -404,16 +403,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(401, httpContext.Response.StatusCode);
+            Assert.Equal(401, httpContext.Response.StatusCode);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("message").GetString());
-            Assert.AreEqual(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("error").GetString());
-            Assert.AreEqual((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
+            Assert.Equal(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_UserState_HttpContextInUserState()
         {
             object? requestHttpContext = null;
@@ -432,10 +431,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(httpContext, requestHttpContext);
+            Assert.Equal(httpContext, requestHttpContext);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_HasInterceptor_InterceptorCalled()
         {
             object? interceptorRun = null;
@@ -457,7 +456,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(true, (bool)interceptorRun!);
+            Assert.True((bool)interceptorRun!);
         }
 
         public class TestInterceptor : Interceptor
@@ -469,7 +468,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_GetHostAndMethodAndPeer_MatchHandler()
         {
             string? peer = null;
@@ -492,12 +491,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual("ipv4:127.0.0.1:0", peer);
-            Assert.AreEqual("localhost", host);
-            Assert.AreEqual("/ServiceName/TestMethodName", method);
+            Assert.Equal("ipv4:127.0.0.1:0", peer);
+            Assert.Equal("localhost", host);
+            Assert.Equal("/ServiceName/TestMethodName", method);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_ExceptionThrown_StatusReturned()
         {
             // Arrange
@@ -513,16 +512,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.AreEqual(500, httpContext.Response.StatusCode);
+            Assert.Equal(500, httpContext.Response.StatusCode);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.AreEqual("Exception was thrown by handler.", responseJson.RootElement.GetProperty("message").GetString());
-            Assert.AreEqual("Exception was thrown by handler.", responseJson.RootElement.GetProperty("error").GetString());
-            Assert.AreEqual((int)StatusCode.Unknown, responseJson.RootElement.GetProperty("code").GetInt32());
+            Assert.Equal("Exception was thrown by handler.", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal("Exception was thrown by handler.", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.Unknown, responseJson.RootElement.GetProperty("code").GetInt32());
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_MatchingRepeatedQueryStringValues_SetOnRequestMessage()
         {
             // Arrange
@@ -544,13 +543,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual(2, request!.Sub.Subfields.Count);
-            Assert.AreEqual("TestSubfields1!", request!.Sub.Subfields[0]);
-            Assert.AreEqual("TestSubfields2!", request!.Sub.Subfields[1]);
+            Assert.NotNull(request);
+            Assert.Equal(2, request!.Sub.Subfields.Count);
+            Assert.Equal("TestSubfields1!", request!.Sub.Subfields[0]);
+            Assert.Equal("TestSubfields2!", request!.Sub.Subfields[1]);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_DataTypes_SetOnRequestMessage()
         {
             // Arrange
@@ -588,27 +587,27 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual(1, request!.Data.SingleInt32);
-            Assert.AreEqual(2, request!.Data.SingleInt64);
-            Assert.AreEqual(3, request!.Data.SingleUint32);
-            Assert.AreEqual(4, request!.Data.SingleUint64);
-            Assert.AreEqual(5, request!.Data.SingleSint32);
-            Assert.AreEqual(6, request!.Data.SingleSint64);
-            Assert.AreEqual(7, request!.Data.SingleFixed32);
-            Assert.AreEqual(8, request!.Data.SingleFixed64);
-            Assert.AreEqual(9, request!.Data.SingleSfixed32);
-            Assert.AreEqual(10, request!.Data.SingleSfixed64);
-            Assert.AreEqual(11.1, request!.Data.SingleFloat, 0.001);
-            Assert.AreEqual(12.1, request!.Data.SingleDouble, 0.001);
-            Assert.AreEqual(true, request!.Data.SingleBool);
-            Assert.AreEqual("A string", request!.Data.SingleString);
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, request!.Data.SingleBytes.ToByteArray());
-            Assert.AreEqual(HelloRequest.Types.DataTypes.Types.NestedEnum.Foo, request!.Data.SingleEnum);
-            Assert.AreEqual("Nested string", request!.Data.SingleMessage.Subfield);
+            Assert.NotNull(request);
+            Assert.Equal(1, request!.Data.SingleInt32);
+            Assert.Equal(2, request!.Data.SingleInt64);
+            Assert.Equal((uint)3, request!.Data.SingleUint32);
+            Assert.Equal((ulong)4, request!.Data.SingleUint64);
+            Assert.Equal(5, request!.Data.SingleSint32);
+            Assert.Equal(6, request!.Data.SingleSint64);
+            Assert.Equal((uint)7, request!.Data.SingleFixed32);
+            Assert.Equal((ulong)8, request!.Data.SingleFixed64);
+            Assert.Equal(9, request!.Data.SingleSfixed32);
+            Assert.Equal(10, request!.Data.SingleSfixed64);
+            Assert.Equal(11.1, request!.Data.SingleFloat, 3);
+            Assert.Equal(12.1, request!.Data.SingleDouble, 3);
+            Assert.True(request!.Data.SingleBool);
+            Assert.Equal("A string", request!.Data.SingleString);
+            Assert.Equal(new byte[] { 1, 2, 3 }, request!.Data.SingleBytes.ToByteArray());
+            Assert.Equal(HelloRequest.Types.DataTypes.Types.NestedEnum.Foo, request!.Data.SingleEnum);
+            Assert.Equal("Nested string", request!.Data.SingleMessage.Subfield);
         }
 
-        [Test]
+        [Fact]
         public async Task HandleCallAsync_Wrappers_SetOnRequestMessage()
         {
             // Arrange
@@ -638,16 +637,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
-            Assert.IsNotNull(request);
-            Assert.AreEqual("1", request!.Wrappers.StringValue);
-            Assert.AreEqual(2, request!.Wrappers.Int32Value);
-            Assert.AreEqual(3, request!.Wrappers.Int64Value);
-            Assert.AreEqual(4.1, request!.Wrappers.FloatValue, 0.001);
-            Assert.AreEqual(5.1, request!.Wrappers.DoubleValue, 0.001);
-            Assert.AreEqual(true, request!.Wrappers.BoolValue);
-            Assert.AreEqual(7, request!.Wrappers.Uint32Value);
-            Assert.AreEqual(8, request!.Wrappers.Uint64Value);
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, request!.Wrappers.BytesValue.ToByteArray());
+            Assert.NotNull(request);
+            Assert.Equal("1", request!.Wrappers.StringValue);
+            Assert.Equal(2, request!.Wrappers.Int32Value);
+            Assert.Equal(3, request!.Wrappers.Int64Value);
+            Assert.Equal(4.1, request!.Wrappers.FloatValue.GetValueOrDefault(), 3);
+            Assert.Equal(5.1, request!.Wrappers.DoubleValue.GetValueOrDefault(), 3);
+            Assert.Equal(true, request!.Wrappers.BoolValue);
+            Assert.Equal((uint)7, request!.Wrappers.Uint32Value.GetValueOrDefault());
+            Assert.Equal((ulong)8, request!.Wrappers.Uint64Value.GetValueOrDefault());
+            Assert.Equal(new byte[] { 1, 2, 3 }, request!.Wrappers.BytesValue.ToByteArray());
         }
 
         private static DefaultHttpContext CreateHttpContext(CancellationToken cancellationToken = default)

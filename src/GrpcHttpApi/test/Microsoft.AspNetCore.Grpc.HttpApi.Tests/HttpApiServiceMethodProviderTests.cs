@@ -12,14 +12,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NUnit.Framework;
+using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
-    [TestFixture]
     public class HttpApiServiceMethodProviderTests
     {
-        [Test]
+        [Fact]
         public void AddMethod_OptionGet_ResolveMethod()
         {
             // Arrange & Act
@@ -28,13 +27,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.SayHello));
 
-            Assert.AreEqual("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.AreEqual("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
-            Assert.AreEqual(1, endpoint.RoutePattern.Parameters.Count);
-            Assert.AreEqual("name", endpoint.RoutePattern.Parameters[0].Name);
+            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
+            Assert.Equal(1, endpoint.RoutePattern.Parameters.Count);
+            Assert.Equal("name", endpoint.RoutePattern.Parameters[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_OptionCustom_ResolveMethod()
         {
             // Arrange & Act
@@ -43,11 +42,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.Custom));
 
-            Assert.AreEqual("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
-            Assert.AreEqual("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
+            Assert.Equal("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_OptionAdditionalBindings_ResolveMethods()
         {
             // Arrange & Act
@@ -56,20 +55,20 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var matchedEndpoints = FindGrpcEndpoints(endpoints, nameof(HttpApiGreeterService.AdditionalBindings));
 
             // Assert
-            Assert.AreEqual(2, matchedEndpoints.Count);
+            Assert.Equal(2, matchedEndpoints.Count);
 
             var getMethodModel = matchedEndpoints[0];
-            Assert.AreEqual("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.AreEqual("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Get);
-            Assert.AreEqual("/v1/additional_bindings/{name}", getMethodModel.RoutePattern.RawText);
+            Assert.Equal("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Get);
+            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.RoutePattern.RawText);
 
             var additionalMethodModel = matchedEndpoints[1];
-            Assert.AreEqual("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.AreEqual("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Delete);
-            Assert.AreEqual("/v1/additional_bindings/{name}", additionalMethodModel.RoutePattern.RawText);
+            Assert.Equal("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Delete);
+            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.RoutePattern.RawText);
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_NoHttpRuleInProto_ThrowNotFoundError()
         {
             // Arrange & Act
@@ -77,43 +76,43 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             // Assert
             var ex = Assert.Throws<InvalidOperationException>(() => FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.NoOption)));
-            Assert.AreEqual("Couldn't find gRPC endpoint for method NoOption.", ex.Message);
+            Assert.Equal("Couldn't find gRPC endpoint for method NoOption.", ex.Message);
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_BadResponseBody_ThrowError()
         {
             // Arrange & Act
             var ex = Assert.Throws<InvalidOperationException>(() => MapEndpoints<HttpApiInvalidResponseBodyGreeterService>());
 
             // Assert
-            Assert.AreEqual("Error binding gRPC service 'HttpApiInvalidResponseBodyGreeterService'.", ex.Message);
-            Assert.AreEqual("Error binding BadResponseBody on HttpApiInvalidResponseBodyGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
-            Assert.AreEqual("Couldn't find matching field for response body 'NoMatch' on HelloReply.", ex.InnerException!.InnerException!.InnerException!.Message);
+            Assert.Equal("Error binding gRPC service 'HttpApiInvalidResponseBodyGreeterService'.", ex.Message);
+            Assert.Equal("Error binding BadResponseBody on HttpApiInvalidResponseBodyGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
+            Assert.Equal("Couldn't find matching field for response body 'NoMatch' on HelloReply.", ex.InnerException!.InnerException!.InnerException!.Message);
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_BadBody_ThrowError()
         {
             // Arrange & Act
             var ex = Assert.Throws<InvalidOperationException>(() => MapEndpoints<HttpApiInvalidBodyGreeterService>());
 
             // Assert
-            Assert.AreEqual("Error binding gRPC service 'HttpApiInvalidBodyGreeterService'.", ex.Message);
-            Assert.AreEqual("Error binding BadBody on HttpApiInvalidBodyGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
-            Assert.AreEqual("Couldn't find matching field for body 'NoMatch' on HelloRequest.", ex.InnerException!.InnerException!.InnerException!.Message);
+            Assert.Equal("Error binding gRPC service 'HttpApiInvalidBodyGreeterService'.", ex.Message);
+            Assert.Equal("Error binding BadBody on HttpApiInvalidBodyGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
+            Assert.Equal("Couldn't find matching field for body 'NoMatch' on HelloRequest.", ex.InnerException!.InnerException!.InnerException!.Message);
         }
 
-        [Test]
+        [Fact]
         public void AddMethod_BadPattern_ThrowError()
         {
             // Arrange & Act
             var ex = Assert.Throws<InvalidOperationException>(() => MapEndpoints<HttpApiInvalidPatternGreeterService>());
 
             // Assert
-            Assert.AreEqual("Error binding gRPC service 'HttpApiInvalidPatternGreeterService'.", ex.Message);
-            Assert.AreEqual("Error binding BadPattern on HttpApiInvalidPatternGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
-            Assert.AreEqual("Path template must start with /: v1/greeter/{name}", ex.InnerException!.InnerException!.InnerException!.Message);
+            Assert.Equal("Error binding gRPC service 'HttpApiInvalidPatternGreeterService'.", ex.Message);
+            Assert.Equal("Error binding BadPattern on HttpApiInvalidPatternGreeterService to HTTP API.", ex.InnerException!.InnerException!.Message);
+            Assert.Equal("Path template must start with /: v1/greeter/{name}", ex.InnerException!.InnerException!.InnerException!.Message);
         }
 
         private static RouteEndpoint FindGrpcEndpoint(IReadOnlyList<Endpoint> endpoints, string methodName)
