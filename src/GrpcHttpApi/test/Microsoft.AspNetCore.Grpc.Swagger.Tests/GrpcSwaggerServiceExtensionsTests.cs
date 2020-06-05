@@ -5,15 +5,14 @@ using Greet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using NUnit.Framework;
 using Swashbuckle.AspNetCore.Swagger;
+using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
 {
-    [TestFixture]
     public class GrpcSwaggerServiceExtensionsTests
     {
-        [Test]
+        [Fact]
         public void AddGrpcSwagger_GrpcServiceRegistered_ReturnSwaggerWithGrpcOperation()
         {
             // Arrange & Act
@@ -38,11 +37,11 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             var swagger = swaggerGenerator.GetSwagger("v1");
 
             // Assert
-            Assert.IsNotNull(swagger);
-            Assert.AreEqual(1, swagger.Paths.Count);
+            Assert.NotNull(swagger);
+            Assert.Single(swagger.Paths);
 
             var path = swagger.Paths["/v1/greeter/{name}"];
-            Assert.IsTrue(path.Operations.ContainsKey(OperationType.Get));
+            Assert.True(path.Operations.ContainsKey(OperationType.Get));
         }
 
         private class GreeterService : Greeter.GreeterBase
