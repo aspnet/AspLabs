@@ -7,10 +7,10 @@
   <ItemGroup>
     <Protobuf Include="..\Proto\greet.proto" GrpcServices="Server" Link="Protos\greet.proto" />
 
-    <PackageReference Include="Grpc.Tools" Version="2.27.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.27.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Grpc.HttpApi" Version="0.1.0-alpha.20213.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.1.0-alpha.20213.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.29.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.29.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.HttpApi" Version="0.1.0-alpha.20305.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.1.0-alpha.20305.2" />
   </ItemGroup>
 
 </Project>
