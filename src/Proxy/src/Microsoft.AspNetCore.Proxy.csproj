@@ -8,6 +8,7 @@
     <PackageTags>aspnetcore</PackageTags>
     <IsPackable>true</IsPackable>
     <IsShipping>false</IsShipping>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
