@@ -12,7 +12,7 @@ namespace ProxyProtocol.Sample
     public static class ProxyProtocol
     {
         // The proxy protocol marker.
-        private static readonly byte[] Preamble = { 0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
+        private static ReadOnlySpan<byte> Preamble => new byte[] { 0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
         public static readonly string SourceIPAddressKey = "ProxyProtocolV2SourceIPAddress";
         public static readonly string DestinationIPAddressKey = "ProxyProtocolV2DestinationIPAddress";
         public static readonly string SourcePortKey = "ProxyProtocolV2SourcePort";
@@ -41,6 +41,7 @@ namespace ProxyProtocol.Sample
             {
                 var result = await input.ReadAsync();
                 var buffer = result.Buffer;
+                var examined = buffer.Start;
 
                 try
                 {
@@ -49,56 +50,51 @@ namespace ProxyProtocol.Sample
                         return;
                     }
 
-                    // Buffer does not have enough data to make decision
-                    if (buffer.Length < 12)
+                    if (buffer.Length == 0)
                     {
                         continue;
                     }
 
+                    if (buffer.Length < Preamble.Length) // 12
+                    {
+                        // Buffer does not have enough data to make decision.
+                        // Check for a partial match.
+                        var partial = buffer.ToArray();
+                        if (!Preamble.StartsWith(partial))
+                        {
+                            break;
+                        }
+
+                        examined = buffer.End;
+                        continue;
+                    }
+
                     var bufferArray = buffer.ToArray();
-                    if (!IsProxyProtocol(bufferArray))
+                    if (!bufferArray.AsSpan().StartsWith(Preamble))
                     {
                         // Break if it is not PPv2.
                         break;
                     }
-                    else
+
+                    if (HasEnoughPpv2Data(bufferArray))
                     {
-                        if (HasEnoughPpv2Data(bufferArray))
-                        {
-                            ExtractPpv2Data(ref buffer, bufferArray, connectionContext, logger);
-
-                            // It is PPv2, and we have enough data for PPv2
-                            break;
-                        }
-
-                        // It is PPv2, and we don't have enough data for PPv2
+                        // It is PPv2
+                        ExtractPpv2Data(ref buffer, bufferArray, connectionContext, logger);
+                        // We've consumed and sliced off the prefix.
+                        examined = buffer.Start;
+                        break;
                     }
+
+                    // It is PPv2, and we don't have enough data for PPv2
+                    examined = buffer.End;
                 }
                 finally
                 {
-                    input.AdvanceTo(buffer.Start);
+                    input.AdvanceTo(buffer.Start, examined);
                 }
             }
 
             await next();
-        }
-
-        private static bool IsProxyProtocol(byte[] buffer)
-        {
-            if (buffer.Length > 12)
-            {
-                for (var i = 0; i < 12; i++)
-                {
-                    if (Preamble[i] != buffer[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         private static void ExtractPpv2Data(ref ReadOnlySequence<byte> buffer, byte[] bufferArray, ConnectionContext context, ILogger logger = null)

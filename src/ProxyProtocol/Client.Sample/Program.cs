@@ -43,7 +43,13 @@ namespace Client.Sample
 
             Console.WriteLine("Sending message");
             var data = CreateMessage(serverAddress);
-            await stream.WriteAsync(data);
+            for (var i = 0; i < data.Length; i++)
+            {
+                Console.Write(".");
+                await stream.WriteAsync(data, i, 1);
+                await Task.Delay(TimeSpan.FromSeconds(0.1));
+            }
+            Console.WriteLine();
 
             Console.WriteLine("Reading response");
             using var reader = new StreamReader(stream);
