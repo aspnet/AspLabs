@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "..\\..\\..\\AspNetCore.sln",
+    "projects": [
+      "src\\Middleware\\CSP\\src\\Microsoft.AspNetCore.Csp.csproj",
+      "src\\Middleware\\CSP\\test\\UnitTests\\Microsoft.AspNetCore.Csp.Test.csproj",
+      "src\\Middleware\\CSP\\test\\testassets\\CspMiddlewareWebSite.csproj",
+    ]
+  }
+}
