@@ -1,0 +1,63 @@
+@page "/"
+@inject JSObjectRuntime JSRuntime
+
+<button @onclick="RunTest">Run!</button>
+<br />
+<span id="@_textId" style="background-color: orange">Will be replaced.</span>
+
+@foreach (var result in results)
+{
+    <h2>@result.Key</h2>
+    <span>@result.Value</span>
+    <br />
+}
+
+@code {
+    private readonly IDictionary<string, object> results = new Dictionary<string, object>();
+
+    private readonly string _textId = "some-text";
+
+    private void RunTest()
+    {
+        using (var window = JSRuntime.GetWindow())
+        {
+            window.console.log("Is this the real world?");
+
+            var document = window.document;
+            document.title = "We can set the title without <Head>!";
+
+            var element = document.getElementById(_textId);
+            element.style = "background-color: green;";
+
+            if (element.innerText == "Will be replaced.")
+            {
+                element.innerText = "New text!";
+            }
+            else
+            {
+                window.console.log("Nothing to change");
+            }
+
+            var jsObject = JSObject.Create(window, new
+            {
+                field = "this is a field",
+                nested = new
+                {
+                    otherField = 3
+                }
+            });
+
+            window.console.log(jsObject);
+        }
+
+        using (var window = JSRuntime.GetWindow())
+        {
+            var jsTrue = JSObject.Create(window, true);
+
+            if (jsTrue)
+            {
+                window.console.log("It's true!");
+            }
+        }
+    }
+}
