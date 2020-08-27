@@ -25,8 +25,6 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
     /// </summary>
     public abstract class ProtectedBrowserStorage
     {
-        private const string JsFunctionsPrefix = "protectedBrowserStorage";
-
         private readonly string _storeName;
         private readonly IJSRuntime _jsRuntime;
         private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -95,8 +93,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
             var protector = GetOrCreateCachedProtector(purpose);
             var protectedJson = protector.Protect(json);
             return _jsRuntime.InvokeVoidAsync(
-                $"{JsFunctionsPrefix}.set",
-                _storeName,
+                $"{_storeName}.setItem",
                 key,
                 protectedJson);
         }
@@ -123,8 +120,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         public async ValueTask<T> GetAsync<T>(string purpose, string key)
         {
             var protectedJson = await _jsRuntime.InvokeAsync<string>(
-                $"{JsFunctionsPrefix}.get",
-                _storeName,
+                $"{_storeName}.getItem",
                 key);
 
             // We should consider having both TryGetAsync and GetValueOrDefaultAsync
@@ -150,8 +146,7 @@ namespace Microsoft.AspNetCore.ProtectedBrowserStorage
         public ValueTask DeleteAsync(string key)
         {
             return _jsRuntime.InvokeVoidAsync(
-                $"{JsFunctionsPrefix}.delete",
-                _storeName,
+                $"{_storeName}.removeItem",
                 key);
         }
 
