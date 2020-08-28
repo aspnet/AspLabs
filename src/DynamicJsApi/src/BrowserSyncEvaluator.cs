@@ -7,10 +7,12 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.JSInterop;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     internal class BrowserSyncEvaluator : ISyncEvaluator
     {
+        private readonly IJSInProcessRuntime _jsRuntime;
+
         private readonly MethodInfo _getResultGenericMethodInfo;
 
         private readonly IDictionary<Type, GetResultDelegate> _cachedDelegates;
@@ -18,41 +20,36 @@ namespace Microsoft.AspNetCore.DynamicJs
         private delegate object GetResultDelegate(
             long treeId,
             long targetObjectId,
-            IJSInProcessRuntime jsRuntime,
             IEnumerable<IJSExpression> expressionList);
 
-        public BrowserSyncEvaluator()
+        public BrowserSyncEvaluator(IJSInProcessRuntime jsRuntime)
         {
+            _jsRuntime = jsRuntime;
             _getResultGenericMethodInfo = GetType().GetMethod(
                 nameof(EvaluateGeneric),
-                BindingFlags.Static | BindingFlags.NonPublic)!;
-
+                BindingFlags.Instance | BindingFlags.NonPublic)!;
             _cachedDelegates = new Dictionary<Type, GetResultDelegate>();
         }
 
         public object Evaluate(
+            Type returnType,
             long treeId,
             long targetObjectId,
-            Type type,
-            IJSRuntime jsRuntime,
             IEnumerable<IJSExpression> expressionList)
         {
-            if (!_cachedDelegates.TryGetValue(type, out var getResult))
+            if (!_cachedDelegates.TryGetValue(returnType, out var getResult))
             {
-                var getResultMethodInfo = _getResultGenericMethodInfo.MakeGenericMethod(type);
-                getResult = _cachedDelegates[type] = (GetResultDelegate)Delegate.CreateDelegate(typeof(GetResultDelegate), getResultMethodInfo);
+                var getResultMethodInfo = _getResultGenericMethodInfo.MakeGenericMethod(returnType);
+                getResult = _cachedDelegates[returnType] = (GetResultDelegate)Delegate.CreateDelegate(typeof(GetResultDelegate), this, getResultMethodInfo);
             }
 
-            return getResult(treeId, targetObjectId, (IJSInProcessRuntime)jsRuntime, expressionList);
+            return getResult(treeId, targetObjectId, expressionList);
         }
 
-        private static object EvaluateGeneric<TResult>(
+        private object EvaluateGeneric<TResult>(
             long treeId,
             long targetObjectId,
-            IJSInProcessRuntime jsRuntime,
             IEnumerable<IJSExpression> expressionList)
-        {
-            return jsRuntime.Invoke<TResult>(JSObjectInterop.Evaluate, treeId, targetObjectId, expressionList.ToList<object>())!;
-        }
+            => _jsRuntime.Invoke<TResult>(JSObjectInterop.Evaluate, treeId, targetObjectId, expressionList.ToList<object>())!;
     }
 }

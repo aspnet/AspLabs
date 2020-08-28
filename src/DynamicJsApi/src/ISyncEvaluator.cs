@@ -3,17 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.JSInterop;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     internal interface ISyncEvaluator
     {
         object Evaluate(
+            Type returnType,
             long treeId,
             long targetObjectId,
-            Type type,
-            IJSRuntime jsRuntime,
             IEnumerable<IJSExpression> expressionList);
     }
 }

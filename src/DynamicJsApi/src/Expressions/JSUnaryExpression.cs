@@ -3,7 +3,7 @@
 
 using System.Linq.Expressions;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     internal class JSUnaryExpression : IJSExpression
     {

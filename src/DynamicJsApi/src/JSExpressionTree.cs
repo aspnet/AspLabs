@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     internal class JSExpressionTree : IDisposable
     {
-        private readonly JSObjectRuntime _jsObjectRuntime;
+        private readonly ISyncEvaluator _syncEvaluator;
 
         private readonly long _id;
 
@@ -20,9 +20,9 @@ namespace Microsoft.AspNetCore.DynamicJs
 
         internal JSObject Root { get; }
 
-        public JSExpressionTree(JSObjectRuntime jsObjectRuntime, long id)
+        public JSExpressionTree(ISyncEvaluator syncEvaluator, long id)
         {
-            _jsObjectRuntime = jsObjectRuntime;
+            _syncEvaluator = syncEvaluator;
             _id = id;
             _expressionList = new List<IJSExpression>();
             _nextObjectId = 1;
@@ -42,11 +42,11 @@ namespace Microsoft.AspNetCore.DynamicJs
             return true;
         }
 
-        public bool Evaluate(long targetObjectId, Type type, out object? result)
+        public bool Evaluate(Type returnType, long targetObjectId, out object? result)
         {
             ThrowIfDisposed();
 
-            result = _jsObjectRuntime.Evaluate(_id, targetObjectId, type,  _expressionList);
+            result = _syncEvaluator.Evaluate(returnType, _id, targetObjectId, _expressionList);
 
             _expressionList.Clear();
 
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.DynamicJs
             }
 
             // Evaluate the remaining expressions (targetObjectId of -1 clears the object cache).
-            _jsObjectRuntime.Evaluate(_id, -1, typeof(object), _expressionList);
+            _syncEvaluator.Evaluate(typeof(object), _id, -1, _expressionList);
             _disposed = true;
         }
 

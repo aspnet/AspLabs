@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     internal struct JSObjectIdWrapper
     {

@@ -5,7 +5,7 @@ using System;
 using System.Dynamic;
 using System.Linq.Expressions;
 
-namespace Microsoft.AspNetCore.DynamicJs
+namespace Microsoft.AspNetCore.DynamicJS
 {
     public class JSObject : DynamicObject, IDisposable
     {
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.DynamicJs
         }
 
         public override bool TryConvert(ConvertBinder binder, out object? result)
-            => _jsExpressionTree.Evaluate(Id, binder.Type, out result);
+            => _jsExpressionTree.Evaluate(binder.Type, Id, out result);
 
         public override bool TryGetMember(GetMemberBinder binder, out object? result)
             => _jsExpressionTree.AddExpression(new JSPropertyExpression
@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.DynamicJs
 
             if (binder.ReturnType != typeof(object) && binder.ReturnType != typeof(JSObject))
             {
-                return _jsExpressionTree.Evaluate(((JSObject)result!).Id, binder.ReturnType, out result);
+                return _jsExpressionTree.Evaluate(binder.ReturnType, ((JSObject)result!).Id, out result);
             }
 
             return true;
@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.DynamicJs
 
             if (returnType != typeof(object) && returnType != typeof(JSObject))
             {
-                return _jsExpressionTree.Evaluate(((JSObject)result!).Id, returnType, out result);
+                return _jsExpressionTree.Evaluate(returnType, ((JSObject)result!).Id, out result);
             }
 
             return true;
@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.DynamicJs
         {
             if (args != null)
             {
-                for (int i = 0; i < args.Length; i++)
+                for (var i = 0; i < args.Length; i++)
                 {
                     args[i] = TransformArg(args[i]);
                 }
