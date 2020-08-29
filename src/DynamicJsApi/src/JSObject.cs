@@ -4,14 +4,16 @@
 using System;
 using System.Dynamic;
 using System.Linq.Expressions;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.DynamicJS
 {
+    [JsonConverter(typeof(JSObjectJsonConverter))]
     public class JSObject : DynamicObject, IDisposable
     {
-        private readonly JSExpressionTree _jsExpressionTree;
-
         internal long Id { get; }
+
+        internal JSExpressionTree ExpressionTree { get; }
 
         public static dynamic Create(JSObject root, object value)
         {
@@ -26,7 +28,7 @@ namespace Microsoft.AspNetCore.DynamicJS
                 Value = value
             };
 
-            if (root._jsExpressionTree.AddExpression(expression, out var result) &&
+            if (root.ExpressionTree.AddExpression(expression, out var result) &&
                 result is JSObject jsObject)
             {
                 expression.TargetObjectId = jsObject.Id;
@@ -41,36 +43,36 @@ namespace Microsoft.AspNetCore.DynamicJS
         internal JSObject(long id, JSExpressionTree jsExpressionTree)
         {
             Id = id;
-            _jsExpressionTree = jsExpressionTree;
+            ExpressionTree = jsExpressionTree;
         }
 
         public override bool TryConvert(ConvertBinder binder, out object? result)
-            => _jsExpressionTree.Evaluate(binder.Type, Id, out result);
+            => ExpressionTree.Evaluate(binder.Type, Id, out result);
 
         public override bool TryGetMember(GetMemberBinder binder, out object? result)
-            => _jsExpressionTree.AddExpression(new JSPropertyExpression
+            => ExpressionTree.AddExpression(new JSPropertyExpression
             {
                 TargetObjectId = Id,
                 Name = binder.Name
             }, out result);
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object?[]? args, out object? result)
-            => _jsExpressionTree.AddExpression(new JSMethodExpression
+            => ExpressionTree.AddExpression(new JSMethodExpression
             {
                 TargetObjectId = Id,
                 Name = binder.Name,
-                Args = TransformArgs(args)
+                Args = args
             }, out result);
 
         public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
-            => _jsExpressionTree.AddExpression(new JSInvocationExpression
+            => ExpressionTree.AddExpression(new JSInvocationExpression
             {
                 TargetObjectId = Id,
-                Args = TransformArgs(args)
+                Args = args
             }, out result);
 
         public override bool TrySetMember(SetMemberBinder binder, object? value)
-            => _jsExpressionTree.AddExpression(new JSAssignmentExpression
+            => ExpressionTree.AddExpression(new JSAssignmentExpression
             {
                 TargetObjectId = Id,
                 Name = binder.Name,
@@ -82,7 +84,7 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         public override bool TryUnaryOperation(UnaryOperationBinder binder, out object? result)
         {
-            _jsExpressionTree.AddExpression(new JSUnaryExpression
+            ExpressionTree.AddExpression(new JSUnaryExpression
             {
                 TargetObjectId = Id,
                 Operation = binder.Operation
@@ -90,7 +92,7 @@ namespace Microsoft.AspNetCore.DynamicJS
 
             if (binder.ReturnType != typeof(object) && binder.ReturnType != typeof(JSObject))
             {
-                return _jsExpressionTree.Evaluate(binder.ReturnType, ((JSObject)result!).Id, out result);
+                return ExpressionTree.Evaluate(binder.ReturnType, ((JSObject)result!).Id, out result);
             }
 
             return true;
@@ -110,16 +112,16 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         private bool AddBinaryExpression(ExpressionType operation, Type returnType, object? arg, out object? result)
         {
-            _jsExpressionTree.AddExpression(new JSBinaryExpression
+            ExpressionTree.AddExpression(new JSBinaryExpression
             {
                 TargetObjectId = Id,
                 Operation = operation,
-                Arg = TransformArg(arg)
+                Arg = arg
             }, out result);
 
             if (returnType != typeof(object) && returnType != typeof(JSObject))
             {
-                return _jsExpressionTree.Evaluate(returnType, ((JSObject)result!).Id, out result);
+                return ExpressionTree.Evaluate(returnType, ((JSObject)result!).Id, out result);
             }
 
             return true;
@@ -134,31 +136,11 @@ namespace Microsoft.AspNetCore.DynamicJS
         public override int GetHashCode()
             => base.GetHashCode();
 
-        private object?[]? TransformArgs(object?[]? args)
-        {
-            if (args != null)
-            {
-                for (var i = 0; i < args.Length; i++)
-                {
-                    args[i] = TransformArg(args[i]);
-                }
-            }
-
-            return args;
-        }
-
-        private object? TransformArg(object? arg)
-            => arg switch
-            {
-                JSObject jsObject => new JSObjectIdWrapper { Id = jsObject.Id },
-                _ => arg
-            };
-
         public void Dispose()
         {
             if (Id == 0)
             {
-                ((IDisposable)_jsExpressionTree).Dispose();
+                ((IDisposable)ExpressionTree).Dispose();
             }
             else
             {

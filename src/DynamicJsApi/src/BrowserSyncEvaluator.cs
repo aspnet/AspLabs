@@ -25,9 +25,7 @@ namespace Microsoft.AspNetCore.DynamicJS
         public BrowserSyncEvaluator(IJSInProcessRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
-            _getResultGenericMethodInfo = GetType().GetMethod(
-                nameof(EvaluateGeneric),
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
+            _getResultGenericMethodInfo = GetType().GetMethod(nameof(EvaluateGeneric), BindingFlags.Instance | BindingFlags.NonPublic)!;
             _cachedDelegates = new Dictionary<Type, GetResultDelegate>();
         }
 

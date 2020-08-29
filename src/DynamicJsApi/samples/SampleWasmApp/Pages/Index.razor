@@ -19,7 +19,9 @@
 
     private void RunTest()
     {
-        using (var window = JSRuntime.GetWindow())
+        var jsRuntime = (JSInProcessRuntime)JSRuntime;
+
+        using (var window = jsRuntime.GetWindowDynamic())
         {
             window.console.log("Is this the real world?");
 
@@ -50,7 +52,7 @@
             window.console.log(jsObject);
         }
 
-        using (var window = JSRuntime.GetWindow())
+        using (var window = jsRuntime.GetWindowDynamic())
         {
             var jsTrue = JSObject.Create(window, true);
 

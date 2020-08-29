@@ -14,10 +14,9 @@
         NOT_EQUAL: 35,
         IS_TRUE: 83,
         IS_FALSE: 84
-    }
+    };
 
-    const objectIdPropertyName = '__objectId';
-
+    const objectIdPropertyName = '__jsObjectId';
     const objectCacheByTreeId = {};
 
     function getOrCreateObjectCache(treeId) {
@@ -31,26 +30,12 @@
         return cache;
     }
 
-    function reviveArg(arg, cache) {
-        if (arg.hasOwnProperty(objectIdPropertyName)) {
-            return cache[arg[objectIdPropertyName]];
-        }
-
-        return arg;
-    }
-
-    function reviveArgs(args, cache) {
-        return args.map(function (arg) {
-            return reviveArg(arg, cache);
-        });
-    }
-
-    function evaluateBinaryExpression(e, target, cache) {
+    function evaluateBinaryExpression(e, target) {
         switch (e.operation) {
             case Operation.EQUAL:
-                return target === reviveArg(e.arg, cache);
+                return target === e.arg;
             case Operation.NOT_EQUAL:
-                return target !== reviveArg(e.arg, cache);
+                return target !== e.arg;
             default:
                 throw new Error('Unknown binary operation.');
         }
@@ -67,20 +52,20 @@
         }
     }
 
-    function evaluateExpression(e, target, cache) {
+    function evaluateExpression(e, target) {
         switch (e.type) {
             case ExpressionType.PROPERTY:
                 return target[e.name];
             case ExpressionType.METHOD:
-                return target[e.name].apply(target, reviveArgs(e.args, cache));
+                return target[e.name].apply(target, e.args);
             case ExpressionType.INVOCATION:
-                return target.apply(null, reviveArgs(e.args, cache));
+                return target.apply(null, e.args);
             case ExpressionType.INSTANTIATION:
                 return e.value;
             case ExpressionType.ASSIGNMENT:
                 return target[e.name] = e.value;
             case ExpressionType.BINARY:
-                return evaluateBinaryExpression(e, target, cache);
+                return evaluateBinaryExpression(e, target);
             case ExpressionType.UNARY:
                 return evaluateUnaryExpression(e, target);
             default:
@@ -88,12 +73,45 @@
         }
     }
 
+    function generateRevivals(root, revivalsByObjectId) {
+        Object.entries(root).forEach(function ([key, value]) {
+            if (value !== null && typeof value === 'object') {
+                if (value.hasOwnProperty(objectIdPropertyName)) {
+                    const objectId = value[objectIdPropertyName];
+                    const revivals = revivalsByObjectId[objectId] || (revivalsByObjectId[objectId] = []);
+                    revivals.push({
+                        parent: root,
+                        key,
+                    });
+                } else {
+                    generateRevivals(value, revivalsByObjectId);
+                }
+            }
+        });
+    }
+
     function evaluate(treeId, targetObjectId, expressionChain) {
         const cache = getOrCreateObjectCache(treeId);
+        const revivalsByObjectId = {};
 
-        expressionChain.forEach(e => {
+        expressionChain.forEach(function (e) {
+            generateRevivals(e, revivalsByObjectId);
+        });
+
+        expressionChain.forEach(function (e) {
             const target = cache[e.targetObjectId];
-            cache[cache.length] = evaluateExpression(e, target, cache);
+            const result = evaluateExpression(e, target);
+
+            const resultObjectId = cache.length;
+            const revivals = revivalsByObjectId[resultObjectId];
+
+            if (revivals) {
+                revivals.forEach(function ({ parent, key }) {
+                    parent[key] = result;
+                });
+            }
+
+            cache[resultObjectId] = result;
         });
 
         if (targetObjectId < 0) {

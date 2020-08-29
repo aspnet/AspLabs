@@ -13,20 +13,18 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         private static ISyncEvaluator? _syncEvaluator;
 
-        public static dynamic GetWindow(this IJSRuntime jsRuntime)
+        public static dynamic GetWindowDynamic(this IJSInProcessRuntime jsRuntime)
         {
-            if (jsRuntime is IJSInProcessRuntime jsInProcessRuntime)
-            {
-                _syncEvaluator ??= new BrowserSyncEvaluator(jsInProcessRuntime);
-                return new JSExpressionTree(_syncEvaluator, _nextTreeId++).Root;
-            }
-
-            throw new InvalidOperationException(
-                $"Can only be called on a {typeof(IJSInProcessRuntime)} instance. " +
-                $"Use {nameof(GetWindowAsync)} when using Blazor Server.");
+            _syncEvaluator ??= new BrowserSyncEvaluator(jsRuntime);
+            return new JSExpressionTree(_syncEvaluator, _nextTreeId++).Root;
         }
 
-        public static ValueTask<dynamic> GetWindowAsync(this IJSRuntime jsRuntime)
+        public static void EvaluateDynamic(this IJSInProcessRuntime jsRuntime, JSObject jsObject)
+        {
+
+        }
+
+        public static ValueTask<dynamic> GetWindowDynamicAsync(this IJSRuntime jsRuntime)
         {
             // TODO
             throw new NotImplementedException();
