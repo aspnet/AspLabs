@@ -1,7 +1,7 @@
-@page "/"
+@page "/async"
 @inject IJSRuntime JSRuntime
 
-<h1>Synchronous dynamic JS</h1>
+<h1>Asynchronous dynamic JS</h1>
 
 <button @onclick="RunTest">Run!</button>
 <br />
@@ -19,11 +19,9 @@
 
     private readonly string _textId = "some-text";
 
-    private void RunTest()
+    private async Task RunTest()
     {
-        var jsInProcessRuntime = (IJSInProcessRuntime)JSRuntime;
-
-        using (var window = jsInProcessRuntime.GetInProcessDynamicWindow())
+        await using (var window = JSRuntime.GetDynamicWindow())
         {
             window.console.log("Is this the real world?");
 
@@ -33,7 +31,7 @@
             var element = document.getElementById(_textId);
             element.style = "background-color: green;";
 
-            if (element.innerText == "Will be replaced.")
+            if (await JSObject.EvaluateAsync<bool>(element.innerText == "Will be replaced."))
             {
                 element.innerText = "New text!";
             }
@@ -54,11 +52,11 @@
             window.console.log(jsObject);
         }
 
-        using (var window = jsInProcessRuntime.GetInProcessDynamicWindow())
+        await using (var window = JSRuntime.GetDynamicWindow())
         {
             var jsTrue = JSObject.Create(window, true);
 
-            if (jsTrue)
+            if (await JSObject.EvaluateAsync<bool>(jsTrue))
             {
                 window.console.log("It's true!");
             }

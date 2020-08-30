@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Microsoft.JSInterop;
 
 namespace Microsoft.AspNetCore.DynamicJS
 {
-    internal class BrowserSyncEvaluator : ISyncEvaluator
+    internal class InProcessEvaluator
     {
         private readonly IJSInProcessRuntime _jsRuntime;
 
@@ -17,23 +16,16 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         private readonly IDictionary<Type, GetResultDelegate> _cachedDelegates;
 
-        private delegate object GetResultDelegate(
-            long treeId,
-            long targetObjectId,
-            IEnumerable<IJSExpression> expressionList);
+        private delegate object GetResultDelegate(long treeId, long targetObjectId, IEnumerable<object> expressionList);
 
-        public BrowserSyncEvaluator(IJSInProcessRuntime jsRuntime)
+        public InProcessEvaluator(IJSInProcessRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
             _getResultGenericMethodInfo = GetType().GetMethod(nameof(EvaluateGeneric), BindingFlags.Instance | BindingFlags.NonPublic)!;
             _cachedDelegates = new Dictionary<Type, GetResultDelegate>();
         }
 
-        public object Evaluate(
-            Type returnType,
-            long treeId,
-            long targetObjectId,
-            IEnumerable<IJSExpression> expressionList)
+        public object Evaluate(Type returnType, long treeId, long targetObjectId, IEnumerable<object> expressionList)
         {
             if (!_cachedDelegates.TryGetValue(returnType, out var getResult))
             {
@@ -44,10 +36,7 @@ namespace Microsoft.AspNetCore.DynamicJS
             return getResult(treeId, targetObjectId, expressionList);
         }
 
-        private object EvaluateGeneric<TResult>(
-            long treeId,
-            long targetObjectId,
-            IEnumerable<IJSExpression> expressionList)
-            => _jsRuntime.Invoke<TResult>(JSObjectInterop.Evaluate, treeId, targetObjectId, expressionList.ToList<object>())!;
+        private object EvaluateGeneric<TResult>(long treeId, long targetObjectId, IEnumerable<object> expressionList)
+            => _jsRuntime.Invoke<TResult>(DynamicJSInterop.Evaluate, treeId, targetObjectId, expressionList)!;
     }
 }

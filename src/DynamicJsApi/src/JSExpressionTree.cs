@@ -3,16 +3,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace Microsoft.AspNetCore.DynamicJS
 {
-    internal class JSExpressionTree : IDisposable
+    internal class JSExpressionTree : IDisposable, IAsyncDisposable
     {
-        private readonly ISyncEvaluator _syncEvaluator;
+        private readonly IJSRuntime _jsRuntime;
 
         private readonly long _id;
 
-        private readonly IList<IJSExpression> _expressionList;
+        private readonly InProcessEvaluator? _inProcessEvaluator;
+
+        private readonly IList<object> _expressionList;
 
         private long _nextObjectId;
 
@@ -20,40 +25,76 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         internal JSObject Root { get; }
 
-        public JSExpressionTree(ISyncEvaluator syncEvaluator, long id)
+        public JSExpressionTree(IJSRuntime jsRuntime, long id, InProcessEvaluator? syncEvaluator = default)
         {
-            _syncEvaluator = syncEvaluator;
+            _jsRuntime = jsRuntime;
             _id = id;
-            _expressionList = new List<IJSExpression>();
+            _inProcessEvaluator = syncEvaluator;
+            _expressionList = new List<object>();
             _nextObjectId = 1;
 
             Root = new JSObject(0, this);
         }
 
-        public bool AddExpression(IJSExpression expression, out object? result)
+        public JSObject AddExpression(IJSExpression expression)
         {
             ThrowIfDisposed();
 
-            result = new JSObject(_nextObjectId, this);
+            var result = new JSObject(_nextObjectId, this);
 
             _nextObjectId++;
             _expressionList.Add(expression);
 
-            return true;
+            return result;
         }
 
-        public bool Evaluate(Type returnType, long targetObjectId, out object? result)
+        public object Evaluate(Type returnType, long targetObjectId)
+        {
+            if (_inProcessEvaluator == null)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot synchronously evaluate an asynchronous JS expression tree as a {returnType}. " +
+                    $"Use {nameof(JSObject.EvaluateAsync)} to evaluate the result asynchronously.");
+            }
+
+            ThrowIfDisposed();
+
+            var result = _inProcessEvaluator.Evaluate(returnType, _id, targetObjectId, _expressionList);
+            _expressionList.Clear();
+
+            return result;
+        }
+
+        public async ValueTask<TResult> EvaluateAsync<TResult>(long targetObjectId)
         {
             ThrowIfDisposed();
 
-            result = _syncEvaluator.Evaluate(returnType, _id, targetObjectId, _expressionList);
-
+            var result = await _jsRuntime.InvokeAsync<TResult>(DynamicJSInterop.Evaluate, _id, targetObjectId, _expressionList);
             _expressionList.Clear();
 
-            return true;
+            return result;
         }
 
-        void IDisposable.Dispose()
+        public void Dispose()
+        {
+            if (_inProcessEvaluator == null)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot synchronously dispose an asynchronous JS expression tree. " +
+                    $"Use {nameof(DisposeAsync)} to dispose the expression tree asynchronously.");
+            }
+
+            if (_disposed)
+            {
+                return;
+            }
+
+            // Evaluate the remaining expressions (targetObjectId of -1 clears the object cache).
+            _inProcessEvaluator.Evaluate(typeof(object), _id, -1, _expressionList);
+            _disposed = true;
+        }
+
+        public async ValueTask DisposeAsync()
         {
             if (_disposed)
             {
@@ -61,7 +102,7 @@ namespace Microsoft.AspNetCore.DynamicJS
             }
 
             // Evaluate the remaining expressions (targetObjectId of -1 clears the object cache).
-            _syncEvaluator.Evaluate(typeof(object), _id, -1, _expressionList);
+            await _jsRuntime.InvokeAsync<object>(DynamicJSInterop.Evaluate, _id, -1, _expressionList.ToList<object>());
             _disposed = true;
         }
 

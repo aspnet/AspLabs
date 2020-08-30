@@ -90,15 +90,15 @@
         });
     }
 
-    function evaluate(treeId, targetObjectId, expressionChain) {
+    function evaluate(treeId, targetObjectId, expressionList) {
         const cache = getOrCreateObjectCache(treeId);
         const revivalsByObjectId = {};
 
-        expressionChain.forEach(function (e) {
+        expressionList.forEach(function (e) {
             generateRevivals(e, revivalsByObjectId);
         });
 
-        expressionChain.forEach(function (e) {
+        expressionList.forEach(function (e) {
             const target = cache[e.targetObjectId];
             const result = evaluateExpression(e, target);
 

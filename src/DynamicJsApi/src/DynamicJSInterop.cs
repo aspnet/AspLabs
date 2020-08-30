@@ -3,7 +3,7 @@
 
 namespace Microsoft.AspNetCore.DynamicJS
 {
-    internal static class JSObjectInterop
+    internal static class DynamicJSInterop
     {
         private const string JSFunctionsPrefix = "jsObject.";
 
