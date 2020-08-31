@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
@@ -65,11 +64,11 @@ namespace Microsoft.AspNetCore.DynamicJS
             return result;
         }
 
-        public async ValueTask<TResult> EvaluateAsync<TResult>(long targetObjectId)
+        public async ValueTask<TValue> EvaluateAsync<TValue>(long targetObjectId)
         {
             ThrowIfDisposed();
 
-            var result = await _jsRuntime.InvokeAsync<TResult>(DynamicJSInterop.Evaluate, _id, targetObjectId, _expressionList);
+            var result = await _jsRuntime.InvokeAsync<TValue>(DynamicJSInterop.Evaluate, _id, targetObjectId, _expressionList);
             _expressionList.Clear();
 
             return result;
@@ -102,7 +101,7 @@ namespace Microsoft.AspNetCore.DynamicJS
             }
 
             // Evaluate the remaining expressions (targetObjectId of -1 clears the object cache).
-            await _jsRuntime.InvokeAsync<object>(DynamicJSInterop.Evaluate, _id, -1, _expressionList.ToList<object>());
+            await _jsRuntime.InvokeAsync<object>(DynamicJSInterop.Evaluate, _id, -1, _expressionList);
             _disposed = true;
         }
 

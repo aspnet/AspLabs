@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.DynamicJS
             return getResult(treeId, targetObjectId, expressionList);
         }
 
-        private object EvaluateGeneric<TResult>(long treeId, long targetObjectId, IEnumerable<object> expressionList)
-            => _jsRuntime.Invoke<TResult>(DynamicJSInterop.Evaluate, treeId, targetObjectId, expressionList)!;
+        private object EvaluateGeneric<TValue>(long treeId, long targetObjectId, IEnumerable<object> expressionList)
+            => _jsRuntime.Invoke<TValue>(DynamicJSInterop.Evaluate, treeId, targetObjectId, expressionList)!;
     }
 }
