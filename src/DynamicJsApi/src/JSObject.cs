@@ -122,17 +122,11 @@ namespace Microsoft.AspNetCore.DynamicJS
             return true;
         }
 
-        public static bool operator ==(JSObject jsObject1, JSObject jsObject2)
-            => (bool)jsObject1.AddBinaryExpression(ExpressionType.Equal, typeof(bool), jsObject2);
+        public static dynamic operator ==(JSObject jsObject1, JSObject jsObject2)
+            => jsObject1.AddBinaryExpression(ExpressionType.Equal, typeof(object), jsObject2);
 
-        public static bool operator !=(JSObject jsObject1, JSObject jsObject2)
-            => (bool)jsObject1.AddBinaryExpression(ExpressionType.NotEqual, typeof(bool), jsObject2);
-
-        public override bool Equals(object? obj)
-            => (bool)AddBinaryExpression(ExpressionType.Equal, typeof(bool), obj);
-
-        public override int GetHashCode()
-            => base.GetHashCode();
+        public static dynamic operator !=(JSObject jsObject1, JSObject jsObject2)
+            => jsObject1.AddBinaryExpression(ExpressionType.NotEqual, typeof(object), jsObject2);
 
         private object AddBinaryExpression(ExpressionType operation, Type returnType, object? arg)
             => _expressionTree.AddExpression(new JSBinaryExpression

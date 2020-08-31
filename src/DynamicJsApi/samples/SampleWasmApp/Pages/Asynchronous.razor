@@ -3,31 +3,31 @@
 
 <h1>Asynchronous dynamic JS</h1>
 
-<button @onclick="RunTest">Run!</button>
+<button @onclick="RunAdvanced">Run advanced usage</button>
 <br />
 <span id="@_textId" style="background-color: orange">Will be replaced.</span>
+<br />
 
-@foreach (var result in results)
-{
-    <h2>@result.Key</h2>
-    <span>@result.Value</span>
-    <br />
-}
+<br />
+<UsageCommon DynamicJSProvider="_dynamicJSProvider" />
 
 @code {
-    private readonly IDictionary<string, object> results = new Dictionary<string, object>();
-
     private readonly string _textId = "some-text";
 
-    private async Task RunTest()
+    private AsyncDynamicJSProvider _dynamicJSProvider;
+
+    protected override void OnInitialized()
+    {
+        _dynamicJSProvider = new AsyncDynamicJSProvider(JSRuntime);
+    }
+
+    private async Task RunAdvanced()
     {
         await using (var window = JSRuntime.GetDynamicWindow())
         {
             window.console.log("Is this the real world?");
 
             var document = window.document;
-            document.title = "We can set the title without <Head>!";
-
             var element = document.getElementById(_textId);
             element.style = "background-color: green;";
 

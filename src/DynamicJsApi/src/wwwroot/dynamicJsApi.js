@@ -9,11 +9,46 @@
         UNARY: 6,
     };
 
+    // These values are a subset of those specified in .NET's System.Linq.Expressions.ExpressionType.
+    // The criteria for which values are included is based on
+    // https://docs.microsoft.com/en-us/dotnet/api/system.dynamic.dynamicobject.trybinaryoperation
+    // and
+    // https://docs.microsoft.com/en-us/dotnet/api/system.dynamic.dynamicobject.tryunaryoperation
     const Operation = {
+        ADD: 0,
+        AND: 2,
+        DIVIDE: 12,
         EQUAL: 13,
+        EXCLUSIVE_OR: 14,
+        GREATER_THAN: 15,
+        GREATER_THAN_OR_EQUAL: 16,
+        LEFT_SHIFT: 19,
+        LESS_THAN: 20,
+        LESS_THAN_OR_EQUAL: 21,
+        MODULO: 25,
+        MULTIPLY: 26,
+        NEGATE: 28,
+        UNARY_PLUS: 29,
+        NOT: 34,
         NOT_EQUAL: 35,
+        OR: 36,
+        RIGHT_SHIFT: 41,
+        SUBTRACT: 42,
+        DECREMENT: 49,
+        INCREMENT: 54,
+        ADD_ASSIGN: 63,
+        AND_ASSIGN: 64,
+        DIVIDE_ASSIGN: 65,
+        EXCLUSIVE_OR_ASSIGN: 66,
+        LEFT_SHIFT_ASSIGN: 67,
+        MODULO_ASSIGN: 68,
+        MULTIPLY_ASSIGN: 69,
+        OR_ASSIGN: 70,
+        RIGHT_SHIFT_ASSIGN: 72,
+        SUBTRACT_ASSIGN: 73,
+        ONES_COPMPLEMENT: 82,
         IS_TRUE: 83,
-        IS_FALSE: 84
+        IS_FALSE: 84,
     };
 
     const objectIdPropertyName = '__jsObjectId';
@@ -32,23 +67,83 @@
 
     function evaluateBinaryExpression(e, target) {
         switch (e.operation) {
+            case Operation.ADD:
+                return target + e.arg;
+            case Operation.AND:
+                return target & e.arg;
+            case Operation.DIVIDE:
+                return target / e.arg;
             case Operation.EQUAL:
                 return target === e.arg;
+            case Operation.EXCLUSIVE_OR:
+                return target ^ e.arg;
+            case Operation.GREATER_THAN:
+                return target > e.arg;
+            case Operation.GREATER_THAN_OR_EQUAL:
+                return target >= e.arg;
+            case Operation.LEFT_SHIFT:
+                return target << e.arg;
+            case Operation.LESS_THAN:
+                return target < e.arg;
+            case Operation.LESS_THAN_OR_EQUAL:
+                return target <= e.arg;
+            case Operation.MODULO:
+                return target % e.arg;
+            case Operation.MULTIPLY:
+                return target * e.arg;
             case Operation.NOT_EQUAL:
                 return target !== e.arg;
+            case Operation.OR:
+                return target | e.arg;
+            case Operation.RIGHT_SHIFT:
+                return target >> e.arg;
+            case Operation.SUBTRACT:
+                return target - e.arg;
+            case Operation.ADD_ASSIGN:
+                return target += e.arg;
+            case Operation.AND_ASSIGN:
+                return target &= e.arg;
+            case Operation.DIVIDE_ASSIGN:
+                return target /= e.arg;
+            case Operation.EXCLUSIVE_OR_ASSIGN:
+                return target ^= e.arg;
+            case Operation.LEFT_SHIFT_ASSIGN:
+                return target <<= e.arg;
+            case Operation.MODULO_ASSIGN:
+                return target %= e.arg;
+            case Operation.MULTIPLY_ASSIGN:
+                return target *= e.arg;
+            case Operation.OR_ASSIGN:
+                return target |= e.arg;
+            case Operation.RIGHT_SHIFT_ASSIGN:
+                return target >>= e.arg;
+            case Operation.SUBTRACT_ASSIGN:
+                return target -= e.arg;
             default:
-                throw new Error('Unknown binary operation.');
+                throw new Error(`Unknown binary operation with ID ${e.operation}.`);
         }
     }
 
     function evaluateUnaryExpression(e, target) {
         switch (e.operation) {
+            case Operation.NEGATE:
+                return -target;
+            case Operation.UNARY_PLUS:
+                return +target;
+            case Operation.NOT:
+                return !target;
+            case Operation.DECREMENT:
+                return --target;
+            case Operation.INCREMENT:
+                return ++target;
+            case Operation.ONES_COPMPLEMENT:
+                return ~target;
             case Operation.IS_TRUE:
                 return !!target;
             case Operation.IS_FALSE:
                 return !target;
             default:
-                throw new Error('Unknown unary operation.');
+                throw new Error(`Unknown unary operation with ID ${e.operation}.`);
         }
     }
 
@@ -69,7 +164,7 @@
             case ExpressionType.UNARY:
                 return evaluateUnaryExpression(e, target);
             default:
-                throw new Error('Unknown expression type.');
+                throw new Error(`Unknown expression type with ID ${e.type}.`);
         }
     }
 
