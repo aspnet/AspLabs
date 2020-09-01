@@ -36,7 +36,7 @@ private async Task OnClick()
 ```
 
 ## Why?
-One of the greatest aspects of Blazor is that it enables developers to create web apps without using JS. However, there are times where the best solution to a problem is to use JS in your Blazor app, even if it's a few simple lines. Instead of introducing a new JS file, linking it up, and calling its functions via JSRuntime, you can write a few lines of C# using the Dynamic JS API.
+One of the greatest aspects of Blazor is that it enables developers to create web apps without using JS. However, there are times where the best solution to a problem is to use JS in your Blazor app, even if it's a few simple lines. Instead of introducing a new JS file, linking it up, and calling its functions via `IJSRuntime`, you can write a few lines of C# using the Dynamic JS API.
 
 ## Setup
 1. Add a package reference to `Microsoft.AspNetCore.DynamicJS`.
@@ -83,6 +83,6 @@ if (document.getElementById("done-loading"))
 Compared to manually evaluating asynchronously, this is far less verbose. Again, note that the example above will only run on Blazor WebAssembly.
 
 ### Cleaning up
-The root `JSObject` (the one obtained directly from `JSRuntime`) should be disposed to free up internal memory. There are two ways to do this:
+The root `JSObject` (the one obtained directly from `IJSRuntime`) should be disposed to free up internal memory. There are two ways to do this:
 1. Create the root `JSObject` with the `using` statement pattern as shown in the examples in this document. Make sure to use `await using` when using asynchronous evaluation.
 2. Call `DisposeAsync()` on the root `JSObject` when using asynchronous evaluation, or `Dispose()` when using synchronous evaluation.
