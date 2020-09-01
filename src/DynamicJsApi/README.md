@@ -40,7 +40,7 @@ One of the greatest aspects of Blazor is that it enables developers to create we
 
 ## Setup
 1. Add a package reference to `Microsoft.AspNetCore.DynamicJS`.
-2. Add `<script src="_content/Microsoft.AspNetCore.DynamicJsApi/dynamicJsApi.js"></script>` to your `index.html` when using Blazor WebAssembly, or to your `_Host.cshtml` on Blazor Server.
+2. Add `<script src="_content/Microsoft.AspNetCore.DynamicJS/dynamicJsApi.js"></script>` to your `index.html` when using Blazor WebAssembly, or to your `_Host.cshtml` on Blazor Server.
 
 ## Usage
 Before using this package, the crucial thing to understand is that all dynamic JS operations are lazily evaluated. This is done to minimize the number of JS interop calls, maximizing perforamance. There are only two conditions that trigger a dynamic JS evaluation:
