@@ -43,7 +43,7 @@ One of the greatest aspects of Blazor is that it enables developers to create we
 2. Add `<script src="_content/Microsoft.AspNetCore.DynamicJS/dynamicJsApi.js"></script>` to your `index.html` when using Blazor WebAssembly, or to your `_Host.cshtml` on Blazor Server.
 
 ## Usage
-Before using this package, the crucial thing to understand is that all dynamic JS operations are lazily evaluated. This is done to minimize the number of JS interop calls, maximizing perforamance. There are only two conditions that trigger a dynamic JS evaluation:
+Before using this package, the crucial thing to understand is that all dynamic JS operations are lazily evaluated. This is done to minimize the number of JS interop calls, maximizing performance. There are only two conditions that trigger a dynamic JS evaluation:
 1. A `JSObject` is evaluated as another .NET type. Various ways this can be done are discussed later.
 2. The "root" `JSObject` is disposed. The `using` statement is a common pattern to make sure disposal occurs, but you can also dispose the root manually. This will be discussed in more detail later.
 
@@ -63,7 +63,7 @@ var title = window.document.title;
 ```
 then `title` would be another `JSObject`, not a `string`, and no evaluation would occur.
 
-**IMPORTANT**: Attempting to cast a `JSObject` to another .NET type, **either implicitly or explicitly**, will throw an exception if the root `JSObject` was obtained via `GetDynamicWindow()`, because dynamic JS evaluations must occur asynchronously. If you're on Blazor server, there's no better alternative, but if you're on Blazor WebAssembly, read the next section.
+**IMPORTANT**: Attempting to cast a `JSObject` to another .NET type, **either implicitly or explicitly**, will throw an exception if the root `JSObject` was obtained via `GetDynamicWindow()`, because dynamic JS evaluations must occur asynchronously. If you're on Blazor Server, there's no better alternative, but if you're on Blazor WebAssembly, read the next section.
 
 ### Synchronous lazy evaluation
 If you're using Blazor WebAssembly, JS interop calls can be done in-process (i.e. synchronously). For this reason, it's possible to evaluate a `JSObject` by directly casting it to a .NET type (either implicitly or explicitly), as long as you create the root `JSObject` with `IJSInProcessRuntime.GetInProcessWindowDynamic()`. For example:
