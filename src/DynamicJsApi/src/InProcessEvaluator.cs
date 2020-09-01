@@ -12,28 +12,28 @@ namespace Microsoft.AspNetCore.DynamicJS
     {
         private readonly IJSInProcessRuntime _jsRuntime;
 
-        private readonly MethodInfo _getResultGenericMethodInfo;
+        private readonly MethodInfo _evaluateGenericMethodInfo;
 
-        private readonly IDictionary<Type, GetResultDelegate> _cachedDelegates;
+        private readonly IDictionary<Type, EvaluateDelegate> _cachedDelegates;
 
-        private delegate object GetResultDelegate(long treeId, long targetObjectId, IEnumerable<object> expressionList);
+        private delegate object EvaluateDelegate(long treeId, long targetObjectId, IEnumerable<object> expressionList);
 
         public InProcessEvaluator(IJSInProcessRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
-            _getResultGenericMethodInfo = GetType().GetMethod(nameof(EvaluateGeneric), BindingFlags.Instance | BindingFlags.NonPublic)!;
-            _cachedDelegates = new Dictionary<Type, GetResultDelegate>();
+            _evaluateGenericMethodInfo = GetType().GetMethod(nameof(EvaluateGeneric), BindingFlags.Instance | BindingFlags.NonPublic)!;
+            _cachedDelegates = new Dictionary<Type, EvaluateDelegate>();
         }
 
         public object Evaluate(Type returnType, long treeId, long targetObjectId, IEnumerable<object> expressionList)
         {
-            if (!_cachedDelegates.TryGetValue(returnType, out var getResult))
+            if (!_cachedDelegates.TryGetValue(returnType, out var evaluate))
             {
-                var getResultMethodInfo = _getResultGenericMethodInfo.MakeGenericMethod(returnType);
-                getResult = _cachedDelegates[returnType] = (GetResultDelegate)Delegate.CreateDelegate(typeof(GetResultDelegate), this, getResultMethodInfo);
+                var evaluateMethodInfo = _evaluateGenericMethodInfo.MakeGenericMethod(returnType);
+                evaluate = _cachedDelegates[returnType] = (EvaluateDelegate)Delegate.CreateDelegate(typeof(EvaluateDelegate), this, evaluateMethodInfo);
             }
 
-            return getResult(treeId, targetObjectId, expressionList);
+            return evaluate(treeId, targetObjectId, expressionList);
         }
 
         private object EvaluateGeneric<TValue>(long treeId, long targetObjectId, IEnumerable<object> expressionList)

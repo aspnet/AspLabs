@@ -24,11 +24,11 @@ namespace Microsoft.AspNetCore.DynamicJS
 
         internal JSObject Root { get; }
 
-        public JSExpressionTree(IJSRuntime jsRuntime, long id, InProcessEvaluator? syncEvaluator = default)
+        public JSExpressionTree(IJSRuntime jsRuntime, long id, InProcessEvaluator? inProcessEvaluator = default)
         {
             _jsRuntime = jsRuntime;
             _id = id;
-            _inProcessEvaluator = syncEvaluator;
+            _inProcessEvaluator = inProcessEvaluator;
             _expressionList = new List<object>();
             _nextObjectId = 1;
 
