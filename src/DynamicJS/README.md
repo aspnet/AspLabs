@@ -1,5 +1,5 @@
-## Blazor Dynamic JS API
-An API allowing JavaScipt-like interactions with JavaScript objects, all in a .NET context.
+## Blazor Dynamic JS
+An package allowing JavaScipt-like interactions with JavaScript objects, all in a .NET context.
 
 ### Example:
 ```csharp
@@ -36,11 +36,11 @@ private async Task OnClick()
 ```
 
 ## Why?
-One of the greatest aspects of Blazor is that it enables developers to create web apps without using JS. However, there are times where the best solution to a problem is to use JS in your Blazor app, even if it's a few simple lines. Instead of introducing a new JS file, linking it up, and calling its functions via `IJSRuntime`, you can write a few lines of C# using the Dynamic JS API.
+One of the greatest aspects of Blazor is that it enables developers to create web apps without using JS. However, there are times where the best solution to a problem is to use JS in your Blazor app, even if it's a few simple lines. Instead of introducing a new JS file, linking it up, and calling its functions via `IJSRuntime`, you can write a few lines of C# using DynamicJS.
 
 ## Setup
 1. Add a package reference to `Microsoft.AspNetCore.DynamicJS`.
-2. Add `<script src="_content/Microsoft.AspNetCore.DynamicJS/dynamicJsApi.js"></script>` to your `index.html` when using Blazor WebAssembly, or to your `_Host.cshtml` on Blazor Server.
+2. Add `<script src="_content/Microsoft.AspNetCore.DynamicJS/dynamic.js"></script>` to your `index.html` when using Blazor WebAssembly, or to your `_Host.cshtml` on Blazor Server.
 
 ## Usage
 Before using this package, the crucial thing to understand is that all dynamic JS operations are lazily evaluated. This is done to minimize the number of JS interop calls, maximizing performance. There are only two conditions that trigger a dynamic JS evaluation:

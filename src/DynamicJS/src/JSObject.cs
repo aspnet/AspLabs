@@ -175,7 +175,7 @@ namespace Microsoft.AspNetCore.DynamicJS
         /// Since a <see cref="bool"/> is returned, a synchronous evaluation is implicitly performed.
         /// For this reason, this operation is invalid in an asynchronous-only context.
         /// </remarks>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => (bool)AddBinaryExpression(ExpressionType.Equal, typeof(bool), obj);
 
         /// <inheritdoc />
@@ -202,6 +202,8 @@ namespace Microsoft.AspNetCore.DynamicJS
         {
             ThrowDisposeExceptionIfNonRoot();
             _expressionTree.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
