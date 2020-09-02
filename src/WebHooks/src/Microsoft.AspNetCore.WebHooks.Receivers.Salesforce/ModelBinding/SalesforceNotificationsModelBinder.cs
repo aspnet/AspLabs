@@ -21,12 +21,7 @@ namespace Microsoft.AspNetCore.WebHooks.ModelBinding
         /// <param name="bodyModelBinder">The <see cref="IModelBinder"/> to bind models from the request body.</param>
         public SalesforceNotificationsModelBinder(IModelBinder bodyModelBinder)
         {
-            if (bodyModelBinder == null)
-            {
-                throw new ArgumentNullException(nameof(bodyModelBinder));
-            }
-
-            _bodyModelBinder = bodyModelBinder;
+            _bodyModelBinder = bodyModelBinder ?? throw new ArgumentNullException(nameof(bodyModelBinder));
         }
 
         /// <inheritdoc />
