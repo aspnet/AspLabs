@@ -51,7 +51,7 @@
         IS_FALSE: 84,
     };
 
-    const objectIdPropertyName = '__jsObjectId';
+    const objectIdPropertyName = '__objectId';
     const objectCacheByTreeId = {};
 
     function getOrCreateObjectCache(treeId) {
@@ -218,7 +218,7 @@
         }
     }
 
-    window.jsObject = {
+    window.dynamicJS = {
         evaluate,
     };
 })();

@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.DynamicJS
 {
     internal class JSObjectJsonConverter : JsonConverter<JSObject>
     {
-        private static readonly string _jsObjectIdKey = "__jsObjectId";
+        private static readonly string _objectIdKey = "__objectId";
 
         public override JSObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.DynamicJS
         public override void Write(Utf8JsonWriter writer, JSObject value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WriteNumber(_jsObjectIdKey, value.Id);
+            writer.WriteNumber(_objectIdKey, value.Id);
             writer.WriteEndObject();
         }
     }
