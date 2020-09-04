@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.WebHooks.Filters;
 namespace Microsoft.AspNetCore.WebHooks.Metadata
 {
     /// <summary>
-    /// An <see cref="IWebHookMetadata"/> service containing metadata about the GitHub receiver.
+    /// An <see cref="IWebHookMetadata"/> service containing metadata about the Intercom receiver.
     /// </summary>
     public class IntercomMetadata :
         WebHookMetadata,
-        IWebHookEventMetadata,
-        IWebHookFilterMetadata,
-        IWebHookPingRequestMetadata
+        IWebHookPingRequestMetadata,
+        IWebHookEventFromBodyMetadata,
+        IWebHookFilterMetadata
     {
         private readonly IntercomVerifySignatureFilter _verifySignatureFilter;
 
@@ -31,14 +31,6 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
         /// <inheritdoc />
         public override WebHookBodyType BodyType => WebHookBodyType.Json;
 
-        // IWebHookEventMetadata...
-
-        /// <inheritdoc />
-        public string ConstantValue => null;
-
-        /// <inheritdoc />
-        public string HeaderName => IntercomConstants.EventHeaderName;
-
         /// <inheritdoc />
         public string QueryParameterName => null;
 
@@ -46,6 +38,15 @@ namespace Microsoft.AspNetCore.WebHooks.Metadata
 
         /// <inheritdoc />
         public string PingEventName => IntercomConstants.PingEventName;
+
+
+        // IWebHookEventFromBodyMetadata...
+
+        /// <inheritdoc />
+        public bool AllowMissing => false;
+
+        /// <inheritdoc />
+        public string BodyPropertyPath => IntercomConstants.EventBodyPropertyPath;
 
         // IWebHookFilterMetadata...
 

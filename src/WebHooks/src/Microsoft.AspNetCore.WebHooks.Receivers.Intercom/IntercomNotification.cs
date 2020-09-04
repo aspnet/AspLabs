@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <summary>
         /// Gets or sets the notification id.
         /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
+        [JsonProperty("id", Required = Required.AllowNull)]
         public string Id { get; set; }
 
         /// <summary>

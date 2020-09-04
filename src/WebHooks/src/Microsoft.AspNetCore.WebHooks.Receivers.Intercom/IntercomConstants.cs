@@ -14,11 +14,6 @@ namespace Microsoft.AspNetCore.WebHooks
         public static string ReceiverName => "intercom";
 
         /// <summary>
-        /// Gets the name of the header containing the Intercom event name e.g. <c>ping</c> or <c>push</c>.
-        /// </summary>
-        public static string EventHeaderName => "X-Github-Event";
-
-        /// <summary>
         /// Gets the name of the Intercom ping event.
         /// </summary>
         public static string PingEventName => "ping";
@@ -38,5 +33,11 @@ namespace Microsoft.AspNetCore.WebHooks
         /// request.
         /// </summary>
         public static string SignatureHeaderName => "X-Hub-Signature";
+
+        /// <summary>
+        /// Gets the JSON path of the property in an Intercom WebHook request body containing the Intercom event
+        /// topic. Matches the topic name.
+        /// </summary>
+        public static string EventBodyPropertyPath => "$['topic']";
     }
 }
