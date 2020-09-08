@@ -85,24 +85,6 @@ Improvement would be to write a new runtime serializer for protobuf types with t
 
 `google/api/annotations.proto` and `google/api/http.proto` need to be added in the end-user's source code so the Protobuf compiler can load them along with the user's proto files. It would be a nicer developer experience if the user somehow didn't need to worry about those files.
 
-### NuGet feed
-
-The `Microsoft.AspNetCore.Grpc.HttpApi` package is published at [https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json](https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json)
-
-To use this NuGet repository and get the latest package from it, place a `NuGet.config` file with the repository setup in your solution folder:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-    <packageSources>
-        <!-- Add this repository to the list of available repositories -->
-        <add key="DotNet5 dev repository" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" />
-    </packageSources>
-</configuration>
-```
-
-Additional instructions for configuring a project to use a custom NuGet repository are available at [Changing NuGet configuration settings](https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#changing-config-settings).
-
 ### Experimental project
 
 This project is experimental. It has known issues, it is not complete and it is not supported. We are interested in this technology but there is no commitment to completing it.
