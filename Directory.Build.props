@@ -11,7 +11,6 @@
  
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\AspNetCore.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Package and Assembly Metadata">
