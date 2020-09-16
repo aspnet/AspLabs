@@ -13,12 +13,12 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
     /// <summary>
     /// Serves as a base for components that represent tags in the HTML head.
     /// </summary>
-    public abstract class HeadTagBase : ComponentBase, IDisposable
+    public abstract class HeadTagBase : ComponentBase, IAsyncDisposable
     {
         private readonly string _id = Guid.NewGuid().ToString("N");
 
         private TagElement _tagElement;
-
+        private HeadManagementJSObjectReference _jsObject = default!;
         private bool _hasRendered;
 
         [Inject]
@@ -39,6 +39,7 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
         protected override void OnParametersSet()
         {
             _tagElement = new TagElement(TagName, Attributes);
+            _jsObject = new HeadManagementJSObjectReference(JSRuntime);
         }
 
         /// <inheritdoc />
@@ -46,7 +47,7 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
         {
             _hasRendered = true;
 
-            await JSRuntime.AddOrUpdateHeadTagAsync(_tagElement, _id);
+            await _jsObject.AddOrUpdateHeadTagAsync(_tagElement, _id);
         }
 
         /// <inheritdoc />
@@ -56,11 +57,11 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             if (_hasRendered)
             {
-                _ = JSRuntime.RemoveHeadTagAsync(_id);
+                await _jsObject.RemoveHeadTagAsync(_id);
             }
         }
     }

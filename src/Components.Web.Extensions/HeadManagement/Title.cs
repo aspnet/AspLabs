@@ -13,6 +13,8 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
     /// </summary>
     public sealed class Title : ComponentBase
     {
+        private HeadManagementJSObjectReference _jsObject = default!;
+
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -22,10 +24,15 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
         [Parameter]
         public string Value { get; set; } = string.Empty;
 
+        protected override void OnParametersSet()
+        {
+            _jsObject = new HeadManagementJSObjectReference(JSRuntime);
+        }
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await JSRuntime.SetTitleAsync(Value);
+            await _jsObject.SetTitleAsync(Value);
         }
 
         /// <inheritdoc />
