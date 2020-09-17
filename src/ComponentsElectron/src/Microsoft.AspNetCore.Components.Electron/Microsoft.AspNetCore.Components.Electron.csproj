@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>library</OutputType>
     <BlazorPackageVersion>3.0.0-preview9.19457.4</BlazorPackageVersion>
     <IsPackable>true</IsPackable>
@@ -21,9 +21,6 @@
 
   <Target Name="GetJsFiles" BeforeTargets="CoreBuild">
     <Copy SourceFiles="..\Microsoft.AspNetCore.Components.Electron.JS\dist\components.electron.js" DestinationFolder="electron-js" />
-    <ItemGroup>
-      <Content Include="electron-js\components.electron.js" CopyToOutputDirectory="PreserveNewest" BuildAction="None" PackageCopyToOutput="true" />
-    </ItemGroup>
   </Target>
 
   <ItemGroup>
