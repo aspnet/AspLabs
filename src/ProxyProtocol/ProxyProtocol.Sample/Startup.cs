@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,18 +31,18 @@ namespace ProxyProtocol.Sample
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    var connectionItems = context.Features.Get<IConnectionItemsFeature>()?.Items;
-                    if (connectionItems == null)
+                    var proxyFeature = context.Features.Get<ProxyProtocolFeature>();
+                    if (proxyFeature == null)
                     {
-                        await context.Response.WriteAsync("Unable to access the connection items. Are you using Kestrel?");
+                        await context.Response.WriteAsync("Unable to access the proxy protocol feature. Did the client send that data?");
                         return;
                     }
 
-                    await context.Response.WriteAsync($"Source IP: {connectionItems[ProxyProtocol.SourceIPAddressKey]}\r\n");
-                    await context.Response.WriteAsync($"Destination IP: {connectionItems[ProxyProtocol.DestinationIPAddressKey]}\r\n");
-                    await context.Response.WriteAsync($"Source Port: {connectionItems[ProxyProtocol.SourcePortKey]}\r\n");
-                    await context.Response.WriteAsync($"Destination Port: {connectionItems[ProxyProtocol.DestinationPortKey]}\r\n");
-                    await context.Response.WriteAsync($"Link Id: {connectionItems[ProxyProtocol.LinkIdKey]}\r\n");
+                    await context.Response.WriteAsync($"Source IP: {proxyFeature.SourceIp}\r\n");
+                    await context.Response.WriteAsync($"Destination IP: {proxyFeature.DestinationIp}\r\n");
+                    await context.Response.WriteAsync($"Source Port: {proxyFeature.SourcePort}\r\n");
+                    await context.Response.WriteAsync($"Destination Port: {proxyFeature.DestinationPort}\r\n");
+                    await context.Response.WriteAsync($"Link Id: {proxyFeature.LinkId}\r\n");
                 });
             });
         }

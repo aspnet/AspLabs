@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +26,13 @@ namespace ProxyProtocol.Sample
                         options.ListenAnyIP(5001, listenOptions =>
                         {
                             listenOptions.UseHttps();
+                            listenOptions.Use(async (connectionContext, next) =>
+                            {
+                                await ProxyProtocol.ProcessAsync(connectionContext, next, logger);
+                            });
+                        });
+                        options.ListenAnyIP(5000, listenOptions =>
+                        {
                             listenOptions.Use(async (connectionContext, next) =>
                             {
                                 await ProxyProtocol.ProcessAsync(connectionContext, next, logger);

@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -13,11 +16,6 @@ namespace ProxyProtocol.Sample
     {
         // The proxy protocol marker.
         private static ReadOnlySpan<byte> Preamble => new byte[] { 0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
-        public static readonly string SourceIPAddressKey = "ProxyProtocolV2SourceIPAddress";
-        public static readonly string DestinationIPAddressKey = "ProxyProtocolV2DestinationIPAddress";
-        public static readonly string SourcePortKey = "ProxyProtocolV2SourcePort";
-        public static readonly string DestinationPortKey = "ProxyProtocolV2DestinationPort";
-        public static readonly string LinkIdKey = "ProxyProtocolV2LinkId";
 
         /// <summary>
         /// Proxy Protocol v2: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt Section 2.2
@@ -37,6 +35,8 @@ namespace ProxyProtocol.Sample
         public static async Task ProcessAsync(ConnectionContext connectionContext, Func<Task> next, ILogger logger = null)
         {
             var input = connectionContext.Transport.Input;
+            // Count how many bytes we've examined so we never go backwards, Pipes don't allow that.
+            var minBytesExamined = 0L;
             while (true)
             {
                 var result = await input.ReadAsync();
@@ -64,7 +64,7 @@ namespace ProxyProtocol.Sample
                         {
                             break;
                         }
-
+                        minBytesExamined = buffer.Length;
                         examined = buffer.End;
                         continue;
                     }
@@ -81,15 +81,21 @@ namespace ProxyProtocol.Sample
                         // It is PPv2
                         ExtractPpv2Data(ref buffer, bufferArray, connectionContext, logger);
                         // We've consumed and sliced off the prefix.
+                        minBytesExamined = 0; // Reset, we sliced off the examined bytes.
                         examined = buffer.Start;
                         break;
                     }
 
                     // It is PPv2, and we don't have enough data for PPv2
+                    minBytesExamined = buffer.Length;
                     examined = buffer.End;
                 }
                 finally
                 {
+                    if (buffer.Slice(buffer.Start, examined).Length < minBytesExamined)
+                    {
+                        examined = buffer.Slice(buffer.Start, minBytesExamined).End;
+                    }
                     input.AdvanceTo(buffer.Start, examined);
                 }
             }
@@ -114,10 +120,13 @@ namespace ProxyProtocol.Sample
                 var srcPort = (int)(bufferArray[25] | (bufferArray[24] << 8));
                 var destPort = (int)(bufferArray[27] | (bufferArray[26] << 8));
 
-                context.Items.Add(SourceIPAddressKey, srcAddress);
-                context.Items.Add(DestinationIPAddressKey, destAddress);
-                context.Items.Add(SourcePortKey, srcPort);
-                context.Items.Add(DestinationPortKey, destPort);
+                var feature = new ProxyProtocolFeature()
+                {
+                    SourceIp = srcAddress,
+                    DestinationIp = destAddress,
+                    SourcePort = srcPort,
+                    DestinationPort = destPort,
+                };
 
                 // Probe traffic does not have link ids.
                 if (length > 12)
@@ -125,15 +134,17 @@ namespace ProxyProtocol.Sample
                     var linkId = (long)(bufferArray[32] | (bufferArray[33] << 8) | (bufferArray[34] << 16) |
                                          (bufferArray[35] << 24));
 
-                    context.Items.Add(LinkIdKey, linkId.ToString());
+                    feature.LinkId = linkId;
                 }
 
                 // Trim the buffer so the HTTP parser can pick up from there.
                 buffer = buffer.Slice(length + 16);
+
+                context.Features.Set(feature);
             }
             catch
             {
-                logger?.LogInformation($"ExtractPpv2Data error. BufferArray: {BitConverter.ToString(bufferArray)}");
+                logger?.LogDebug($"ExtractPpv2Data error. BufferArray: {BitConverter.ToString(bufferArray)}");
                 throw;
             }
         }

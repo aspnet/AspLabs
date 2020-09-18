@@ -1,8 +1,10 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,15 +14,17 @@ namespace Client.Sample
     {
         static async Task Main(string[] args)
         {
-            var serverAddress = new Uri("https://localhost:5001");
+            var serverAddress =
+                new Uri("https://localhost:5001");
+                // new Uri("http://localhost:5000");
 
-            Console.WriteLine("Ready");
+            Console.WriteLine("Ready, press any key to run.");
             Console.ReadKey();
 
-            await ConnectAsync(serverAddress);
+            await SendRequestAsync(serverAddress);
         }
 
-        private static async Task ConnectAsync(Uri serverAddress)
+        private static async Task SendRequestAsync(Uri serverAddress)
         {
             using var client = new TcpClient();
             Console.WriteLine($"Connecting to {serverAddress}");
@@ -35,7 +39,6 @@ namespace Client.Sample
                 await sslStream.AuthenticateAsClientAsync(new SslClientAuthenticationOptions()
                 {
                     TargetHost = serverAddress.Host,
-                    RemoteCertificateValidationCallback = (_, __, ___, ____) => true,
                 });
 
                 stream = sslStream;
@@ -43,11 +46,12 @@ namespace Client.Sample
 
             Console.WriteLine("Sending message");
             var data = CreateMessage(serverAddress);
+            // Send it one byte at a time to test boundary conditions.
             for (var i = 0; i < data.Length; i++)
             {
                 Console.Write(".");
-                await stream.WriteAsync(data, i, 1);
-                await Task.Delay(TimeSpan.FromSeconds(0.1));
+                await stream.WriteAsync(data.AsMemory(i, 1));
+                await Task.Delay(TimeSpan.FromSeconds(0.05));
             }
             Console.WriteLine();
 
