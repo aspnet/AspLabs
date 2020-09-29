@@ -48,7 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             // Add or replace contract resolver.
-            services.Replace(ServiceDescriptor.Transient<IDataContractResolver>(s =>
+            services.Replace(ServiceDescriptor.Transient<ISerializerDataContractResolver>(s =>
             {
                 var serializerOptions = s.GetService<IOptions<JsonOptions>>()?.Value?.JsonSerializerOptions ?? new JsonSerializerOptions();
                 var innerContractResolver = new JsonSerializerDataContractResolver(serializerOptions);

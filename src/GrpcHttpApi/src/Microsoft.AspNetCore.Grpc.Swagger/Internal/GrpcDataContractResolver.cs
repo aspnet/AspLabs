@@ -13,13 +13,13 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
 {
-    internal class GrpcDataContractResolver : IDataContractResolver
+    internal class GrpcDataContractResolver : ISerializerDataContractResolver
     {
-        private readonly IDataContractResolver _innerContractResolver;
+        private readonly ISerializerDataContractResolver _innerContractResolver;
         private readonly Dictionary<Type, MessageDescriptor> _messageTypeMapping;
         private readonly Dictionary<Type, EnumDescriptor> _enumTypeMapping;
 
-        public GrpcDataContractResolver(IDataContractResolver innerContractResolver)
+        public GrpcDataContractResolver(ISerializerDataContractResolver innerContractResolver)
         {
             _innerContractResolver = innerContractResolver;
             _messageTypeMapping = new Dictionary<Type, MessageDescriptor>();
@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                 if (_enumTypeMapping.TryGetValue(type, out var enumDescriptor))
                 {
                     var values = enumDescriptor.Values.Select(v => v.Name).ToList();
-                    return new DataContract(DataType.String, type, enumValues: values);
+                    return DataContract.ForPrimitive(type, DataType.String, null, values);
                 }
             }
 
@@ -75,19 +75,19 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                     messageDescriptor.FullName == Duration.Descriptor.FullName ||
                     messageDescriptor.FullName == FieldMask.Descriptor.FullName)
                 {
-                    return new DataContract(DataType.String, messageDescriptor.ClrType);
+                    return DataContract.ForPrimitive(messageDescriptor.ClrType, DataType.String, null);
                 }
                 if (messageDescriptor.FullName == Struct.Descriptor.FullName)
                 {
-                    return new DataContract(DataType.Object, messageDescriptor.ClrType, additionalPropertiesType: typeof(Value));
+                    return DataContract.ForObject(messageDescriptor.ClrType, properties: Enumerable.Empty<DataProperty>(), typeof(Value));
                 }
                 if (messageDescriptor.FullName == ListValue.Descriptor.FullName)
                 {
-                    return new DataContract(DataType.Array, messageDescriptor.ClrType, arrayItemType: typeof(Value));
+                    return DataContract.ForArray(messageDescriptor.ClrType, typeof(Value));
                 }
                 if (messageDescriptor.FullName == Value.Descriptor.FullName)
                 {
-                    return new DataContract(DataType.Unknown, messageDescriptor.ClrType);
+                    return DataContract.ForDynamic(messageDescriptor.ClrType);
                 }
                 if (messageDescriptor.FullName == Any.Descriptor.FullName)
                 {
@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                     {
                         new DataProperty("@type", typeof(string), isRequired: true)
                     };
-                    return new DataContract(DataType.Object, messageDescriptor.ClrType, properties: anyProperties, additionalPropertiesType: typeof(Value));
+                    return DataContract.ForObject(messageDescriptor.ClrType, properties: anyProperties, typeof(Value));
                 }
             }
 
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                 properties.Add(new DataProperty(field.JsonName, fieldType));
             }
 
-            var schema = new DataContract(DataType.Object, messageDescriptor.ClrType, properties: properties);
+            var schema = DataContract.ForObject(messageDescriptor.ClrType, properties);
 
             return schema;
         }
