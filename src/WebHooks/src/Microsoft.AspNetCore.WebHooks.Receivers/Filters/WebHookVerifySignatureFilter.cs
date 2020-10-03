@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             }
 
             var areSame = true;
-            for (var i = 0; i < inputA.Length; i++)
+            for (var i = 0; i < inputA.Length && areSame; i++)
             {
                 areSame &= inputA[i] == inputB[i];
             }
