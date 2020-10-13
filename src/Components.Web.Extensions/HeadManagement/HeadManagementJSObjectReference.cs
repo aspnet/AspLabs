@@ -10,15 +10,15 @@ namespace Microsoft.AspNetCore.Components.Web.Extensions.Head
     {
         private const string ScriptPath = "./_content/Microsoft.AspNetCore.Components.Web.Extensions/headManager.js";
         private readonly IJSRuntime _jsRuntime;
-        private Task<JSObjectReference>? _headManager;
+        private Task<IJSObjectReference>? _headManager;
 
         public HeadManagementJSObjectReference(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
         }
 
-        public Task<JSObjectReference> HeadManager =>
-            _headManager ??= _jsRuntime.InvokeAsync<JSObjectReference>("import", ScriptPath).AsTask();
+        public Task<IJSObjectReference> HeadManager =>
+            _headManager ??= _jsRuntime.InvokeAsync<IJSObjectReference>("import", ScriptPath).AsTask();
 
         public async ValueTask SetTitleAsync(string title)
         {
