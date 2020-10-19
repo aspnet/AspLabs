@@ -1,9 +1,9 @@
 {
   "sdk": {
-    "version": "5.0.100-rc.1.20452.10"
+    "version": "5.0.100-rc.2.20479.15"
   },
   "tools": {
-    "dotnet": "5.0.100-rc.1.20452.10",
+    "dotnet": "5.0.100-rc.2.20479.15",
     "runtimes": {
       "aspnetcore/x64": [
         "3.0.0",
@@ -17,6 +17,6 @@
   },
   "msbuild-sdks": {
     "Yarn.MSBuild": "1.15.2",
-    "Microsoft.DotNet.Arcade.Sdk": "5.0.0-beta.20506.7"
+    "Microsoft.DotNet.Arcade.Sdk": "6.0.0-beta.20515.7"
   }
 }
