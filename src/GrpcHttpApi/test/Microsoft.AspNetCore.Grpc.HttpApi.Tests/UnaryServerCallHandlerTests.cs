@@ -336,6 +336,68 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal("TestSubfield!", request!.Sub.Subfield);
         }
 
+        [Theory]
+        [InlineData("{malformed_json}", "Request json payload is not correctly formatted.")]
+        [InlineData("{\"name\": 1234}", "Unsupported conversion from JSON number for field type String")]
+        [InlineData("{\"abcd\": 1234}", "Unknown field: abcd")]
+        public async Task HandleCallAsync_MalformedRequestBody_BadRequestReturned(string json, string expectedError)
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                bodyDescriptor: HelloRequest.Descriptor);
+            var httpContext = CreateHttpContext();
+            httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            httpContext.Request.ContentType = "application/json";
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.Equal(400, httpContext.Response.StatusCode);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.Equal(expectedError, responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal(expectedError, responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.InvalidArgument, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("text/html")]
+        public async Task HandleCallAsync_BadContentType_BadRequestReturned(string contentType)
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                bodyDescriptor: HelloRequest.Descriptor);
+            var httpContext = CreateHttpContext();
+            httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes("{}"));
+            httpContext.Request.ContentType = contentType;
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.Equal(400, httpContext.Response.StatusCode);
+
+            var expectedError = "Request content-type of application/json is required.";
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.Equal(expectedError, responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal(expectedError, responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal((int)StatusCode.InvalidArgument, responseJson.RootElement.GetProperty("code").GetInt32());
+        }
+
         [Fact]
         public async Task HandleCallAsync_RpcExceptionReturned_StatusReturned()
         {
