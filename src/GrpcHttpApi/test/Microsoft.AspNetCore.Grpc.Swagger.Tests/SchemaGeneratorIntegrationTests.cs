@@ -106,13 +106,19 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
         public void GenerateSchema_Struct_ReturnSchema()
         {
             // Arrange & Act
-            var (schema, _) = GenerateSchema(typeof(Struct));
+            var (schema, repository) = GenerateSchema(typeof(Struct));
+
+            _ = repository.Schemas.Count;
 
             // Assert
-            Assert.Equal("object", schema.Type);
-            Assert.Equal(0, schema.Properties.Count);
-            Assert.NotNull(schema.AdditionalProperties);
-            Assert.Null(schema.AdditionalProperties.Type);
+            Assert.Equal("Struct", schema.Reference.Id);
+
+            var resolvedSchema = repository.Schemas[schema.Reference.Id];
+
+            Assert.Equal("object", resolvedSchema.Type);
+            Assert.Equal(0, resolvedSchema.Properties.Count);
+            Assert.NotNull(resolvedSchema.AdditionalProperties);
+            Assert.Null(resolvedSchema.AdditionalProperties.Type);
         }
 
         [Fact]

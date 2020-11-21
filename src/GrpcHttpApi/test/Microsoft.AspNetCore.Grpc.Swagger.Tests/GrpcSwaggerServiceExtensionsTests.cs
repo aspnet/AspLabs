@@ -3,7 +3,9 @@
 
 using Greet;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Xunit;
@@ -24,6 +26,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             });
             services.AddRouting();
             services.AddLogging();
+            services.AddSingleton<IWebHostEnvironment, TestWebHostEnvironment>();
             var serviceProvider = services.BuildServiceProvider();
             var app = new ApplicationBuilder(serviceProvider);
 
@@ -42,6 +45,16 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
 
             var path = swagger.Paths["/v1/greeter/{name}"];
             Assert.True(path.Operations.ContainsKey(OperationType.Get));
+        }
+
+        private class TestWebHostEnvironment : IWebHostEnvironment
+        {
+            public IFileProvider? WebRootFileProvider { get; set; }
+            public string? WebRootPath { get; set; }
+            public string? ApplicationName { get; set; }
+            public IFileProvider? ContentRootFileProvider { get; set; }
+            public string? ContentRootPath { get; set; }
+            public string? EnvironmentName { get; set; }
         }
 
         private class GreeterService : Greeter.GreeterBase

@@ -407,8 +407,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.Equal(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("message").GetString());
-            Assert.Equal(@"Status(StatusCode=Unauthenticated, Detail=""Detail!"")", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal(@"Status(StatusCode=""Unauthenticated"", Detail=""Detail!"")", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal(@"Status(StatusCode=""Unauthenticated"", Detail=""Detail!"")", responseJson.RootElement.GetProperty("error").GetString());
             Assert.Equal((int)StatusCode.Unauthenticated, responseJson.RootElement.GetProperty("code").GetInt32());
         }
 
