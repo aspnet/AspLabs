@@ -163,7 +163,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                         }
                         catch (InvalidJsonException)
                         {
-                            return (null, StatusCode.InvalidArgument, "Request json payload is not correctly formatted.");
+                            return (null, StatusCode.InvalidArgument, "Request JSON payload is not correctly formatted.");
                         }
                         catch (InvalidProtocolBufferException exception)
                         {

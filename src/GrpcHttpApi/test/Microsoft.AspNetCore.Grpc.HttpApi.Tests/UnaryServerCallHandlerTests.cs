@@ -337,7 +337,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         }
 
         [Theory]
-        [InlineData("{malformed_json}", "Request json payload is not correctly formatted.")]
+        [InlineData("{malformed_json}", "Request JSON payload is not correctly formatted.")]
         [InlineData("{\"name\": 1234}", "Unsupported conversion from JSON number for field type String")]
         [InlineData("{\"abcd\": 1234}", "Unknown field: abcd")]
         public async Task HandleCallAsync_MalformedRequestBody_BadRequestReturned(string json, string expectedError)
