@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Gateway.Runtime;
 using Grpc.Shared.HttpApi;
@@ -65,11 +64,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         public async Task HandleCallAsync(HttpContext httpContext)
         {
-            var requestMessage = await CreateMessage(httpContext.Request);
+            var selectedEncoding = ResponseEncoding.SelectCharacterEncoding(httpContext.Request);
+
+            var (requestMessage, requestStatusCode, errorMessage) = await CreateMessage(httpContext.Request);
+
+            if (requestMessage == null || requestStatusCode != StatusCode.OK)
+            {
+                await SendErrorResponse(httpContext.Response, selectedEncoding, errorMessage ?? string.Empty, requestStatusCode);
+                return;
+            }
 
             var serverCallContext = new HttpApiServerCallContext(httpContext, _unaryMethodInvoker.Method.FullName);
-
-            var selectedEncoding = ResponseEncoding.SelectCharacterEncoding(httpContext.Request);
 
             TResponse responseMessage;
             try
@@ -106,7 +111,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             await SendResponse(httpContext.Response, selectedEncoding, responseMessage);
         }
 
-        private async Task<IMessage> CreateMessage(HttpRequest request)
+        private async Task<(IMessage? requestMessage, StatusCode statusCode, string? errorMessage)> CreateMessage(HttpRequest request)
         {
             IMessage? requestMessage;
 
@@ -115,7 +120,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 if (request.ContentType == null ||
                     !request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new InvalidOperationException("Request content-type of application/json is required.");
+                    return (null, StatusCode.InvalidArgument, "Request content-type of application/json is required.");
                 }
 
                 if (!request.Body.CanSeek)
@@ -150,7 +155,20 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     }
                     else
                     {
-                        var bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
+                        IMessage bodyContent;
+
+                        try
+                        {
+                            bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
+                        }
+                        catch (InvalidJsonException)
+                        {
+                            return (null, StatusCode.InvalidArgument, "Request JSON payload is not correctly formatted.");
+                        }
+                        catch (InvalidProtocolBufferException exception)
+                        {
+                            return (null, StatusCode.InvalidArgument, exception.Message);
+                        }
 
                         if (_bodyFieldDescriptors != null)
                         {
@@ -192,7 +210,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 }
             }
 
-            return requestMessage;
+            return (requestMessage, StatusCode.OK, null);
         }
 
         private List<FieldDescriptor>? GetPathDescriptors(IMessage requestMessage, string path)
