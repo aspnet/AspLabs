@@ -47,8 +47,6 @@ namespace Microsoft.AspNetCore.WebHooks
     /// </remarks>
     public class AzureDevOpsWebHookAttribute : WebHookAttribute
     {
-        private string _eventName;
-
         /// <summary>
         /// Instantiates a new <see cref="AzureDevOpsWebHookAttribute"/> indicating the associated action is an Azure
         /// DevOps WebHook endpoint.

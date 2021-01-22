@@ -101,7 +101,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHoo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps\Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps.csproj", "{820D031D-237E-4892-A0BD-EF341421066A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsStronglyTypedCoreReceiver", "samples\AzureDevOpstronglyTypedCoreReceiver\AzureDevOpsStronglyTypedCoreReceiver.csproj", "{DAE01DE1-421B-420C-87DE-74ED9279A034}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsCoreReceiver", "samples\AzureDevOpsCoreReceiver\AzureDevOpsCoreReceiver.csproj", "{DAE01DE1-421B-420C-87DE-74ED9279A034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,7 +306,7 @@ Global
 		{DAE01DE1-421B-420C-87DE-74ED9279A034} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8;packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45
 	EndGlobalSection
 EndGlobal
