@@ -5,8 +5,7 @@
     <PropertyGroup>
         <RestoreSources>
           $(RestoreSources);
-          http://api.nuget.org/v3/index.json;
-          https://www.myget.org/F/anurse-clrmd/api/v3/index.json
+          https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json;
         </RestoreSources>
         <IsShipping>false</IsShipping>
     </PropertyGroup>
