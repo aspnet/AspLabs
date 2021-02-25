@@ -8,7 +8,7 @@
     <ComponentsElectronVersion>0.1.0-alpha.19165.3</ComponentsElectronVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**;package-lock.json</DefaultItemExcludes>
     <RestoreAdditionalProjectSources>
-      https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
+      https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json;
     </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
