@@ -13,7 +13,6 @@ using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
-using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
@@ -27,7 +26,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly ServiceDescriptor _serviceDescriptor;
         private readonly GrpcServiceOptions _globalOptions;
         private readonly GrpcServiceOptions<TService> _serviceOptions;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
         private readonly ILogger _logger;
 
@@ -46,7 +44,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _serviceDescriptor = serviceDescriptor;
             _globalOptions = globalOptions;
             _serviceOptions = serviceOptions;
-            _serviceProvider = serviceProvider;
             _serviceActivator = serviceActivator;
             _logger = loggerFactory.CreateLogger<HttpApiProviderServiceBinder<TService>>();
         }

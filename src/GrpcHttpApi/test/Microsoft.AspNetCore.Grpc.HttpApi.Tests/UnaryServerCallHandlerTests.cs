@@ -336,6 +336,36 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal("TestSubfield!", request!.Sub.Subfield);
         }
 
+        [Fact]
+        public async Task HandleCallAsync_SuccessfulResponse_DefaultValuesInResponseJson()
+        {
+            // Arrange
+            HelloRequest? request = null;
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                request = r;
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+            httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+            {
+                ["name"] = "TestName!"
+            });
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.NotNull(request);
+            Assert.Equal("TestName!", request!.Name);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+            Assert.Equal("", responseJson.RootElement.GetProperty("message").GetString());
+        }
+
         [Theory]
         [InlineData("{malformed_json}", "Request JSON payload is not correctly formatted.")]
         [InlineData("{\"name\": 1234}", "Unsupported conversion from JSON number for field type String")]
