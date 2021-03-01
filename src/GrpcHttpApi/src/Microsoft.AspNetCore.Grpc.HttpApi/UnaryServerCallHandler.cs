@@ -27,6 +27,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         where TRequest : class
         where TResponse : class
     {
+        // grpc-gateway V2 writes default values by default
+        // https://github.com/grpc-ecosystem/grpc-gateway/pull/1377
+        private static readonly JsonFormatter JsonFormatter = new JsonFormatter(new JsonFormatter.Settings(formatDefaultValues: true));
+
         private readonly UnaryServerMethodInvoker<TService, TRequest, TResponse> _unaryMethodInvoker;
         private readonly FieldDescriptor? _responseBodyDescriptor;
         private readonly MessageDescriptor? _bodyDescriptor;
@@ -275,11 +279,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             {
                 if (responseBody is IMessage responseMessage)
                 {
-                    JsonFormatter.Default.Format(responseMessage, writer);
+                    JsonFormatter.Format(responseMessage, writer);
                 }
                 else
                 {
-                    JsonFormatter.Default.WriteValue(writer, responseBody);
+                    JsonFormatter.WriteValue(writer, responseBody);
                 }
 
                 // Perf: call FlushAsync to call WriteAsync on the stream with any content left in the TextWriter's
