@@ -69,15 +69,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal("Hello TestName!", responseJson.RootElement.GetProperty("message").GetString());
         }
 
-        [Fact]
-        public async Task HandleCallAsync_ResponseBodySet_ResponseReturned()
+        [Theory]
+        [InlineData("TestName!")]
+        [InlineData("")]
+        public async Task HandleCallAsync_ResponseBodySet_ResponseReturned(string name)
         {
             // Arrange
             HelloRequest? request = null;
             UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
             {
                 request = r;
-                return Task.FromResult(new HelloReply { Message = $"Hello {r.Name}" });
+                return Task.FromResult(new HelloReply { Message = r.Name });
             };
 
             var routeParameterDescriptors = new Dictionary<string, List<FieldDescriptor>>
@@ -89,18 +91,49 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 HelloReply.Descriptor.FindFieldByNumber(HelloReply.MessageFieldNumber),
                 routeParameterDescriptors);
             var httpContext = CreateHttpContext();
-            httpContext.Request.RouteValues["name"] = "TestName!";
+            httpContext.Request.RouteValues["name"] = name;
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
 
             // Assert
             Assert.NotNull(request);
-            Assert.Equal("TestName!", request!.Name);
+            Assert.Equal(name, request!.Name);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
-            Assert.Equal("Hello TestName!", responseJson.RootElement.GetString());
+            Assert.Equal(name, responseJson.RootElement.GetString());
+        }
+
+        [Fact]
+        public async Task HandleCallAsync_NullProperty_ResponseReturned()
+        {
+            // Arrange
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                return Task.FromResult(new HelloReply { NullableMessage = null });
+            };
+
+            var routeParameterDescriptors = new Dictionary<string, List<FieldDescriptor>>
+            {
+                ["name"] = new List<FieldDescriptor>(new[] { HelloRequest.Descriptor.FindFieldByNumber(HelloRequest.NameFieldNumber) })
+            };
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                HelloReply.Descriptor.FindFieldByNumber(HelloReply.NullableMessageFieldNumber),
+                routeParameterDescriptors);
+            var httpContext = CreateHttpContext();
+            httpContext.Request.RouteValues["name"] = "Doesn't matter";
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            var sr = new StreamReader(httpContext.Response.Body);
+            var content = sr.ReadToEnd();
+
+            Assert.Equal("null", content);
         }
 
         [Fact]
@@ -111,7 +144,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
             {
                 request = r;
-                return Task.FromResult(new HelloReply { Values = { "One", "Two", "Three" } });
+                return Task.FromResult(new HelloReply { Values = { "One", "Two", "" } });
             };
 
             var unaryServerCallHandler = CreateCallHandler(
@@ -130,7 +163,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal(JsonValueKind.Array, responseJson.RootElement.ValueKind);
             Assert.Equal("One", responseJson.RootElement[0].GetString());
             Assert.Equal("Two", responseJson.RootElement[1].GetString());
-            Assert.Equal("Three", responseJson.RootElement[2].GetString());
+            Assert.Equal("", responseJson.RootElement[2].GetString());
         }
 
         [Fact]

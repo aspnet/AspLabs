@@ -144,4 +144,5 @@ message HelloRequest {
 message HelloReply {
   string message = 1;
   repeated string values = 2;
+  google.protobuf.StringValue nullableMessage = 3;
 }
