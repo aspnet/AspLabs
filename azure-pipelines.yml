@@ -28,6 +28,7 @@ resources:
 
 trigger:
 - master
+- main
 
 pr:
 - "*"
