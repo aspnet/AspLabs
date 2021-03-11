@@ -27,7 +27,6 @@ resources:
     options: --init # This ensures all the stray defunct processes are reaped.
 
 trigger:
-- master
 - main
 
 pr:
