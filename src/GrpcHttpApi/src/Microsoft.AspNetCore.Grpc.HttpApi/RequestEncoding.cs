@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
-    // Logic from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/Formatters/TextInputFormatter.cs
+    // Logic from https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/Formatters/TextInputFormatter.cs
     internal static class RequestEncoding
     {
         /// <summary>
