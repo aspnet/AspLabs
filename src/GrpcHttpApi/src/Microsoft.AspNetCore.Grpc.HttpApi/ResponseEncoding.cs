@@ -13,7 +13,7 @@ using StringWithQualityHeaderValue = Microsoft.Net.Http.Headers.StringWithQualit
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
-    // Logic from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/Formatters/TextOutputFormatter.cs
+    // Logic from https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/Formatters/TextOutputFormatter.cs
     internal static class ResponseEncoding
     {
         private static List<Encoding> SupportedEncodings { get; } = new List<Encoding>
