@@ -11,6 +11,27 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
     public class GrpcHttpApiServiceExtensionsTests
     {
         [Fact]
+        public void AddGrpcHttpApi_DefaultOptions_PopulatedProperties()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            // Act
+            services.AddGrpcHttpApi();
+
+            // Assert
+            var serviceProvider = services.BuildServiceProvider();
+            var options1 = serviceProvider.GetRequiredService<IOptions<GrpcHttpApiOptions>>().Value;
+
+            Assert.NotNull(options1.JsonFormatter);
+            Assert.NotNull(options1.JsonParser);
+
+            var options2 = serviceProvider.GetRequiredService<IOptions<GrpcHttpApiOptions>>().Value;
+
+            Assert.Equal(options1, options2);
+        }
+
+        [Fact]
         public void AddGrpcHttpApi_OverrideOptions_OptionsApplied()
         {
             // Arrange
