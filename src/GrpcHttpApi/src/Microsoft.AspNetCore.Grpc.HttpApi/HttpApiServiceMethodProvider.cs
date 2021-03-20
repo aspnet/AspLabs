@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly ILogger<HttpApiServiceMethodProvider<TService>> _logger;
         private readonly GrpcServiceOptions _globalOptions;
         private readonly GrpcServiceOptions<TService> _serviceOptions;
+        private readonly GrpcHttpApiOptions _httpApiOptions;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
@@ -27,11 +28,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             IOptions<GrpcServiceOptions> globalOptions,
             IOptions<GrpcServiceOptions<TService>> serviceOptions,
             IServiceProvider serviceProvider,
-            IGrpcServiceActivator<TService> serviceActivator)
+            IGrpcServiceActivator<TService> serviceActivator,
+            IOptions<GrpcHttpApiOptions> httpApiOptions)
         {
             _logger = loggerFactory.CreateLogger<HttpApiServiceMethodProvider<TService>>();
             _globalOptions = globalOptions.Value;
             _serviceOptions = serviceOptions.Value;
+            _httpApiOptions = httpApiOptions.Value;
             _loggerFactory = loggerFactory;
             _serviceProvider = serviceProvider;
             _serviceActivator = serviceActivator;
@@ -67,7 +70,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                         _serviceOptions,
                         _serviceProvider,
                         _loggerFactory,
-                        _serviceActivator);
+                        _serviceActivator,
+                        _httpApiOptions);
 
                     try
                     {

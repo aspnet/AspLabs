@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Google.Protobuf;
 using Grpc.AspNetCore.Server.Model;
 using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,6 +30,22 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>), typeof(HttpApiServiceMethodProvider<>)));
 
             return services;
+        }
+
+        /// <summary>
+        /// Adds gRPC HTTP API services to the specified <see cref="IServiceCollection" />.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> for adding services.</param>
+        /// <param name="configureOptions">An <see cref="Action{GrpcHttpApiOptions}"/> to configure the provided <see cref="GrpcHttpApiOptions"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddGrpcHttpApi(this IServiceCollection services, Action<GrpcHttpApiOptions> configureOptions)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            return services.Configure(configureOptions).AddGrpcHttpApi();
         }
     }
 }

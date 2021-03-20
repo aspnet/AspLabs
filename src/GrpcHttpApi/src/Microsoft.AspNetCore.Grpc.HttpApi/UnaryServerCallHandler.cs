@@ -27,10 +27,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         where TRequest : class
         where TResponse : class
     {
-        // grpc-gateway V2 writes default values by default
-        // https://github.com/grpc-ecosystem/grpc-gateway/pull/1377
-        private static readonly JsonFormatter JsonFormatter = new JsonFormatter(new JsonFormatter.Settings(formatDefaultValues: true));
-
         private readonly UnaryServerMethodInvoker<TService, TRequest, TResponse> _unaryMethodInvoker;
         private readonly FieldDescriptor? _responseBodyDescriptor;
         private readonly MessageDescriptor? _bodyDescriptor;
@@ -38,6 +34,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly List<FieldDescriptor>? _bodyFieldDescriptors;
         private readonly string? _bodyFieldDescriptorsPath;
         private readonly Dictionary<string, List<FieldDescriptor>> _routeParameterDescriptors;
+        private readonly JsonFormatter _jsonFormatter;
+        private readonly JsonParser _jsonParser;
         private readonly ConcurrentDictionary<string, List<FieldDescriptor>?> _pathDescriptorsCache;
         private readonly List<FieldDescriptor>? _resolvedBodyFieldDescriptors;
 
@@ -47,7 +45,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             MessageDescriptor? bodyDescriptor,
             bool bodyDescriptorRepeated,
             List<FieldDescriptor>? bodyFieldDescriptors,
-            Dictionary<string, List<FieldDescriptor>> routeParameterDescriptors)
+            Dictionary<string, List<FieldDescriptor>> routeParameterDescriptors,
+            GrpcHttpApiOptions httpApiOptions)
         {
             _unaryMethodInvoker = unaryMethodInvoker;
             _responseBodyDescriptor = responseBodyDescriptor;
@@ -63,6 +62,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 _resolvedBodyFieldDescriptors = _bodyFieldDescriptors.Take(_bodyFieldDescriptors.Count - 1).ToList();
             }
             _routeParameterDescriptors = routeParameterDescriptors;
+            _jsonFormatter = httpApiOptions.JsonFormatter;
+            _jsonParser = httpApiOptions.JsonParser;
             _pathDescriptorsCache = new ConcurrentDictionary<string, List<FieldDescriptor>?>(StringComparer.Ordinal);
         }
 
@@ -163,7 +164,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
                         try
                         {
-                            bodyContent = JsonParser.Default.Parse(requestReader, _bodyDescriptor);
+                            bodyContent = _jsonParser.Parse(requestReader, _bodyDescriptor);
                         }
                         catch (InvalidJsonException)
                         {
@@ -240,7 +241,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             // with the repeated fields set on it.
             var containingType = _bodyFieldDescriptors.Last()!.ContainingType;
 
-            return JsonParser.Default.Parse(new PropertyWrappingTextReader(requestReader, _bodyFieldDescriptors.Last().JsonName), containingType);
+            return _jsonParser.Parse(new PropertyWrappingTextReader(requestReader, _bodyFieldDescriptors.Last().JsonName), containingType);
         }
 
         private async Task SendResponse(HttpResponse response, Encoding encoding, TResponse message)
@@ -273,17 +274,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             await WriteResponseMessage(response, encoding, e);
         }
 
-        private static async Task WriteResponseMessage(HttpResponse response, Encoding encoding, object responseBody)
+        private async Task WriteResponseMessage(HttpResponse response, Encoding encoding, object responseBody)
         {
             using (var writer = new HttpResponseStreamWriter(response.Body, encoding))
             {
                 if (responseBody is IMessage responseMessage)
                 {
-                    JsonFormatter.Format(responseMessage, writer);
+                    _jsonFormatter.Format(responseMessage, writer);
                 }
                 else
                 {
-                    JsonFormatter.WriteValue(writer, responseBody);
+                    _jsonFormatter.WriteValue(writer, responseBody);
                 }
 
                 // Perf: call FlushAsync to call WriteAsync on the stream with any content left in the TextWriter's

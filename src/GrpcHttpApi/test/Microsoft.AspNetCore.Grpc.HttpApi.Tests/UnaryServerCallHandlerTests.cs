@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
@@ -26,6 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 using MethodOptions = Grpc.Shared.Server.MethodOptions;
+using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
@@ -774,6 +776,56 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal(new byte[] { 1, 2, 3 }, request!.Wrappers.BytesValue.ToByteArray());
         }
 
+        [Fact]
+        public async Task HandleCallAsync_Any_Success()
+        {
+            // Arrange
+            HelloRequest? request = null;
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                request = r;
+                return Task.FromResult(new HelloReply
+                {
+                    AnyMessage = Any.Pack(new StringValue { Value = "A value!" })
+                });
+            };
+
+            var typeRegistry = TypeRegistry.FromMessages(StringValue.Descriptor, Int32Value.Descriptor);
+            var jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(formatDefaultValues: true, typeRegistry));
+            var jsonParser = new JsonParser(new JsonParser.Settings(recursionLimit: 100, typeRegistry));
+
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                bodyDescriptor: HelloRequest.Descriptor,
+                httpApiOptions: new GrpcHttpApiOptions
+                {
+                    JsonFormatter = jsonFormatter,
+                    JsonParser = jsonParser
+                });
+            var httpContext = CreateHttpContext();
+            httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(jsonFormatter.Format(new HelloRequest
+            {
+                Name = "Test",
+                AnyMessage = Any.Pack(new Int32Value { Value = 123 })
+            })));
+            httpContext.Request.ContentType = "application/json";
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            Assert.NotNull(request);
+            Assert.Equal("Test", request!.Name);
+            Assert.Equal("type.googleapis.com/google.protobuf.Int32Value", request!.AnyMessage.TypeUrl);
+
+            httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
+            using var responseJson = JsonDocument.Parse(httpContext.Response.Body);
+
+            var anyMessage = responseJson.RootElement.GetProperty("anyMessage");
+            Assert.Equal("type.googleapis.com/google.protobuf.StringValue", anyMessage.GetProperty("@type").GetString());
+            Assert.Equal("A value!", anyMessage.GetProperty("value").GetString());
+        }
+
         private static DefaultHttpContext CreateHttpContext(CancellationToken cancellationToken = default)
         {
             var serviceCollection = new ServiceCollection();
@@ -823,7 +875,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             MessageDescriptor? bodyDescriptor = null,
             bool? bodyDescriptorRepeated = null,
             List<FieldDescriptor>? bodyFieldDescriptors = null,
-            List<(Type Type, object[] Args)>? interceptors = null)
+            List<(Type Type, object[] Args)>? interceptors = null,
+            GrpcHttpApiOptions? httpApiOptions = null)
         {
             var serviceOptions = new GrpcServiceOptions();
             if (interceptors != null)
@@ -846,7 +899,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 bodyDescriptor,
                 bodyDescriptorRepeated ?? false,
                 bodyFieldDescriptors,
-                routeParameterDescriptors ?? new Dictionary<string, List<FieldDescriptor>>());
+                routeParameterDescriptors ?? new Dictionary<string, List<FieldDescriptor>>(),
+                httpApiOptions ?? new GrpcHttpApiOptions());
         }
 
         private class HttpApiGreeterService : HttpApiGreeter.HttpApiGreeterBase
