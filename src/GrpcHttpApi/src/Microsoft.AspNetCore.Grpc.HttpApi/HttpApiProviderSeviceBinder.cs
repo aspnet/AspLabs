@@ -27,6 +27,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly GrpcServiceOptions _globalOptions;
         private readonly GrpcServiceOptions<TService> _serviceOptions;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
+        private readonly GrpcHttpApiOptions _httpApiOptions;
         private readonly ILogger _logger;
 
         internal HttpApiProviderServiceBinder(
@@ -37,7 +38,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             GrpcServiceOptions<TService> serviceOptions,
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
-            IGrpcServiceActivator<TService> serviceActivator)
+            IGrpcServiceActivator<TService> serviceActivator,
+            GrpcHttpApiOptions httpApiOptions)
         {
             _context = context;
             _declaringType = declaringType;
@@ -45,6 +47,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _globalOptions = globalOptions;
             _serviceOptions = serviceOptions;
             _serviceActivator = serviceActivator;
+            _httpApiOptions = httpApiOptions;
             _logger = loggerFactory.CreateLogger<HttpApiProviderServiceBinder<TService>>();
         }
 
@@ -161,7 +164,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     bodyDescriptor,
                     bodyDescriptorRepeated,
                     bodyFieldDescriptors,
-                    routeParameterDescriptors);
+                    routeParameterDescriptors,
+                    _httpApiOptions);
 
                 _context.AddMethod<TRequest, TResponse>(method, routePattern, metadata, unaryServerCallHandler.HandleCallAsync);
             }
