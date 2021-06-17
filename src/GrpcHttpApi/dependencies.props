@@ -10,6 +10,6 @@
     <GrpcCorePackageVersion>2.33.1</GrpcCorePackageVersion>
     <NUnitPackageVersion>3.12.0</NUnitPackageVersion>
     <NUnit3TestAdapterPackageVersion>3.13.0</NUnit3TestAdapterPackageVersion>
-    <SwashbuckleAspNetCorePackageVersion>5.6.3</SwashbuckleAspNetCorePackageVersion>
+    <SwashbuckleAspNetCorePackageVersion>6.1.4</SwashbuckleAspNetCorePackageVersion>
   </PropertyGroup>
 </Project>
