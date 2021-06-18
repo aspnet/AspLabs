@@ -54,7 +54,12 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                 if (_enumTypeMapping.TryGetValue(type, out var enumDescriptor))
                 {
                     var values = enumDescriptor.Values.Select(v => v.Name).ToList();
-                    return DataContract.ForPrimitive(type, DataType.String, dataFormat: null, enumValues: values);
+                    return DataContract.ForPrimitive(type, DataType.String, dataFormat: null, value =>
+                    {
+                        var match = enumDescriptor.Values.SingleOrDefault(v => v.Number == (int)value);
+                        var name = match?.Name ?? value.ToString();
+                        return @"""" + name + @"""";
+                    });
                 }
             }
 
