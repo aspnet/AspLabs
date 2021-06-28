@@ -59,17 +59,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             ILoggerFactory loggerFactory,
             IWebHookBodyTypeMetadataService bodyTypeMetadata)
         {
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-            if (bodyTypeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(bodyTypeMetadata));
-            }
-
-            _bodyTypeMetadata = bodyTypeMetadata;
-            _logger = loggerFactory.CreateLogger<WebHookVerifyBodyTypeFilter>();
+            _logger = loggerFactory?.CreateLogger<WebHookVerifyBodyTypeFilter>() ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _bodyTypeMetadata = bodyTypeMetadata ?? throw new ArgumentNullException(nameof(bodyTypeMetadata));
         }
 
         /// <summary>
@@ -84,17 +75,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
         /// <remarks>This overload is intended for use with <see cref="GeneralWebHookAttribute"/>.</remarks>
         public WebHookVerifyBodyTypeFilter(ILoggerFactory loggerFactory, WebHookMetadataProvider metadataProvider)
         {
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            _logger = loggerFactory.CreateLogger<WebHookVerifyBodyTypeFilter>();
-            _metadataProvider = metadataProvider;
+            _logger = loggerFactory?.CreateLogger<WebHookVerifyBodyTypeFilter>() ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         /// <summary>

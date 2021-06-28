@@ -35,13 +35,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (pingRequestMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(pingRequestMetadata));
-            }
 
             _logger = loggerFactory.CreateLogger<WebHookPingRequestFilter>();
-            _pingRequestMetadata = pingRequestMetadata;
+            _pingRequestMetadata = pingRequestMetadata ?? throw new ArgumentNullException(nameof(pingRequestMetadata));
         }
 
         /// <summary>
@@ -62,13 +58,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
 
             _logger = loggerFactory.CreateLogger<WebHookPingRequestFilter>();
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         /// <summary>

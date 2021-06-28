@@ -46,12 +46,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             IWebHookGetHeadRequestMetadata getHeadRequestMetadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            if (getHeadRequestMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(getHeadRequestMetadata));
-            }
-
-            _getHeadRequestMetadata = getHeadRequestMetadata;
+            _getHeadRequestMetadata = getHeadRequestMetadata ?? throw new ArgumentNullException(nameof(getHeadRequestMetadata));;
         }
 
         /// <summary>
@@ -80,12 +75,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             WebHookMetadataProvider metadataProvider)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));;
         }
 
         /// <summary>

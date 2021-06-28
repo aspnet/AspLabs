@@ -35,11 +35,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// <param name="doc">An Outbound SOAP Message received from Salesforce.</param>
         public SalesforceNotifications(XElement doc)
         {
-            if (doc == null)
-            {
-                throw new ArgumentNullException(nameof(doc));
-            }
-            _doc = doc;
+            _doc = doc ?? throw new ArgumentNullException(nameof(doc));
         }
 
         /// <summary>

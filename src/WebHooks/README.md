@@ -12,6 +12,7 @@ ASP.NET Core WebHooks provide support for receiving WebHooks. The packages depen
 - [Dropbox](./samples/DropboxCoreReceiver)
 - [DynamicCRM](./samples/DynamicsCRMCoreReceiver)
 - [GitHub](./samples/GitHubCoreReceiver)
+- [Intercom](./samples/IntercomCoreReceiver)
 - [Kudu](./samples/KuduCoreReceiver)
 - [MailChimp](./samples/MailChimpCoreReceiver)
 - [Pusher](./samples/PusherCoreReceiver)

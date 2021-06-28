@@ -49,16 +49,12 @@ namespace Microsoft.AspNetCore.WebHooks
         /// </param>
         public SlackSlashResponse(string text, params SlackAttachment[] attachments)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
             if (attachments == null)
             {
                 throw new ArgumentNullException(nameof(attachments));
             }
 
-            _text = text;
+            _text = text ?? throw new ArgumentNullException(nameof(text));;
             foreach (var att in attachments)
             {
                 _attachments.Add(att);
@@ -84,11 +80,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _text = value;
+                _text = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

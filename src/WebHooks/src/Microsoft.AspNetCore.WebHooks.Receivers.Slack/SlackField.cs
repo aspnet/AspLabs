@@ -31,16 +31,8 @@ namespace Microsoft.AspNetCore.WebHooks
         /// </param>
         public SlackField(string title, string value)
         {
-            if (title == null)
-            {
-                throw new ArgumentNullException(nameof(title));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            _title = title;
-            _value = value;
+            _title = title ?? throw new ArgumentNullException(nameof(title));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>
@@ -63,11 +55,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _title = value;
+                _title = value ?? throw new ArgumentNullException(nameof(value));;
             }
         }
 
@@ -85,11 +73,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _value = value;
+                _value = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

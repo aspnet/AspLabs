@@ -38,12 +38,8 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (eventMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(eventMetadata));
-            }
 
-            _eventMetadata = eventMetadata;
+            _eventMetadata = eventMetadata ?? throw new ArgumentNullException(nameof(eventMetadata));
             _logger = loggerFactory.CreateLogger<WebHookEventNameMapperConstraint>();
         }
 
@@ -64,13 +60,9 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
 
             _logger = loggerFactory.CreateLogger<WebHookEventNameMapperConstraint>();
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         /// <summary>

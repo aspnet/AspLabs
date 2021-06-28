@@ -27,12 +27,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         /// <param name="eventName">Name of the event this action expects.</param>
         public WebHookEventNameConstraint(string eventName)
         {
-            if (eventName == null)
-            {
-                throw new ArgumentNullException(nameof(eventName));
-            }
-
-            _eventName = eventName;
+            _eventName = eventName ?? throw new ArgumentNullException(nameof(eventName));
         }
 
         /// <summary>
@@ -47,12 +42,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         public WebHookEventNameConstraint(string eventName, IWebHookPingRequestMetadata pingRequestMetadata)
             : this(eventName)
         {
-            if (pingRequestMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(pingRequestMetadata));
-            }
-
-            _pingRequestMetadata = pingRequestMetadata;
+            _pingRequestMetadata = pingRequestMetadata ?? throw new ArgumentNullException(nameof(pingRequestMetadata));
         }
 
         /// <summary>
@@ -70,12 +60,7 @@ namespace Microsoft.AspNetCore.WebHooks.Routing
         public WebHookEventNameConstraint(string eventName, WebHookMetadataProvider metadataProvider)
             : this(eventName)
         {
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         // Running this constraint last avoids NotFound responses to ping requests because other actions have different

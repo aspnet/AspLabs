@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\samples\DropboxCoreReceiver\DropboxCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\DynamicsCRMCoreReceiver\DynamicsCRMCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\GitHubCoreReceiver\GitHubCoreReceiver.csproj" />
+    <ProjectReference Include="..\..\samples\IntercomCoreReceiver\IntercomCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\KuduCoreReceiver\KuduCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\MailChimpCoreReceiver\MailChimpCoreReceiver.csproj" />
     <ProjectReference Include="..\..\samples\PusherCoreReceiver\PusherCoreReceiver.csproj" />

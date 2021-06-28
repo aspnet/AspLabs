@@ -30,16 +30,8 @@ namespace Microsoft.AspNetCore.WebHooks
         /// that don't show formatted text (e.g. IRC, mobile notifications). It should not contain any markup.</param>
         public SlackAttachment(string text, string fallback)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-            if (fallback == null)
-            {
-                throw new ArgumentNullException(nameof(fallback));
-            }
-            _text = text;
-            _fallback = fallback;
+            _text = text ?? throw new ArgumentNullException(nameof(text));
+            _fallback = fallback ?? throw new ArgumentNullException(nameof(fallback));
         }
 
         /// <summary>
@@ -63,11 +55,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _fallback = value;
+                _fallback = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -134,11 +122,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _text = value;
+                _text = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
