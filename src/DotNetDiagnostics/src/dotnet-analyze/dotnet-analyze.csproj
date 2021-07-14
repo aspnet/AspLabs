@@ -5,8 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Microsoft.Diagnostics.Tools.Analyze</RootNamespace>
 
-    <IsPackable>true</IsPackable>
-    <PackAsTool>true</PackAsTool>
+    <IsPackable>false</IsPackable>
+    <PackAsTool>false</PackAsTool>
   </PropertyGroup>
 
   <ItemGroup>
