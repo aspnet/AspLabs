@@ -71,7 +71,7 @@ stages:
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+              ${{ if ne(variables['System.TeamProject'], 'public') }}:
                 _SignType: real
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
                   /p:DotNetPublishUsingPipelines=true
