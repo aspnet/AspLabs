@@ -180,8 +180,6 @@ stages:
             /p:LatestLinkShortUrlPrefix=dotnet/'${{ parameters.akaMSChannelName }}'
             /p:AkaMSClientId=$(akams-client-id)
             /p:AkaMSClientSecret=$(akams-client-secret)
-            /p:StreamingPublishingMaxClients=16
-            /p:NonStreamingPublishingMaxClients=12
             ${{ parameters.artifactsPublishingAdditionalParameters }}
 
       - template: ../../steps/publish-logs.yml
