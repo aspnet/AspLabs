@@ -178,8 +178,6 @@ stages:
             /p:AzureDevOpsStaticSymbolsFeed='${{ parameters.symbolsFeed }}'
             /p:AzureDevOpsStaticSymbolsFeedKey='$(dn-bot-dnceng-artifact-feeds-rw)'
             /p:PublishToMSDL=false
-            /p:StreamingPublishingMaxClients=16
-            /p:NonStreamingPublishingMaxClients=12
             ${{ parameters.artifactsPublishingAdditionalParameters }}
 
       - template: ../../steps/publish-logs.yml
