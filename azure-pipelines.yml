@@ -16,7 +16,7 @@ variables:
       value: pr/aspnet/AspLabs/$(Build.SourceBranch)
 
   # Variables for internal Official builds
-  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - name: _HelixSource
       value: official/aspnet/AspLabs/$(Build.SourceBranch)
 
@@ -71,7 +71,7 @@ stages:
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-              ${{ if ne(variables['System.TeamProject'], 'public') }}:
+              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: real
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
                   /p:DotNetPublishUsingPipelines=true
@@ -203,7 +203,7 @@ stages:
             pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
             publishLocation: Container
 
-- ${{ if ne(variables['System.TeamProject'], 'public') }}:
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       # Symbol validation isn't being very reliable lately. This should be enabled back
