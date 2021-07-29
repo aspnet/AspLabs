@@ -10,5 +10,6 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\WebHooks\WebHooks.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Components.Web.Extensions\Microsoft.AspNetCore.Components.Web.Extensions.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ApiTemplate\ApiTemplatePackage.csproj" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorCustomElements\BlazorCustomElements.sln" />
   </ItemGroup>
 </Project>
