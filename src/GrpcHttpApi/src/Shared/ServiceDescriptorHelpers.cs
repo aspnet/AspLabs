@@ -116,13 +116,17 @@ namespace Grpc.Shared.HttpApi
                     {
                         if (value is string s)
                         {
-                            var enumValueDescriptor = descriptor.EnumType.FindValueByName(s);
-                            if (enumValueDescriptor == null)
+                            if (int.TryParse(s, out int i))
                             {
-                                throw new InvalidOperationException($"Invalid enum value '{s}' for enum type {descriptor.EnumType.Name}.");
-                            }
+                                var enumValueDescriptor = descriptor.EnumType.FindValueByNumber(i);
+                                if (enumValueDescriptor == null)
+                                {
+                                    throw new InvalidOperationException($"Invalid enum value '{s}' for enum type {descriptor.EnumType.Name}.");
+                                }
 
-                            return enumValueDescriptor.Number;
+                                return enumValueDescriptor.Number;
+                            }
+                            throw new InvalidOperationException($"Enum value '{s}' is not Integer");
                         }
                         throw new InvalidOperationException("String required to convert to enum.");
                     }
