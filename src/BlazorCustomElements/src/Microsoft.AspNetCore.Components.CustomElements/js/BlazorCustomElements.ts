@@ -1,8 +1,6 @@
 declare const Blazor: any;
 
-let blazorCustomElementsReadyResolver: any;
-(window as any).blazorCustomElementsReady = new Promise((resolve, reject) => blazorCustomElementsReadyResolver = resolve);
-
+// This function is called by the framework because RegisterAsCustomElement sets it as the initializer function
 (window as any).registerBlazorCustomElement = function defaultRegisterCustomElement(elementName: string, parameters: JSComponentParameter[]): void {
     customElements.define(elementName, class ConfiguredBlazorCustomElement extends BlazorCustomElement {
         static get observedAttributes() {
@@ -13,17 +11,17 @@ let blazorCustomElementsReadyResolver: any;
             super(parameters);
         }
     });
-
-    blazorCustomElementsReadyResolver();
 }
 
-class BlazorCustomElement extends HTMLElement {
+export class BlazorCustomElement extends HTMLElement {
     private _attributeMappings: { [attributeName: string]: JSComponentParameter };
     private _parameterValues: { [dotNetName: string]: any } = {};
     private _addRootComponentPromise: Promise<any>;
     private _hasPendingSetParameters = true; // The constructor will call setParameters, so it starts true
     private _isDisposed = false;
     private _disposalTimeoutHandle: any;
+
+    public renderIntoElement = this;
 
     // Subclasses will need to call this if they want to retain the built-in behavior for knowing which
     // attribute names to observe, since they have to return it from a static function
@@ -41,19 +39,11 @@ class BlazorCustomElement extends HTMLElement {
             this._attributeMappings[attributeName] = parameter;
         });
 
-        // We don't have to do this, but as an experiment, output to a shadow DOM
-        // Note that only 'open' shadow roots are supported, because there's only one global event delegator.
-        // If we want to add support for closed shadow roots in the future, we need some mechanism to create
-        // a separate event delegator for each document root, which isn't wildly difficult but out of scope now.
-        // It's not clear that the advantages are worthwhile, as closed shadow roots aren't widely used.
-        // const renderIntoElement = this.attachShadow({ mode: 'open' });
-        const renderIntoElement = this;
-
         // Defer until end of execution cycle so that (1) we know the heap is unlocked, and (2) the initial parameter
         // values will be populated from the initial attributes before we send them to .NET
         this._addRootComponentPromise = Promise.resolve().then(() => {
             this._hasPendingSetParameters = false;
-            return Blazor.rootComponents.add(renderIntoElement, this.localName, this._parameterValues);
+            return Blazor.rootComponents.add(this.renderIntoElement, this.localName, this._parameterValues);
         });
 
         // Also allow assignment of parameters via properties. This is the only way to set complex-typed values.
