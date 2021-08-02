@@ -14,6 +14,6 @@ module.exports = {
     },
     output: {
         filename: 'BlazorCustomElements.js',
-        path: path.resolve(__dirname, 'wwwroot'),
+        path: path.resolve(__dirname, '..', 'wwwroot'),
     },
 };

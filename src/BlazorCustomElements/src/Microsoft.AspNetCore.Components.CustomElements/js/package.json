@@ -1,14 +1,8 @@
 {
-  "name": "blazorcustomelements",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build:Debug": "webpack --mode development",
+    "build:Release": "webpack --mode production"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "ts-loader": "^9.2.4",
     "typescript": "^4.3.5",
