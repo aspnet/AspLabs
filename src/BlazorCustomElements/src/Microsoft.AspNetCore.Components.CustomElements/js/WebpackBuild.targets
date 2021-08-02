@@ -1,0 +1,28 @@
+<Project>
+  <ItemGroup>
+    <WebpackBuildInputs Include="$(MSBuildThisFileDirectory)**" Exclude="$(MSBuildThisFileDirectory)node_modules\**" />
+    <WebpackBuildInputs Include="$(BaseIntermediateOutputPath)webpackconfig.txt" />
+    <UpToDateCheckInput Include="@(WebpackBuildInputs)" />
+  </ItemGroup>
+
+  <!-- If package-lock.json has changed, perform an NPM install -->
+  <Target Name="NpmInstall"
+          Inputs="$(MSBuildThisFileDirectory)package-lock.json"
+          Outputs="$(BaseIntermediateOutputPath)package-lock.json">
+    <Message Importance="high" Text="Running npm install..." />
+    <Exec Command="npm install" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)package-lock.json"
+          DestinationFolder="$(BaseIntermediateOutputPath)" />
+  </Target>
+
+  <!-- If any source file in this dir or below has changed, perform a Webpack build -->
+  <Target Name="TrackWebpackBuildConfig">
+    <WriteLinesToFile File="$(BaseIntermediateOutputPath)webpackconfig.txt" Lines="$(Configuration)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+  <Target Name="WebpackBuild" DependsOnTargets="NpmInstall; TrackWebpackBuildConfig" BeforeTargets="CoreBuild"
+          Inputs="@(WebpackBuildInputs)"
+          Outputs="$(MSBuildThisFileDirectory)..\wwwroot\BlazorCustomElements.js">
+    <Exec Command="npm run build:$(Configuration)" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+
+</Project>
