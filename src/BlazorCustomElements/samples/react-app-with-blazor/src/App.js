@@ -28,7 +28,7 @@ function App() {
 
         {blazorCounters.map(counter =>
           <div key={counter.title}>
-            <my-counter title={counter.title} increment-amount={counter.incrementAmount}></my-counter>
+            <my-blazor-counter title={counter.title} increment-amount={counter.incrementAmount}></my-blazor-counter>
           </div>
         )}
 

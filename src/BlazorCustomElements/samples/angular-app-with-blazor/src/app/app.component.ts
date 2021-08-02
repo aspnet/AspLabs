@@ -12,9 +12,9 @@ import { Component } from '@angular/core';
       </p>
 
       <div *ngFor="let counter of blazorCounters">
-        <my-counter [attr.title]="counter.title"
+        <my-blazor-counter [attr.title]="counter.title"
                     [attr.increment-amount]="counter.incrementAmount">
-        </my-counter>
+        </my-blazor-counter>
       </div>
     </div>
   `,
