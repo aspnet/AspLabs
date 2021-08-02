@@ -46,7 +46,8 @@ class BlazorCustomElement extends HTMLElement {
         // If we want to add support for closed shadow roots in the future, we need some mechanism to create
         // a separate event delegator for each document root, which isn't wildly difficult but out of scope now.
         // It's not clear that the advantages are worthwhile, as closed shadow roots aren't widely used.
-        const renderIntoElement = this.attachShadow({ mode: 'open' });
+        // const renderIntoElement = this.attachShadow({ mode: 'open' });
+        const renderIntoElement = this;
 
         // Defer until end of execution cycle so that (1) we know the heap is unlocked, and (2) the initial parameter
         // values will be populated from the initial attributes before we send them to .NET
