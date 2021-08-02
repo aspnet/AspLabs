@@ -11,8 +11,10 @@ import { Component } from '@angular/core';
         <button (click)="removeBlazorCounter()">Remove Blazor counter</button>
       </p>
 
-      <div *ngFor="let blazorCounter of blazorCounters; let myIndex = index">
-        <my-counter [attr.increment-amount]="myIndex + 1"></my-counter>
+      <div *ngFor="let counter of blazorCounters">
+        <my-counter [attr.title]="counter.title"
+                    [attr.increment-amount]="counter.incrementAmount">
+        </my-counter>
       </div>
     </div>
   `,
@@ -22,9 +24,14 @@ export class AppComponent {
   title = 'angular-app-with-blazor';
 
   blazorCounters: any[] = [];
+  nextCounterIndex = 1;
 
   addBlazorCounter() {
-    this.blazorCounters.push({});
+    const index = this.nextCounterIndex++;
+    this.blazorCounters.push({
+      title: `Counter ${index}`,
+      incrementAmount: index,
+    });
   }
 
   removeBlazorCounter() {
