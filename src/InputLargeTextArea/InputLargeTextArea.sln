@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputLargeTextArea", "src\InputLargeTextArea\InputLargeTextArea.csproj", "{D3C10569-1320-4C66-B76B-FC02BDC9010F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleServerApp", "SampleServerApp\SampleServerApp.csproj", "{8162C3A5-8054-4647-B597-64A01027EC24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3C10569-1320-4C66-B76B-FC02BDC9010F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C10569-1320-4C66-B76B-FC02BDC9010F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C10569-1320-4C66-B76B-FC02BDC9010F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C10569-1320-4C66-B76B-FC02BDC9010F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8162C3A5-8054-4647-B597-64A01027EC24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8162C3A5-8054-4647-B597-64A01027EC24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8162C3A5-8054-4647-B597-64A01027EC24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8162C3A5-8054-4647-B597-64A01027EC24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {130EF2A6-BAD0-430B-9B31-D35406A46F67}
+	EndGlobalSection
+EndGlobal

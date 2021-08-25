@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <IsShipping>false</IsShipping>
+    <Nullable>enable</Nullable>
+    <PackageDescription>
+      A multiline input component for editing large <see cref="string" /> values, supports async
+      content access without binding and without validations.
+    </PackageDescription>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0-rc.1.21424.21" />
+  </ItemGroup>
+
+</Project>

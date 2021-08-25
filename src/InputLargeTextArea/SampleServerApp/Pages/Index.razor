@@ -1,0 +1,50 @@
+@page "/"
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Input Large Text Area</PageTitle>
+
+<InputLargeTextArea id="largeTextArea" @ref="TextArea" OnChange="TextAreaChanged" />
+
+<br />
+
+<button id="setTextBtn" @onclick="SetTextAsync">SetTextAsync</button>
+<button id="getTextBtn" @onclick="GetTextAsync">GetTextAsync</button>
+
+<hr />
+
+<h3>Last Changed:</h3>
+Length: <p id="lastChangedLength">@LastChangedLength</p>
+
+<h3>Get Text Result:</h3>
+<p id="getTextResult">@GetTextResult</p>
+<p id="getTextError">@GetTextError</p>
+
+
+@code {
+  public long LastChangedLength { get; set; }
+  public string GetTextResult { get; set; } = string.Empty;
+  public string GetTextError { get; set; } = string.Empty;
+
+  InputLargeTextArea? TextArea;
+
+  public async Task GetTextAsync()
+  {
+      var streamReader = await TextArea!.GetTextAsync(maxLength: 50_000);
+      GetTextResult = await streamReader.ReadToEndAsync();
+      StateHasChanged();
+  }
+
+  public async Task SetTextAsync()
+  {
+      var memoryStream = new MemoryStream();
+      var streamWriter = new StreamWriter(memoryStream);
+      await streamWriter.WriteAsync(new string('c', 50_000));
+      await streamWriter.FlushAsync();
+      await TextArea!.SetTextAsync(streamWriter);
+  }
+
+  public void TextAreaChanged(InputLargeTextAreaChangeEventArgs args)
+  {
+      LastChangedLength = args.Length;
+  }
+}
