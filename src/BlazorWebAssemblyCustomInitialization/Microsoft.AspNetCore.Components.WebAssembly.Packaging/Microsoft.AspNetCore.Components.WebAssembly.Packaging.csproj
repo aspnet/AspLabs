@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <!-- Supress the warning about the assemblies we are putting in the task folder. -->
+    <NoWarn>NU5100</NoWarn>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Sample package demonstrating how to customize the Blazor publish process. Using this package in production is not supported.</Description>
+    <PackageVersion>0.1.0</PackageVersion>
+    <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="build\**" Pack="true" PackagePath="%(Identity)" />
+    <Content Include="_._" Pack="true" PackagePath="lib\net6.0\_._" />
+  </ItemGroup>
+  
+  <Target Name="GetTasksOutputDlls" BeforeTargets="CoreCompile">
+    <MSBuild Projects="..\Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks\Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks.csproj" Targets="Publish;PublishItemsOutputGroup" Properties="Configuration=Release">
+      <Output TaskParameter="TargetOutputs" ItemName="_TasksProjectOutputs" />
+    </MSBuild>
+    <ItemGroup>
+      <Content Include="@(_TasksProjectOutputs)" Condition="'%(_TasksProjectOutputs.Extension)' == '.dll'" Pack="true" PackagePath="tasks\%(_TasksProjectOutputs.TargetPath)" KeepMetadata="Pack;PackagePath" />
+    </ItemGroup>
+  </Target>
+
+</Project>
