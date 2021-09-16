@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <WebpackOutputFile>$(MSBuildProjectDirectory)\wwwroot\BlazorCustomElements.js</WebpackOutputFile>
+    <WebpackOutputFile>wwwroot\BlazorCustomElements.js</WebpackOutputFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +30,7 @@
           Outputs="$(WebpackOutputFile)">
     <Exec Command="npm run build:$(Configuration)" WorkingDirectory="$(MSBuildThisFileDirectory)" />
     <ItemGroup>
+      <Content Remove="$(WebpackOutputFile)" />
       <Content Include="$(WebpackOutputFile)" />
     </ItemGroup>
   </Target>
