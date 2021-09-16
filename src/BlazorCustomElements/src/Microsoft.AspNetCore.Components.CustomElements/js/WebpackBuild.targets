@@ -1,4 +1,9 @@
 <Project>
+
+  <PropertyGroup>
+    <WebpackOutputFile>wwwroot\BlazorCustomElements.js</WebpackOutputFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <WebpackBuildInputs Include="$(MSBuildThisFileDirectory)**" Exclude="$(MSBuildThisFileDirectory)node_modules\**" />
     <WebpackBuildInputs Include="$(BaseIntermediateOutputPath)webpackconfig.txt" />
@@ -19,10 +24,15 @@
   <Target Name="TrackWebpackBuildConfig">
     <WriteLinesToFile File="$(BaseIntermediateOutputPath)webpackconfig.txt" Lines="$(Configuration)" Overwrite="true" WriteOnlyWhenDifferent="true" />
   </Target>
-  <Target Name="WebpackBuild" DependsOnTargets="NpmInstall; TrackWebpackBuildConfig" BeforeTargets="CoreBuild"
+
+  <Target Name="WebpackBuild" DependsOnTargets="NpmInstall; TrackWebpackBuildConfig" BeforeTargets="AssignTargetPaths"
           Inputs="@(WebpackBuildInputs)"
-          Outputs="$(MSBuildThisFileDirectory)..\wwwroot\BlazorCustomElements.js">
+          Outputs="$(WebpackOutputFile)">
     <Exec Command="npm run build:$(Configuration)" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+    <ItemGroup>
+      <Content Remove="$(WebpackOutputFile)" />
+      <Content Include="$(WebpackOutputFile)" />
+    </ItemGroup>
   </Target>
 
 </Project>
