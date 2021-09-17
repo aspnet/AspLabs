@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Client\CustomPackagedApp.Client.csproj" />
-    <ProjectReference Include="..\Shared\CustomPackagedApp.Shared.csproj" />
   </ItemGroup>
 
 

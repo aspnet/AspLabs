@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,15 +21,39 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseBundlingExtension();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-
 app.MapRazorPages();
 app.MapControllers();
+
+app.MapGet("app.bundle", (HttpContext context) =>
+{
+    string? contentEncoding = null;
+    var contentType = "multipart/form-data; boundary=\"--0a7e8441d64b4bf89086b85e59523b7d\"";
+    var fileName = "app.bundle";
+
+    if (context.Request.Headers.AcceptEncoding.Contains("br"))
+    {
+        contentEncoding = "br";
+        fileName += ".br";
+    }else if (context.Request.Headers.AcceptEncoding.Contains("gzip"))
+	{
+        contentEncoding = "gzip";
+        fileName += ".gz";
+	}
+
+    if (contentEncoding != null)
+	{
+         context.Response.Headers.ContentEncoding = contentEncoding;
+	}
+    return Results.File(
+        app.Environment.WebRootFileProvider.GetFileInfo(fileName).CreateReadStream(),
+        contentType);
+});
+
 app.MapFallbackToFile("index.html");
 
 app.Run();
