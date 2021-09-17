@@ -8,7 +8,7 @@
     <Copyright>$(CopyrightMicrosoft)</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
- 
+
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\AspNetCore.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -23,5 +23,9 @@
       replace PackageLicenseUrl with PackageLicenseExpression.
     -->
     <NoWarn>$(NoWarn);NU5125</NoWarn>
+    <!--
+      Suppress a warning about the deprecation of netcoreapp2.1 since some packages/samples here target it
+    -->
+    <NoWarn>$(NoWarn);NETSDK1138</NoWarn>
   </PropertyGroup>
 </Project>
