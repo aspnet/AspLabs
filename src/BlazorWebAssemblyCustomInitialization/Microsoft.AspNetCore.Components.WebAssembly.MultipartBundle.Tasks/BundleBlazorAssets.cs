@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks
+namespace Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks
 {
     public class BundleBlazorAssets : Task
     {

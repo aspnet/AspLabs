@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0-rc.1.21423.16" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Packaging.Server" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>

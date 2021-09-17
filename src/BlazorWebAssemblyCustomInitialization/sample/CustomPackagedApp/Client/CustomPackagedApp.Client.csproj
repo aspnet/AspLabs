@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0-rc.1.21423.16" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Packaging" Version="0.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle" Version="0.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0-rc.1.21423.16" PrivateAssets="all" />
   </ItemGroup>
 

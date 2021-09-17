@@ -17,9 +17,9 @@
     <None Update="build\**" Pack="true" PackagePath="%(Identity)" />
     <Content Include="_._" Pack="true" PackagePath="lib\net6.0\_._" />
   </ItemGroup>
-  
+
   <Target Name="GetTasksOutputDlls" BeforeTargets="CoreCompile">
-    <MSBuild Projects="..\Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks\Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks.csproj" Targets="Publish;PublishItemsOutputGroup" Properties="Configuration=Release">
+    <MSBuild Projects="..\Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks\Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks.csproj" Targets="Publish;PublishItemsOutputGroup" Properties="Configuration=Release">
       <Output TaskParameter="TargetOutputs" ItemName="_TasksProjectOutputs" />
     </MSBuild>
     <ItemGroup>

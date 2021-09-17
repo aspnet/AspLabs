@@ -1,6 +1,6 @@
 <Project>
-  <UsingTask TaskName="Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks.BundleBlazorAssets" AssemblyFile="$(MSBuildThisProjectFileDirectory)..\..\tasks\Microsoft.AspNetCore.Components.WebAssembly.Packaging.Tasks.dll" />
-  
+  <UsingTask TaskName="Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks.BundleBlazorAssets" AssemblyFile="$(MSBuildThisProjectFileDirectory)..\..\tasks\Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks.dll" />
+
   <PropertyGroup>
     <ComputeBlazorExtensionsDependsOn>$(ComputeBlazorExtensionsDependsOn);_BundleBlazorDlls</ComputeBlazorExtensionsDependsOn>
   </PropertyGroup>
@@ -13,5 +13,5 @@
       <Output TaskParameter="Extension" ItemName="BlazorPublishExtension"/>
     </BundleBlazorAssets>
   </Target>
-  
+
 </Project>
