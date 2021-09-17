@@ -42,8 +42,6 @@ namespace Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks
             using (var output = File.Open(BundlePath, FileMode.OpenOrCreate))
             {
                 output.SetLength(0);
-
-                // Sweet sync over async
                 bundle.CopyToAsync(output).ConfigureAwait(false).GetAwaiter().GetResult();
                 output.Flush(true);
             }

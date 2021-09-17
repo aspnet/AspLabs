@@ -12,18 +12,11 @@ export async function beforeStart(wasmOptions, extensions) {
         for (let value of bundleFromData.values()) {
             resources.set(value, URL.createObjectURL(value));
         }
+        wasmOptions.loadBootResource = function (type, name, defaultUri, integrity) {
+            return resources.get(name) ?? null;
+        }
     } catch (error) {
         console.log(error);
-    }
-
-    wasmOptions.loadBootResource = function (type, name, defaultUri, integrity) {
-        for (const [resource, objectUrl] of resources) {
-            if (resource.name === name) {
-                return objectUrl;
-            }
-        }
-
-        return null;
     }
 }
 
