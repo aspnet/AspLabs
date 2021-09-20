@@ -10,7 +10,7 @@ export async function beforeStart(wasmOptions, extensions) {
         const bundleResponse = await fetch('app.bundle', { integrity: integrity, cache: 'no-cache' });
         const bundleFromData = await bundleResponse.formData();
         for (let value of bundleFromData.values()) {
-            resources.set(value, URL.createObjectURL(value));
+            resources.set(value.name, URL.createObjectURL(value));
         }
         wasmOptions.loadBootResource = function (type, name, defaultUri, integrity) {
             return resources.get(name) ?? null;
