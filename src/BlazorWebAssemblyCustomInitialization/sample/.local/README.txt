@@ -1,3 +1,3 @@
-To run the sample, copy the output packages from the build into this folder, which will make them available during the restore process.
+This folder is used as an additional package source by the sample project.
 
-The packages needed are Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle and Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Server
+Using `run.ps1` at the root of the sample will populate this folder with the generated packages for customizing the publish output.
