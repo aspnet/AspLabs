@@ -7,7 +7,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Sample package demonstrating how to customize the Blazor publish process. Using this package in production is not supported.</Description>
-    <PackageVersion>0.1.0</PackageVersion>
     <IsPackable>true</IsPackable>
     <IsShipping>true</IsShipping>
     <IncludeBuildOutput>false</IncludeBuildOutput>
