@@ -39,7 +39,8 @@ app.MapGet("app.bundle", (HttpContext context) =>
     {
         contentEncoding = "br";
         fileName += ".br";
-    }else if (context.Request.Headers.AcceptEncoding.Contains("gzip"))
+    }
+    else if (context.Request.Headers.AcceptEncoding.Contains("gzip"))
 	{
         contentEncoding = "gzip";
         fileName += ".gz";
