@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Threading.Tasks;
 
 namespace System.Threading.RateLimiting
@@ -36,6 +39,6 @@ namespace System.Threading.RateLimiting
         }
 
         // Implementation
-        protected abstract ValueTask<RateLimitLease> WaitAsyncCore(int permitCount, CancellationToken cancellationToken = default);
+        protected abstract ValueTask<RateLimitLease> WaitAsyncCore(int permitCount, CancellationToken cancellationToken);
     }
 }

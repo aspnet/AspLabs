@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 // Pending dotnet API review
 
 using System.Collections.Generic;
@@ -30,7 +33,7 @@ namespace System.Threading.RateLimiting
             // These amounts of resources can never be acquired
             if (permitCount > _options.PermitLimit)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidOperationException($"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
             }
 
             // Return SuccessfulAcquisition or FailedAcquisition depending to indicate limiter state
@@ -104,14 +107,14 @@ namespace System.Threading.RateLimiting
                 while (_queue.Count > 0)
                 {
                     var nextPendingRequest =
-                        _options.QueueProcessingOrder == QueueProcessingOrder.ProcessOldest
+                        _options.QueueProcessingOrder == QueueProcessingOrder.OldestFirst
                         ? _queue.PeekHead()
                         : _queue.PeekTail(); 
 
                     if (GetAvailablePermits() >= nextPendingRequest.Count)
                     {
                         var request =
-                            _options.QueueProcessingOrder == QueueProcessingOrder.ProcessOldest
+                            _options.QueueProcessingOrder == QueueProcessingOrder.OldestFirst
                             ? _queue.DequeueHead()
                             : _queue.DequeueTail();
 

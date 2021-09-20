@@ -1,3 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace System.Threading.RateLimiting
 {
     public sealed class MetadataName<T> : IEquatable<MetadataName<T>>
@@ -9,10 +14,7 @@ namespace System.Threading.RateLimiting
             _name = name;
         }
 
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name => _name;
 
         public override string ToString()
         {
@@ -23,6 +25,7 @@ namespace System.Threading.RateLimiting
         {
             return _name == null ? 0 : _name.GetHashCode();
         }
+
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             return obj is MetadataName<T> && Equals((MetadataName<T>)obj);

@@ -1,4 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Threading.RateLimiting
 {
@@ -12,7 +16,7 @@ namespace System.Threading.RateLimiting
         public abstract bool TryGetMetadata(string metadataName, out object? metadata);
 
         // This casts the metadata returned by the general method above to known types of values.
-        public bool TryGetMetadata<T>(MetadataName<T> metadataName, out T metadata)
+        public bool TryGetMetadata<T>(MetadataName<T> metadataName, [MaybeNullWhen(false)] out T? metadata)
         {
             if (metadataName.Name == null)
             {
@@ -23,7 +27,7 @@ namespace System.Threading.RateLimiting
             var successful = TryGetMetadata(metadataName.Name, out var rawMetadata);
             if (successful)
             {
-                metadata = rawMetadata == null ? default : (T)rawMetadata;
+                metadata = rawMetadata is null ? default : (T)rawMetadata;
                 return true;
             }
 
@@ -48,7 +52,11 @@ namespace System.Threading.RateLimiting
         }
 
         // Follow the general .NET pattern for dispose
-        public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
         protected abstract void Dispose(bool disposing);
     }
 }

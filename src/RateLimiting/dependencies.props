@@ -4,5 +4,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <XunitAnalyzersPackageVersion>0.10.0</XunitAnalyzersPackageVersion>
+    <XunitPackageVersion>2.4.0</XunitPackageVersion>
+    <XunitRunnerVisualStudioPackageVersion>2.4.0</XunitRunnerVisualStudioPackageVersion>
   </PropertyGroup>
 </Project>

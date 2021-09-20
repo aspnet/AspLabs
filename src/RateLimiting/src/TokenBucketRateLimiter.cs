@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 // Pending dotnet API review
 
 using System.Collections.Generic;
@@ -7,7 +10,7 @@ namespace System.Threading.RateLimiting
 {
     public sealed class TokenBucketRateLimiter : RateLimiter
     {
-        private int _permitCount;
+        private int _tokenCount;
         private int _queueCount;
         private long _lastReplenishmentTick;
 
@@ -20,7 +23,7 @@ namespace System.Threading.RateLimiting
 
         public TokenBucketRateLimiter(TokenBucketRateLimiterOptions options)
         {
-            _permitCount = options.PermitLimit;
+            _tokenCount = options.TokenLimit;
             _options = options;
 
             if (_options.AutoReplenishment)
@@ -29,90 +32,92 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        public override int GetAvailablePermits() => _permitCount;
+        public override int GetAvailablePermits() => _tokenCount;
 
-        protected override RateLimitLease AcquireCore(int permitCount)
+        protected override RateLimitLease AcquireCore(int tokenCount)
         {
             // These amounts of resources can never be acquired
-            if (permitCount > _options.PermitLimit)
+            if (tokenCount > _options.TokenLimit)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidOperationException($"{tokenCount} tokens exceeds the token limit of {_options.TokenLimit}.");
             }
 
             // Return SuccessfulAcquisition or FailedAcquisition depending to indicate limiter state
-            if (permitCount == 0)
+            if (tokenCount == 0)
             {
                 if (GetAvailablePermits() > 0)
                 {
                     return SuccessfulLease;
                 }
 
-                return CreateFailedPermitLease();
+                return CreateFailedTokenLease();
             }
 
             // These amounts of resources can never be acquired
-            if (Interlocked.Add(ref _permitCount, -permitCount) >= 0)
+            if (Interlocked.Add(ref _tokenCount, -tokenCount) >= 0)
             {
                 return SuccessfulLease;
             }
 
-            Interlocked.Add(ref _permitCount, permitCount);
+            Interlocked.Add(ref _tokenCount, tokenCount);
 
-            return CreateFailedPermitLease();
+            return CreateFailedTokenLease();
         }
 
-        protected override ValueTask<RateLimitLease> WaitAsyncCore(int permitCount, CancellationToken cancellationToken = default)
+        protected override ValueTask<RateLimitLease> WaitAsyncCore(int tokenCount, CancellationToken cancellationToken = default)
         {
             // These amounts of resources can never be acquired
-            if (permitCount < 0 || permitCount > _options.PermitLimit)
+            if (tokenCount < 0 || tokenCount > _options.TokenLimit)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
             // Return SuccessfulAcquisition if requestedCount is 0 and resources are available
-            if (permitCount == 0 && GetAvailablePermits() > 0)
+            if (tokenCount == 0 && GetAvailablePermits() > 0)
             {
                 // Perf: static failed/successful value tasks?
                 return new ValueTask<RateLimitLease>(SuccessfulLease);
             }
 
-            if (Interlocked.Add(ref _permitCount, -permitCount) >= 0)
+            if (Interlocked.Add(ref _tokenCount, -tokenCount) >= 0)
             {
                 // Perf: static failed/successful value tasks?
                 return new ValueTask<RateLimitLease>(SuccessfulLease);
             }
 
-            Interlocked.Add(ref _permitCount, permitCount);
+            Interlocked.Add(ref _tokenCount, tokenCount);
 
             // Don't queue if queue limit reached
-            if (_queueCount + permitCount > _options.QueueLimit)
+            if (_queueCount + tokenCount > _options.QueueLimit)
             {
-                return new ValueTask<RateLimitLease>(CreateFailedPermitLease());
+                return new ValueTask<RateLimitLease>(CreateFailedTokenLease());
             }
 
-            var registration = new RequestRegistration(permitCount);
+            var registration = new RequestRegistration(tokenCount);
             _queue.EnqueueTail(registration);
-            Interlocked.Add(ref _permitCount, permitCount);
+            Interlocked.Add(ref _tokenCount, tokenCount);
 
             // handle cancellation
-            return new ValueTask<RateLimitLease>(registration.TCS.Task);
+            return new ValueTask<RateLimitLease>(registration.Tcs.Task);
         }
 
-        private RateLimitLease CreateFailedPermitLease()
+        private RateLimitLease CreateFailedTokenLease()
         {
-            var replenishAmount = _permitCount - GetAvailablePermits() + _queueCount;
-            var replenishPeriods = (replenishAmount / _options.TokensPerReplenishment) + 1;
+            var replenishAmount = _tokenCount - GetAvailablePermits() + _queueCount;
+            var replenishPeriods = (replenishAmount / _options.TokensPerPeriod) + 1;
 
             return new TokenBucketLease(false, TimeSpan.FromTicks(_options.ReplenishmentPeriod.Ticks*replenishPeriods));
         }
 
-        public void Replenish()
+        // Attempts to replenish the bucket, returns triue if enough time has elapsed and it replenishes; otherwise, false.
+        public bool TryReplenish()
         {
             if (_options.AutoReplenishment)
             {
-                return;
+                return false;
             }
             Replenish(this);
+            return true;
         }
 
         private static void Replenish(object? state)
@@ -136,12 +141,12 @@ namespace System.Threading.RateLimiting
 
             var availablePermits = limiter.GetAvailablePermits();
             var options = limiter._options;
-            var maxPermits = options.PermitLimit;
+            var maxPermits = options.TokenLimit;
 
             if (availablePermits < maxPermits)
             {
-                var resoucesToAdd = Math.Min(options.TokensPerReplenishment, maxPermits - availablePermits);
-                Interlocked.Add(ref limiter._permitCount, resoucesToAdd);
+                var resoucesToAdd = Math.Min(options.TokensPerPeriod, maxPermits - availablePermits);
+                Interlocked.Add(ref limiter._tokenCount, resoucesToAdd);
             }
 
             // Process queued requests
@@ -151,26 +156,26 @@ namespace System.Threading.RateLimiting
                 while (queue.Count > 0)
                 {
                     var nextPendingRequest =
-                          options.QueueProcessingOrder == QueueProcessingOrder.ProcessOldest
+                          options.QueueProcessingOrder == QueueProcessingOrder.OldestFirst
                           ? queue.PeekHead()
                           : queue.PeekTail();
 
-                    if (Interlocked.Add(ref limiter._permitCount, -nextPendingRequest.Count) >= 0)
+                    if (Interlocked.Add(ref limiter._tokenCount, -nextPendingRequest.Count) >= 0)
                     {
                         // Request can be fulfilled
                         var request =
-                            options.QueueProcessingOrder == QueueProcessingOrder.ProcessOldest
+                            options.QueueProcessingOrder == QueueProcessingOrder.OldestFirst
                             ? queue.DequeueHead()
                             : queue.DequeueTail();
                         Interlocked.Add(ref limiter._queueCount, -request.Count);
 
                         // requestToFulfill == request
-                        request.TCS.SetResult(SuccessfulLease);
+                        request.Tcs.SetResult(SuccessfulLease);
                     }
                     else
                     {
                         // Request cannot be fulfilled
-                        Interlocked.Add(ref limiter._permitCount, nextPendingRequest.Count);
+                        Interlocked.Add(ref limiter._tokenCount, nextPendingRequest.Count);
                         break;
                     }
                 }
@@ -208,16 +213,16 @@ namespace System.Threading.RateLimiting
 
         private struct RequestRegistration
         {
-            public RequestRegistration(int permitCount)
+            public RequestRegistration(int tokenCount)
             {
-                Count = permitCount;
+                Count = tokenCount;
                 // Use VoidAsyncOperationWithData<T> instead
-                TCS = new TaskCompletionSource<RateLimitLease>();
+                Tcs = new TaskCompletionSource<RateLimitLease>(TaskCreationOptions.RunContinuationsAsynchronously);
             }
 
             public int Count { get; }
 
-            public TaskCompletionSource<RateLimitLease> TCS { get; }
+            public TaskCompletionSource<RateLimitLease> Tcs { get; }
         }
     }
 }
