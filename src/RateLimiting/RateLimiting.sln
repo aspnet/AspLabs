@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F2DEA5D2-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Threading.RateLimiting", "src\System.Threading.RateLimiting.csproj", "{EF336993-5ABE-4B10-ADD6-C81FF5C38FFA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Threading.RateLimiting.Test", "test\System.Threading.RateLimiting.Test.csproj", "{0B341E2F-59ED-4DDF-94A7-ECFD00F774DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Threading.RateLimiting.Tests", "test\System.Threading.RateLimiting.Tests.csproj", "{0B341E2F-59ED-4DDF-94A7-ECFD00F774DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
