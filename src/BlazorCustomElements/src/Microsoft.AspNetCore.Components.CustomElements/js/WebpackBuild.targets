@@ -23,10 +23,7 @@
       <FileWrites Include="$(IntermediateOutputPath)npmbuild.complete.txt" />
     </ItemGroup>
 
-    <GetFileHash Files="@(_NpmOutput)">
-      <Output TaskParameter="Items" ItemName="_NpmOutputWithHash" />
-    </GetFileHash>
-    <WriteLinesToFile File="$(IntermediateOutputPath)npmbuild.complete.txt" Lines="@(_NpmOutputWithHash->'%(Identity): %(FileHash)')" WriteOnlyWhenDifferent="true" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)npmbuild.complete.txt" Lines="@(_NpmOutput)" />
   </Target>
 
 </Project>
