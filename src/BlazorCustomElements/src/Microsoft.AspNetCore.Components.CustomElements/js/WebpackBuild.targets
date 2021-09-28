@@ -1,38 +1,33 @@
 <Project>
 
   <PropertyGroup>
-    <WebpackOutputFile>wwwroot\BlazorCustomElements.js</WebpackOutputFile>
+    <DefaultItemExcludes>**\dist\**;**\*.targets;$(DefaultItemExcludes)</DefaultItemExcludes>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <WebpackBuildInputs Include="$(MSBuildThisFileDirectory)**" Exclude="$(MSBuildThisFileDirectory)node_modules\**" />
-    <WebpackBuildInputs Include="$(BaseIntermediateOutputPath)webpackconfig.txt" />
-    <UpToDateCheckInput Include="@(WebpackBuildInputs)" />
+    <NpmBuildInputs Include="$(NpmFolder)**" Exclude="$(DefaultItemExcludes)" />
   </ItemGroup>
 
   <!-- If package-lock.json has changed, perform an NPM install -->
-  <Target Name="NpmInstall"
-          Inputs="$(MSBuildThisFileDirectory)package-lock.json"
-          Outputs="$(BaseIntermediateOutputPath)package-lock.json">
+  <Target Name="NpmInstall" Inputs="$(NpmFolder)package-lock.json" Outputs="$(NpmFolder)node_modules\.package-lock.json">
     <Message Importance="high" Text="Running npm install..." />
-    <Exec Command="npm install" WorkingDirectory="$(MSBuildThisFileDirectory)" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)package-lock.json"
-          DestinationFolder="$(BaseIntermediateOutputPath)" />
+    <Exec Command="npm install" WorkingDirectory="$(NpmFolder)" />
   </Target>
 
-  <!-- If any source file in this dir or below has changed, perform a Webpack build -->
-  <Target Name="TrackWebpackBuildConfig">
-    <WriteLinesToFile File="$(BaseIntermediateOutputPath)webpackconfig.txt" Lines="$(Configuration)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" Inputs="@(NpmBuildInputs)" Outputs="$(IntermediateOutputPath)npmbuild.complete.txt">
+    <Exec Command="$(NpmCommand) -- -o $(IntermediateOutputPath)\npm" WorkingDirectory="$(NpmFolder)" />
   </Target>
 
-  <Target Name="WebpackBuild" DependsOnTargets="NpmInstall; TrackWebpackBuildConfig" BeforeTargets="AssignTargetPaths"
-          Inputs="@(WebpackBuildInputs)"
-          Outputs="$(WebpackOutputFile)">
-    <Exec Command="npm run build:$(Configuration)" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  <Target Name="IncludeNpmBuildOuputs" DependsOnTargets="NpmRunBuild" BeforeTargets="AssignTargetPaths">
     <ItemGroup>
-      <Content Remove="$(WebpackOutputFile)" />
-      <Content Include="$(WebpackOutputFile)" />
+      <_NpmOutput Include="$(IntermediateOutputPath)\npm\**"></_NpmOutput>
+      <Content Include="@(_NpmOutput)" Link="wwwroot\%(_NpmOutput.RecursiveDir)\%(_NpmOutput.FileName)%(_NpmOutput.Extension)" />
+      <FileWrites Include="$(IntermediateOutputPath)npmbuild.complete.txt" />
     </ItemGroup>
+    <GetFileHash Files="@(_NpmOutput)">
+      <Output TaskParameter="Items" ItemName="_NpmOutputWithHash" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(IntermediateOutputPath)npmbuild.complete.txt" Lines="@(_NpmOutputWithHash->'%(Identity): %(FileHash)')" WriteOnlyWhenDifferent="true" />
   </Target>
 
 </Project>
