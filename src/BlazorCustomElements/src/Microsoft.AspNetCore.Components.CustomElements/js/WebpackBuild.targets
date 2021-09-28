@@ -14,16 +14,15 @@
     <Exec Command="npm install" WorkingDirectory="$(NpmFolder)" />
   </Target>
 
-  <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" Inputs="@(NpmBuildInputs)" Outputs="$(IntermediateOutputPath)npmbuild.complete.txt">
+  <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" BeforeTargets="AssignTargetPaths" Inputs="@(NpmBuildInputs)" Outputs="$(IntermediateOutputPath)npmbuild.complete.txt">
     <Exec Command="$(NpmCommand) -- -o $(IntermediateOutputPath)\npm" WorkingDirectory="$(NpmFolder)" />
-  </Target>
 
-  <Target Name="IncludeNpmBuildOuputs" DependsOnTargets="NpmRunBuild" BeforeTargets="AssignTargetPaths">
     <ItemGroup>
       <_NpmOutput Include="$(IntermediateOutputPath)\npm\**"></_NpmOutput>
       <Content Include="@(_NpmOutput)" Link="wwwroot\%(_NpmOutput.RecursiveDir)\%(_NpmOutput.FileName)%(_NpmOutput.Extension)" />
       <FileWrites Include="$(IntermediateOutputPath)npmbuild.complete.txt" />
     </ItemGroup>
+
     <GetFileHash Files="@(_NpmOutput)">
       <Output TaskParameter="Items" ItemName="_NpmOutputWithHash" />
     </GetFileHash>
