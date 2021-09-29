@@ -10,8 +10,10 @@
 
     <ClientAssetsRestoreInputs>$(MSBuildProjectFile);$(ClientAssetsRestoreInputs)</ClientAssetsRestoreInputs>
 
-    <!-- Run restore only once for cross-targeting builds -->
+    <!-- Run restore only once for multi targeting builds -->
     <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+    <!-- Allow multitargeting projects to choose the target framework in which they run by setting this value to true only for a given target framework -->
+    <ShouldRunClientAssetsBuild Condition="'$(ShouldRunClientAssetsBuild)' == ''>true</ShouldRunClientAssetsBuild>
   </PropertyGroup>
 
   <ItemGroup>
