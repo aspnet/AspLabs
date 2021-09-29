@@ -1,0 +1,39 @@
+<Project>
+
+  <PropertyGroup>
+    <ClientAssetsDirectory Condition="'$(ClientAssetsDirectory)' == ''">assets\</ClientAssetsDirectory>
+    <ClientAssetsRestoreInputs Condition="'$(ClientAssetsRestoreInputs)' == ''">$(ClientAssetsDirectory)package-lock.json;$(ClientAssetsDirectory)package.json</ClientAssetsRestoreInputs>
+    <ClientAssetsRestoreOutputs Condition="'$(ClientAssetsRestoreOutputs)' == ''">$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
+    <ClientAssetsRestoreCommand Condition="'$(ClientAssetsRestoreCommand)' == ''">npm install</ClientAssetsRestoreCommand>
+    <ClientAssetsBuildCommand Condition="'$(ClientAssetsBuildCommand)' == ''">npm run build:$(Configuration)</ClientAssetsBuildCommand>
+    <ClientAssetsBuildOutputParameter Condition="'$(ClientAssetsBuildOutputParameter)' == ''">-o</ClientAssetsBuildOutputParameter>
+
+    <ClientAssetsRestoreInputs>$(MSBuildProjectFile);$(ClientAssetsRestoreInputs)</ClientAssetsRestoreInputs>
+
+    <!-- Run restore only once for cross-targeting builds -->
+    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClientAssetsInputs Include="$(ClientAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
+  </ItemGroup>
+
+  <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
+    <Message Importance="high" Text="Running $(ClientAssetsRestoreCommand)..." />
+    <Exec Command="$(ClientAssetsRestoreCommand)" WorkingDirectory="$(ClientAssetsDirectory)" />
+  </Target>
+
+  <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+    <Exec Command="$(ClientAssetsBuildCommand) -- $(ClientAssetsBuildOutputParameter) $(IntermediateOutputPath)clientassets" WorkingDirectory="$(ClientAssetsDirectory)" />
+
+    <ItemGroup>
+      <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
+      <Content Include="@(_ClientAssetsBuildOutput)" Link="wwwroot\%(_ClientAssetsBuildOutput.RecursiveDir)\%(_ClientAssetsBuildOutput.FileName)%(_ClientAssetsBuildOutput.Extension)" />
+      <FileWrites Include="@(_ClientAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)clientassetsbuild.complete.txt" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)clientassetsbuild.complete.txt" Lines="@(_ClientAssetsBuildOutput)" />
+  </Target>
+
+</Project>
