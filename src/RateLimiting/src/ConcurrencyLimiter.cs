@@ -192,6 +192,15 @@ namespace System.Threading.RateLimiting
             }
         }
 
+        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs)
+        {
+            lock (_lock)
+            {
+                // REVIEW: failed lease or exception?
+                tcs.TrySetResult(FailedLease);
+            }
+        }
+
         private class ConcurrencyLease : RateLimitLease
         {
             private bool _disposed;
@@ -260,6 +269,8 @@ namespace System.Threading.RateLimiting
             public int Count { get; }
 
             public TaskCompletionSource<RateLimitLease> Tcs { get; }
+
+            public CancellationTokenRegistration CancellationTokenRegistration { get; }
 
             public CancellationTokenRegistration CancellationTokenRegistration { get; }
         }
