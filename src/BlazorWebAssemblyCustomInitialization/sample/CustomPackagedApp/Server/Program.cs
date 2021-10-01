@@ -35,16 +35,17 @@ app.MapGet("app.bundle", (HttpContext context) =>
     var contentType = "multipart/form-data; boundary=\"--0a7e8441d64b4bf89086b85e59523b7d\"";
     var fileName = "app.bundle";
 
-    if (context.Request.Headers.AcceptEncoding.Contains("br"))
+    var acceptEncodings = context.Request.Headers.AcceptEncoding.SelectMany(s => s.Split(',').Select(s => s.Trim()));
+    if (acceptEncodings.Contains("br"))
     {
         contentEncoding = "br";
         fileName += ".br";
     }
-    else if (context.Request.Headers.AcceptEncoding.Contains("gzip"))
-	{
+    else if (acceptEncodings.Contains("gzip"))
+    {
         contentEncoding = "gzip";
         fileName += ".gz";
-	}
+    }
 
     if (contentEncoding != null)
 	{
