@@ -71,6 +71,8 @@ namespace System.Threading.RateLimiting
         /// <inheritdoc/>
         protected override ValueTask<RateLimitLease> WaitAsyncCore(int permitCount, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             // These amounts of resources can never be acquired
             if (permitCount > _options.PermitLimit)
             {
@@ -110,7 +112,7 @@ namespace System.Threading.RateLimiting
                 CancellationTokenRegistration ctr;
                 if (cancellationToken.CanBeCanceled)
                 {
-                    ctr = cancellationToken.Register(obj => CancellationRequested((TaskCompletionSource<RateLimitLease>)obj), tcs);
+                    ctr = cancellationToken.Register(obj => CancellationRequested((TaskCompletionSource<RateLimitLease>)obj, cancellationToken), tcs);
                 }
 
                 RequestRegistration request = new RequestRegistration(permitCount, tcs, ctr);
@@ -165,12 +167,11 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs)
+        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs, CancellationToken token)
         {
             lock (_lock)
             {
-                // REVIEW: failed lease or exception?
-                tcs.TrySetResult(FailedLease);
+                tcs.TrySetException(new OperationCanceledException(token));
             }
         }
 

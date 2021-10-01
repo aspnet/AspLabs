@@ -199,7 +199,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanCancelWaitAsync()
+        public async Task CanCancelWaitAsyncAfterQueuing()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
             var lease = limiter.Acquire(1);
@@ -209,8 +209,24 @@ namespace System.Threading.RateLimiting.Test
             var wait = limiter.WaitAsync(1, cts.Token);
 
             cts.Cancel();
-            var failedLease = await wait.DefaultTimeout();
-            Assert.False(failedLease.IsAcquired);
+            await Assert.ThrowsAsync<OperationCanceledException>(() => wait.DefaultTimeout());
+
+            lease.Dispose();
+
+            Assert.Equal(1, limiter.GetAvailablePermits());
+        }
+
+        [Fact]
+        public async Task CanCancelWaitAsyncBeforeQueuing()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
+            var lease = limiter.Acquire(1);
+            Assert.True(lease.IsAcquired);
+
+            var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() => limiter.WaitAsync(1, cts.Token).DefaultTimeout());
 
             lease.Dispose();
 
