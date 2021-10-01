@@ -192,12 +192,11 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs)
+        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs, CancellationToken token)
         {
             lock (_lock)
             {
-                // REVIEW: failed lease or exception?
-                tcs.TrySetResult(FailedLease);
+                tcs.TrySetException(new OperationCanceledException(token));
             }
         }
 
