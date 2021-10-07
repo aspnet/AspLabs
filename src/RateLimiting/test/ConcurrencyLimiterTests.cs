@@ -106,6 +106,28 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
+        public async Task QueueAvailableAfterQueueLimitHitAndResources_BecomeAvailable()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
+            var lease = limiter.Acquire(1);
+            var wait = limiter.WaitAsync(1);
+
+            var failedLease = await limiter.WaitAsync(1).DefaultTimeout();
+            Assert.False(failedLease.IsAcquired);
+
+            lease.Dispose();
+            lease = await wait.DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            wait = limiter.WaitAsync(1);
+            Assert.False(wait.IsCompleted);
+
+            lease.Dispose();
+            lease = await wait.DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+        }
+
+        [Fact]
         public void ThrowsWhenAcquiringMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
