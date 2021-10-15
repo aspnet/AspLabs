@@ -16,7 +16,6 @@ namespace System.Threading.RateLimiting
         /// <returns></returns>
         public abstract int GetAvailablePermits();
 
-        // Set permitCount to 0 to get whether permits are exhausted
         /// <summary>
         /// Fast synchronous attempt to acquire permits.
         /// </summary>
@@ -39,7 +38,7 @@ namespace System.Threading.RateLimiting
         /// <summary>
         /// Method that <see cref="RateLimiter"/> implementations implement for <see cref="Acquire"/>.
         /// </summary>
-        /// <param name="permitCount"></param>
+        /// <param name="permitCount">Number of permits to try and acquire.</param>
         /// <returns></returns>
         protected abstract RateLimitLease AcquireCore(int permitCount);
 
@@ -49,9 +48,9 @@ namespace System.Threading.RateLimiting
         /// <remarks>
         /// Set <paramref name="permitCount"/> to 0 to wait until permits are replenished.
         /// </remarks>
-        /// <param name="permitCount"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="permitCount">Number of permits to try and acquire.</param>
+        /// <param name="cancellationToken">Optional token to allow canceling a queued request for permits.</param>
+        /// <returns>A task that completes when the requested permits are acquired or when the requested permits are denied.</returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public ValueTask<RateLimitLease> WaitAsync(int permitCount = 1, CancellationToken cancellationToken = default)
         {
@@ -66,8 +65,8 @@ namespace System.Threading.RateLimiting
         /// <summary>
         /// Method that <see cref="RateLimiter"/> implementations implement for <see cref="WaitAsync"/>.
         /// </summary>
-        /// <param name="permitCount"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="permitCount">Number of permits to try and acquire.</param>
+        /// <param name="cancellationToken">Optional token to allow canceling a queued request for permits.</param>
         /// <returns>A task that completes when the requested permits are acquired or when the requested permits are denied.</returns>
         protected abstract ValueTask<RateLimitLease> WaitAsyncCore(int permitCount, CancellationToken cancellationToken);
     }

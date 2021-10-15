@@ -20,7 +20,7 @@ namespace System.Threading.RateLimiting
         /// Attempt to extract metadata for the lease.
         /// </summary>
         /// <param name="metadataName">The name of the metadata. Some common ones can be found in <see cref="MetadataName"/>.</param>
-        /// <param name="metadata"></param>
+        /// <param name="metadata">The metadata object if it exists.</param>
         /// <returns>True if the metadata exists, otherwise false.</returns>
         public abstract bool TryGetMetadata(string metadataName, out object? metadata);
 
@@ -31,7 +31,7 @@ namespace System.Threading.RateLimiting
         /// <param name="metadataName">The name of the strongly-typed metadata. Some common ones can be found in <see cref="MetadataName"/>.</param>
         /// <param name="metadata">The strongly-typed metadata object if it exists.</param>
         /// <returns>True if the metadata exists, otherwise false.</returns>
-        public bool TryGetMetadata<T>(MetadataName<T> metadataName, [MaybeNullWhen(false)] out T? metadata)
+        public bool TryGetMetadata<T>(MetadataName<T> metadataName, [MaybeNull] out T metadata)
         {
             if (metadataName.Name == null)
             {
@@ -72,7 +72,7 @@ namespace System.Threading.RateLimiting
         }
 
         /// <summary>
-        /// Dispose the lease. This will generally free up space on the limiter implementation the lease came from.
+        /// Dispose the lease. This may free up space on the limiter implementation the lease came from.
         /// </summary>
         public void Dispose()
         {

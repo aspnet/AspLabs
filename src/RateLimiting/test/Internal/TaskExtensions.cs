@@ -9,7 +9,13 @@ namespace System.Threading.RateLimiting.Tests.Internal
 {
     public static class TaskExtensions
     {
-        private const int DefaultTimeoutDuration = 30 * 1000;
+#if DEBUG
+        // Shorter duration when running tests with debug.
+        // Less time waiting for hanging unit tests to fail locally.
+        public const int DefaultTimeoutDuration = 5 * 1000;
+#else
+        public const int DefaultTimeoutDuration = 30 * 1000;
+#endif
 
         public static TimeSpan DefaultTimeoutTimeSpan { get; } = TimeSpan.FromMilliseconds(DefaultTimeoutDuration);
 

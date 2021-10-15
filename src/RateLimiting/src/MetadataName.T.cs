@@ -45,11 +45,7 @@ namespace System.Threading.RateLimiting
             return obj is MetadataName<T> && Equals((MetadataName<T>)obj);
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="MetadataName{T}"/> is equal to the current object.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public bool Equals(MetadataName<T> other)
         {
             // NOTE: intentionally ordinal and case sensitive, matches CNG.

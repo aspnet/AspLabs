@@ -199,6 +199,90 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
+        public async Task CanAcquireResourcesWithWaitAsyncWithQueuedItemsIfNewestFirst()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.NewestFirst, 3));
+            using var lease = await limiter.WaitAsync(1).DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            var wait1 = limiter.WaitAsync(2);
+            Assert.False(wait1.IsCompleted);
+            var wait2 = limiter.WaitAsync(1);
+            var lease2 = await wait2.DefaultTimeout();
+            Assert.True(lease2.IsAcquired);
+
+            lease.Dispose();
+
+            Assert.False(wait1.IsCompleted);
+            lease2.Dispose();
+
+            var lease1 = await wait1.DefaultTimeout();
+            Assert.True(lease1.IsAcquired);
+        }
+
+        [Fact]
+        public async Task CannotAcquireResourcesWithWaitAsyncWithQueuedItemsIfOldestFirst()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.OldestFirst, 3));
+            using var lease = await limiter.WaitAsync(1).DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            var wait1 = limiter.WaitAsync(2);
+            var wait2 = limiter.WaitAsync(1);
+            Assert.False(wait1.IsCompleted);
+            Assert.False(wait2.IsCompleted);
+
+            lease.Dispose();
+
+            var lease1 = await wait1.DefaultTimeout();
+            Assert.True(lease1.IsAcquired);
+            Assert.False(wait2.IsCompleted);
+
+            lease1.Dispose();
+            var lease2 = await wait2.DefaultTimeout();
+            Assert.True(lease2.IsAcquired);
+        }
+
+        [Fact]
+        public async Task CanAcquireResourcesWithAcquireWithQueuedItemsIfNewestFirst()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.NewestFirst, 3));
+            using var lease = await limiter.WaitAsync(1).DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            var wait1 = limiter.WaitAsync(2);
+            Assert.False(wait1.IsCompleted);
+            var lease2 = limiter.Acquire(1);
+            Assert.True(lease2.IsAcquired);
+
+            lease.Dispose();
+
+            Assert.False(wait1.IsCompleted);
+            lease2.Dispose();
+
+            var lease1 = await wait1.DefaultTimeout();
+            Assert.True(lease1.IsAcquired);
+        }
+
+        [Fact]
+        public async Task CannotAcquireResourcesWithAcquireWithQueuedItemsIfOldestFirst()
+        {
+            var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.OldestFirst, 3));
+            using var lease = await limiter.WaitAsync(1).DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            var wait1 = limiter.WaitAsync(2);
+            Assert.False(wait1.IsCompleted);
+            var lease2 = limiter.Acquire(1);
+            Assert.False(lease2.IsAcquired);
+
+            lease.Dispose();
+
+            var lease1 = await wait1.DefaultTimeout();
+            Assert.True(lease1.IsAcquired);
+        }
+
+        [Fact]
         public async Task CanCancelWaitAsyncAfterQueuing()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
