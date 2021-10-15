@@ -23,6 +23,7 @@ namespace System.Threading.RateLimiting
 
         private static readonly ConcurrencyLease SuccessfulLease = new ConcurrencyLease(true, null, 0);
         private static readonly ConcurrencyLease FailedLease = new ConcurrencyLease(false, null, 0);
+        private static readonly ConcurrencyLease QueueLimitLease = new ConcurrencyLease(false, null, 0, "Queue limit reached");
 
         // Use the queue as the lock field so we don't need to allocate another object for a lock and have another field in the object
         private object Lock => _queue;
@@ -49,18 +50,18 @@ namespace System.Threading.RateLimiting
                 throw new InvalidOperationException($"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
             }
 
-            // Return SuccessfulAcquisition or FailedAcquisition to indicate limiter state
+            // Return SuccessfulLease or FailedLease to indicate limiter state
             if (permitCount == 0)
             {
-                return GetAvailablePermits() > 0 ? SuccessfulLease : FailedLease;
+                return _permitCount > 0 ? SuccessfulLease : FailedLease;
             }
 
             // Perf: Check SemaphoreSlim implementation instead of locking
-            if (GetAvailablePermits() >= permitCount)
+            if (_permitCount >= permitCount)
             {
                 lock (Lock)
                 {
-                    if (TryLeaseUnsynchronized(permitCount, out var lease))
+                    if (TryLeaseUnsynchronized(permitCount, out RateLimitLease? lease))
                     {
                         return lease;
                     }
@@ -82,15 +83,15 @@ namespace System.Threading.RateLimiting
             }
 
             // Return SuccessfulAcquisition if requestedCount is 0 and resources are available
-            if (permitCount == 0 && GetAvailablePermits() > 0)
+            if (permitCount == 0 && _permitCount > 0)
             {
                 return new ValueTask<RateLimitLease>(SuccessfulLease);
             }
 
             // Perf: Check SemaphoreSlim implementation instead of locking
-            lock (Lock) // Check lock check
+            lock (Lock)
             {
-                if (TryLeaseUnsynchronized(permitCount, out var lease))
+                if (TryLeaseUnsynchronized(permitCount, out RateLimitLease? lease))
                 {
                     return new ValueTask<RateLimitLease>(lease);
                 }
@@ -99,7 +100,7 @@ namespace System.Threading.RateLimiting
                 if (_queueCount + permitCount > _options.QueueLimit)
                 {
                     // Perf: static failed/successful value tasks?
-                    return new ValueTask<RateLimitLease>(new ConcurrencyLease(false, null, 0, "Queue limit reached"));
+                    return new ValueTask<RateLimitLease>(QueueLimitLease);
                 }
 
                 TaskCompletionSource<RateLimitLease> tcs = new TaskCompletionSource<RateLimitLease>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -117,14 +118,14 @@ namespace System.Threading.RateLimiting
                 _queueCount += permitCount;
                 Debug.Assert(_queueCount <= _options.QueueLimit);
 
-                return new ValueTask<RateLimitLease>(request.TCS.Task);
+                return new ValueTask<RateLimitLease>(request.Tcs.Task);
             }
         }
 
         private bool TryLeaseUnsynchronized(int permitCount, [NotNullWhen(true)] out RateLimitLease? lease)
         {
             // if permitCount is 0 we want to queue it if there are no available permits
-            if (GetAvailablePermits() >= permitCount && GetAvailablePermits() != 0)
+            if (_permitCount >= permitCount && _permitCount != 0)
             {
                 if (permitCount == 0)
                 {
@@ -150,7 +151,7 @@ namespace System.Threading.RateLimiting
 
         private void Release(int releaseCount)
         {
-            lock (Lock) // Check lock check
+            lock (Lock)
             {
                 _permitCount += releaseCount;
                 Debug.Assert(_permitCount <=  _options.PermitLimit);
@@ -162,7 +163,7 @@ namespace System.Threading.RateLimiting
                         ? _queue.PeekHead()
                         : _queue.PeekTail(); 
 
-                    if (GetAvailablePermits() >= nextPendingRequest.Count)
+                    if (_permitCount >= nextPendingRequest.Count)
                     {
                         nextPendingRequest =
                             _options.QueueProcessingOrder == QueueProcessingOrder.OldestFirst
@@ -174,9 +175,9 @@ namespace System.Threading.RateLimiting
                         Debug.Assert(_queueCount >= 0);
                         Debug.Assert(_permitCount >= 0);
 
-                        var lease = nextPendingRequest.Count == 0 ? SuccessfulLease : new ConcurrencyLease(true, this, nextPendingRequest.Count);
+                        ConcurrencyLease lease = nextPendingRequest.Count == 0 ? SuccessfulLease : new ConcurrencyLease(true, this, nextPendingRequest.Count);
                         // Check if request was canceled
-                        if (!nextPendingRequest.TCS.TrySetResult(lease))
+                        if (!nextPendingRequest.Tcs.TrySetResult(lease))
                         {
                             // Queued item was canceled so add count back
                             _permitCount += nextPendingRequest.Count;
@@ -215,12 +216,10 @@ namespace System.Threading.RateLimiting
 
             private IEnumerable<string> Enumerable()
             {
-                if (_reason is null)
+                if (_reason is not null)
                 {
-                    yield break;
+                    yield return MetadataName.ReasonPhrase.Name;
                 }
-
-                yield return MetadataName.ReasonPhrase.Name;
             }
 
             public override bool TryGetMetadata(string metadataName, out object? metadata)
@@ -247,20 +246,20 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        private struct RequestRegistration
+        private readonly struct RequestRegistration
         {
             public RequestRegistration(int requestedCount, TaskCompletionSource<RateLimitLease> tcs,
                 CancellationTokenRegistration cancellationTokenRegistration)
             {
                 Count = requestedCount;
                 // Perf: Use AsyncOperation<TResult> instead
-                TCS = tcs;
+                Tcs = tcs;
                 CancellationTokenRegistration = cancellationTokenRegistration;
             }
 
             public int Count { get; }
 
-            public TaskCompletionSource<RateLimitLease> TCS { get; }
+            public TaskCompletionSource<RateLimitLease> Tcs { get; }
 
             public CancellationTokenRegistration CancellationTokenRegistration { get; }
         }
