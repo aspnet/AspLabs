@@ -47,7 +47,7 @@ namespace System.Threading.RateLimiting
             // These amounts of resources can never be acquired
             if (permitCount > _options.PermitLimit)
             {
-                throw new InvalidOperationException($"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
+                throw new ArgumentOutOfRangeException(nameof(permitCount), $"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
             }
 
             // Return SuccessfulLease or FailedLease to indicate limiter state
@@ -79,7 +79,7 @@ namespace System.Threading.RateLimiting
             // These amounts of resources can never be acquired
             if (permitCount > _options.PermitLimit)
             {
-                throw new InvalidOperationException($"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
+                throw new ArgumentOutOfRangeException(nameof(permitCount), $"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
             }
 
             // Return SuccessfulAcquisition if requestedCount is 0 and resources are available

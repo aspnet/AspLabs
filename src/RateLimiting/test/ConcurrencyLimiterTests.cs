@@ -109,14 +109,16 @@ namespace System.Threading.RateLimiting.Test
         public void ThrowsWhenAcquiringMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
-            Assert.Throws<InvalidOperationException>(() => limiter.Acquire(2));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => limiter.Acquire(2));
+            Assert.Equal("permitCount", ex.ParamName);
         }
 
         [Fact]
         public async Task ThrowsWhenWaitingForMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await limiter.WaitAsync(2).DefaultTimeout());
+            var ex = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await limiter.WaitAsync(2).DefaultTimeout());
+            Assert.Equal("permitCount", ex.ParamName);
         }
 
         [Fact]
