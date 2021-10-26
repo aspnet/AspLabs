@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text.Json;
@@ -10,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
+using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
@@ -78,16 +81,137 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             writer.WriteEndObject();
         }
 
-        public override bool CanConvert(Type typeToConvert)
+        public override bool CanConvert(System.Type typeToConvert)
         {
-            var result = base.CanConvert(typeToConvert);
-            
             return typeof(IMessage).IsAssignableFrom(typeToConvert);
         }
 
         private void WriteValue(Utf8JsonWriter writer, object value)
         {
-            writer.WriteStringValue(value.ToString());
+            if (value == null || value is NullValue)
+            {
+                writer.WriteNullValue();
+            }
+            else if (value is bool b)
+            {
+                writer.WriteBooleanValue(b);
+            }
+            else if (value is ByteString bs)
+            {
+                writer.WriteStringValue(bs.ToBase64());
+            }
+            else if (value is string s)
+            {
+                writer.WriteStringValue(s);
+            }
+            else if (value is IDictionary d)
+            {
+                WriteDictionary(writer, (IDictionary)value);
+            }
+            else if (value is IList l)
+            {
+                WriteList(writer, (IList)value);
+            }
+            //else if (value is int || value is uint)
+            //{
+            //    IFormattable formattable = (IFormattable)value;
+            //    writer.Write(formattable.ToString("d", CultureInfo.InvariantCulture));
+            //}
+            //else if (value is long || value is ulong)
+            //{
+            //    writer.Write('"');
+            //    IFormattable formattable = (IFormattable)value;
+            //    writer.Write(formattable.ToString("d", CultureInfo.InvariantCulture));
+            //    writer.Write('"');
+            //}
+            //else if (value is System.Enum)
+            //{
+            //    if (settings.FormatEnumsAsIntegers)
+            //    {
+            //        WriteValue(writer, (int)value);
+            //    }
+            //    else
+            //    {
+            //        string name = OriginalEnumValueHelper.GetOriginalName(value);
+            //        if (name != null)
+            //        {
+            //            WriteString(writer, name);
+            //        }
+            //        else
+            //        {
+            //            WriteValue(writer, (int)value);
+            //        }
+            //    }
+            //}
+            //else if (value is float || value is double)
+            //{
+            //    string text = ((IFormattable)value).ToString("r", CultureInfo.InvariantCulture);
+            //    if (text == "NaN" || text == "Infinity" || text == "-Infinity")
+            //    {
+            //        writer.Write('"');
+            //        writer.Write(text);
+            //        writer.Write('"');
+            //    }
+            //    else
+            //    {
+            //        writer.Write(text);
+            //    }
+            //}
+            else if (value is IMessage m)
+            {
+                WriteMessage(writer, m);
+            }
+            else
+            {
+                throw new ArgumentException("Unable to format value of type " + value.GetType());
+            }
+        }
+
+        private void WriteList(Utf8JsonWriter writer, IList list)
+        {
+            writer.WriteStartArray();
+
+            foreach (var value in list)
+            {
+                WriteValue(writer, value);
+            }
+
+            writer.WriteEndArray();
+        }
+
+        private void WriteDictionary(Utf8JsonWriter writer, IDictionary dictionary)
+        {
+            writer.WriteStartObject();
+
+            foreach (DictionaryEntry pair in dictionary)
+            {
+                string keyText;
+                if (pair.Key is string)
+                {
+                    keyText = (string)pair.Key;
+                }
+                else if (pair.Key is bool)
+                {
+                    keyText = (bool)pair.Key ? "true" : "false";
+                }
+                else if (pair.Key is int || pair.Key is uint | pair.Key is long || pair.Key is ulong)
+                {
+                    keyText = ((IFormattable)pair.Key).ToString("d", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (pair.Key == null)
+                    {
+                        throw new ArgumentException("Dictionary has entry with null key");
+                    }
+                    throw new ArgumentException("Unhandled dictionary key type: " + pair.Key.GetType());
+                }
+
+                writer.WritePropertyName(keyText);
+                WriteValue(writer, pair.Value);
+            }
+
+            writer.WriteEndObject();
         }
 
         /// <summary>
@@ -173,7 +297,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var helloRequest = new HelloRequest
             {
-                Name = "test"
+                Name = "test",
+                RepeatedStrings =
+                {
+                    "One",
+                    "Two",
+                    "Three"
+                }
             };
 
             var json = JsonSerializer.Serialize(helloRequest, jsonSerializerOptions);
