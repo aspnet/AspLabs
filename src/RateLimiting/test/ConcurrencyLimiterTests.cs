@@ -7,17 +7,17 @@ using Xunit;
 
 namespace System.Threading.RateLimiting.Test
 {
-    public class ConcurrencyLimiterTests
+    public class ConcurrencyLimiterTests : BaseRateLimiterTests
     {
         [Fact]
-        public void InvalidOptionsThrows()
+        public override void InvalidOptionsThrows()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new ConcurrencyLimiterOptions(-1, QueueProcessingOrder.NewestFirst, 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, -1));
         }
 
         [Fact]
-        public void CanAcquireResource()
+        public override void CanAcquireResource()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var lease = limiter.Acquire();
@@ -31,7 +31,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanAcquireResourceAsync()
+        public override async Task CanAcquireResourceAsync()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var lease = await limiter.WaitAsync().DefaultTimeout();
@@ -46,7 +46,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanAcquireResourceAsync_QueuesAndGrabsOldest()
+        public override async Task CanAcquireResourceAsync_QueuesAndGrabsOldest()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 2));
             var lease = await limiter.WaitAsync().DefaultTimeout();
@@ -70,7 +70,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanAcquireResourceAsync_QueuesAndGrabsNewest()
+        public override async Task CanAcquireResourceAsync_QueuesAndGrabsNewest()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 2));
             var lease = await limiter.WaitAsync().DefaultTimeout();
@@ -95,7 +95,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task FailsWhenQueuingMoreThanLimit()
+        public override async Task FailsWhenQueuingMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             using var lease = limiter.Acquire(1);
@@ -106,7 +106,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task QueueAvailableAfterQueueLimitHitAndResources_BecomeAvailable()
+        public override async Task QueueAvailableAfterQueueLimitHitAndResources_BecomeAvailable()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var lease = limiter.Acquire(1);
@@ -128,7 +128,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public void ThrowsWhenAcquiringMoreThanLimit()
+        public override void ThrowsWhenAcquiringMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => limiter.Acquire(2));
@@ -136,7 +136,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task ThrowsWhenWaitingForMoreThanLimit()
+        public override async Task ThrowsWhenWaitingForMoreThanLimit()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var ex = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await limiter.WaitAsync(2).DefaultTimeout());
@@ -144,21 +144,21 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public void ThrowsWhenAcquiringLessThanZero()
+        public override void ThrowsWhenAcquiringLessThanZero()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => limiter.Acquire(-1));
         }
 
         [Fact]
-        public async Task ThrowsWhenWaitingForLessThanZero()
+        public override async Task ThrowsWhenWaitingForLessThanZero()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await limiter.WaitAsync(-1).DefaultTimeout());
         }
 
         [Fact]
-        public void AcquireZero_WithAvailability()
+        public override void AcquireZero_WithAvailability()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
 
@@ -167,7 +167,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public void AcquireZero_WithoutAvailability()
+        public override void AcquireZero_WithoutAvailability()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             using var lease = limiter.Acquire(1);
@@ -179,7 +179,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task WaitAsyncZero_WithAvailability()
+        public override async Task WaitAsyncZero_WithAvailability()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
 
@@ -188,7 +188,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task WaitAsyncZero_WithoutAvailabilityWaitsForAvailability()
+        public override async Task WaitAsyncZero_WithoutAvailabilityWaitsForAvailability()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1));
             var lease = await limiter.WaitAsync(1).DefaultTimeout();
@@ -203,7 +203,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanDequeueMultipleResourcesAtOnce()
+        public override async Task CanDequeueMultipleResourcesAtOnce()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.OldestFirst, 2));
             using var lease = await limiter.WaitAsync(2).DefaultTimeout();
@@ -223,7 +223,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanAcquireResourcesWithWaitAsyncWithQueuedItemsIfNewestFirst()
+        public override async Task CanAcquireResourcesWithWaitAsyncWithQueuedItemsIfNewestFirst()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.NewestFirst, 3));
             using var lease = await limiter.WaitAsync(1).DefaultTimeout();
@@ -245,7 +245,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CannotAcquireResourcesWithWaitAsyncWithQueuedItemsIfOldestFirst()
+        public override async Task CannotAcquireResourcesWithWaitAsyncWithQueuedItemsIfOldestFirst()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.OldestFirst, 3));
             using var lease = await limiter.WaitAsync(1).DefaultTimeout();
@@ -268,7 +268,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanAcquireResourcesWithAcquireWithQueuedItemsIfNewestFirst()
+        public override async Task CanAcquireResourcesWithAcquireWithQueuedItemsIfNewestFirst()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.NewestFirst, 3));
             using var lease = await limiter.WaitAsync(1).DefaultTimeout();
@@ -289,7 +289,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CannotAcquireResourcesWithAcquireWithQueuedItemsIfOldestFirst()
+        public override async Task CannotAcquireResourcesWithAcquireWithQueuedItemsIfOldestFirst()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(2, QueueProcessingOrder.OldestFirst, 3));
             using var lease = await limiter.WaitAsync(1).DefaultTimeout();
@@ -307,7 +307,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanCancelWaitAsyncAfterQueuing()
+        public override async Task CanCancelWaitAsyncAfterQueuing()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
             var lease = limiter.Acquire(1);
@@ -325,7 +325,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public async Task CanCancelWaitAsyncBeforeQueuing()
+        public override async Task CanCancelWaitAsyncBeforeQueuing()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
             var lease = limiter.Acquire(1);
@@ -342,7 +342,7 @@ namespace System.Threading.RateLimiting.Test
         }
 
         [Fact]
-        public void NoMetadataOnAcquiredLease()
+        public override void NoMetadataOnAcquiredLease()
         {
             var limiter = new ConcurrencyLimiter(new ConcurrencyLimiterOptions(1, QueueProcessingOrder.OldestFirst, 1));
             using var lease = limiter.Acquire(1);

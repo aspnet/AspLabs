@@ -78,7 +78,7 @@ namespace System.Threading.RateLimiting
         /// Determines the behaviour of <see cref="RateLimiter.WaitAsync"/> when not enough resources can be leased.
         /// </summary>
         /// <value>
-        /// <see cref="QueueProcessingOrder.OldestFirst"/>
+        /// <see cref="QueueProcessingOrder.OldestFirst"/> by default.
         /// </value>
         public QueueProcessingOrder QueueProcessingOrder { get; }
 

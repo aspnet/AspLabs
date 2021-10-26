@@ -82,7 +82,7 @@ namespace System.Threading.RateLimiting
                 throw new ArgumentOutOfRangeException(nameof(permitCount), $"{permitCount} permits exceeds the permit limit of {_options.PermitLimit}.");
             }
 
-            // Return SuccessfulAcquisition if requestedCount is 0 and resources are available
+            // Return SuccessfulLease if requestedCount is 0 and resources are available
             if (permitCount == 0 && _permitCount > 0)
             {
                 return new ValueTask<RateLimitLease>(SuccessfulLease);
@@ -192,14 +192,6 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        private void CancellationRequested(TaskCompletionSource<RateLimitLease> tcs, CancellationToken token)
-        {
-            lock (_lock)
-            {
-                tcs.TrySetException(new OperationCanceledException(token));
-            }
-        }
-
         private class ConcurrencyLease : RateLimitLease
         {
             private bool _disposed;
@@ -268,8 +260,6 @@ namespace System.Threading.RateLimiting
             public int Count { get; }
 
             public TaskCompletionSource<RateLimitLease> Tcs { get; }
-
-            public CancellationTokenRegistration CancellationTokenRegistration { get; }
 
             public CancellationTokenRegistration CancellationTokenRegistration { get; }
         }
