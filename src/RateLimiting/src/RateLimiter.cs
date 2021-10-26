@@ -25,14 +25,6 @@ namespace System.Threading.RateLimiting
         /// <param name="permitCount">Number of permits to try and acquire.</param>
         /// <returns>A successful or failed lease.</returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <summary>
-        /// Fast synchronous attempt to acquire permits.
-        /// </summary>
-        /// <remarks>
-        /// Set <paramref name="permitCount"/> to 0 to get whether permits are exhausted.
-        /// </remarks>
-        /// <returns>A successful or failed lease.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public RateLimitLease Acquire(int permitCount = 1)
         {
             if (permitCount < 0)
