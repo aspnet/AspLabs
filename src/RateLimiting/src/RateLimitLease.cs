@@ -6,17 +6,32 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace System.Threading.RateLimiting
 {
+    /// <summary>
+    /// Abstraction for leases returned by <see cref="RateLimiter"/> implementations.
+    /// </summary>
     public abstract class RateLimitLease : IDisposable
     {
-        // This represents whether lease acquisition was successful
+        /// <summary>
+        /// Represents whether lease acquisition was successful.
+        /// </summary>
         public abstract bool IsAcquired { get; }
 
-        // Method to extract any general metadata. This is implemented by subclasses
-        // to return the metadata they support.
+        /// <summary>
+        /// Attempt to extract metadata for the lease.
+        /// </summary>
+        /// <param name="metadataName">The name of the metadata. Some common ones can be found in <see cref="MetadataName"/>.</param>
+        /// <param name="metadata">The metadata object if it exists.</param>
+        /// <returns>True if the metadata exists, otherwise false.</returns>
         public abstract bool TryGetMetadata(string metadataName, out object? metadata);
 
-        // This casts the metadata returned by the general method above to known types of values.
-        public bool TryGetMetadata<T>(MetadataName<T> metadataName, [MaybeNullWhen(false)] out T? metadata)
+        /// <summary>
+        /// Attempt to extract a strongly-typed metadata for the lease.
+        /// </summary>
+        /// <typeparam name="T">Type of the expected metadata.</typeparam>
+        /// <param name="metadataName">The name of the strongly-typed metadata. Some common ones can be found in <see cref="MetadataName"/>.</param>
+        /// <param name="metadata">The strongly-typed metadata object if it exists.</param>
+        /// <returns>True if the metadata exists, otherwise false.</returns>
+        public bool TryGetMetadata<T>(MetadataName<T> metadataName, [MaybeNull] out T metadata)
         {
             if (metadataName.Name == null)
             {
@@ -27,6 +42,7 @@ namespace System.Threading.RateLimiting
             var successful = TryGetMetadata(metadataName.Name, out var rawMetadata);
             if (successful)
             {
+                // TODO: is null metadata allowed?
                 metadata = rawMetadata is null ? default : (T)rawMetadata;
                 return true;
             }
@@ -35,11 +51,15 @@ namespace System.Threading.RateLimiting
             return false;
         }
 
-        // Used to get a list of metadata that is available on the lease which can be dictionary keys or static list of strings.
-        // Useful for debugging purposes but TryGetMetadata should be used instead in product code.
+        /// <summary>
+        /// Gets a list of the metadata names that are available on the lease.
+        /// </summary>
         public abstract IEnumerable<string> MetadataNames { get; }
 
-        // Virtual method that extracts all the metadata using the list of metadata names and TryGetMetadata().
+        /// <summary>
+        /// Gets a list of all the metadata that is available on the lease.
+        /// </summary>
+        /// <returns>List of key-value pairs of metadata name and metadata object.</returns>
         public virtual IEnumerable<KeyValuePair<string, object?>> GetAllMetadata()
         {
             foreach (var name in MetadataNames)
@@ -51,12 +71,19 @@ namespace System.Threading.RateLimiting
             }
         }
 
-        // Follow the general .NET pattern for dispose
+        /// <summary>
+        /// Dispose the lease. This may free up space on the limiter implementation the lease came from.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// Dispose method for implementations to write.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected abstract void Dispose(bool disposing);
     }
 }

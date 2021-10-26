@@ -5,6 +5,7 @@
 
 namespace System.Threading.RateLimiting
 {
+#pragma warning disable 1591
     sealed public class TokenBucketRateLimiterOptions
     {
         public TokenBucketRateLimiterOptions(
@@ -42,4 +43,5 @@ namespace System.Threading.RateLimiting
         // Maximum cumulative permit count of queued acquisition requests
         public int QueueLimit { get; }
     }
+#pragma warning disable
 }

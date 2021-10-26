@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace System.Threading.RateLimiting
 {
+#pragma warning disable 1591
     // Represent an aggregated resource (e.g. a resource limiter aggregated by IP)
     public abstract class AggregatedRateLimiter<TKey>
     {
@@ -19,4 +20,5 @@ namespace System.Threading.RateLimiting
         // Wait until the requested resources are available
         public abstract ValueTask<RateLimitLease> WaitAsync(TKey resourceID, int requestedCount, CancellationToken cancellationToken = default);
     }
+#pragma warning restore
 }

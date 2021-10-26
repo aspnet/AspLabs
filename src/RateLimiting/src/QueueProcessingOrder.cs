@@ -5,9 +5,18 @@
 
 namespace System.Threading.RateLimiting
 {
+    /// <summary>
+    /// Controls the behaviour of <see cref="RateLimiter.WaitAsync"/> when not enough resources can be leased.
+    /// </summary>
     public enum QueueProcessingOrder
     {
+        /// <summary>
+        /// Lease the oldest queued <see cref="RateLimiter.WaitAsync"/>.
+        /// </summary>
         OldestFirst,
+        /// <summary>
+        /// Lease the newest queued <see cref="RateLimiter.WaitAsync"/>.
+        /// </summary>
         NewestFirst
     }
 }

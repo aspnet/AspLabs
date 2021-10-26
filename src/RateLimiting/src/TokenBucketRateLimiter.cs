@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace System.Threading.RateLimiting
 {
+#pragma warning disable 1591
     public sealed class TokenBucketRateLimiter : RateLimiter
     {
         private int _tokenCount;
@@ -225,4 +226,5 @@ namespace System.Threading.RateLimiting
             public TaskCompletionSource<RateLimitLease> Tcs { get; }
         }
     }
+#pragma warning restore
 }
