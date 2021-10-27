@@ -13,7 +13,7 @@ namespace System.Threading.RateLimiting.Test
         public override void CanAcquireResource()
         {
             var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1,
-                TimeSpan.FromMinutes(2), 1, autoReplenishment: false));
+                TimeSpan.Zero, 1, autoReplenishment: false));
             var lease = limiter.Acquire();
 
             Assert.True(lease.IsAcquired);
@@ -38,7 +38,7 @@ namespace System.Threading.RateLimiting.Test
         public override async Task CanAcquireResourceAsync()
         {
             var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1,
-                TimeSpan.FromMinutes(2), 1, autoReplenishment: false));
+                TimeSpan.Zero, 1, autoReplenishment: false));
 
             using var lease = await limiter.WaitAsync().DefaultTimeout();
 
@@ -55,7 +55,7 @@ namespace System.Threading.RateLimiting.Test
         public override async Task CanAcquireResourceAsync_QueuesAndGrabsOldest()
         {
             var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.OldestFirst, 2,
-                TimeSpan.FromMinutes(0), 1, autoReplenishment: false));
+                TimeSpan.Zero, 1, autoReplenishment: false));
             var lease = await limiter.WaitAsync().DefaultTimeout();
 
             Assert.True(lease.IsAcquired);
@@ -426,7 +426,7 @@ namespace System.Threading.RateLimiting.Test
         public async Task AutoReplenish_ReplenishesTokens()
         {
             var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions(2, QueueProcessingOrder.OldestFirst, 1,
-                TimeSpan.FromMilliseconds(1), 1, autoReplenishment: true));
+                TimeSpan.FromMilliseconds(1000), 1, autoReplenishment: true));
             Assert.Equal(2, limiter.GetAvailablePermits());
             limiter.Acquire(2);
 

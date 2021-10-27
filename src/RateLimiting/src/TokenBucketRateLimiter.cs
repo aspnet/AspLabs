@@ -17,7 +17,7 @@ namespace System.Threading.RateLimiting
     {
         private int _tokenCount;
         private int _queueCount;
-        private long _lastReplenishmentTick = Environment.TickCount;
+        private int _lastReplenishmentTick = Environment.TickCount;
 
         private readonly Timer? _renewTimer;
         private readonly TokenBucketRateLimiterOptions _options;
@@ -189,19 +189,19 @@ namespace System.Threading.RateLimiting
 
             // TODO: Handle wrapping? TickCount will wrap after ~24.8 days
             // Use Environment.TickCount instead of DateTime.UtcNow to avoid issues on systems where the clock can change
-            long nowTicks = Environment.TickCount * TimeSpan.TicksPerMillisecond;
+            int nowTicks = Environment.TickCount;
 
             // method is re-entrant (from Timer), lock to avoid multiple simultaneous replenishes
             lock (limiter!.Lock)
             {
-                if (nowTicks - limiter._lastReplenishmentTick < limiter._options.ReplenishmentPeriod.Ticks)
+                if (nowTicks - limiter._lastReplenishmentTick < limiter._options.ReplenishmentPeriod.TotalMilliseconds)
                 {
                     return;
                 }
 
                 limiter._lastReplenishmentTick = nowTicks;
 
-                int availablePermits = limiter.GetAvailablePermits();
+                int availablePermits = limiter._tokenCount;
                 TokenBucketRateLimiterOptions options = limiter._options;
                 int maxPermits = options.TokenLimit;
                 int resourcesToAdd;
@@ -228,7 +228,7 @@ namespace System.Threading.RateLimiting
                           ? queue.PeekHead()
                           : queue.PeekTail();
 
-                    if (limiter.GetAvailablePermits() >= nextPendingRequest.Count)
+                    if (limiter._tokenCount >= nextPendingRequest.Count)
                     {
                         // Request can be fulfilled
                         nextPendingRequest =
