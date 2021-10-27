@@ -525,5 +525,42 @@ namespace System.Threading.RateLimiting.Test
             lease = await wait.DefaultTimeout();
             Assert.True(lease.IsAcquired);
         }
+
+        [Fact]
+        public async Task ReplenishWorksWhenTicksWrap()
+        {
+            var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions(10, QueueProcessingOrder.OldestFirst, 2,
+                TimeSpan.FromMilliseconds(2), 1, autoReplenishment: false));
+
+            var lease = limiter.Acquire(10);
+            Assert.True(lease.IsAcquired);
+
+            var wait = limiter.WaitAsync(1);
+            Assert.False(wait.IsCompleted);
+
+            // This will set the last tick to the max value
+            limiter.ReplenishInternal(uint.MaxValue);
+
+            lease = await wait.DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            wait = limiter.WaitAsync(1);
+            Assert.False(wait.IsCompleted);
+
+            // ticks wrapped, should replenish
+            limiter.ReplenishInternal(2);
+            lease = await wait.DefaultTimeout();
+            Assert.True(lease.IsAcquired);
+
+            limiter.ReplenishInternal(uint.MaxValue);
+
+            wait = limiter.WaitAsync(2);
+            Assert.False(wait.IsCompleted);
+
+            // ticks wrapped, but only 1 millisecond passed, make sure the wrapping behaves correctly and replenish doesn't happen
+            limiter.ReplenishInternal(1);
+            Assert.False(wait.IsCompleted);
+            Assert.Equal(1, limiter.GetAvailablePermits());
+        }
     }
 }

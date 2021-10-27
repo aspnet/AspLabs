@@ -17,7 +17,7 @@ namespace System.Threading.RateLimiting
     {
         private int _tokenCount;
         private int _queueCount;
-        private int _lastReplenishmentTick = Environment.TickCount;
+        private uint _lastReplenishmentTick = (uint)Environment.TickCount;
 
         private readonly Timer? _renewTimer;
         private readonly TokenBucketRateLimiterOptions _options;
@@ -187,22 +187,35 @@ namespace System.Threading.RateLimiting
             TokenBucketRateLimiter limiter = (state as TokenBucketRateLimiter)!;
             Debug.Assert(limiter is not null);
 
-            // TODO: Handle wrapping? TickCount will wrap after ~24.8 days
             // Use Environment.TickCount instead of DateTime.UtcNow to avoid issues on systems where the clock can change
-            int nowTicks = Environment.TickCount;
+            uint nowTicks = (uint)Environment.TickCount;
+            limiter!.ReplenishInternal(nowTicks);
+        }
+
+        // Used in tests that test behavior with specific time intervals
+        internal void ReplenishInternal(uint nowTicks)
+        {
+            bool wrapped = false;
+            // (uint)TickCount will wrap every ~50 days, we can detect that by checking if the new ticks is less than the last replenishment
+            if (nowTicks < _lastReplenishmentTick)
+            {
+                wrapped = true;
+            }
 
             // method is re-entrant (from Timer), lock to avoid multiple simultaneous replenishes
-            lock (limiter!.Lock)
+            lock (Lock)
             {
-                if (nowTicks - limiter._lastReplenishmentTick < limiter._options.ReplenishmentPeriod.TotalMilliseconds)
+                // Fix the wrapping by using a long and adding uint.MaxValue in the wrapped case
+                long nonWrappedTicks = wrapped ? (long)nowTicks + uint.MaxValue : nowTicks;
+                if (nonWrappedTicks - _lastReplenishmentTick < _options.ReplenishmentPeriod.TotalMilliseconds)
                 {
                     return;
                 }
 
-                limiter._lastReplenishmentTick = nowTicks;
+                _lastReplenishmentTick = nowTicks;
 
-                int availablePermits = limiter._tokenCount;
-                TokenBucketRateLimiterOptions options = limiter._options;
+                int availablePermits = _tokenCount;
+                TokenBucketRateLimiterOptions options = _options;
                 int maxPermits = options.TokenLimit;
                 int resourcesToAdd;
 
@@ -217,10 +230,10 @@ namespace System.Threading.RateLimiting
                 }
 
                 // Process queued requests
-                Deque<RequestRegistration> queue = limiter._queue;
+                Deque<RequestRegistration> queue = _queue;
 
-                limiter._tokenCount += resourcesToAdd;
-                Debug.Assert(limiter._tokenCount <= limiter._options.TokenLimit);
+                _tokenCount += resourcesToAdd;
+                Debug.Assert(_tokenCount <= _options.TokenLimit);
                 while (queue.Count > 0)
                 {
                     RequestRegistration nextPendingRequest =
@@ -228,7 +241,7 @@ namespace System.Threading.RateLimiting
                           ? queue.PeekHead()
                           : queue.PeekTail();
 
-                    if (limiter._tokenCount >= nextPendingRequest.Count)
+                    if (_tokenCount >= nextPendingRequest.Count)
                     {
                         // Request can be fulfilled
                         nextPendingRequest =
@@ -236,15 +249,15 @@ namespace System.Threading.RateLimiting
                             ? queue.DequeueHead()
                             : queue.DequeueTail();
 
-                        limiter._queueCount -= nextPendingRequest.Count;
-                        limiter._tokenCount -= nextPendingRequest.Count;
-                        Debug.Assert(limiter._queueCount >= 0);
-                        Debug.Assert(limiter._tokenCount >= 0);
+                        _queueCount -= nextPendingRequest.Count;
+                        _tokenCount -= nextPendingRequest.Count;
+                        Debug.Assert(_queueCount >= 0);
+                        Debug.Assert(_tokenCount >= 0);
 
                         if (!nextPendingRequest.Tcs.TrySetResult(SuccessfulLease))
                         {
                             // Queued item was canceled so add count back
-                            limiter._tokenCount += nextPendingRequest.Count;
+                            _tokenCount += nextPendingRequest.Count;
                         }
                         nextPendingRequest.CancellationTokenRegistration.Dispose();
                     }
