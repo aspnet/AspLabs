@@ -1,9 +1,9 @@
 {
   "sdk": {
-    "version": "6.0.100-rc.1.21458.32"
+    "version": "6.0.100-rtm.21477.15"
   },
   "tools": {
-    "dotnet": "6.0.100-rc.1.21458.32",
+    "dotnet": "6.0.100-rtm.21477.15",
     "runtimes": {
       "aspnetcore/x64": [
         "3.1.14"
