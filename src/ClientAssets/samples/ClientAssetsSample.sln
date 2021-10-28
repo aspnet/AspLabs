@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWasmAppWithJsAssets", "BlazorWasmAppWithJsAssets\BlazorWasmAppWithJsAssets.csproj", "{0560F896-0AEF-4EEC-B7E6-F222BAE044A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleRazorClassLibraryWithJsAssets", "SampleRazorClassLibraryWithJsAssets\SampleRazorClassLibraryWithJsAssets.csproj", "{46351F95-DCC7-47AD-B16F-8C8A202B42E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0560F896-0AEF-4EEC-B7E6-F222BAE044A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0560F896-0AEF-4EEC-B7E6-F222BAE044A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0560F896-0AEF-4EEC-B7E6-F222BAE044A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0560F896-0AEF-4EEC-B7E6-F222BAE044A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46351F95-DCC7-47AD-B16F-8C8A202B42E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46351F95-DCC7-47AD-B16F-8C8A202B42E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46351F95-DCC7-47AD-B16F-8C8A202B42E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46351F95-DCC7-47AD-B16F-8C8A202B42E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
