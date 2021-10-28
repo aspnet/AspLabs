@@ -11,6 +11,7 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Components.Web.Extensions\Microsoft.AspNetCore.Components.Web.Extensions.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ApiTemplate\ApiTemplatePackage.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorCustomElements\BlazorCustomElements.sln" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\RateLimiting\RateLimiting.sln" />
   </ItemGroup>
