@@ -5,9 +5,26 @@
 
 namespace System.Threading.RateLimiting
 {
-#pragma warning disable 1591
-    sealed public class TokenBucketRateLimiterOptions
+    /// <summary>
+    /// Options to control the behavior of a <see cref="TokenBucketRateLimiter"/>.
+    /// </summary>
+    public sealed class TokenBucketRateLimiterOptions
     {
+        /// <summary>
+        /// Initializes the <see cref="TokenBucketRateLimiterOptions"/>.
+        /// </summary>
+        /// <param name="tokenLimit">Maximum number of tokens that can be in the token bucket.</param>
+        /// <param name="queueProcessingOrder"></param>
+        /// <param name="queueLimit">Maximum number of unprocessed tokens waiting via <see cref="RateLimiter.WaitAsync(int, CancellationToken)"/>.</param>
+        /// <param name="replenishmentPeriod">
+        /// Specifies how often tokens can be replenished. Replenishing is triggered either by an internal timer if <paramref name="autoReplenishment"/> is true, or by calling <see cref="TokenBucketRateLimiter.TryReplenish"/>.
+        /// </param>
+        /// <param name="tokensPerPeriod">Specified how many tokens can be added to the token bucket on a successful replenish. Available token count will not exceed <paramref name="tokenLimit"/>.</param>
+        /// <param name="autoReplenishment">
+        /// Specifies whether token replenishment will be handled by the <see cref="TokenBucketRateLimiter"/> or by another party via <see cref="TokenBucketRateLimiter.TryReplenish"/>.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="tokenLimit"/>, <paramref name="queueLimit"/>, or <paramref name="tokensPerPeriod"/> are less than 0
+        /// or when <paramref name="replenishmentPeriod"/> is more than 49 days.</exception>
         public TokenBucketRateLimiterOptions(
             int tokenLimit,
             QueueProcessingOrder queueProcessingOrder,
@@ -16,6 +33,23 @@ namespace System.Threading.RateLimiting
             int tokensPerPeriod,
             bool autoReplenishment = true)
         {
+            if (tokenLimit < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tokenLimit));
+            }
+            if (queueLimit < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(queueLimit));
+            }
+            if (tokensPerPeriod < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tokensPerPeriod));
+            }
+            if (replenishmentPeriod.TotalDays > 49)
+            {
+                throw new ArgumentOutOfRangeException(nameof(replenishmentPeriod), "Over 49 days is not supported");
+            }
+
             TokenLimit = tokenLimit;
             QueueProcessingOrder = queueProcessingOrder;
             QueueLimit = queueLimit;
@@ -24,24 +58,38 @@ namespace System.Threading.RateLimiting
             AutoReplenishment = autoReplenishment;
         }
 
-        // Specifies the period between replenishments
+        /// <summary>
+        /// Specifies the minimum period between replenishments.
+        /// </summary>
         public TimeSpan ReplenishmentPeriod { get; }
 
-        // Specifies how many tokens to restore each replenishment
+        /// <summary>
+        /// Specifies the maximum number of tokens to restore each replenishment.
+        /// </summary>
         public int TokensPerPeriod { get; }
 
-        // Whether to create a timer to trigger replenishment automatically
-        // This parameter is optional
+        /// <summary>
+        /// Specified whether the <see cref="TokenBucketRateLimiter"/> is automatically replenishing tokens or if someone else
+        /// will be calling <see cref="TokenBucketRateLimiter.TryReplenish"/> to replenish tokens.
+        /// </summary>
         public bool AutoReplenishment { get; }
 
-        // Maximum number of permits allowed to be leased
+        /// <summary>
+        /// Maximum number of tokens that can be in the bucket at any time.
+        /// </summary>
         public int TokenLimit { get; }
 
-        // Behaviour of WaitAsync when not enough resources can be leased
+        /// <summary>
+        /// Determines the behaviour of <see cref="RateLimiter.WaitAsync"/> when not enough resources can be leased.
+        /// </summary>
+        /// <value>
+        /// <see cref="QueueProcessingOrder.OldestFirst"/> by default.
+        /// </value>
         public QueueProcessingOrder QueueProcessingOrder { get; }
 
-        // Maximum cumulative permit count of queued acquisition requests
+        /// <summary>
+        /// Maximum cumulative token count of queued acquisition requests.
+        /// </summary>
         public int QueueLimit { get; }
     }
-#pragma warning disable
 }
