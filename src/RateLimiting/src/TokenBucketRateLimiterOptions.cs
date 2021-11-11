@@ -24,7 +24,7 @@ namespace System.Threading.RateLimiting
         /// Specifies whether token replenishment will be handled by the <see cref="TokenBucketRateLimiter"/> or by another party via <see cref="TokenBucketRateLimiter.TryReplenish"/>.
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException">When <paramref name="tokenLimit"/>, <paramref name="queueLimit"/>, or <paramref name="tokensPerPeriod"/> are less than 0
-        /// or when <paramref name="replenishmentPeriod"/> is 50 or more days.</exception>
+        /// or when <paramref name="replenishmentPeriod"/> is more than 49 days.</exception>
         public TokenBucketRateLimiterOptions(
             int tokenLimit,
             QueueProcessingOrder queueProcessingOrder,
@@ -45,9 +45,9 @@ namespace System.Threading.RateLimiting
             {
                 throw new ArgumentOutOfRangeException(nameof(tokensPerPeriod));
             }
-            if (replenishmentPeriod.TotalDays >= 50)
+            if (replenishmentPeriod.TotalDays > 49)
             {
-                throw new ArgumentOutOfRangeException(nameof(replenishmentPeriod), "50 or more days is not supported");
+                throw new ArgumentOutOfRangeException(nameof(replenishmentPeriod), "Over 49 days is not supported");
             }
 
             TokenLimit = tokenLimit;

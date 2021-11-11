@@ -32,7 +32,7 @@ namespace System.Threading.RateLimiting.Test
             Assert.Throws<ArgumentOutOfRangeException>(() => new TokenBucketRateLimiterOptions(-1, QueueProcessingOrder.NewestFirst, 1, TimeSpan.FromMinutes(2), 1, autoReplenishment: false));
             Assert.Throws<ArgumentOutOfRangeException>(() => new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, -1, TimeSpan.FromMinutes(2), 1, autoReplenishment: false));
             Assert.Throws<ArgumentOutOfRangeException>(() => new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1, TimeSpan.FromMinutes(2), -1, autoReplenishment: false));
-            Assert.Throws<ArgumentOutOfRangeException>(() => new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1, TimeSpan.FromDays(50), 1, autoReplenishment: false));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new TokenBucketRateLimiterOptions(1, QueueProcessingOrder.NewestFirst, 1, TimeSpan.FromDays(49).Add(TimeSpan.FromMilliseconds(1)), 1, autoReplenishment: false));
         }
 
         [Fact]
