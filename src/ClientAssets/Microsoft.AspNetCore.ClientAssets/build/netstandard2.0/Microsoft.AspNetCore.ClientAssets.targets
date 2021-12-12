@@ -32,7 +32,7 @@
     </PropertyGroup>
 
     <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
-    <Exec Command="$(ClientAssetsBuildCommand) -- $(ClientAssetsBuildOutputParameter) $(_ClientAssetsOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
+    <Exec Command="$(ClientAssetsBuildCommand) -- $(ClientAssetsBuildOutputParameter) '$(_ClientAssetsOutputFullPath)'" WorkingDirectory="$(ClientAssetsDirectory)" />
 
     <ItemGroup>
       <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
