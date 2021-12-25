@@ -40,22 +40,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-            if (hostingEnvironment == null)
-            {
-                throw new ArgumentNullException(nameof(hostingEnvironment));
-            }
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-
-            Configuration = configuration;
-            HostingEnvironment = hostingEnvironment;
-            Logger = loggerFactory.CreateLogger(GetType());
+            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            HostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            Logger = loggerFactory?.CreateLogger(GetType()) ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         /// <summary>

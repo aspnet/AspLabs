@@ -50,12 +50,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (bindingMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(bindingMetadata));
-            }
-
-            _bindingMetadata = bindingMetadata;
+            _bindingMetadata = bindingMetadata ?? throw new ArgumentNullException(nameof(bindingMetadata));
             _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
         }
 
@@ -76,13 +71,9 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
 
             _logger = loggerFactory.CreateLogger<WebHookVerifyRequiredValueFilter>();
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         /// <summary>

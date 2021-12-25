@@ -99,6 +99,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrelloCoreReceiver", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.FunctionalTest", "test\Microsoft.AspNetCore.WebHooks.FunctionalTest\Microsoft.AspNetCore.WebHooks.FunctionalTest.csproj", "{F42E56B7-60D4-481A-8585-04015B2B501E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.WebHooks.Receivers.Intercom", "src\Microsoft.AspNetCore.WebHooks.Receivers.Intercom\Microsoft.AspNetCore.WebHooks.Receivers.Intercom.csproj", "{920467E5-A7BD-4425-967E-32D9F411DE6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntercomCoreReceiver", "samples\IntercomCoreReceiver\IntercomCoreReceiver.csproj", "{0F90B202-3D68-4EE2-B310-6D81A9440E22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +253,14 @@ Global
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{920467E5-A7BD-4425-967E-32D9F411DE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{920467E5-A7BD-4425-967E-32D9F411DE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{920467E5-A7BD-4425-967E-32D9F411DE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{920467E5-A7BD-4425-967E-32D9F411DE6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F90B202-3D68-4EE2-B310-6D81A9440E22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F90B202-3D68-4EE2-B310-6D81A9440E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F90B202-3D68-4EE2-B310-6D81A9440E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F90B202-3D68-4EE2-B310-6D81A9440E22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -290,6 +302,8 @@ Global
 		{91E02D64-BA6E-473C-A250-D1051A50DDAB} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{E9E37253-3FE1-44A4-A9E7-A2B6C54EECFE} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{F42E56B7-60D4-481A-8585-04015B2B501E} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{920467E5-A7BD-4425-967E-32D9F411DE6C} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{0F90B202-3D68-4EE2-B310-6D81A9440E22} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}

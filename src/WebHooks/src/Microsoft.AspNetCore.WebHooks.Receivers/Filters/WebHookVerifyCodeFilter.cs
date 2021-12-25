@@ -48,12 +48,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             IWebHookVerifyCodeMetadata verifyCodeMetadata)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            if (verifyCodeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(verifyCodeMetadata));
-            }
-
-            _verifyCodeMetadata = verifyCodeMetadata;
+            _verifyCodeMetadata = verifyCodeMetadata ?? throw new ArgumentNullException(nameof(verifyCodeMetadata));
         }
 
         /// <summary>
@@ -81,12 +76,7 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             WebHookMetadataProvider metadataProvider)
             : base(configuration, hostingEnvironment, loggerFactory)
         {
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         /// <inheritdoc />

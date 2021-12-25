@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ASP.NET Core Intercom WebHooks infrastructure. Contains the IntercomWebHookAttribute class and AddIntercomWebHooks method.</Description>
+    <PackageTags>aspnetcore;webhook;receiver;intercom</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\shared\Utilities\TrimmingTokenizer.cs">
+      <Link>Utilities\TrimmingTokenizer.cs</Link>
+    </Compile>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="$(MicrosoftAspNetCoreMvcFormattersJsonPackageVersion)" />
+    <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+  </ItemGroup>
+
+</Project>

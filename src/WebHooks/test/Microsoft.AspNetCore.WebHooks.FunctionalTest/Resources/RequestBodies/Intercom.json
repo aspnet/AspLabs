@@ -1,0 +1,17 @@
+﻿{
+  "type" : "notification_event",
+  "id" : "notif_78c122d0-23ba-11e4-9464-79b01267cc2e",
+  "topic" : "user.created",
+  "app_id" : "a86dr8yl",
+  "data" : {
+    "type" : "notification_event_data",
+    "item" : {
+      "type" : "user",
+      "id" : "530370b477ad7120001d",
+      "user_id" : "25",
+      "name" : "Hoban Washburne",
+      "unsubscribed_from_emails" : false,
+      "custom_attributes" : {}
+    }
+  }
+}

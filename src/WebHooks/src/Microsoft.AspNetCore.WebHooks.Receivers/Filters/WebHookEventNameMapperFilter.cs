@@ -55,17 +55,8 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             IWebHookEventFromBodyMetadata eventFromBodyMetadata)
             : this(requestReader, loggerFactory)
         {
-            if (bodyTypeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(bodyTypeMetadata));
-            }
-            if (eventFromBodyMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(eventFromBodyMetadata));
-            }
-
-            _bodyTypeMetadata = bodyTypeMetadata;
-            _eventFromBodyMetadata = eventFromBodyMetadata;
+            _bodyTypeMetadata = bodyTypeMetadata ?? throw new ArgumentNullException(nameof(bodyTypeMetadata));
+            _eventFromBodyMetadata = eventFromBodyMetadata ?? throw new ArgumentNullException(nameof(eventFromBodyMetadata));
         }
 
         /// <summary>
@@ -85,27 +76,18 @@ namespace Microsoft.AspNetCore.WebHooks.Filters
             WebHookMetadataProvider metadataProvider)
             : this(requestReader, loggerFactory)
         {
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            _metadataProvider = metadataProvider;
+            _metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
         }
 
         private WebHookEventNameMapperFilter(IWebHookRequestReader requestReader, ILoggerFactory loggerFactory)
         {
-            if (requestReader == null)
-            {
-                throw new ArgumentNullException(nameof(requestReader));
-            }
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
             _logger = loggerFactory.CreateLogger<WebHookEventNameMapperFilter>();
-            _requestReader = requestReader;
+            _requestReader = requestReader ?? throw new ArgumentNullException(nameof(requestReader));;
         }
 
         /// <summary>

@@ -20,11 +20,7 @@ namespace Microsoft.AspNetCore.WebHooks
         /// </summary>
         public SlackResponse(string text)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-            _text = text;
+            _text = text ?? throw new ArgumentNullException(nameof(text));
         }
 
         /// <summary>
@@ -39,11 +35,7 @@ namespace Microsoft.AspNetCore.WebHooks
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                _text = value;
+                _text = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
     }
