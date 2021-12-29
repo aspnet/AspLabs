@@ -9,7 +9,7 @@
     <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
     <MicrosoftAspNetCoreMvcTestingPackageVersion>2.1.0</MicrosoftAspNetCoreMvcTestingPackageVersion>
-    <MicrosoftAspNetCorePackageVersion>2.1.0</MicrosoftAspNetCorePackageVersion>
+    <MicrosoftAspNetCorePackageVersion>2.1.2</MicrosoftAspNetCorePackageVersion>
     <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0</MicrosoftAspNetCoreStaticFilesPackageVersion>
     <MicrosoftAspNetCoreTestingPackageVersion>2.1.0</MicrosoftAspNetCoreTestingPackageVersion>
     <MicrosoftExtensionsConfigurationPackageVersion>2.1.1</MicrosoftExtensionsConfigurationPackageVersion>
