@@ -10,6 +10,7 @@
       <Link>Utilities\ObjectPathUtilities.cs</Link>
     </Compile>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="$(MicrosoftAspNetCoreMvcFormattersXmlPackageVersion)" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
     <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
   </ItemGroup>
 </Project>
