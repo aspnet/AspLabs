@@ -19,5 +19,8 @@
     "typescript": "^3.5.3",
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6"
+  },
+  "resolutions": {
+    "glob-parent": "^5.1.2"
   }
 }

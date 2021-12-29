@@ -33,6 +33,7 @@
   },
   "resolutions": {
     "**/set-value": "^2.0.1",
-    "bl": "2.2.1"
+    "bl": "2.2.1",
+    "glob-parent": "^5.1.2"
   }
 }
