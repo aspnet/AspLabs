@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="ElectronNET.API" Version="0.0.9" />
-    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+    <PackageReference Include="MessagePack" Version="1.9.11" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(BlazorPackageVersion)" />
     <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
     <ProjectReference Include="..\Microsoft.AspNetCore.Components.Electron.JS\Microsoft.AspNetCore.Components.Electron.JS.csproj" ReferenceOutputAssembly="false" />
