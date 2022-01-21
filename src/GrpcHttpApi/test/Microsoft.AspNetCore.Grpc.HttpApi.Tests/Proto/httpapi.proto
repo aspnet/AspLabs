@@ -141,6 +141,10 @@ message HelloRequest {
   Wrappers wrappers = 4;
   repeated string repeated_strings = 5;
   google.protobuf.Any any_message = 6;
+  map<string, string> map_strings = 7;
+  map<string, SubMessage> map_message = 8;
+  map<bool, string> map_keybool = 9;
+  map<int32, string> map_keyint = 10;
 }
 
 message HelloReply {
