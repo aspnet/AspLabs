@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -13,7 +13,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
     {
         public override long Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return long.Parse(reader.GetString()!);
+            }
+
+            return reader.GetInt64();
         }
 
         public override void Write(Utf8JsonWriter writer, long value, JsonSerializerOptions options)

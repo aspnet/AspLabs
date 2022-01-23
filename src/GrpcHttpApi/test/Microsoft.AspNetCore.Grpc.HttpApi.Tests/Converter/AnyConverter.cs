@@ -7,6 +7,7 @@ using System.Text.Json;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
+using HttpApi;
 using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
 
         protected override string WellKnownTypeName => Any.Descriptor.FullName;
 
-        public override bool CanConvert(Type typeToConvert)
+        public sealed override bool CanConvert(Type typeToConvert)
         {
             if (!typeof(IMessage).IsAssignableFrom(typeToConvert))
             {
@@ -56,7 +57,41 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
 
         public override IMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            using var d = JsonDocument.ParseValue(ref reader);
+            if (!d.RootElement.TryGetProperty(AnyTypeUrlField, out var urlField))
+            {
+                throw new InvalidOperationException("Any message with no @type");
+            }
+
+            IMessage message = new Any();
+            var typeUrl = urlField.GetString();
+            string typeName = Any.GetTypeName(typeUrl);
+
+            MessageDescriptor descriptor = _settings.TypeRegistry.Find(typeName);
+            if (descriptor == null)
+            {
+                throw new InvalidOperationException($"Type registry has no descriptor for type name '{typeName}'");
+            }
+
+            IMessage data;
+            if (ConverterHelpers.IsWellKnownType(descriptor))
+            {
+                if (!d.RootElement.TryGetProperty(AnyWellKnownTypeValueField, out var valueField))
+                {
+                    throw new InvalidOperationException($"Expected '{AnyWellKnownTypeValueField}' property for well-known type Any body");
+                }
+
+                data = (IMessage)JsonSerializer.Deserialize(valueField, descriptor.ClrType, options)!;
+            }
+            else
+            {
+                data = (IMessage)JsonSerializer.Deserialize(d.RootElement, descriptor.ClrType, options)!;
+            }
+
+            message.Descriptor.Fields[Any.TypeUrlFieldNumber].Accessor.SetValue(message, typeUrl);
+            message.Descriptor.Fields[Any.ValueFieldNumber].Accessor.SetValue(message, data.ToByteString());
+
+            return message;
         }
 
         public override void Write(Utf8JsonWriter writer, IMessage value, JsonSerializerOptions options)

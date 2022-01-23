@@ -145,6 +145,12 @@ message HelloRequest {
   map<string, SubMessage> map_message = 8;
   map<bool, string> map_keybool = 9;
   map<int32, string> map_keyint = 10;
+  oneof oneof_test {
+      string oneof_name1 = 11;
+      string oneof_name2 = 12;
+  }
+  int32 age = 13;
+  repeated google.protobuf.DoubleValue repeated_double_values = 14;
 }
 
 message HelloReply {

@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Google.Protobuf;
+using Google.Protobuf.Collections;
 using Google.Protobuf.Reflection;
-using HttpApi;
+using Google.Protobuf.WellKnownTypes;
 using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
@@ -28,7 +30,82 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             Type typeToConvert,
             JsonSerializerOptions options)
         {
-            return new TMessage();
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new Exception();
+            }
+
+            var message = new TMessage();
+            var jsonFieldMap = CreateJsonFieldMap(message.Descriptor.Fields.InFieldNumberOrder());
+
+            while (reader.Read())
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.EndObject:
+                        return message;
+                    case JsonTokenType.PropertyName:
+                        if (jsonFieldMap.TryGetValue(reader.GetString()!, out var fieldDescriptor))
+                        {
+                            if (fieldDescriptor.ContainingOneof != null)
+                            {
+                                if (fieldDescriptor.ContainingOneof.Accessor.GetCaseFieldDescriptor(message) != null)
+                                {
+                                    throw new InvalidOperationException($"Multiple values specified for oneof {fieldDescriptor.ContainingOneof.Name}");
+                                }
+                            }
+
+                            if (fieldDescriptor.IsMap)
+                            {
+                                var mapFields = fieldDescriptor.MessageType.Fields.InFieldNumberOrder();
+                                var mapKey = mapFields[0];
+                                var mapValue = mapFields[1];
+
+                                var keyType = GetFieldType(mapKey);
+                                var valueType = GetFieldType(mapValue);
+
+                                var repeatedFieldType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
+                                var newValues = (IDictionary)JsonSerializer.Deserialize(ref reader, repeatedFieldType, options)!;
+
+                                var existingValue = (IDictionary)fieldDescriptor.Accessor.GetValue(message);
+                                foreach (DictionaryEntry item in newValues)
+                                {
+                                    existingValue[item.Key] = item.Value;
+                                }
+                            }
+                            else if (fieldDescriptor.IsRepeated)
+                            {
+                                var fieldType = GetFieldType(fieldDescriptor);
+                                var repeatedFieldType = typeof(List<>).MakeGenericType(fieldType);
+                                var newValues = (IList)JsonSerializer.Deserialize(ref reader, repeatedFieldType, options)!;
+
+                                var existingValue = (IList)fieldDescriptor.Accessor.GetValue(message);
+                                foreach (var item in newValues)
+                                {
+                                    existingValue.Add(item);
+                                }
+                            }
+                            else
+                            {
+                                var fieldType = GetFieldType(fieldDescriptor);
+                                var propertyValue = JsonSerializer.Deserialize(ref reader, fieldType, options);
+                                fieldDescriptor.Accessor.SetValue(message, propertyValue);
+                            }
+                        }
+                        else
+                        {
+                            reader.Skip();
+                        }
+                        break;
+                    case JsonTokenType.Comment:
+                        // Ignore
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unexpected JSON token: {reader.TokenType}");
+                }
+            }
+
+            throw new Exception();
         }
 
         public override void Write(
@@ -64,6 +141,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                 writer.WritePropertyName(accessor.Descriptor.JsonName);
                 JsonSerializer.Serialize(writer, value, value.GetType(), options);
             }
+        }
+
+        private static Dictionary<string, FieldDescriptor> CreateJsonFieldMap(IList<FieldDescriptor> fields)
+        {
+            var map = new Dictionary<string, FieldDescriptor>();
+            foreach (var field in fields)
+            {
+                map[field.Name] = field;
+                map[field.JsonName] = field;
+            }
+            return new Dictionary<string, FieldDescriptor>(map);
         }
 
         /*
@@ -472,6 +560,47 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                 case FieldType.Message:
                 case FieldType.Group: // Never expect to get this, but...
                     return value == null;
+                default:
+                    throw new ArgumentException("Invalid field type");
+            }
+        }
+
+        private static Type GetFieldType(FieldDescriptor descriptor)
+        {
+            switch (descriptor.FieldType)
+            {
+                case FieldType.Bool:
+                    return typeof(bool);
+                case FieldType.Bytes:
+                    return typeof(ByteString);
+                case FieldType.String:
+                    return typeof(string);
+                case FieldType.Double:
+                    return typeof(double);
+                case FieldType.SInt32:
+                case FieldType.Int32:
+                case FieldType.SFixed32:
+                case FieldType.Enum:
+                    return typeof(int);
+                case FieldType.Fixed32:
+                case FieldType.UInt32:
+                    return typeof(uint);
+                case FieldType.Fixed64:
+                case FieldType.UInt64:
+                    return typeof(ulong);
+                case FieldType.SFixed64:
+                case FieldType.Int64:
+                case FieldType.SInt64:
+                    return typeof(long);
+                case FieldType.Float:
+                    return typeof(float);
+                case FieldType.Message:
+                case FieldType.Group: // Never expect to get this, but...
+                    if (ConverterHelpers.IsWrapperType(descriptor.MessageType))
+                    {
+                        return GetFieldType(descriptor.MessageType.Fields[ConverterHelpers.WrapperValueFieldNumber]);
+                    }
+                    return descriptor.MessageType.ClrType;
                 default:
                     throw new ArgumentException("Invalid field type");
             }

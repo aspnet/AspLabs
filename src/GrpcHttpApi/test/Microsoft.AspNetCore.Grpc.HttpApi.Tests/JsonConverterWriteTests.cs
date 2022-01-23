@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using System.Text;
 using System.Text.Json;
 using Google.Protobuf;
@@ -14,11 +15,11 @@ using Xunit.Abstractions;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
-    public class JsonConverterTests
+    public class JsonConverterWriteTests
     {
         private readonly ITestOutputHelper _output;
 
-        public JsonConverterTests(ITestOutputHelper output)
+        public JsonConverterWriteTests(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -34,6 +35,21 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                     "One",
                     "Two",
                     "Three"
+                }
+            };
+
+            AssertWrittenJson(helloRequest);
+        }
+
+        [Fact]
+        public void RepeatedDoubleValues()
+        {
+            var helloRequest = new HelloRequest
+            {
+                RepeatedDoubleValues =
+                {
+                    1,
+                    1.1
                 }
             };
 
