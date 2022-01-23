@@ -186,23 +186,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 Timestamp.Descriptor.File);
 
             settings = settings ?? new JsonSettings { TypeRegistry = typeRegistery };
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                Converters =
-                {
-                },
-                WriteIndented = true,
-                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
-            };
-            var converter = new JsonConverterFactoryForMessage(settings, jsonSerializerOptions);
-            jsonSerializerOptions.Converters.Add(new AnyConverter(settings, jsonSerializerOptions));
-            jsonSerializerOptions.Converters.Add(new TimestampConverter());
-            jsonSerializerOptions.Converters.Add(converter);
-            jsonSerializerOptions.Converters.Add(new ByteStringConverter());
-            jsonSerializerOptions.Converters.Add(new Int64Converter());
-            jsonSerializerOptions.Converters.Add(new UInt64Converter());
-            jsonSerializerOptions.Converters.Add(new EnumConverter(settings));
-            jsonSerializerOptions.Converters.Add(new BoolConverter());
+
+            var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
 
             var jsonNew = JsonSerializer.Serialize(value, jsonSerializerOptions);
 

@@ -7,7 +7,6 @@ using System.Text.Json;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
-using HttpApi;
 using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
@@ -18,12 +17,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
         internal const string AnyWellKnownTypeValueField = "value";
 
         private readonly JsonSettings _settings;
-        private readonly JsonSerializerOptions _options;
 
-        public AnyConverter(JsonSettings settings, JsonSerializerOptions options)
+        public AnyConverter(JsonSettings settings)
         {
             _settings = settings;
-            _options = options;
         }
 
         protected override string WellKnownTypeName => Any.Descriptor.FullName;
@@ -111,11 +108,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             if (ConverterHelpers.IsWellKnownType(descriptor))
             {
                 writer.WritePropertyName(AnyWellKnownTypeValueField);
-                JsonSerializer.Serialize(writer, message, message.GetType(), _options);
+                JsonSerializer.Serialize(writer, message, message.GetType(), options);
             }
             else
             {
-                MessageConverter<Any>.WriteMessageFields(writer, message, _settings, _options);
+                MessageConverter<Any>.WriteMessageFields(writer, message, _settings, options);
             }
 
             writer.WriteEndObject();

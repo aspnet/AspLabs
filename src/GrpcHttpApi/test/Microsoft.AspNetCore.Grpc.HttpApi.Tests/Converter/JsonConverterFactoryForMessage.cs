@@ -13,12 +13,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
     public class JsonConverterFactoryForMessage : JsonConverterFactory
     {
         private readonly JsonSettings _settings;
-        private readonly JsonSerializerOptions _options;
 
-        public JsonConverterFactoryForMessage(JsonSettings settings, JsonSerializerOptions options)
+        public JsonConverterFactoryForMessage(JsonSettings settings)
         {
             _settings = settings;
-            _options = options;
         }
 
         public override bool CanConvert(Type typeToConvert)
@@ -33,7 +31,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                 typeof(MessageConverter<>).MakeGenericType(new Type[] { typeToConvert }),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
-                args: new object[] { _settings, _options },
+                args: new object[] { _settings },
                 culture: null)!;
 
             return converter;

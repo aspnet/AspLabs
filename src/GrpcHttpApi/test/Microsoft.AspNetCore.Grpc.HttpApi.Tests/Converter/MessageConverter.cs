@@ -17,12 +17,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
     public sealed class MessageConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private readonly JsonSettings _settings;
-        private readonly JsonSerializerOptions _options;
 
-        public MessageConverter(JsonSettings settings, JsonSerializerOptions options)
+        public MessageConverter(JsonSettings settings)
         {
             _settings = settings;
-            _options = options;
         }
 
         public override TMessage Read(
@@ -113,14 +111,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             TMessage value,
             JsonSerializerOptions options)
         {
-            WriteMessage(writer, value);
+            WriteMessage(writer, value, options);
         }
 
-        private void WriteMessage(Utf8JsonWriter writer, IMessage message)
+        private void WriteMessage(Utf8JsonWriter writer, IMessage message, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
 
-            WriteMessageFields(writer, message, _settings, _options);
+            WriteMessageFields(writer, message, _settings, options);
 
             writer.WriteEndObject();
         }

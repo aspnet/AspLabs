@@ -182,7 +182,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 HelloRequest.Descriptor.File,
                 Timestamp.Descriptor.File);
 
-            var jsonSerializerOptions = CreateSerializerOptions(settings, typeRegistery);
+            var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
 
             var objectNew = JsonSerializer.Deserialize<TValue>(value, jsonSerializerOptions)!;
 
@@ -209,7 +209,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 HelloRequest.Descriptor.File,
                 Timestamp.Descriptor.File);
 
-            var jsonSerializerOptions = CreateSerializerOptions(settings, typeRegistery);
+            var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
 
             var ex = Assert.ThrowsAny<Exception>(() => JsonSerializer.Deserialize<TValue>(value, jsonSerializerOptions));
             assertException(ex);
@@ -220,30 +220,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             ex = Assert.ThrowsAny<Exception>(() => formatter.Parse<TValue>(value));
             assertException(ex);
-        }
-
-        private static JsonSerializerOptions CreateSerializerOptions(JsonSettings? settings, TypeRegistry typeRegistery)
-        {
-            var resolvedSettings = settings ?? new JsonSettings { TypeRegistry = typeRegistery };
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                Converters =
-                {
-                },
-                WriteIndented = true,
-                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
-            };
-            var converter = new JsonConverterFactoryForMessage(resolvedSettings, jsonSerializerOptions);
-            jsonSerializerOptions.Converters.Add(new AnyConverter(resolvedSettings, jsonSerializerOptions));
-            jsonSerializerOptions.Converters.Add(new TimestampConverter());
-            //jsonSerializerOptions.Converters.Add(new DoubleConverter());
-            jsonSerializerOptions.Converters.Add(converter);
-            jsonSerializerOptions.Converters.Add(new ByteStringConverter());
-            jsonSerializerOptions.Converters.Add(new Int64Converter());
-            jsonSerializerOptions.Converters.Add(new UInt64Converter());
-            jsonSerializerOptions.Converters.Add(new EnumConverter(resolvedSettings));
-            jsonSerializerOptions.Converters.Add(new BoolConverter());
-            return jsonSerializerOptions;
         }
     }
 }
