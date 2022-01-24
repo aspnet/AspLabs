@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
 {
     public class JsonConverterWriteTests
     {
