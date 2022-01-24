@@ -70,7 +70,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
   ""name"": ""In any!""
 }";
 
-            AssertReadJson<Any>(json);
+            var any = AssertReadJson<Any>(json);
+            var helloRequest = any.Unpack<HelloRequest>();
+            Assert.Equal("In any!", helloRequest.Name);
         }
 
         [Fact]
@@ -81,7 +83,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
   ""value"": ""1970-01-01T00:00:00Z""
 }";
 
-            AssertReadJson<Any>(json);
+            var any = AssertReadJson<Any>(json);
+            var timestamp = any.Unpack<Timestamp>();
+            Assert.Equal(DateTimeOffset.UnixEpoch, timestamp.ToDateTimeOffset());
         }
 
         [Fact]
@@ -159,6 +163,24 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         }
 
         [Fact]
+        public void NullableWrappers_Null()
+        {
+            var json = @"{
+  ""stringValue"": null,
+  ""int32Value"": null,
+  ""int64Value"": null,
+  ""floatValue"": null,
+  ""doubleValue"": null,
+  ""boolValue"": null,
+  ""uint32Value"": null,
+  ""uint64Value"": null,
+  ""bytesValue"": null
+}";
+
+            AssertReadJson<HelloRequest.Types.Wrappers>(json);
+        }
+
+        [Fact]
         public void NullableWrappers()
         {
             var json = @"{
@@ -182,18 +204,18 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 HelloRequest.Descriptor.File,
                 Timestamp.Descriptor.File);
 
+            var formatter = new JsonParser(new JsonParser.Settings(
+                recursionLimit: int.MaxValue,
+                typeRegistery));
+
+            var objectOld = formatter.Parse<TValue>(value);
+
             var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
 
             var objectNew = JsonSerializer.Deserialize<TValue>(value, jsonSerializerOptions)!;
 
             _output.WriteLine("New:");
             _output.WriteLine(objectNew.ToString());
-
-            var formatter = new JsonParser(new JsonParser.Settings(
-                recursionLimit: int.MaxValue,
-                typeRegistery));
-
-            var objectOld = formatter.Parse<TValue>(value);
 
             _output.WriteLine("Old:");
             _output.WriteLine(objectOld.ToString());
