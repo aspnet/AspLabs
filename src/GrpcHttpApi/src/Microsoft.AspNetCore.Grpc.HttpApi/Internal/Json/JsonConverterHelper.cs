@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
+                WriteIndented = settings.WriteIndented,
                 NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };

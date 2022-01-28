@@ -19,5 +19,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         public bool FormatEnumsAsIntegers { get; set; }
 
         public TypeRegistry TypeRegistry { get; set; } = TypeRegistry.Empty;
+
+        public bool WriteIndented { get; set; } = true;
     }
 }
