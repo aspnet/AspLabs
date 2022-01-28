@@ -4,14 +4,15 @@
 using System;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
 using Type = System.Type;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class AnyConverter : WellKnownTypeConverter
+    public sealed class AnyConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         internal const string AnyTypeUrlField = "@type";
         internal const string AnyWellKnownTypeValueField = "value";
@@ -23,36 +24,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             _settings = settings;
         }
 
-        protected override string WellKnownTypeName => Any.Descriptor.FullName;
-
-        public sealed override bool CanConvert(Type typeToConvert)
-        {
-            if (!typeof(IMessage).IsAssignableFrom(typeToConvert))
-            {
-                return false;
-            }
-
-            var property = typeToConvert.GetProperty("Descriptor", BindingFlags.Static | BindingFlags.Public, binder: null, typeof(MessageDescriptor), Type.EmptyTypes, modifiers: null);
-            if (property == null)
-            {
-                return false;
-            }
-
-            var descriptor = property.GetValue(null, null) as MessageDescriptor;
-            if (descriptor == null)
-            {
-                return false;
-            }
-
-            if (descriptor.FullName != Any.Descriptor.FullName)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public override IMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override TMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             using var d = JsonDocument.ParseValue(ref reader);
             if (!d.RootElement.TryGetProperty(AnyTypeUrlField, out var urlField))
@@ -60,7 +32,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                 throw new InvalidOperationException("Any message with no @type");
             }
 
-            IMessage message = new Any();
+            var message = new TMessage();
             var typeUrl = urlField.GetString();
             string typeName = Any.GetTypeName(typeUrl);
 
@@ -91,7 +63,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             return message;
         }
 
-        public override void Write(Utf8JsonWriter writer, IMessage value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, TMessage value, JsonSerializerOptions options)
         {
             string typeUrl = (string)value.Descriptor.Fields[Any.TypeUrlFieldNumber].Accessor.GetValue(value);
             ByteString data = (ByteString)value.Descriptor.Fields[Any.ValueFieldNumber].Accessor.GetValue(value);
@@ -101,18 +73,26 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             {
                 throw new InvalidOperationException($"Type registry has no descriptor for type name '{typeName}'");
             }
-            IMessage message = descriptor.Parser.ParseFrom(data);
+            IMessage valueMessage = descriptor.Parser.ParseFrom(data);
             writer.WriteStartObject();
             writer.WriteString(AnyTypeUrlField, typeUrl);
 
             if (ConverterHelpers.IsWellKnownType(descriptor))
             {
                 writer.WritePropertyName(AnyWellKnownTypeValueField);
-                JsonSerializer.Serialize(writer, message, message.GetType(), options);
+                if (ConverterHelpers.IsWrapperType(descriptor))
+                {
+                    var wrappedValue = valueMessage.Descriptor.Fields[ConverterHelpers.WrapperValueFieldNumber].Accessor.GetValue(valueMessage);
+                    JsonSerializer.Serialize(writer, wrappedValue, wrappedValue.GetType(), options);
+                }
+                else
+                {
+                    JsonSerializer.Serialize(writer, valueMessage, valueMessage.GetType(), options);
+                }
             }
             else
             {
-                MessageConverter<Any>.WriteMessageFields(writer, message, _settings, options);
+                MessageConverter<Any>.WriteMessageFields(writer, valueMessage, _settings, options);
             }
 
             writer.WriteEndObject();

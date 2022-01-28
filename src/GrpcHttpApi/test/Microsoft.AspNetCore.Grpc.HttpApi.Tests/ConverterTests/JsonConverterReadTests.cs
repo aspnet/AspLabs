@@ -2,13 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Text;
 using System.Text.Json;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
 using HttpApi;
-using Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -50,6 +49,158 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
         }
 
         [Fact]
+        public void DataTypes_DefaultValues()
+        {
+            var json = @"{
+  ""singleInt32"": 0,
+  ""singleInt64"": ""0"",
+  ""singleUint32"": 0,
+  ""singleUint64"": ""0"",
+  ""singleSint32"": 0,
+  ""singleSint64"": ""0"",
+  ""singleFixed32"": 0,
+  ""singleFixed64"": ""0"",
+  ""singleSfixed32"": 0,
+  ""singleSfixed64"": ""0"",
+  ""singleFloat"": 0,
+  ""singleDouble"": 0,
+  ""singleBool"": false,
+  ""singleString"": """",
+  ""singleBytes"": """",
+  ""singleEnum"": ""NESTED_ENUM_UNSPECIFIED""
+}";
+
+            AssertReadJson<HelloRequest.Types.DataTypes>(json);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(-1)]
+        [InlineData(100)]
+        public void Enum_ReadNumber(int value)
+        {
+            var json = @"{ ""singleEnum"": " + value + " }";
+
+            AssertReadJson<HelloRequest.Types.DataTypes>(json);
+        }
+
+        [Fact]
+        public void Timestamp_Nested()
+        {
+            var json = @"{ ""timestampValue"": ""2020-12-01T00:30:00Z"" }";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void Duration_Nested()
+        {
+            var json = @"{ ""durationValue"": ""43200s"" }";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void Value_Nested()
+        {
+            var json = @"{
+  ""valueValue"": {
+    ""enabled"": true,
+    ""metadata"": [
+      ""value1"",
+      ""value2""
+    ]
+  }
+}";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void Value_Root()
+        {
+            var json = @"{
+  ""enabled"": true,
+  ""metadata"": [
+    ""value1"",
+    ""value2""
+  ]
+}";
+
+            AssertReadJson<Value>(json);
+        }
+
+        [Fact]
+        public void Struct_Nested()
+        {
+            var json = @"{
+  ""structValue"": {
+    ""enabled"": true,
+    ""metadata"": [
+      ""value1"",
+      ""value2""
+    ]
+  }
+}";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void Struct_Root()
+        {
+            var json = @"{
+  ""enabled"": true,
+  ""metadata"": [
+    ""value1"",
+    ""value2""
+  ]
+}";
+
+            AssertReadJson<Struct>(json);
+        }
+
+        [Fact]
+        public void ListValue_Nested()
+        {
+            var json = @"{
+  ""listValue"": [
+    true,
+    ""value1"",
+    ""value2""
+  ]
+}";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void ListValue_Root()
+        {
+            var json = @"[
+  true,
+  ""value1"",
+  ""value2""
+]";
+
+            AssertReadJson<ListValue>(json);
+        }
+
+        [Fact]
+        public void Int64_ReadNumber()
+        {
+            var json = @"{
+  ""singleInt64"": 1,
+  ""singleUint64"": 2,
+  ""singleSint64"": 3,
+  ""singleFixed64"": 4,
+  ""singleSfixed64"": 5
+}";
+
+            AssertReadJson<HelloRequest.Types.DataTypes>(json);
+        }
+
+        [Fact]
         public void RepeatedDoubleValues()
         {
             var json = @"{
@@ -76,7 +227,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
         }
 
         [Fact]
-        public void Any_WellKnownType()
+        public void Any_WellKnownType_Timestamp()
         {
             var json = @"{
   ""@type"": ""type.googleapis.com/google.protobuf.Timestamp"",
@@ -86,6 +237,19 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
             var any = AssertReadJson<Any>(json);
             var timestamp = any.Unpack<Timestamp>();
             Assert.Equal(DateTimeOffset.UnixEpoch, timestamp.ToDateTimeOffset());
+        }
+
+        [Fact]
+        public void Any_WellKnownType_Int32()
+        {
+            var json = @"{
+  ""@type"": ""type.googleapis.com/google.protobuf.Int32Value"",
+  ""value"": 2147483647
+}";
+
+            var any = AssertReadJson<Any>(json);
+            var value = any.Unpack<Int32Value>();
+            Assert.Equal(2147483647, value.Value);
         }
 
         [Fact]
@@ -198,6 +362,38 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
             AssertReadJson<HelloRequest.Types.Wrappers>(json);
         }
 
+        [Fact]
+        public void NullValue_Default_Null()
+        {
+            var json = @"{ ""nullValue"": null }";
+
+            AssertReadJson<NullValueContainer>(json);
+        }
+
+        [Fact]
+        public void NullValue_Default_String()
+        {
+            var json = @"{ ""nullValue"": ""NULL_VALUE"" }";
+
+            AssertReadJson<NullValueContainer>(json);
+        }
+
+        [Fact]
+        public void NullValue_NonDefaultValue_Int()
+        {
+            var json = @"{ ""nullValue"": 1 }";
+
+            AssertReadJson<NullValueContainer>(json);
+        }
+
+        [Fact]
+        public void NullValue_NonDefaultValue_String()
+        {
+            var json = @"{ ""nullValue"": ""MONKEY"" }";
+
+            AssertReadJsonError<NullValueContainer>(json, ex => Assert.Equal("Invalid enum value: MONKEY for enum type: google.protobuf.NullValue", ex.Message));
+        }
+
         private TValue AssertReadJson<TValue>(string value, JsonSettings? settings = null) where TValue : IMessage, new()
         {
             var typeRegistery = TypeRegistry.FromFiles(
@@ -210,7 +406,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
 
             var objectOld = formatter.Parse<TValue>(value);
 
-            var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
+            var jsonSerializerOptions = CreateSerializerOptions(settings, typeRegistery);
 
             var objectNew = JsonSerializer.Deserialize<TValue>(value, jsonSerializerOptions)!;
 
@@ -231,7 +427,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
                 HelloRequest.Descriptor.File,
                 Timestamp.Descriptor.File);
 
-            var jsonSerializerOptions = JsonConverterHelper.CreateSerializerOptions(settings, typeRegistery);
+            var jsonSerializerOptions = CreateSerializerOptions(settings, typeRegistery);
 
             var ex = Assert.ThrowsAny<Exception>(() => JsonSerializer.Deserialize<TValue>(value, jsonSerializerOptions));
             assertException(ex);
@@ -242,6 +438,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
 
             ex = Assert.ThrowsAny<Exception>(() => formatter.Parse<TValue>(value));
             assertException(ex);
+        }
+
+        internal static JsonSerializerOptions CreateSerializerOptions(JsonSettings? settings, TypeRegistry typeRegistery)
+        {
+            var resolvedSettings = settings ?? new JsonSettings { TypeRegistry = typeRegistery };
+            return JsonConverterHelper.CreateSerializerOptions(resolvedSettings);
         }
     }
 }

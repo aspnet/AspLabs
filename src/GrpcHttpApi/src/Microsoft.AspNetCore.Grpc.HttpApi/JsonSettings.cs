@@ -3,8 +3,9 @@
 
 using Google.Protobuf.Reflection;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
+    // TODO - improve names. boolean property values should aim to be false
     public class JsonSettings
     {
         /// <summary>
@@ -13,9 +14,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
         /// This option only affects fields which don't support "presence" (e.g.
         /// singular non-optional proto3 primitive fields).
         /// </summary>
-        public bool FormatDefaultValues { get; }
+        public bool FormatDefaultValues { get; set; } = true;
 
-        public bool FormatEnumsAsIntegers { get; }
+        public bool FormatEnumsAsIntegers { get; set; }
 
         public TypeRegistry TypeRegistry { get; set; } = TypeRegistry.Empty;
     }

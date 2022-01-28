@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
     internal static class ConverterHelpers
     {

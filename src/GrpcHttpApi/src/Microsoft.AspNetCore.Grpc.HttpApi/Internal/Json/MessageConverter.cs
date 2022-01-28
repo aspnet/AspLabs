@@ -10,7 +10,7 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Type = System.Type;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
     public sealed class MessageConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
@@ -26,12 +26,23 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             Type typeToConvert,
             JsonSerializerOptions options)
         {
+            var message = new TMessage();
+
+            if (ConverterHelpers.IsWrapperType(message.Descriptor))
+            {
+                var valueDescriptor = message.Descriptor.Fields[ConverterHelpers.WrapperValueFieldNumber];
+                var t = JsonConverterHelper.GetFieldType(valueDescriptor);
+                var value = JsonSerializer.Deserialize(ref reader, t, options);
+                valueDescriptor.Accessor.SetValue(message, value);
+
+                return message;
+            }
+
             if (reader.TokenType != JsonTokenType.StartObject)
             {
                 throw new Exception();
             }
 
-            var message = new TMessage();
             var jsonFieldMap = CreateJsonFieldMap(message.Descriptor.Fields.InFieldNumberOrder());
 
             while (reader.Read())
@@ -53,37 +64,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
 
                             if (fieldDescriptor.IsMap)
                             {
-                                var mapFields = fieldDescriptor.MessageType.Fields.InFieldNumberOrder();
-                                var mapKey = mapFields[0];
-                                var mapValue = mapFields[1];
-
-                                var keyType = GetFieldType(mapKey);
-                                var valueType = GetFieldType(mapValue);
-
-                                var repeatedFieldType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
-                                var newValues = (IDictionary)JsonSerializer.Deserialize(ref reader, repeatedFieldType, options)!;
-
-                                var existingValue = (IDictionary)fieldDescriptor.Accessor.GetValue(message);
-                                foreach (DictionaryEntry item in newValues)
-                                {
-                                    existingValue[item.Key] = item.Value;
-                                }
+                                JsonConverterHelper.PopulateMap(ref reader, options, message, fieldDescriptor);
                             }
                             else if (fieldDescriptor.IsRepeated)
                             {
-                                var fieldType = GetFieldType(fieldDescriptor);
-                                var repeatedFieldType = typeof(List<>).MakeGenericType(fieldType);
-                                var newValues = (IList)JsonSerializer.Deserialize(ref reader, repeatedFieldType, options)!;
-
-                                var existingValue = (IList)fieldDescriptor.Accessor.GetValue(message);
-                                foreach (var item in newValues)
-                                {
-                                    existingValue.Add(item);
-                                }
+                                JsonConverterHelper.PopulateList(ref reader, options, message, fieldDescriptor);
                             }
                             else
                             {
-                                var fieldType = GetFieldType(fieldDescriptor);
+                                var fieldType = JsonConverterHelper.GetFieldType(fieldDescriptor);
                                 var propertyValue = JsonSerializer.Deserialize(ref reader, fieldType, options);
                                 fieldDescriptor.Accessor.SetValue(message, propertyValue);
                             }
@@ -204,53 +193,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                 case FieldType.Message:
                 case FieldType.Group: // Never expect to get this, but...
                     return value == null;
-                default:
-                    throw new ArgumentException("Invalid field type");
-            }
-        }
-
-        private static Type GetFieldType(FieldDescriptor descriptor)
-        {
-            switch (descriptor.FieldType)
-            {
-                case FieldType.Bool:
-                    return typeof(bool);
-                case FieldType.Bytes:
-                    return typeof(ByteString);
-                case FieldType.String:
-                    return typeof(string);
-                case FieldType.Double:
-                    return typeof(double);
-                case FieldType.SInt32:
-                case FieldType.Int32:
-                case FieldType.SFixed32:
-                case FieldType.Enum:
-                    return typeof(int);
-                case FieldType.Fixed32:
-                case FieldType.UInt32:
-                    return typeof(uint);
-                case FieldType.Fixed64:
-                case FieldType.UInt64:
-                    return typeof(ulong);
-                case FieldType.SFixed64:
-                case FieldType.Int64:
-                case FieldType.SInt64:
-                    return typeof(long);
-                case FieldType.Float:
-                    return typeof(float);
-                case FieldType.Message:
-                case FieldType.Group: // Never expect to get this, but...
-                    if (ConverterHelpers.IsWrapperType(descriptor.MessageType))
-                    {
-                        var t = GetFieldType(descriptor.MessageType.Fields[ConverterHelpers.WrapperValueFieldNumber]);
-                        if (t.IsValueType)
-                        {
-                            return typeof(Nullable<>).MakeGenericType(t);
-                        }
-
-                        return t;
-                    }
-                    return descriptor.MessageType.ClrType;
                 default:
                     throw new ArgumentException("Invalid field type");
             }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Google.Api;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
@@ -28,6 +29,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly GrpcServiceOptions<TService> _serviceOptions;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
         private readonly GrpcHttpApiOptions _httpApiOptions;
+        private readonly JsonSerializerOptions _serializerOptions;
         private readonly ILogger _logger;
 
         internal HttpApiProviderServiceBinder(
@@ -39,7 +41,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
             IGrpcServiceActivator<TService> serviceActivator,
-            GrpcHttpApiOptions httpApiOptions)
+            GrpcHttpApiOptions httpApiOptions,
+            JsonSerializerOptions serializerOptions)
         {
             _context = context;
             _declaringType = declaringType;
@@ -48,6 +51,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _serviceOptions = serviceOptions;
             _serviceActivator = serviceActivator;
             _httpApiOptions = httpApiOptions;
+            _serializerOptions = serializerOptions;
             _logger = loggerFactory.CreateLogger<HttpApiProviderServiceBinder<TService>>();
         }
 
@@ -165,7 +169,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     bodyDescriptorRepeated,
                     bodyFieldDescriptors,
                     routeParameterDescriptors,
-                    _httpApiOptions);
+                    _serializerOptions);
 
                 _context.AddMethod<TRequest, TResponse>(method, routePattern, metadata, unaryServerCallHandler.HandleCallAsync);
             }

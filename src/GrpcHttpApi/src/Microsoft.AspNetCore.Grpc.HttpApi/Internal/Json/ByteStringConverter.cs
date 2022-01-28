@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using Google.Protobuf;
 using Type = System.Type;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
     public sealed class ByteStringConverter : JsonConverter<ByteString>
     {

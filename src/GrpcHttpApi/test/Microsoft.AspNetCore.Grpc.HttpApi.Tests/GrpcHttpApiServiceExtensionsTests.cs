@@ -23,8 +23,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var serviceProvider = services.BuildServiceProvider();
             var options1 = serviceProvider.GetRequiredService<IOptions<GrpcHttpApiOptions>>().Value;
 
-            Assert.NotNull(options1.JsonFormatter);
-            Assert.NotNull(options1.JsonParser);
+            Assert.NotNull(options1.JsonSettings);
 
             var options2 = serviceProvider.GetRequiredService<IOptions<GrpcHttpApiOptions>>().Value;
 
@@ -35,24 +34,21 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         public void AddGrpcHttpApi_OverrideOptions_OptionsApplied()
         {
             // Arrange
-            var jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(formatDefaultValues: false));
-            var jsonParser = new JsonParser(new JsonParser.Settings(recursionLimit: 1));
+            var settings = new JsonSettings();
 
             var services = new ServiceCollection();
 
             // Act
             services.AddGrpcHttpApi(o =>
             {
-                o.JsonFormatter = jsonFormatter;
-                o.JsonParser = jsonParser;
+                o.JsonSettings = settings;
             });
 
             // Assert
             var serviceProvider = services.BuildServiceProvider();
             var options = serviceProvider.GetRequiredService<IOptions<GrpcHttpApiOptions>>().Value;
 
-            Assert.Equal(jsonFormatter, options.JsonFormatter);
-            Assert.Equal(jsonParser, options.JsonParser);
+            Assert.Equal(settings, options.JsonSettings);
         }
     }
 }

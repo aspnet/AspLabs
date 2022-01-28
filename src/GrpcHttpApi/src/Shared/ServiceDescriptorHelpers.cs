@@ -156,6 +156,13 @@ namespace Grpc.Shared.HttpApi
                                 list.Add(ConvertValue(value, field));
                             }
                         }
+                        else if (values is IList listValues)
+                        {
+                            foreach (var value in listValues)
+                            {
+                                list.Add(ConvertValue(value, field));
+                            }
+                        }
                         else
                         {
                             list.Add(ConvertValue(values, field));

@@ -5,14 +5,15 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Type = System.Type;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class TimestampConverter : WellKnownTypeConverter
+    public sealed class TimestampConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private static readonly Regex TimestampRegex = new Regex(@"^(?<datetime>[0-9]{4}-[01][0-9]-[0-3][0-9]T[012][0-9]:[0-5][0-9]:[0-5][0-9])(?<subseconds>\.[0-9]{1,9})?(?<offset>(Z|[+-][0-1][0-9]:[0-5][0-9]))$", RegexOptions.Compiled);
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -23,15 +24,17 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
         internal const int MaxNanos = Duration.NanosecondsPerSecond - 1;
         private static readonly int[] SubsecondScalingFactors = { 0, 100000000, 100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
 
+        public TimestampConverter(JsonSettings settings)
+        {
+        }
+
         private static bool IsNormalized(long seconds, int nanoseconds) =>
             nanoseconds >= 0 &&
             nanoseconds <= MaxNanos &&
             seconds >= UnixSecondsAtBclMinValue &&
             seconds <= UnixSecondsAtBclMaxValue;
 
-        protected override string WellKnownTypeName => Timestamp.Descriptor.FullName;
-
-        public override IMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override TMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.String)
             {
@@ -99,7 +102,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
                     }
                 }
 
-                IMessage message = new Timestamp();
+                var message = new TMessage();
                 message.Descriptor.Fields[Timestamp.SecondsFieldNumber].Accessor.SetValue(message, timestamp.Seconds);
                 message.Descriptor.Fields[Timestamp.NanosFieldNumber].Accessor.SetValue(message, timestamp.Nanos);
                 return message;
@@ -110,7 +113,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.Converter
             }
         }
 
-        public override void Write(Utf8JsonWriter writer, IMessage value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, TMessage value, JsonSerializerOptions options)
         {
             int nanos = (int)value.Descriptor.Fields[Timestamp.NanosFieldNumber].Accessor.GetValue(value);
             long seconds = (long)value.Descriptor.Fields[Timestamp.SecondsFieldNumber].Accessor.GetValue(value);

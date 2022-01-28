@@ -10,11 +10,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
 {
     public class JsonElementComparer : IEqualityComparer<JsonElement>
     {
-        public JsonElementComparer() : this(-1) { }
+        public JsonElementComparer() : this(maxHashDepth: -1, compareRawStrings: false) { }
 
-        public JsonElementComparer(int maxHashDepth) => this.MaxHashDepth = maxHashDepth;
+        public JsonElementComparer(int maxHashDepth, bool compareRawStrings)
+        {
+            MaxHashDepth = maxHashDepth;
+            CompareRawStrings = compareRawStrings;
+        }
 
-        int MaxHashDepth { get; } = -1;
+        private int MaxHashDepth { get; }
+        private bool CompareRawStrings { get; }
 
         #region IEqualityComparer<JsonElement> Members
 
@@ -39,7 +44,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
                     return x.GetRawText() == y.GetRawText();
 
                 case JsonValueKind.String:
-                    return x.GetString() == y.GetString(); // Do not use GetRawText() here, it does not automatically resolve JSON escape sequences to their corresponding characters.
+                    if (CompareRawStrings)
+                    {
+                        return x.GetRawText() == y.GetRawText();
+                    }
+                    else
+                    {
+                        // Automatically resolve JSON escape sequences to their corresponding characters.
+                        return x.GetString() == y.GetString();
+                    }
 
                 case JsonValueKind.Array:
                     return x.EnumerateArray().SequenceEqual(y.EnumerateArray(), this);

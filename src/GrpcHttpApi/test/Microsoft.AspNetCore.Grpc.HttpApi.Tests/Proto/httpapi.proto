@@ -6,6 +6,9 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
 
 package http_api;
 
@@ -151,6 +154,12 @@ message HelloRequest {
   }
   int32 age = 13;
   repeated google.protobuf.DoubleValue repeated_double_values = 14;
+  google.protobuf.Timestamp timestamp_value = 15;
+  google.protobuf.Duration duration_value = 16;
+  google.protobuf.Value value_value = 17;
+  google.protobuf.Struct struct_value = 18;
+  google.protobuf.ListValue list_value = 19;
+  google.protobuf.NullValue null_value = 20;
 }
 
 message HelloReply {
@@ -158,4 +167,8 @@ message HelloReply {
   repeated string values = 2;
   google.protobuf.StringValue nullable_message = 3;
   google.protobuf.Any any_message = 4;
+}
+
+message NullValueContainer {
+  google.protobuf.NullValue null_value = 1;
 }

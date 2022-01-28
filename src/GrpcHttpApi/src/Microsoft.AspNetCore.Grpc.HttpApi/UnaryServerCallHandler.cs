@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
@@ -17,8 +18,9 @@ using Grpc.Gateway.Runtime;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
@@ -30,14 +32,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly UnaryServerMethodInvoker<TService, TRequest, TResponse> _unaryMethodInvoker;
         private readonly FieldDescriptor? _responseBodyDescriptor;
         private readonly MessageDescriptor? _bodyDescriptor;
-        private readonly bool _bodyDescriptorRepeated;
         private readonly List<FieldDescriptor>? _bodyFieldDescriptors;
         private readonly string? _bodyFieldDescriptorsPath;
         private readonly Dictionary<string, List<FieldDescriptor>> _routeParameterDescriptors;
-        private readonly JsonFormatter _jsonFormatter;
-        private readonly JsonParser _jsonParser;
         private readonly ConcurrentDictionary<string, List<FieldDescriptor>?> _pathDescriptorsCache;
-        private readonly List<FieldDescriptor>? _resolvedBodyFieldDescriptors;
+        private readonly JsonSerializerOptions _options;
+
+        [MemberNotNull(nameof(_bodyFieldDescriptors))]
+        private bool BodyDescriptorRepeated { get; }
 
         public UnaryServerCallHandler(
             UnaryServerMethodInvoker<TService, TRequest, TResponse> unaryMethodInvoker,
@@ -46,25 +48,20 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             bool bodyDescriptorRepeated,
             List<FieldDescriptor>? bodyFieldDescriptors,
             Dictionary<string, List<FieldDescriptor>> routeParameterDescriptors,
-            GrpcHttpApiOptions httpApiOptions)
+            JsonSerializerOptions options)
         {
             _unaryMethodInvoker = unaryMethodInvoker;
             _responseBodyDescriptor = responseBodyDescriptor;
             _bodyDescriptor = bodyDescriptor;
-            _bodyDescriptorRepeated = bodyDescriptorRepeated;
+            BodyDescriptorRepeated = bodyDescriptorRepeated;
             _bodyFieldDescriptors = bodyFieldDescriptors;
             if (_bodyFieldDescriptors != null)
             {
                 _bodyFieldDescriptorsPath = string.Join('.', _bodyFieldDescriptors.Select(d => d.Name));
             }
-            if (_bodyDescriptorRepeated && _bodyFieldDescriptors != null)
-            {
-                _resolvedBodyFieldDescriptors = _bodyFieldDescriptors.Take(_bodyFieldDescriptors.Count - 1).ToList();
-            }
             _routeParameterDescriptors = routeParameterDescriptors;
-            _jsonFormatter = httpApiOptions.JsonFormatter;
-            _jsonParser = httpApiOptions.JsonParser;
             _pathDescriptorsCache = new ConcurrentDictionary<string, List<FieldDescriptor>?>(StringComparer.Ordinal);
+            _options = options;
         }
 
         public async Task HandleCallAsync(HttpContext httpContext)
@@ -122,55 +119,36 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
             if (_bodyDescriptor != null)
             {
-                if (request.ContentType == null ||
-                    !request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
+                if (!JsonRequestHelpers.HasJsonContentType(request, out var charset))
                 {
                     return (null, StatusCode.InvalidArgument, "Request content-type of application/json is required.");
                 }
 
-                if (!request.Body.CanSeek)
+                var encoding = JsonRequestHelpers.GetEncodingFromCharset(charset);
+                var (stream, usesTranscodingStream) = JsonRequestHelpers.GetStream(request.HttpContext.Request.Body, encoding);
+
+                try
                 {
-                    // JsonParser does synchronous reads. In order to avoid blocking on the stream, we asynchronously
-                    // read everything into a buffer, and then seek back to the beginning.
-                    request.EnableBuffering();
-                    Debug.Assert(request.Body.CanSeek);
-
-                    await request.Body.DrainAsync(CancellationToken.None);
-                    request.Body.Seek(0L, SeekOrigin.Begin);
-                }
-
-                var encoding = RequestEncoding.SelectCharacterEncoding(request);
-                // TODO: Handle unsupported encoding
-
-                using (var requestReader = new HttpRequestStreamReader(request.Body, encoding))
-                {
-                    if (_bodyDescriptorRepeated)
+                    if (BodyDescriptorRepeated)
                     {
-                        var containingMessage = ParseRepeatedContent(requestReader);
+                        requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                        var repeatedContent = await ParseRepeatedContentAsync(stream);
 
-                        if (_resolvedBodyFieldDescriptors!.Count > 0)
-                        {
-                            requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _resolvedBodyFieldDescriptors, containingMessage);
-                        }
-                        else
-                        {
-                            requestMessage = containingMessage;
-                        }                        
+                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _bodyFieldDescriptors, repeatedContent);
                     }
                     else
                     {
-                        IMessage bodyContent;
+                        IMessage? bodyContent;
 
                         try
                         {
-                            bodyContent = _jsonParser.Parse(requestReader, _bodyDescriptor);
+                            bodyContent = (IMessage?)await JsonSerializer.DeserializeAsync(stream, _bodyDescriptor.ClrType, _options);
                         }
-                        catch (InvalidJsonException)
+                        catch (JsonException)
                         {
                             return (null, StatusCode.InvalidArgument, "Request JSON payload is not correctly formatted.");
                         }
-                        catch (InvalidProtocolBufferException exception)
+                        catch (Exception exception)
                         {
                             return (null, StatusCode.InvalidArgument, exception.Message);
                         }
@@ -178,12 +156,19 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                         if (_bodyFieldDescriptors != null)
                         {
                             requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _bodyFieldDescriptors, bodyContent);
+                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _bodyFieldDescriptors, bodyContent!); // TODO - check nullability
                         }
                         else
                         {
                             requestMessage = bodyContent;
                         }
+                    }
+                }
+                finally
+                {
+                    if (usesTranscodingStream)
+                    {
+                        await stream.DisposeAsync();
                     }
                 }
             }
@@ -227,21 +212,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             });
         }
 
-        private IMessage ParseRepeatedContent(HttpRequestStreamReader requestReader)
+        private async ValueTask<IList> ParseRepeatedContentAsync(Stream inputStream)
         {
-            // The following code is SUPER hacky.
-            //
-            // Problem:
-            // JsonParser doesn't provide a way to directly parse a JSON array to repeated fields.
-            // JsonParser's Parse methods only support reading JSON objects as methods.
-            //
-            // Solution:
-            // To get around this limitation a wrapping TextReader is created that inserts a wrapping
-            // object into the JSON passed to the parser. The parser returns the containing message
-            // with the repeated fields set on it.
-            var containingType = _bodyFieldDescriptors.Last()!.ContainingType;
+            var type = JsonConverterHelper.GetFieldType(_bodyFieldDescriptors!.Last());
+            var listType = typeof(List<>).MakeGenericType(type);
 
-            return _jsonParser.Parse(new PropertyWrappingTextReader(requestReader, _bodyFieldDescriptors.Last().JsonName), containingType);
+            return (IList)(await JsonSerializer.DeserializeAsync(inputStream, listType, _options))!;
         }
 
         private async Task SendResponse(HttpResponse response, Encoding encoding, TResponse message)
@@ -254,7 +230,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
 
             response.StatusCode = StatusCodes.Status200OK;
-            response.ContentType = "application/json";
+            response.ContentType = MediaType.ReplaceEncoding("application/json", encoding);
 
             await WriteResponseMessage(response, encoding, responseBody);
         }
@@ -269,28 +245,25 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             };
 
             response.StatusCode = MapStatusCodeToHttpStatus(statusCode);
-            response.ContentType = "application/json";
+            response.ContentType = MediaType.ReplaceEncoding("application/json", encoding);
 
             await WriteResponseMessage(response, encoding, e);
         }
 
         private async Task WriteResponseMessage(HttpResponse response, Encoding encoding, object responseBody)
         {
-            using (var writer = new HttpResponseStreamWriter(response.Body, encoding))
-            {
-                if (responseBody is IMessage responseMessage)
-                {
-                    _jsonFormatter.Format(responseMessage, writer);
-                }
-                else
-                {
-                    _jsonFormatter.WriteValue(writer, responseBody);
-                }
+            var (stream, usesTranscodingStream) = JsonRequestHelpers.GetStream(response.Body, encoding);
 
-                // Perf: call FlushAsync to call WriteAsync on the stream with any content left in the TextWriter's
-                // buffers. This is better than just letting dispose handle it (which would result in a synchronous
-                // write).
-                await writer.FlushAsync();
+            try
+            {
+                await JsonSerializer.SerializeAsync(stream, responseBody, _options);
+            }
+            finally
+            {
+                if (usesTranscodingStream)
+                {
+                    await stream.DisposeAsync();
+                }
             }
         }
 
