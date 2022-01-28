@@ -13,7 +13,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class DurationConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class DurationConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private static readonly Regex DurationRegex = new Regex(@"^(?<sign>-)?(?<int>[0-9]{1,12})(?<subseconds>\.[0-9]{1,9})?s$", RegexOptions.Compiled);
 

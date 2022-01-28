@@ -9,7 +9,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class Int64Converter : JsonConverter<long>
+    internal sealed class Int64Converter : JsonConverter<long>
     {
         public override long Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

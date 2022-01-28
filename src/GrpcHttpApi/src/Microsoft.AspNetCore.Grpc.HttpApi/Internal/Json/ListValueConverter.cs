@@ -11,7 +11,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class ListValueConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class ListValueConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         public ListValueConverter(JsonSettings settings)
         {

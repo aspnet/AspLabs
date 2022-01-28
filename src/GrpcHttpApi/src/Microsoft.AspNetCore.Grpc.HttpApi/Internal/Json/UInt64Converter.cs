@@ -9,7 +9,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class UInt64Converter : JsonConverter<ulong>
+    internal sealed class UInt64Converter : JsonConverter<ulong>
     {
         public override ulong Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

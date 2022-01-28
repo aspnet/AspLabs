@@ -10,7 +10,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class ValueConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class ValueConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         public ValueConverter(JsonSettings settings)
         {

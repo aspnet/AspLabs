@@ -10,7 +10,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public class JsonConverterFactoryForMessage : JsonConverterFactory
+    internal class JsonConverterFactoryForMessage : JsonConverterFactory
     {
         private readonly JsonSettings _settings;
 

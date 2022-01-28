@@ -15,7 +15,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class FieldMaskConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class FieldMaskConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private static readonly char[] FieldMaskPathSeparators = new[] { ',' };
 

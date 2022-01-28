@@ -9,7 +9,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class EnumConverter : JsonConverter<Enum>
+    internal sealed class EnumConverter : JsonConverter<Enum>
     {
         private readonly JsonSettings _settings;
 

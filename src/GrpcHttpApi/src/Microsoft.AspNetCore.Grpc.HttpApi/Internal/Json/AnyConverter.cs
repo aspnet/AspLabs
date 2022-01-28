@@ -12,7 +12,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class AnyConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class AnyConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         internal const string AnyTypeUrlField = "@type";
         internal const string AnyWellKnownTypeValueField = "value";
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             }
 
             IMessage data;
-            if (ConverterHelpers.IsWellKnownType(descriptor))
+            if (JsonConverterHelper.IsWellKnownType(descriptor))
             {
                 if (!d.RootElement.TryGetProperty(AnyWellKnownTypeValueField, out var valueField))
                 {
@@ -77,12 +77,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             writer.WriteStartObject();
             writer.WriteString(AnyTypeUrlField, typeUrl);
 
-            if (ConverterHelpers.IsWellKnownType(descriptor))
+            if (JsonConverterHelper.IsWellKnownType(descriptor))
             {
                 writer.WritePropertyName(AnyWellKnownTypeValueField);
-                if (ConverterHelpers.IsWrapperType(descriptor))
+                if (JsonConverterHelper.IsWrapperType(descriptor))
                 {
-                    var wrappedValue = valueMessage.Descriptor.Fields[ConverterHelpers.WrapperValueFieldNumber].Accessor.GetValue(valueMessage);
+                    var wrappedValue = valueMessage.Descriptor.Fields[JsonConverterHelper.WrapperValueFieldNumber].Accessor.GetValue(valueMessage);
                     JsonSerializer.Serialize(writer, wrappedValue, wrappedValue.GetType(), options);
                 }
                 else

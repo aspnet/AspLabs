@@ -12,7 +12,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public class JsonConverterFactoryForWellKnownTypes : JsonConverterFactory
+    internal class JsonConverterFactoryForWellKnownTypes : JsonConverterFactory
     {
         private readonly JsonSettings _settings;
 

@@ -9,7 +9,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class ByteStringConverter : JsonConverter<ByteString>
+    internal sealed class ByteStringConverter : JsonConverter<ByteString>
     {
         public override ByteString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

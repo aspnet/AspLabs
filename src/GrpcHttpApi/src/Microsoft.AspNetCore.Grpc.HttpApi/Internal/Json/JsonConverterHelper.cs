@@ -9,11 +9,29 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
+using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
     internal static class JsonConverterHelper
     {
+        internal const int WrapperValueFieldNumber = Int32Value.ValueFieldNumber;
+
+        private static readonly HashSet<string> WellKnownTypeNames = new HashSet<string>
+        {
+            "google/protobuf/any.proto",
+            "google/protobuf/api.proto",
+            "google/protobuf/duration.proto",
+            "google/protobuf/empty.proto",
+            "google/protobuf/wrappers.proto",
+            "google/protobuf/timestamp.proto",
+            "google/protobuf/field_mask.proto",
+            "google/protobuf/source_context.proto",
+            "google/protobuf/struct.proto",
+            "google/protobuf/type.proto",
+        };
+
         internal static JsonSerializerOptions CreateSerializerOptions(JsonSettings settings)
         {
             var options = new JsonSerializerOptions
@@ -66,9 +84,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                     return typeof(float);
                 case FieldType.Message:
                 case FieldType.Group: // Never expect to get this, but...
-                    if (ConverterHelpers.IsWrapperType(descriptor.MessageType))
+                    if (IsWrapperType(descriptor.MessageType))
                     {
-                        var t = GetFieldType(descriptor.MessageType.Fields[ConverterHelpers.WrapperValueFieldNumber]);
+                        var t = GetFieldType(descriptor.MessageType.Fields[WrapperValueFieldNumber]);
                         if (t.IsValueType)
                         {
                             return typeof(Nullable<>).MakeGenericType(t);
@@ -124,5 +142,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                 existingValue.Add(item);
             }
         }
+
+        internal static bool IsWellKnownType(MessageDescriptor messageDescriptor) => messageDescriptor.File.Package == "google.protobuf" &&
+            WellKnownTypeNames.Contains(messageDescriptor.File.Name);
+
+        internal static bool IsWrapperType(MessageDescriptor messageDescriptor) => messageDescriptor.File.Package == "google.protobuf" &&
+            messageDescriptor.File.Name == "google/protobuf/wrappers.proto";
     }
 }

@@ -12,7 +12,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    public sealed class MessageConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
+    internal sealed class MessageConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private readonly JsonSettings _settings;
 
@@ -28,9 +28,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
         {
             var message = new TMessage();
 
-            if (ConverterHelpers.IsWrapperType(message.Descriptor))
+            if (JsonConverterHelper.IsWrapperType(message.Descriptor))
             {
-                var valueDescriptor = message.Descriptor.Fields[ConverterHelpers.WrapperValueFieldNumber];
+                var valueDescriptor = message.Descriptor.Fields[JsonConverterHelper.WrapperValueFieldNumber];
                 var t = JsonConverterHelper.GetFieldType(valueDescriptor);
                 var value = JsonSerializer.Deserialize(ref reader, t, options);
                 valueDescriptor.Accessor.SetValue(message, value);
