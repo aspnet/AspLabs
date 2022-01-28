@@ -46,6 +46,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             options.Converters.Add(new UInt64Converter());
             options.Converters.Add(new EnumConverter(settings));
             options.Converters.Add(new BoolConverter());
+            options.Converters.Add(new JsonConverterFactoryForWrappers(settings));
             options.Converters.Add(new JsonConverterFactoryForWellKnownTypes(settings));
             options.Converters.Add(new JsonConverterFactoryForMessage(settings));
 

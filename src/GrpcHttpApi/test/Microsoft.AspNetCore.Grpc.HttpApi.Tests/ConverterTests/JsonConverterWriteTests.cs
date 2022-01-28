@@ -185,6 +185,22 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
         }
 
         [Fact]
+        public void NullableWrapper_Root_Int32()
+        {
+            var v = new Int32Value { Value = 1 };
+
+            AssertWrittenJson(v);
+        }
+
+        [Fact]
+        public void NullableWrapper_Root_Int64()
+        {
+            var v = new Int64Value { Value = 1 };
+
+            AssertWrittenJson(v);
+        }
+
+        [Fact]
         public void Any()
         {
             var helloRequest = new HelloRequest

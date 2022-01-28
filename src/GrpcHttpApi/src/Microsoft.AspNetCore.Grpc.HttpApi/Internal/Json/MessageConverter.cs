@@ -28,15 +28,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
         {
             var message = new TMessage();
 
-            if (JsonConverterHelper.IsWrapperType(message.Descriptor))
-            {
-                var valueDescriptor = message.Descriptor.Fields[JsonConverterHelper.WrapperValueFieldNumber];
-                var t = JsonConverterHelper.GetFieldType(valueDescriptor);
-                var value = JsonSerializer.Deserialize(ref reader, t, options);
-                valueDescriptor.Accessor.SetValue(message, value);
+            //if (JsonConverterHelper.IsWrapperType(message.Descriptor))
+            //{
+            //    var valueDescriptor = message.Descriptor.Fields[JsonConverterHelper.WrapperValueFieldNumber];
+            //    var t = JsonConverterHelper.GetFieldType(valueDescriptor);
+            //    var value = JsonSerializer.Deserialize(ref reader, t, options);
+            //    valueDescriptor.Accessor.SetValue(message, value);
 
-                return message;
-            }
+            //    return message;
+            //}
 
             if (reader.TokenType != JsonTokenType.StartObject)
             {

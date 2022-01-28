@@ -410,6 +410,22 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
             AssertReadJson<FieldMask>(json);
         }
 
+        [Fact]
+        public void NullableWrapper_Root_Int32()
+        {
+            var json = @"1";
+
+            AssertReadJson<Int32Value>(json);
+        }
+
+        [Fact]
+        public void NullableWrapper_Root_Int64()
+        {
+            var json = @"""1""";
+
+            AssertReadJson<Int64Value>(json);
+        }
+
         private TValue AssertReadJson<TValue>(string value, JsonSettings? settings = null) where TValue : IMessage, new()
         {
             var typeRegistery = TypeRegistry.FromFiles(
