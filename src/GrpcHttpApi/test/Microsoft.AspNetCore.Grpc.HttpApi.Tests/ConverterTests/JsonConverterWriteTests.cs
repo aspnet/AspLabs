@@ -361,6 +361,25 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
             AssertWrittenJson(value);
         }
 
+        [Fact]
+        public void FieldMask_Nested()
+        {
+            var helloRequest = new HelloRequest
+            {
+                FieldMaskValue = FieldMask.FromString("value1,value2,value3.nested_value"),
+            };
+
+            AssertWrittenJson(helloRequest);
+        }
+
+        [Fact]
+        public void FieldMask_Root()
+        {
+            var m = FieldMask.FromString("value1,value2,value3.nested_value");
+
+            AssertWrittenJson(m);
+        }
+
         [Theory]
         [InlineData(HelloRequest.Types.DataTypes.Types.NestedEnum.Unspecified)]
         [InlineData(HelloRequest.Types.DataTypes.Types.NestedEnum.Bar)]

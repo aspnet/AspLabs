@@ -394,6 +394,22 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
             AssertReadJsonError<NullValueContainer>(json, ex => Assert.Equal("Invalid enum value: MONKEY for enum type: google.protobuf.NullValue", ex.Message));
         }
 
+        [Fact]
+        public void FieldMask_Nested()
+        {
+            var json = @"{ ""fieldMaskValue"": ""value1,value2,value3.nestedValue"" }";
+
+            AssertReadJson<HelloRequest>(json);
+        }
+
+        [Fact]
+        public void FieldMask_Root()
+        {
+            var json = @"""value1,value2,value3.nestedValue""";
+
+            AssertReadJson<FieldMask>(json);
+        }
+
         private TValue AssertReadJson<TValue>(string value, JsonSettings? settings = null) where TValue : IMessage, new()
         {
             var typeRegistery = TypeRegistry.FromFiles(

@@ -30,12 +30,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             var list = (IList)value.Descriptor.Fields[ListValue.ValuesFieldNumber].Accessor.GetValue(value);
 
             JsonSerializer.Serialize(writer, list, list.GetType(), options);
-            //writer.WriteStartArray();
-            //foreach (var v in list)
-            //{
-            //    JsonSerializer.Serialize(writer, v, v.GetType(), options);
-            //}
-            //writer.WriteEndArray();
         }
     }
 }

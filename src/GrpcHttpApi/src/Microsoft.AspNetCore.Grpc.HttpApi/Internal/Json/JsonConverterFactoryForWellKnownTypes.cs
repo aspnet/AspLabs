@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Google.Protobuf;
-using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
 using Type = System.Type;
 
@@ -35,17 +34,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                 return false;
             }
 
-            if (!ConverterHelpers.IsWellKnownType(descriptor))
-            {
-                return false;
-            }
-
-            if (ConverterHelpers.IsWrapperType(descriptor))
-            {
-                return false;
-            }
-
-            return true;
+            return WellKnownTypeNames.ContainsKey(descriptor.FullName);
         }
 
         public override JsonConverter CreateConverter(
@@ -66,22 +55,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 
         private static readonly Dictionary<string, Type> WellKnownTypeNames = new Dictionary<string, Type>
         {
-            [Timestamp.Descriptor.FullName] = typeof(TimestampConverter<>),
-            [ListValue.Descriptor.FullName] = typeof(ListValueConverter<>),
-            [Struct.Descriptor.FullName] = typeof(StructConverter<>),
             [Any.Descriptor.FullName] = typeof(AnyConverter<>),
-            [Value.Descriptor.FullName] = typeof(ValueConverter<>),
             [Duration.Descriptor.FullName] = typeof(DurationConverter<>),
-            //"google/protobuf/any.proto",
-            //"google/protobuf/api.proto",
-            //"google/protobuf/duration.proto",
-            //"google/protobuf/empty.proto",
-            //"google/protobuf/wrappers.proto",
-            //"google/protobuf/timestamp.proto",
-            //"google/protobuf/field_mask.proto",
-            //"google/protobuf/source_context.proto",
-            //"google/protobuf/struct.proto",
-            //"google/protobuf/type.proto",
+            [Timestamp.Descriptor.FullName] = typeof(TimestampConverter<>),
+            [FieldMask.Descriptor.FullName] = typeof(FieldMaskConverter<>),
+            [Struct.Descriptor.FullName] = typeof(StructConverter<>),
+            [ListValue.Descriptor.FullName] = typeof(ListValueConverter<>),
+            [Value.Descriptor.FullName] = typeof(ValueConverter<>),
         };
     }
 }

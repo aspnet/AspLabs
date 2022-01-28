@@ -9,6 +9,7 @@ import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/field_mask.proto";
 
 package http_api;
 
@@ -160,6 +161,7 @@ message HelloRequest {
   google.protobuf.Struct struct_value = 18;
   google.protobuf.ListValue list_value = 19;
   google.protobuf.NullValue null_value = 20;
+  google.protobuf.FieldMask field_mask_value = 21;
 }
 
 message HelloReply {
