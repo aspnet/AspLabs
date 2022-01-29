@@ -109,7 +109,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         protected override AuthContext AuthContextCore => throw new NotImplementedException();
 
-        protected override IDictionary<object, object> UserStateCore => _httpContext.Items;
+        protected override IDictionary<object, object?> UserStateCore => _httpContext.Items;
 
         protected override ContextPropagationToken CreatePropagationTokenCore(ContextPropagationOptions options)
         {

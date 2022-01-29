@@ -175,10 +175,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests.ConverterTests
                 DoubleValue = 1.1,
                 FloatValue = 1.2f,
                 Int32Value = 1,
-                Int64Value = 2l,
+                Int64Value = 2L,
                 StringValue = "A string",
-                Uint32Value = 3u,
-                Uint64Value = 4ul
+                Uint32Value = 3U,
+                Uint64Value = 4UL
             };
 
             AssertWrittenJson(wrappers);

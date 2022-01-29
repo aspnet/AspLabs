@@ -49,8 +49,8 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
 
         private class TestWebHostEnvironment : IWebHostEnvironment
         {
-            public IFileProvider? WebRootFileProvider { get; set; }
-            public string? WebRootPath { get; set; }
+            public IFileProvider WebRootFileProvider { get; set; } = default!;
+            public string WebRootPath { get; set; } = default!;
             public string? ApplicationName { get; set; }
             public IFileProvider? ContentRootFileProvider { get; set; }
             public string? ContentRootPath { get; set; }
