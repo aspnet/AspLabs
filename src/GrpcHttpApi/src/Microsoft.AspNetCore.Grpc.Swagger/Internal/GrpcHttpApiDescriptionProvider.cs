@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
             apiDescription.HttpMethod = verb;
             apiDescription.ActionDescriptor = new ActionDescriptor
             {
-                RouteValues = new Dictionary<string, string>
+                RouteValues = new Dictionary<string, string?>
                 {
                     // Swagger uses this to group endpoints together.
                     // Group methods together using the service name.

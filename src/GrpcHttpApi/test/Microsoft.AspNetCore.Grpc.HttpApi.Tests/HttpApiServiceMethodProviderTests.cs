@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.SayHello));
 
-            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
             Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
             Assert.Equal(1, endpoint.RoutePattern.Parameters.Count);
             Assert.Equal("name", endpoint.RoutePattern.Parameters[0].Name);
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.Custom));
 
             Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
-            Assert.Equal("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
         }
 
         [Fact]
@@ -58,13 +58,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal(2, matchedEndpoints.Count);
 
             var getMethodModel = matchedEndpoints[0];
-            Assert.Equal("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Get);
+            Assert.Equal("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Get);
             Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.RoutePattern.RawText);
 
             var additionalMethodModel = matchedEndpoints[1];
-            Assert.Equal("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Delete);
+            Assert.Equal("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Delete);
             Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.RoutePattern.RawText);
         }
 

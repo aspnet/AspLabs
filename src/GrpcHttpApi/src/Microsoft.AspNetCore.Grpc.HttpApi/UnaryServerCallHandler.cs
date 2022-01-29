@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         private async Task<(IMessage? requestMessage, StatusCode statusCode, string? errorMessage)> CreateMessage(HttpRequest request)
         {
-            IMessage? requestMessage;
+            IMessage requestMessage;
 
             if (_bodyDescriptor != null)
             {
@@ -138,11 +138,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     }
                     else
                     {
-                        IMessage? bodyContent;
+                        IMessage bodyContent;
 
                         try
                         {
-                            bodyContent = (IMessage?)await JsonSerializer.DeserializeAsync(stream, _bodyDescriptor.ClrType, _options);
+                            bodyContent = (IMessage)(await JsonSerializer.DeserializeAsync(stream, _bodyDescriptor.ClrType, _options))!;
                         }
                         catch (JsonException)
                         {
