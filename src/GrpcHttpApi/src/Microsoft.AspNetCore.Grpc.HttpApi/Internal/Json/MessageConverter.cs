@@ -15,10 +15,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
     internal sealed class MessageConverter<TMessage> : JsonConverter<TMessage> where TMessage : IMessage, new()
     {
         private readonly JsonSettings _settings;
+        private readonly Dictionary<string, FieldDescriptor> _jsonFieldMap;
 
         public MessageConverter(JsonSettings settings)
         {
             _settings = settings;
+            _jsonFieldMap = CreateJsonFieldMap((new TMessage()).Descriptor.Fields.InFieldNumberOrder());
         }
 
         public override TMessage Read(
@@ -33,8 +35,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                 throw new InvalidOperationException($"Unexpected JSON token: {reader.TokenType}");
             }
 
-            var jsonFieldMap = CreateJsonFieldMap(message.Descriptor.Fields.InFieldNumberOrder());
-
             while (reader.Read())
             {
                 switch (reader.TokenType)
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                     case JsonTokenType.EndObject:
                         return message;
                     case JsonTokenType.PropertyName:
-                        if (jsonFieldMap.TryGetValue(reader.GetString()!, out var fieldDescriptor))
+                        if (_jsonFieldMap.TryGetValue(reader.GetString()!, out var fieldDescriptor))
                         {
                             if (fieldDescriptor.ContainingOneof != null)
                             {
