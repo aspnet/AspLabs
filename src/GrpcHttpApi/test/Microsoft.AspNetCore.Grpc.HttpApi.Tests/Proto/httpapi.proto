@@ -94,6 +94,24 @@ service HttpApiInvalidPatternGreeter {
   }
 }
 
+service HttpApiStreaming {
+  rpc GetServerStreaming (HelloRequest) returns (stream HelloReply) {
+    option (google.api.http) = {
+      get: "/v1/server_greeter/{name}"
+    };
+  }
+  rpc GetClientStreaming (stream HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      get: "/v1/client_greeter/{name}"
+    };
+  }
+  rpc GetBidiStreaming (stream HelloRequest) returns (stream HelloReply) {
+    option (google.api.http) = {
+      get: "/v1/bidi_greeter/{name}"
+    };
+  }
+}
+
 message HelloRequest {
   message SubMessage {
     string subfield = 1;

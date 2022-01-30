@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
@@ -77,6 +79,27 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var ex = Assert.Throws<InvalidOperationException>(() => FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.NoOption)));
             Assert.Equal("Couldn't find gRPC endpoint for method NoOption.", ex.Message);
+        }
+
+        [Fact]
+        public void AddMethod_StreamingMethods_ThrowNotFoundError()
+        {
+            // Arrange
+            var testSink = new TestSink();
+            var testProvider = new TestLoggerProvider(testSink);
+
+            // Act
+            var endpoints = MapEndpoints<HttpApiStreamingService>(
+                configureLogging: c =>
+                {
+                    c.AddProvider(testProvider);
+                    c.SetMinimumLevel(LogLevel.Trace);
+                });
+
+            // Assert
+            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetServerStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
+            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetClientStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
+            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetBidiStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
         }
 
         [Fact]
@@ -153,11 +176,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             }
         }
 
-        private IReadOnlyList<Endpoint> MapEndpoints<TService>()
+        private IReadOnlyList<Endpoint> MapEndpoints<TService>(Action<ILoggingBuilder>? configureLogging = null)
             where TService : class
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging();
+            serviceCollection.AddLogging(log =>
+            {
+                configureLogging?.Invoke(log);
+            });
             serviceCollection.AddGrpc();
             serviceCollection.RemoveAll(typeof(IServiceMethodProvider<>));
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>), typeof(HttpApiServiceMethodProvider<>)));
