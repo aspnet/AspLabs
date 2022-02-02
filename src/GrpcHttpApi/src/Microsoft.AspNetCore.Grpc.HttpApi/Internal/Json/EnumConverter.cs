@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Google.Protobuf.Reflection;
@@ -9,7 +10,7 @@ using Type = System.Type;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 {
-    internal sealed class EnumConverter : JsonConverter<Enum>
+    internal sealed class EnumConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
     {
         private readonly JsonSettings _settings;
 
@@ -18,12 +19,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             _settings = settings;
         }
 
-        public override bool CanConvert(Type typeToConvert)
-        {
-            return typeToConvert.IsEnum;
-        }
-
-        public override Enum? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override TEnum? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             switch (reader.TokenType)
             {
@@ -34,14 +30,25 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                         throw new InvalidOperationException($"Unable to resolve descriptor for {typeToConvert}.");
                     }
                     var valueDescriptor = enumDescriptor.FindValueByName(reader.GetString()!);
-                    return (Enum)Enum.ToObject(typeToConvert, valueDescriptor.Number);
+                    
+                    return ConvertInteger(valueDescriptor.Number);
                 case JsonTokenType.Number:
-                    return (Enum)Enum.ToObject(typeToConvert, reader.GetInt32());
+                    return ConvertInteger(reader.GetInt32());
                 case JsonTokenType.Null:
-                    return null;
+                    return default;
                 default:
                     throw new InvalidOperationException($"Unexpected JSON token: {reader.TokenType}");
             }
+        }
+
+        private static TEnum ConvertInteger(int integer)
+        {
+            if (!TryConvertToEnum(integer, out var value))
+            {
+                throw new InvalidOperationException($"Integer can't be converted to enum {value.GetType().FullName}.");
+            }
+
+            return value;
         }
 
         private static EnumDescriptor? ResolveEnumDescriptor(Type typeToConvert)
@@ -66,11 +73,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             return null;
         }
 
-        public override void Write(Utf8JsonWriter writer, Enum value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
         {
             if (_settings.FormatEnumsAsIntegers)
             {
-                writer.WriteNumberValue((int)(object)value);
+                if (!TryConvertToInteger(value, out var integer))
+                {
+                    throw new InvalidOperationException($"Enum {value.GetType().FullName} can't be converted to integer.");
+                }
+                writer.WriteNumberValue(integer);
             }
             else
             {
@@ -84,6 +95,30 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                     writer.WriteNumberValue((int)(object)value);
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool TryConvertToInteger(TEnum value, out int integer)
+        {
+            if (Unsafe.SizeOf<int>() == Unsafe.SizeOf<TEnum>())
+            {
+                integer = Unsafe.As<TEnum, int>(ref value);
+                return true;
+            }
+            integer = default;
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool TryConvertToEnum(int integer, out TEnum value)
+        {
+            if (Unsafe.SizeOf<int>() == Unsafe.SizeOf<TEnum>())
+            {
+                value = Unsafe.As<int, TEnum>(ref integer);
+                return true;
+            }
+            value = default;
+            return false;
         }
     }
 }
