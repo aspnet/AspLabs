@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             }
             else
             {
-                var name = OriginalEnumValueHelper.GetOriginalName(value);
+                var name = Legacy.OriginalEnumValueHelper.GetOriginalName(value);
                 if (name != null)
                 {
                     writer.WriteStringValue(name);

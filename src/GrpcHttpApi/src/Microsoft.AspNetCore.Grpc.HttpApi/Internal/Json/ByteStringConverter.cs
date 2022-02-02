@@ -13,6 +13,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
     {
         public override ByteString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            // TODO - handle base64 strings without padding
             return UnsafeByteOperations.UnsafeWrap(reader.GetBytesFromBase64());
         }
 

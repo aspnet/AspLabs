@@ -34,9 +34,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 
             var message = new TMessage();
             var typeUrl = urlField.GetString();
-            string typeName = Any.GetTypeName(typeUrl);
+            var typeName = Any.GetTypeName(typeUrl);
 
-            MessageDescriptor descriptor = _settings.TypeRegistry.Find(typeName);
+            var descriptor = _settings.TypeRegistry.Find(typeName);
             if (descriptor == null)
             {
                 throw new InvalidOperationException($"Type registry has no descriptor for type name '{typeName}'");
@@ -65,15 +65,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
 
         public override void Write(Utf8JsonWriter writer, TMessage value, JsonSerializerOptions options)
         {
-            string typeUrl = (string)value.Descriptor.Fields[Any.TypeUrlFieldNumber].Accessor.GetValue(value);
-            ByteString data = (ByteString)value.Descriptor.Fields[Any.ValueFieldNumber].Accessor.GetValue(value);
-            string typeName = Any.GetTypeName(typeUrl);
-            MessageDescriptor descriptor = _settings.TypeRegistry.Find(typeName);
+            var typeUrl = (string)value.Descriptor.Fields[Any.TypeUrlFieldNumber].Accessor.GetValue(value);
+            var data = (ByteString)value.Descriptor.Fields[Any.ValueFieldNumber].Accessor.GetValue(value);
+            var typeName = Any.GetTypeName(typeUrl);
+            var descriptor = _settings.TypeRegistry.Find(typeName);
             if (descriptor == null)
             {
                 throw new InvalidOperationException($"Type registry has no descriptor for type name '{typeName}'");
             }
-            IMessage valueMessage = descriptor.Parser.ParseFrom(data);
+            var valueMessage = descriptor.Parser.ParseFrom(data);
             writer.WriteStartObject();
             writer.WriteString(AnyTypeUrlField, typeUrl);
 
