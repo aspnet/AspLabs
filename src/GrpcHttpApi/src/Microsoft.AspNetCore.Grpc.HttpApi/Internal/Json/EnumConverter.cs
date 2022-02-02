@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,24 +32,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                     }
                     var valueDescriptor = enumDescriptor.FindValueByName(reader.GetString()!);
                     
-                    return ConvertInteger(valueDescriptor.Number);
+                    return ConvertFromInteger(valueDescriptor.Number);
                 case JsonTokenType.Number:
-                    return ConvertInteger(reader.GetInt32());
+                    return ConvertFromInteger(reader.GetInt32());
                 case JsonTokenType.Null:
                     return default;
                 default:
                     throw new InvalidOperationException($"Unexpected JSON token: {reader.TokenType}");
             }
-        }
-
-        private static TEnum ConvertInteger(int integer)
-        {
-            if (!TryConvertToEnum(integer, out var value))
-            {
-                throw new InvalidOperationException($"Integer can't be converted to enum {value.GetType().FullName}.");
-            }
-
-            return value;
         }
 
         private static EnumDescriptor? ResolveEnumDescriptor(Type typeToConvert)
@@ -77,11 +68,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
         {
             if (_settings.FormatEnumsAsIntegers)
             {
-                if (!TryConvertToInteger(value, out var integer))
-                {
-                    throw new InvalidOperationException($"Enum {value.GetType().FullName} can't be converted to integer.");
-                }
-                writer.WriteNumberValue(integer);
+                writer.WriteNumberValue(ConvertToInteger(value));
             }
             else
             {
@@ -92,9 +79,29 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
                 }
                 else
                 {
-                    writer.WriteNumberValue((int)(object)value);
+                    writer.WriteNumberValue(ConvertToInteger(value));
                 }
             }
+        }
+
+        private static TEnum ConvertFromInteger(int integer)
+        {
+            if (!TryConvertToEnum(integer, out var value))
+            {
+                throw new InvalidOperationException($"Integer can't be converted to enum {typeof(TEnum).FullName}.");
+            }
+
+            return value;
+        }
+
+        private static int ConvertToInteger(TEnum value)
+        {
+            if (!TryConvertToInteger(value, out var integer))
+            {
+                throw new InvalidOperationException($"Enum {typeof(TEnum).FullName} can't be converted to integer.");
+            }
+
+            return integer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -110,7 +117,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryConvertToEnum(int integer, out TEnum value)
+        private static bool TryConvertToEnum(int integer, [NotNullWhen(true)] out TEnum? value)
         {
             if (Unsafe.SizeOf<int>() == Unsafe.SizeOf<TEnum>())
             {
