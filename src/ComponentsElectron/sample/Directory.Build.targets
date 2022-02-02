@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project>
-  <!-- Don't chain imports, because this sample needs to build independently of repo conventions -->
-  <!-- However we do need the workarounds, because we're still using the repo's SDK -->
-  <Target Name="GenerateSourceLinkFile" />
-  <Import Project="..\Workarounds.targets" />
-</Project>
