@@ -3,11 +3,13 @@
 
 using System;
 using System.Reflection;
+using System.Text.Json;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +24,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
+        private readonly JsonSerializerOptions _serializerOptions;
 
         public HttpApiServiceMethodProvider(
             ILoggerFactory loggerFactory,
@@ -38,6 +41,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _loggerFactory = loggerFactory;
             _serviceProvider = serviceProvider;
             _serviceActivator = serviceActivator;
+            _serializerOptions = JsonConverterHelper.CreateSerializerOptions(_httpApiOptions.JsonSettings);
         }
 
         public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TService> context)
@@ -71,7 +75,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                         _serviceProvider,
                         _loggerFactory,
                         _serviceActivator,
-                        _httpApiOptions);
+                        _httpApiOptions,
+                        _serializerOptions);
 
                     try
                     {

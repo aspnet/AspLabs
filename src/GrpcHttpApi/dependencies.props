@@ -5,7 +5,7 @@
 
   <PropertyGroup>
     <GoogleApiCommonProtosPackageVersion>2.2.0</GoogleApiCommonProtosPackageVersion>
-    <GoogleProtobufPackageVersion>3.14.0</GoogleProtobufPackageVersion>
+    <GoogleProtobufPackageVersion>3.18.0</GoogleProtobufPackageVersion>
     <GrpcAspNetCoreServerPackageVersion>2.33.1</GrpcAspNetCoreServerPackageVersion>
     <GrpcCorePackageVersion>2.33.1</GrpcCorePackageVersion>
     <NUnitPackageVersion>3.12.0</NUnitPackageVersion>
