@@ -8,6 +8,7 @@ using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
 using Grpc.Shared.HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -77,6 +78,11 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                 ModelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(methodDescriptor.OutputType.ClrType)),
                 StatusCode = 200
             });
+            var explorerSettings = routeEndpoint.Metadata.GetMetadata<ApiExplorerSettingsAttribute>();
+            if (explorerSettings != null)
+            {
+                apiDescription.GroupName = explorerSettings.GroupName;
+            }
 
             var methodMetadata = routeEndpoint.Metadata.GetMetadata<GrpcMethodMetadata>()!;
             var routeParameters = ServiceDescriptorHelpers.ResolveRouteParameterDescriptors(routeEndpoint.RoutePattern, methodDescriptor.InputType);

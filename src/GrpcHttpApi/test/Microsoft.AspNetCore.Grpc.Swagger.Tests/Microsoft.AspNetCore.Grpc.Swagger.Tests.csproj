@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Proto\counter.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Proto\counter.proto" GrpcServices="Both" />
     <Protobuf Include="Proto\xmldoc.proto" GrpcServices="Both" />
     <Protobuf Include="Proto\greeter.proto" GrpcServices="Both" />
     <Protobuf Include="Proto\messages.proto" GrpcServices="Both" />
