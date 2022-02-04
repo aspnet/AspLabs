@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -11,15 +11,8 @@
 
     <PackageReference Include="Grpc.Tools" Version="2.29.0" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="2.29.0" />
-    <!--<PackageReference Include="Microsoft.AspNetCore.Grpc.HttpApi" Version="0.1.0-alpha.20305.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.1.0-alpha.20305.2" />-->
-  </ItemGroup>
-
-  <ItemGroup>
-    <!--<ProjectReference Include="..\..\..\..\..\Swashbuckle.AspNetCore\src\Swashbuckle.AspNetCore.SwaggerUI\Swashbuckle.AspNetCore.SwaggerUI.csproj" />-->
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.Swagger\Microsoft.AspNetCore.Grpc.Swagger.csproj" />
-    <!--<ProjectReference Include="..\..\test\Microsoft.AspNetCore.Grpc.Swagger.Tests\Microsoft.AspNetCore.Grpc.Swagger.Tests.csproj" />-->
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.HttpApi" Version="0.1.0-alpha.20305.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.1.0-alpha.20305.2" />
   </ItemGroup>
 
 </Project>
