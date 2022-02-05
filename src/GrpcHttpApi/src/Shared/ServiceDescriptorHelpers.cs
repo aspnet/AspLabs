@@ -116,10 +116,13 @@ namespace Grpc.Shared.HttpApi
                     {
                         if (value is string s)
                         {
-                            var enumValueDescriptor = descriptor.EnumType.FindValueByName(s);
+                            var enumValueDescriptor = int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
+                                ? descriptor.EnumType.FindValueByNumber(i)
+                                : descriptor.EnumType.FindValueByName(s);
+
                             if (enumValueDescriptor == null)
                             {
-                                throw new InvalidOperationException($"Invalid enum value '{s}' for enum type {descriptor.EnumType.Name}.");
+                                throw new InvalidOperationException($"Invalid value '{s}' for enum type {descriptor.EnumType.Name}.");
                             }
 
                             return enumValueDescriptor.Number;
