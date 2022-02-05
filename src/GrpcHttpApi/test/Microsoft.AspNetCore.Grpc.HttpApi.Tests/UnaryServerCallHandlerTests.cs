@@ -742,7 +742,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         [InlineData("2", HelloRequest.Types.DataTypes.Types.NestedEnum.Bar)]
         [InlineData("3", HelloRequest.Types.DataTypes.Types.NestedEnum.Baz)]
         [InlineData("-1", HelloRequest.Types.DataTypes.Types.NestedEnum.Neg)]
-        [InlineData("99", (HelloRequest.Types.DataTypes.Types.NestedEnum)99)]
         public async Task HandleCallAsync_IntegerEnum_SetOnRequestMessage(string value, HelloRequest.Types.DataTypes.Types.NestedEnum expectedEnum)
         {
             var request = await ExecuteUnaryHandler(httpContext =>
