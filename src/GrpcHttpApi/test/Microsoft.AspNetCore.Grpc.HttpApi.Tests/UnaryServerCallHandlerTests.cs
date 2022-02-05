@@ -24,6 +24,7 @@ using HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Xunit;
@@ -733,6 +734,64 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal(new byte[] { 1, 2, 3 }, request!.Data.SingleBytes.ToByteArray());
             Assert.Equal(HelloRequest.Types.DataTypes.Types.NestedEnum.Foo, request!.Data.SingleEnum);
             Assert.Equal("Nested string", request!.Data.SingleMessage.Subfield);
+        }
+
+        [Theory]
+        [InlineData("0", HelloRequest.Types.DataTypes.Types.NestedEnum.Unspecified)]
+        [InlineData("1", HelloRequest.Types.DataTypes.Types.NestedEnum.Foo)]
+        [InlineData("2", HelloRequest.Types.DataTypes.Types.NestedEnum.Bar)]
+        [InlineData("3", HelloRequest.Types.DataTypes.Types.NestedEnum.Baz)]
+        [InlineData("-1", HelloRequest.Types.DataTypes.Types.NestedEnum.Neg)]
+        [InlineData("99", (HelloRequest.Types.DataTypes.Types.NestedEnum)99)]
+        public async Task HandleCallAsync_IntegerEnum_SetOnRequestMessage(string value, HelloRequest.Types.DataTypes.Types.NestedEnum expectedEnum)
+        {
+            var request = await ExecuteUnaryHandler(httpContext =>
+            {
+                httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+                {
+                    ["data.single_enum"] = value
+                });
+            });
+
+            // Assert
+            Assert.Equal(expectedEnum, request.Data.SingleEnum);
+        }
+
+        [Theory]
+        [InlineData("99")]
+        [InlineData("INVALID")]
+        public async Task HandleCallAsync_InvalidEnum_Error(string value)
+        {
+            await ExceptionAssert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await ExecuteUnaryHandler(httpContext =>
+                {
+                    httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+                    {
+                        ["data.single_enum"] = value
+                    });
+                });
+            }, $"Invalid value '{value}' for enum type NestedEnum.");
+        }
+
+        private static async Task<HelloRequest> ExecuteUnaryHandler(Action<HttpContext> configureHttpContext)
+        {
+            // Arrange
+            HelloRequest? request = null;
+            UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>
+            {
+                request = r;
+                return Task.FromResult(new HelloReply());
+            };
+
+            var unaryServerCallHandler = CreateCallHandler(invoker);
+            var httpContext = CreateHttpContext();
+            configureHttpContext(httpContext);
+
+            // Act
+            await unaryServerCallHandler.HandleCallAsync(httpContext);
+            Assert.NotNull(request);
+            return request!;
         }
 
         [Fact]
