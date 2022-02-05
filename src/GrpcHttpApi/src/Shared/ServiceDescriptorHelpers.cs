@@ -116,7 +116,7 @@ namespace Grpc.Shared.HttpApi
                     {
                         if (value is string s)
                         {
-                            var enumValueDescriptor = int.TryParse(s, out var i)
+                            var enumValueDescriptor = int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
                                 ? descriptor.EnumType.FindValueByNumber(i)
                                 : descriptor.EnumType.FindValueByName(s);
 
