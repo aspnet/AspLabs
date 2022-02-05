@@ -3,91 +3,9 @@
 
 syntax = "proto3";
 
-import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
-package http_api;
-
-service HttpApiGreeter {
-  rpc SayHello (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/SayHello/{name}"
-    };
-  }
-  rpc ResponseBody (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/ResponseBody/{name}"
-      response_body: "message"
-    };
-  }
-  rpc Custom (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      custom: {
-        kind: "HEAD",
-        path: "/v1/greeter/Custom/{name}"
-      }
-    };
-  }
-  rpc AdditionalBindings (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/additional_bindings/{name}"
-      additional_bindings {
-        delete: "/v1/additional_bindings/{name}"
-      }
-    };
-  }
-  rpc NoOption (HelloRequest) returns (HelloReply);
-  rpc ServerStreamingGetOption (HelloRequest) returns (stream HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/ServerStreamingGetOption/{name}"
-    };
-  }
-  rpc Body (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      post: "/v1/greeter/Body"
-      body: "*"
-    };
-  }
-  rpc SubBody (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      post: "/v1/greeter/SubBody"
-      body: "sub"
-    };
-  }
-  rpc SubRepeatedBody (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      post: "/v1/greeter/SubRepeatedBody"
-      body: "repeated_strings"
-    };
-  }
-}
-
-service HttpApiInvalidResponseBodyGreeter {
-  rpc BadResponseBody (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/BadResponseBody/{name}"
-      response_body: "NoMatch"
-    };
-  }
-}
-
-service HttpApiInvalidBodyGreeter {
-  rpc BadBody (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/BadBody/{name}"
-      body: "NoMatch"
-    };
-  }
-}
-
-service HttpApiInvalidPatternGreeter {
-  rpc BadPattern (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "v1/greeter/BadPattern/{name}"
-      body: "NoMatch"
-    };
-  }
-}
+package messages;
 
 message HelloRequest {
   message SubMessage {

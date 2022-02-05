@@ -5,10 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Google.Api;
 using Google.Protobuf.Reflection;
+using Grpc.AspNetCore.Server;
 using Grpc.Shared.HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Routing;
@@ -64,7 +67,8 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                     // Swagger uses this to group endpoints together.
                     // Group methods together using the service name.
                     ["controller"] = methodDescriptor.Service.FullName
-                }
+                },
+                EndpointMetadata = routeEndpoint.Metadata.ToList()
             };
             apiDescription.RelativePath = pattern.TrimStart('/');
             apiDescription.SupportedRequestFormats.Add(new ApiRequestFormat { MediaType = "application/json" });
@@ -74,30 +78,54 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                 ModelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(methodDescriptor.OutputType.ClrType)),
                 StatusCode = 200
             });
+            var explorerSettings = routeEndpoint.Metadata.GetMetadata<ApiExplorerSettingsAttribute>();
+            if (explorerSettings != null)
+            {
+                apiDescription.GroupName = explorerSettings.GroupName;
+            }
 
+            var methodMetadata = routeEndpoint.Metadata.GetMetadata<GrpcMethodMetadata>()!;
             var routeParameters = ServiceDescriptorHelpers.ResolveRouteParameterDescriptors(routeEndpoint.RoutePattern, methodDescriptor.InputType);
 
             foreach (var routeParameter in routeParameters)
             {
                 var field = routeParameter.Value.Last();
+                var parameterName = ServiceDescriptorHelpers.FormatUnderscoreName(field.Name, pascalCase: true, preservePeriod: false);
+                var propertyInfo = field.ContainingType.ClrType.GetProperty(parameterName);
+
+                // If from a property, create model as property to get its XML comments.
+                var identity = propertyInfo != null
+                    ? ModelMetadataIdentity.ForProperty(propertyInfo, MessageDescriptorHelpers.ResolveFieldType(field), field.ContainingType.ClrType)
+                    : ModelMetadataIdentity.ForType(MessageDescriptorHelpers.ResolveFieldType(field));
 
                 apiDescription.ParameterDescriptions.Add(new ApiParameterDescription
                 {
                     Name = routeParameter.Key,
-                    ModelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(MessageDescriptorHelpers.ResolveFieldType(field))),
+                    ModelMetadata = new GrpcModelMetadata(identity),
                     Source = BindingSource.Path,
                     DefaultValue = string.Empty
                 });
             }
 
-            ServiceDescriptorHelpers.ResolveBodyDescriptor(httpRule.Body, methodDescriptor, out var bodyDescriptor, out _, out _);
+            var bodyDescriptor = ServiceDescriptorHelpers.ResolveBodyDescriptor(httpRule.Body, methodMetadata.ServiceType, methodDescriptor);
             if (bodyDescriptor != null)
             {
+                // If from a property, create model as property to get its XML comments.
+                var identity = bodyDescriptor.PropertyInfo != null
+                    ? ModelMetadataIdentity.ForProperty(bodyDescriptor.PropertyInfo, bodyDescriptor.Descriptor.ClrType, bodyDescriptor.PropertyInfo.DeclaringType!)
+                    : ModelMetadataIdentity.ForType(bodyDescriptor.Descriptor.ClrType);
+
+                // Or if from a parameter, create model as parameter to get its XML comments.
+                var parameterDescriptor = bodyDescriptor.ParameterInfo != null
+                    ? new ControllerParameterDescriptor { ParameterInfo = bodyDescriptor.ParameterInfo }
+                    : null;
+
                 apiDescription.ParameterDescriptions.Add(new ApiParameterDescription
                 {
                     Name = "Input",
-                    ModelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(bodyDescriptor.ClrType)),
-                    Source = BindingSource.Body
+                    ModelMetadata = new GrpcModelMetadata(identity),
+                    Source = BindingSource.Body,
+                    ParameterDescriptor = parameterDescriptor!
                 });
             }
 

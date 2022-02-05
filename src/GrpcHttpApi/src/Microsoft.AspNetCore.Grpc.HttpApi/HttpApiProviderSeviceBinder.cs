@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 var routePattern = RoutePatternFactory.Parse(pattern);
                 var routeParameterDescriptors = ServiceDescriptorHelpers.ResolveRouteParameterDescriptors(routePattern, methodDescriptor.InputType);
 
-                ServiceDescriptorHelpers.ResolveBodyDescriptor(body, methodDescriptor, out var bodyDescriptor, out var bodyFieldDescriptors, out var bodyDescriptorRepeated);
+                var bodyDescriptor = ServiceDescriptorHelpers.ResolveBodyDescriptor(body, typeof(TService), methodDescriptor);
 
                 FieldDescriptor? responseBodyDescriptor = null;
                 if (!string.IsNullOrEmpty(responseBody))
@@ -165,9 +165,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 var unaryServerCallHandler = new UnaryServerCallHandler<TService, TRequest, TResponse>(
                     unaryInvoker,
                     responseBodyDescriptor,
-                    bodyDescriptor,
-                    bodyDescriptorRepeated,
-                    bodyFieldDescriptors,
+                    bodyDescriptor?.Descriptor,
+                    bodyDescriptor?.IsDescriptorRepeated ?? false,
+                    bodyDescriptor?.FieldDescriptors,
                     routeParameterDescriptors,
                     _serializerOptions);
 
