@@ -1,19 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Adapters", "src\System.Web.Adapters.csproj", "{55C1BBE0-B922-46B0-8F2C-8472BC9A5F33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Web.Adapters", "src\System.Web.Adapters.csproj", "{55C1BBE0-B922-46B0-8F2C-8472BC9A5F33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Adapters.Tests", "test\System.Web.Adapters.Tests.csproj", "{DA28CCAB-3C88-46F1-B779-43C573ED49E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Web.Adapters.Tests", "test\System.Web.Adapters.Tests.csproj", "{DA28CCAB-3C88-46F1-B779-43C573ED49E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{95915611-30BF-4AFF-AE41-5CDC6F57DCF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary", "samples\ClassLibrary\ClassLibrary.csproj", "{11DD4D64-7A95-4635-A273-775715E18852}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreApp", "samples\CoreApp\CoreApp.csproj", "{86B0CBE2-E41C-4D1D-B849-436510A5809C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameworkApp", "samples\FrameworkApp\FrameworkApp.csproj", "{235137FE-04D5-4ADF-83D3-6D98A5BC3358}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{67BB2CCD-5EF4-4A0C-8272-C7219A3B02D2}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{55C1BBE0-B922-46B0-8F2C-8472BC9A5F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,5 +34,28 @@ Global
 		{DA28CCAB-3C88-46F1-B779-43C573ED49E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA28CCAB-3C88-46F1-B779-43C573ED49E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA28CCAB-3C88-46F1-B779-43C573ED49E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11DD4D64-7A95-4635-A273-775715E18852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11DD4D64-7A95-4635-A273-775715E18852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11DD4D64-7A95-4635-A273-775715E18852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11DD4D64-7A95-4635-A273-775715E18852}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86B0CBE2-E41C-4D1D-B849-436510A5809C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86B0CBE2-E41C-4D1D-B849-436510A5809C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86B0CBE2-E41C-4D1D-B849-436510A5809C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86B0CBE2-E41C-4D1D-B849-436510A5809C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{235137FE-04D5-4ADF-83D3-6D98A5BC3358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{235137FE-04D5-4ADF-83D3-6D98A5BC3358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{235137FE-04D5-4ADF-83D3-6D98A5BC3358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{235137FE-04D5-4ADF-83D3-6D98A5BC3358}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{11DD4D64-7A95-4635-A273-775715E18852} = {95915611-30BF-4AFF-AE41-5CDC6F57DCF7}
+		{86B0CBE2-E41C-4D1D-B849-436510A5809C} = {95915611-30BF-4AFF-AE41-5CDC6F57DCF7}
+		{235137FE-04D5-4ADF-83D3-6D98A5BC3358} = {95915611-30BF-4AFF-AE41-5CDC6F57DCF7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DABA3C65-9D74-4EB6-9B1C-730328710EAD}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,11 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Static user agent: @ClassLibrary.Helper.UserAgent</p>
+    <p>Method user agent: @ClassLibrary.Helper.GetUserAgent(HttpContext)</p>
+</div>

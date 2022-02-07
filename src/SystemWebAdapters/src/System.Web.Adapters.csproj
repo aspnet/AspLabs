@@ -1,12 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <InternalsVisibleTo Include="System.Web.Adapters.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TypeForwards.Framework.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <Compile Remove="**/*.cs" />
+    <Compile Include="TypeForwards.Framework.cs" />
+    <Reference Include="System.Web" />
   </ItemGroup>
 
 </Project>
