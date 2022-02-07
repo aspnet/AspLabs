@@ -1,6 +1,6 @@
 ﻿namespace System.Web
 {
-    public class SameSiteMode
+    public enum SameSiteMode
     {
     }
 }
