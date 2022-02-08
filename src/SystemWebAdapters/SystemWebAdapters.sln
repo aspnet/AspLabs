@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcApp", "samples\MvcApp\MvcApp.csproj", "{174A36F1-27ED-43FC-A3A1-00DA58C4E30C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcCoreApp", "samples\MvcCoreApp\MvcCoreApp.csproj", "{B1D06F62-B315-4ED8-8109-168B4D4E4B86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcCoreApp", "samples\MvcCoreApp\MvcCoreApp.csproj", "{B1D06F62-B315-4ED8-8109-168B4D4E4B86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

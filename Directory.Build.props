@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\AspNetCore.snk</AssemblyOriginatorKeyFile>
+    <!-- <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\AspNetCore.snk</AssemblyOriginatorKeyFile> -->
   </PropertyGroup>
 
   <PropertyGroup Label="Package and Assembly Metadata">

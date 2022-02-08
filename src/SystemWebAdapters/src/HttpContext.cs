@@ -9,8 +9,6 @@ namespace System.Web
 
         public HttpRequest Request => throw new NotImplementedException();
 
-#if NETCOREAPP
         public static implicit operator HttpContext(HttpContextCore context) => throw new NotImplementedException();
-#endif
     }
 }

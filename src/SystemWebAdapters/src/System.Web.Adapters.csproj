@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
@@ -10,7 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="TypeForwards.Framework.cs" />
+    <Compile Remove="Framework/**" />
+    <Compile Remove="NetStandard/**" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <Compile Remove="**/*" />
+    <Compile Include="NetStandard/**" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
@@ -22,9 +28,11 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-    <Compile Remove="**/*.cs" />
-    <Compile Include="TypeForwards.Framework.cs" />
+    <Compile Remove="**/*" />
+    <Compile Include="Framework/*.cs" />
     <Reference Include="System.Web" />
   </ItemGroup>
+
+  <Import Condition=" '$(TargetFramework)' == 'netcoreapp3.1' " Project="GenerateApis.targets" />
 
 </Project>
