@@ -4,33 +4,53 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Grpc.AspNetCore.Server;
 using Grpc.Core;
+using Grpc.Gateway.Runtime;
+using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
-    internal class HttpApiServerCallContext : ServerCallContext
+    internal class HttpApiServerCallContext : ServerCallContext, IServerCallContextFeature
     {
-        private readonly HttpContext _httpContext;
         private readonly string _methodFullName;
+
+        public HttpContext HttpContext { get; }
+        public MethodOptions Options { get; }
+        public bool IsJsonRequestContent { get; }
+        public Encoding RequestEncoding { get; }
+
+        internal ILogger Logger { get; }
+
         private string? _peer;
         private Metadata? _requestHeaders;
 
-        public HttpApiServerCallContext(HttpContext httpContext, string methodFullName)
+        public HttpApiServerCallContext(HttpContext httpContext, MethodOptions options, string methodFullName, ILogger logger)
         {
-            _httpContext = httpContext;
+            HttpContext = httpContext;
+            Options = options;
             _methodFullName = methodFullName;
+            Logger = logger;
+            IsJsonRequestContent = JsonRequestHelpers.HasJsonContentType(httpContext.Request, out var charset);
+            RequestEncoding = JsonRequestHelpers.GetEncodingFromCharset(charset) ?? Encoding.UTF8;
 
             // Add the HttpContext to UserState so GetHttpContext() continues to work
-            _httpContext.Items["__HttpContext"] = httpContext;
+            HttpContext.Items["__HttpContext"] = httpContext;
         }
+
+        public ServerCallContext ServerCallContext => this;
 
         protected override string MethodCore => _methodFullName;
 
-        protected override string HostCore => _httpContext.Request.Host.Value;
+        protected override string HostCore => HttpContext.Request.Host.Value;
 
         protected override string? PeerCore
         {
@@ -39,7 +59,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 // Follows the standard at https://github.com/grpc/grpc/blob/master/doc/naming.md
                 if (_peer == null)
                 {
-                    var connection = _httpContext.Connection;
+                    var connection = HttpContext.Connection;
                     if (connection.RemoteIpAddress != null)
                     {
                         switch (connection.RemoteIpAddress.AddressFamily)
@@ -62,6 +82,36 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
         }
 
+        internal Task ProcessHandlerErrorAsync(Exception ex, string method, JsonSerializerOptions options)
+        {
+            Status status;
+            if (ex is RpcException rpcException)
+            {
+                // RpcException is thrown by client code to modify the status returned from the server.
+                // Log the status and detail. Don't log the exception to reduce log verbosity.
+                GrpcServerLog.RpcConnectionError(Logger, rpcException.StatusCode, rpcException.Status.Detail);
+
+                status = rpcException.Status;
+            }
+            else
+            {
+                GrpcServerLog.ErrorExecutingServiceMethod(Logger, method, ex);
+
+                var message = ErrorMessageHelper.BuildErrorMessage("Exception was thrown by handler.", ex, Options.EnableDetailedErrors);
+
+                // Note that the exception given to status won't be returned to the client.
+                // It is still useful to set in case an interceptor accesses the status on the server.
+                status = new Status(StatusCode.Unknown, message, ex);
+            }
+
+            return JsonRequestHelpers.SendErrorResponse(HttpContext.Response, RequestEncoding, status, options);
+        }
+
+        internal Task EndCallAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         protected override DateTime DeadlineCore { get; }
 
         protected override Metadata RequestHeadersCore
@@ -72,7 +122,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 {
                     _requestHeaders = new Metadata();
 
-                    foreach (var header in _httpContext.Request.Headers)
+                    foreach (var header in HttpContext.Request.Headers)
                     {
                         // gRPC metadata contains a subset of the request headers
                         // Filter out pseudo headers (start with :) and other known headers
@@ -95,7 +145,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
         }
 
-        protected override CancellationToken CancellationTokenCore => _httpContext.RequestAborted;
+        protected override CancellationToken CancellationTokenCore => HttpContext.RequestAborted;
 
         protected override Metadata ResponseTrailersCore => throw new NotImplementedException();
 
@@ -109,7 +159,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         protected override AuthContext AuthContextCore => throw new NotImplementedException();
 
-        protected override IDictionary<object, object?> UserStateCore => _httpContext.Items;
+        protected override IDictionary<object, object?> UserStateCore => HttpContext.Items;
 
         protected override ContextPropagationToken CreatePropagationTokenCore(ContextPropagationOptions options)
         {
@@ -119,7 +169,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         protected override async Task WriteResponseHeadersAsyncCore(Metadata responseHeaders)
         {
             // Headers can only be written once. Throw on subsequent call to write response header instead of silent no-op.
-            if (_httpContext.Response.HasStarted)
+            if (HttpContext.Response.HasStarted)
             {
                 throw new InvalidOperationException("Response headers can only be sent once per call.");
             }
@@ -130,16 +180,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 {
                     if (entry.IsBinary)
                     {
-                        _httpContext.Response.Headers[entry.Key] = Convert.ToBase64String(entry.ValueBytes);
+                        HttpContext.Response.Headers[entry.Key] = Convert.ToBase64String(entry.ValueBytes);
                     }
                     else
                     {
-                        _httpContext.Response.Headers[entry.Key] = entry.Value;
+                        HttpContext.Response.Headers[entry.Key] = entry.Value;
                     }
                 }
             }
 
-            await _httpContext.Response.BodyWriter.FlushAsync();
+            await HttpContext.Response.BodyWriter.FlushAsync();
         }
     }
 }
