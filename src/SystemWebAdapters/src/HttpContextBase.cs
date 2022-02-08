@@ -5,11 +5,15 @@ namespace System.Web
 {
     public class HttpContextBase : IServiceProvider
     {
+        protected HttpContextBase()
+        {
+        }
+
         public virtual HttpRequestBase Request => throw new NotImplementedException();
 
         public virtual HttpResponseBase Response => throw new NotImplementedException();
 
-        public object GetService(Type serviceType)
+        public virtual object GetService(Type serviceType)
         {
             throw new NotImplementedException();
         }
