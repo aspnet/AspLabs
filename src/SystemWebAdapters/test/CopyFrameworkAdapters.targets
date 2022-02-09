@@ -1,0 +1,42 @@
+<Project>
+  <!-- This targets file sets up what is needed for the tests to verify that the framework version of the build has
+       the types forwarded to System.Web. In order to do that, we set up the following:
+
+       - Copy the .NET Framework build of the adapters into this project as content
+       - Copy the .NET Framework reference assemblies into the same directory
+
+       Once the files are available there, they can be loaded into a MetadataLoadContext to identify which types are forwarded.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="6.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <FrameworkAdapterDirectory>adapters/netfx/</FrameworkAdapterDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" PrivateAssets="All" Version="1.0.0" GeneratePathProperty="true" />
+    <Content Include="$(PkgMicrosoft_NETFramework_ReferenceAssemblies_net472)\build\.NETFramework\v4.7.2\**">
+      <Visible>false</Visible>
+      <Link>$(FrameworkAdapterDirectory)/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Get .NET Framework build of adapters to verify type forwards -->
+  <Target Name="_GetFrameworkAdapterAssembly" BeforeTargets="AssignTargetPaths">
+    <MSBuild Projects="..\src\System.Web.Adapters.csproj" Properties="TargetFramework=net472">
+      <Output TaskParameter="TargetOutputs" ItemName="AdapterFiles" />
+    </MSBuild>
+
+    <ItemGroup>
+      <Content Include="@(AdapterFiles)">
+        <Link>$(FrameworkAdapterDirectory)/$([System.IO.Path]::GetFileName(%(Identity)))</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+  </Target>
+</Project>

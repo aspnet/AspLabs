@@ -1,12 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
+    <LangVersion>10</LangVersion>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <InternalsVisibleTo Include="System.Web.Adapters.Tests" />
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <Compile Remove="**/*" />
+    <Compile Include="NetStandard/**" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <Compile Remove="Framework/**" />
+    <Compile Remove="NetStandard/**" />
+
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <Compile Remove="**/*" />
+    <Compile Include="Framework/*.cs" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <Import Condition=" '$(TargetFramework)' == 'netcoreapp3.1' " Project="GenerateApis.targets" />
 
 </Project>
