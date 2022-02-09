@@ -13,7 +13,6 @@ namespace System.Web
         public System.Web.HttpRequest Request { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Web.HttpResponse Response { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Web.HttpServerUtility Server { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public System.Web.SessionState.HttpSessionState Session { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Security.Principal.IPrincipal User { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public object GetService(System.Type serviceType) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
@@ -24,7 +23,6 @@ namespace System.Web
         public virtual System.Web.HttpRequestBase Request { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual System.Web.HttpResponseBase Response { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Web.HttpServerUtilityBase Server { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public System.Web.HttpSessionStateBase Session { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual System.Security.Principal.IPrincipal User { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual object GetService(System.Type serviceType) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
@@ -189,28 +187,6 @@ namespace System.Web
         public virtual byte[] UrlTokenDecode(string input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual string UrlTokenEncode(byte[] input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
-    public abstract partial class HttpSessionStateBase : System.Collections.ICollection, System.Collections.IEnumerable
-    {
-        protected HttpSessionStateBase() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual System.Web.HttpSessionStateBase Contents { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual bool IsSynchronized { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual object this[int index] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual System.Collections.Specialized.NameObjectCollectionBase.KeysCollection Keys { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual object SyncRoot { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual int Timeout { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public virtual void Abandon() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void Add(string name, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void Clear() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void CopyTo(System.Array array, int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual System.Collections.IEnumerator GetEnumerator() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public virtual void RemoveAt(int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-    }
     public enum SameSiteMode
     {
     }
@@ -226,29 +202,5 @@ namespace System.Web.Caching
         public object Get(string key) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Insert(string key, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public object Remove(string key) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-    }
-}
-namespace System.Web.SessionState
-{
-    public partial class HttpSessionState : System.Collections.ICollection, System.Collections.IEnumerable
-    {
-        public HttpSessionState() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public System.Web.HttpSessionStateBase Contents { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public bool IsSynchronized { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public object this[int index] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public System.Collections.Specialized.NameObjectCollectionBase.KeysCollection Keys { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public object SyncRoot { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public int Timeout { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public void Abandon() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void Add(string name, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void Clear() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void CopyTo(System.Array array, int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public System.Collections.IEnumerator GetEnumerator() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-        public void RemoveAt(int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
 }

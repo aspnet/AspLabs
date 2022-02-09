@@ -9,7 +9,5 @@
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpResponseBase))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpServerUtility))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpServerUtilityBase))]
-[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpSessionStateBase))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.SameSiteMode))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Caching.Cache))]
-[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.SessionState.HttpSessionState))]
