@@ -4,7 +4,6 @@
 using System.Collections;
 using System.Security.Principal;
 using System.Web.Caching;
-using System.Web.SessionState;
 
 namespace System.Web
 {
@@ -19,8 +18,6 @@ namespace System.Web
         public IDictionary Items => throw new NotImplementedException();
 
         public HttpServerUtility Server => throw new NotImplementedException();
-
-        public HttpSessionState Session => throw new NotImplementedException();
 
         public Cache Cache => throw new NotImplementedException();
 

@@ -24,8 +24,6 @@ namespace System.Web
             set => throw new NotImplementedException();
         }
 
-        public HttpSessionStateBase Session => throw new NotImplementedException();
-
         public HttpServerUtilityBase Server => throw new NotImplementedException();
 
         public virtual object GetService(Type serviceType)
