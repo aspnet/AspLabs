@@ -2,8 +2,6 @@
   "solution": {
     "path": "SystemWebAdapters.sln",
     "projects": [
-      "samples\\ClassLibrary\\ClassLibrary.csproj",
-      "samples\\MvcCoreApp\\MvcCoreApp.csproj",
       "src\\System.Web.Adapters.csproj",
       "test\\System.Web.Adapters.Tests.csproj"
     ]
