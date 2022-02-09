@@ -13,6 +13,6 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\RateLimiting\RateLimiting.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\SystemWebAdapters\SystemWebAdapters.sln" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\SystemWebAdapters\SystemWebAdapters.slnf" />
   </ItemGroup>
 </Project>
