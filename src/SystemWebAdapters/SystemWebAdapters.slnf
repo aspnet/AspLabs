@@ -1,0 +1,9 @@
+{
+  "solution": {
+    "path": "SystemWebAdapters.sln",
+    "projects": [
+      "src\\System.Web.Adapters.csproj",
+      "test\\System.Web.Adapters.Tests.csproj"
+    ]
+  }
+}

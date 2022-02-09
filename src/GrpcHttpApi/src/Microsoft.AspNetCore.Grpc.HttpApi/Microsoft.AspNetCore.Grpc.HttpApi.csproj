@@ -14,6 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.HttpApi.Tests" />
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.Microbenchmarks" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Shared\Server\BindMethodFinder.cs" Link="Internal\Shared\Server\BindMethodFinder.cs" />
     <Compile Include="..\Shared\Server\ClientStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\ClientStreamingServerMethodInvoker.cs" />
     <Compile Include="..\Shared\Server\DuplexStreamingServerMethodInvoker.cs" Link="Internal\Shared\Server\DuplexStreamingServerMethodInvoker.cs" />
