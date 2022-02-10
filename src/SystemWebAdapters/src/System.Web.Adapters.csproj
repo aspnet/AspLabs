@@ -5,6 +5,7 @@
     <LangVersion>10</LangVersion>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
+    <RootNamespace>System.Web</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

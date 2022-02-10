@@ -1,7 +1,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Web.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
@@ -75,5 +78,11 @@ namespace System.Web
 
         [return: NotNullIfNotNull("response")]
         internal static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
+
+        internal static IDictionary AsNonGeneric(this IDictionary<object, object?> dictionary)
+         => dictionary is IDictionary d ? d : new NonGenericDictionaryWrapper(dictionary);
+
+        internal static ICollection AsNonGeneric<T>(this ICollection<T> collection)
+            => collection is ICollection c ? c : new NonGenericCollectionWrapper<T>(collection);
     }
 }
