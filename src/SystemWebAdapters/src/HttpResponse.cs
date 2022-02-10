@@ -2,12 +2,20 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace System.Web
 {
     public class HttpResponse
     {
+        private readonly HttpResponseCore _response;
+
+        public HttpResponse(HttpResponseCore response)
+        {
+            _response = response;
+        }
+
         public int StatusCode
         {
             get => throw new NotImplementedException();
@@ -84,5 +92,11 @@ namespace System.Web
         public void ClearContent() => throw new NotImplementedException();
 
         public void Abort() => throw new NotImplementedException();
+
+        [return: NotNullIfNotNull("response")]
+        public static implicit operator HttpResponse?(HttpResponseCore? response) => response?.GetAdapter();
+
+        [return: NotNullIfNotNull("response")]
+        public static implicit operator HttpResponseCore?(HttpResponse? response) => response?._response;
     }
 }

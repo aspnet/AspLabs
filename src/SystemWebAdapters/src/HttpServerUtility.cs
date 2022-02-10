@@ -5,6 +5,13 @@ namespace System.Web
 {
     public class HttpServerUtility
     {
+        private readonly HttpContextCore _context;
+
+        public HttpServerUtility(HttpContextCore context)
+        {
+            _context = context;
+        }
+
         public string MachineName => throw new NotImplementedException();
 
         public string MapPath(string path) => throw new NotImplementedException();

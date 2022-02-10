@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Principal;
 using System.Text;
@@ -10,6 +11,13 @@ namespace System.Web
 {
     public class HttpRequest
     {
+        private readonly HttpRequestCore _request;
+
+        public HttpRequest(HttpRequestCore request)
+        {
+            _request = request;
+        }
+
         public string Path => throw new NotImplementedException();
 
         public NameValueCollection Headers => throw new NotImplementedException();
@@ -24,7 +32,7 @@ namespace System.Web
 
         public string[] UserLanguages => throw new NotImplementedException();
 
-        public string UserAgent => throw new NotImplementedException();
+        public string UserAgent => _request.Headers["User-Agent"];
 
         public string RequestType => HttpMethod;
 
@@ -71,5 +79,11 @@ namespace System.Web
         public byte[] BinaryRead(int count) => throw new NotImplementedException();
 
         public void Abort() => throw new NotImplementedException();
+
+        [return: NotNullIfNotNull("request")]
+        public static implicit operator HttpRequest?(HttpRequestCore? request) => request.GetAdapter();
+
+        [return: NotNullIfNotNull("request")]
+        public static implicit operator HttpRequestCore?(HttpRequest? request) => request?._request;
     }
 }
