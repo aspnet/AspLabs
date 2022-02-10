@@ -12,8 +12,6 @@ M:System.Web.HttpResponse.#ctor(Microsoft.AspNetCore.Http.HttpResponse)
 M:System.Web.HttpResponse.op_Implicit(Microsoft.AspNetCore.Http.HttpResponse)~System.Web.HttpResponse
 M:System.Web.HttpResponse.op_Implicit(System.Web.HttpResponse)~Microsoft.AspNetCore.Http.HttpResponse
 
-T:System.Web.SystemWebAdaptersExtensions
-
 M:System.Web.SessionState.HttpSessionState.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 
 M:System.Web.HttpServerUtility.#ctor(Microsoft.AspNetCore.Http.HttpContext)

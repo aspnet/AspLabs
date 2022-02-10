@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace System.Web
 {
-    public static class SystemWebAdaptersExtensions
+    internal static class SystemWebAdaptersExtensions
     {
         [return: NotNullIfNotNull("context")]
         public static HttpContext? GetAdapter(this HttpContextCore? context)
