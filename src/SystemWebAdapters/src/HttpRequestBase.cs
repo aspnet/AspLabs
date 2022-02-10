@@ -35,7 +35,6 @@ namespace System.Web
         public virtual string ContentType
         {
             get => throw new NotImplementedException();
-
             set => throw new NotImplementedException();
         }
 
