@@ -2,13 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
 {
-    internal static class SystemWebAdaptersExtensions
+    public static class SystemWebAdaptersExtensions
     {
+        public static void AddSystemWebAdapters(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+        }
+
         [return: NotNullIfNotNull("context")]
-        public static HttpContext? GetAdapter(this HttpContextCore? context)
+        internal static HttpContext? GetAdapter(this HttpContextCore? context)
         {
             if (context is null)
             {
@@ -27,10 +33,10 @@ namespace System.Web
         }
 
         [return: NotNullIfNotNull("context")]
-        public static HttpContextCore? UnwrapAdapter(this HttpContext? context) => context;
+        internal static HttpContextCore? UnwrapAdapter(this HttpContext? context) => context;
 
         [return: NotNullIfNotNull("context")]
-        public static HttpContextBase? GetAdapterBase(this HttpContextCore? context)
+        internal static HttpContextBase? GetAdapterBase(this HttpContextCore? context)
         {
             if (context is null)
             {
@@ -49,25 +55,25 @@ namespace System.Web
         }
 
         [return: NotNullIfNotNull("request")]
-        public static HttpRequest? GetAdapter(this HttpRequestCore? request)
+        internal static HttpRequest? GetAdapter(this HttpRequestCore? request)
             => request?.HttpContext.GetAdapter().Request;
 
         [return: NotNullIfNotNull("request")]
-        public static HttpRequestBase? GetAdapterBase(this HttpRequestCore? request)
+        internal static HttpRequestBase? GetAdapterBase(this HttpRequestCore? request)
             => request?.HttpContext.GetAdapterBase().Request;
 
         [return: NotNullIfNotNull("request")]
-        public static HttpRequestCore? UnwrapAdapter(this HttpRequest? request) => request;
+        internal static HttpRequestCore? UnwrapAdapter(this HttpRequest? request) => request;
 
         [return: NotNullIfNotNull("response")]
-        public static HttpResponse? GetAdapter(this HttpResponseCore? response)
+        internal static HttpResponse? GetAdapter(this HttpResponseCore? response)
             => response?.HttpContext.GetAdapter().Response;
 
         [return: NotNullIfNotNull("request")]
-        public static HttpResponseBase? GetAdapterBase(this HttpResponseCore? response)
+        internal static HttpResponseBase? GetAdapterBase(this HttpResponseCore? response)
             => response?.HttpContext.GetAdapterBase().Response;
 
         [return: NotNullIfNotNull("response")]
-        public static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
+        internal static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
     }
 }
