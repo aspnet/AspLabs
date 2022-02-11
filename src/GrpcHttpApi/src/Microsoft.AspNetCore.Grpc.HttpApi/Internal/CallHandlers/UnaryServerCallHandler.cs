@@ -4,7 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -12,10 +11,8 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
-using Grpc.Gateway.Runtime;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
-using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -84,6 +81,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers
                         {
                             requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
 
+                            // TODO: JsonSerializer currently doesn't support deserializing values onto an existing object or collection.
+                            // Either update this to use new functionality in JsonSerializer or improve work-around perf.
                             var type = JsonConverterHelper.GetFieldType(_descriptorInfo.BodyFieldDescriptors!.Last());
                             var listType = typeof(List<>).MakeGenericType(type);
 
