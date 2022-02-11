@@ -46,103 +46,125 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers
             var requestMessage = (TRequest)await CreateMessage(serverCallContext);
 
             var responseMessage = await _unaryMethodInvoker.Invoke(httpContext, serverCallContext, requestMessage);
+
             if (serverCallContext.Status.StatusCode != StatusCode.OK)
             {
                 throw new RpcException(serverCallContext.Status);
             }
 
-            GrpcServerLog.SendingMessage(Logger);
+            if (responseMessage == null)
+            {
+                // This is consistent with Grpc.Core when a null value is returned
+                throw new RpcException(new Status(StatusCode.Cancelled, "No message returned from method."));
+            }
 
             await SendResponse(httpContext.Response, serverCallContext.RequestEncoding, responseMessage);
         }
 
         private async Task<IMessage> CreateMessage(HttpApiServerCallContext serverCallContext)
         {
-            IMessage requestMessage;
-
-            if (_descriptorInfo.BodyDescriptor != null)
+            try
             {
-                if (!serverCallContext.IsJsonRequestContent)
-                {
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Request content-type of application/json is required."));
-                }
+                GrpcServerLog.ReadingMessage(Logger);
 
-                var (stream, usesTranscodingStream) = JsonRequestHelpers.GetStream(serverCallContext.HttpContext.Request.Body, serverCallContext.RequestEncoding);
-
-                try
+                IMessage requestMessage;
+                if (_descriptorInfo.BodyDescriptor != null)
                 {
-                    if (_descriptorInfo.BodyDescriptorRepeated)
+                    if (!serverCallContext.IsJsonRequestContent)
                     {
-                        requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                        var repeatedContent = await ParseRepeatedContentAsync(stream);
-
-                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _descriptorInfo.BodyFieldDescriptors!, repeatedContent);
+                        GrpcServerLog.UnsupportedRequestContentType(Logger, serverCallContext.HttpContext.Request.ContentType);
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Request content-type of application/json is required."));
                     }
-                    else
+
+                    var (stream, usesTranscodingStream) = JsonRequestHelpers.GetStream(serverCallContext.HttpContext.Request.Body, serverCallContext.RequestEncoding);
+
+                    try
                     {
-                        IMessage bodyContent;
-
-                        try
-                        {
-                            bodyContent = (IMessage)(await JsonSerializer.DeserializeAsync(stream, _descriptorInfo.BodyDescriptor.ClrType, SerializerOptions))!;
-                        }
-                        catch (JsonException)
-                        {
-                            throw new RpcException(new Status(StatusCode.InvalidArgument, "Request JSON payload is not correctly formatted."));
-                        }
-                        catch (Exception exception)
-                        {
-                            throw new RpcException(new Status(StatusCode.InvalidArgument, exception.Message));
-                        }
-
-                        if (_descriptorInfo.BodyFieldDescriptors != null)
+                        if (_descriptorInfo.BodyDescriptorRepeated)
                         {
                             requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _descriptorInfo.BodyFieldDescriptors, bodyContent!); // TODO - check nullability
+
+                            var type = JsonConverterHelper.GetFieldType(_descriptorInfo.BodyFieldDescriptors!.Last());
+                            var listType = typeof(List<>).MakeGenericType(type);
+
+                            GrpcServerLog.DeserializingMessage(Logger, listType);
+                            var repeatedContent = (IList)(await JsonSerializer.DeserializeAsync(stream, listType, SerializerOptions))!;
+
+                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _descriptorInfo.BodyFieldDescriptors!, repeatedContent);
                         }
                         else
                         {
-                            requestMessage = bodyContent;
+                            IMessage bodyContent;
+
+                            try
+                            {
+                                GrpcServerLog.DeserializingMessage(Logger, _descriptorInfo.BodyDescriptor.ClrType);
+                                bodyContent = (IMessage)(await JsonSerializer.DeserializeAsync(stream, _descriptorInfo.BodyDescriptor.ClrType, SerializerOptions))!;
+                            }
+                            catch (JsonException)
+                            {
+                                throw new RpcException(new Status(StatusCode.InvalidArgument, "Request JSON payload is not correctly formatted."));
+                            }
+                            catch (Exception exception)
+                            {
+                                throw new RpcException(new Status(StatusCode.InvalidArgument, exception.Message));
+                            }
+
+                            if (_descriptorInfo.BodyFieldDescriptors != null)
+                            {
+                                requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                                ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, _descriptorInfo.BodyFieldDescriptors, bodyContent!); // TODO - check nullability
+                            }
+                            else
+                            {
+                                requestMessage = bodyContent;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (usesTranscodingStream)
+                        {
+                            await stream.DisposeAsync();
                         }
                     }
                 }
-                finally
+                else
                 {
-                    if (usesTranscodingStream)
+                    requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
+                }
+
+                foreach (var parameterDescriptor in _descriptorInfo.RouteParameterDescriptors)
+                {
+                    var routeValue = serverCallContext.HttpContext.Request.RouteValues[parameterDescriptor.Key];
+                    if (routeValue != null)
                     {
-                        await stream.DisposeAsync();
+                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, parameterDescriptor.Value, routeValue);
                     }
                 }
-            }
-            else
-            {
-                requestMessage = (IMessage)Activator.CreateInstance<TRequest>();
-            }
 
-            foreach (var parameterDescriptor in _descriptorInfo.RouteParameterDescriptors)
-            {
-                var routeValue = serverCallContext.HttpContext.Request.RouteValues[parameterDescriptor.Key];
-                if (routeValue != null)
+                foreach (var item in serverCallContext.HttpContext.Request.Query)
                 {
-                    ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, parameterDescriptor.Value, routeValue);
-                }
-            }
-
-            foreach (var item in serverCallContext.HttpContext.Request.Query)
-            {
-                if (CanBindQueryStringVariable(item.Key))
-                {
-                    var pathDescriptors = GetPathDescriptors(requestMessage, item.Key);
-
-                    if (pathDescriptors != null)
+                    if (CanBindQueryStringVariable(item.Key))
                     {
-                        object value = item.Value.Count == 1 ? (object)item.Value[0] : item.Value;
-                        ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, pathDescriptors, value);
+                        var pathDescriptors = GetPathDescriptors(requestMessage, item.Key);
+
+                        if (pathDescriptors != null)
+                        {
+                            object value = item.Value.Count == 1 ? (object)item.Value[0] : item.Value;
+                            ServiceDescriptorHelpers.RecursiveSetValue(requestMessage, pathDescriptors, value);
+                        }
                     }
                 }
-            }
 
-            return requestMessage;
+                GrpcServerLog.ReceivedMessage(Logger);
+                return requestMessage;
+            }
+            catch (Exception ex)
+            {
+                GrpcServerLog.ErrorReadingMessage(Logger, ex);
+                throw;
+            }
         }
 
         private List<FieldDescriptor>? GetPathDescriptors(IMessage requestMessage, string path)
@@ -154,27 +176,40 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers
             });
         }
 
-        private async ValueTask<IList> ParseRepeatedContentAsync(Stream inputStream)
-        {
-            var type = JsonConverterHelper.GetFieldType(_descriptorInfo.BodyFieldDescriptors!.Last());
-            var listType = typeof(List<>).MakeGenericType(type);
-
-            return (IList)(await JsonSerializer.DeserializeAsync(inputStream, listType, SerializerOptions))!;
-        }
-
         private async Task SendResponse(HttpResponse response, Encoding encoding, TResponse message)
         {
-            object responseBody = message;
-
-            if (_descriptorInfo.ResponseBodyDescriptor != null)
+            try
             {
-                responseBody = _descriptorInfo.ResponseBodyDescriptor.Accessor.GetValue((IMessage)responseBody);
+                GrpcServerLog.SendingMessage(Logger);
+
+                object responseBody;
+                Type responseType;
+
+                if (_descriptorInfo.ResponseBodyDescriptor != null)
+                {
+                    // TODO: Support recursive response body?
+                    responseBody = _descriptorInfo.ResponseBodyDescriptor.Accessor.GetValue((IMessage)message);
+                    responseType = JsonConverterHelper.GetFieldType(_descriptorInfo.ResponseBodyDescriptor);
+                }
+                else
+                {
+                    responseBody = message;
+                    responseType = message.GetType();
+                }
+
+                response.StatusCode = StatusCodes.Status200OK;
+                response.ContentType = MediaType.ReplaceEncoding("application/json", encoding);
+
+                await JsonRequestHelpers.WriteResponseMessage(response, encoding, responseBody, SerializerOptions);
+
+                GrpcServerLog.SerializedMessage(Logger, responseType);
+                GrpcServerLog.MessageSent(Logger);
             }
-
-            response.StatusCode = StatusCodes.Status200OK;
-            response.ContentType = MediaType.ReplaceEncoding("application/json", encoding);
-
-            await JsonRequestHelpers.WriteResponseMessage(response, encoding, responseBody, SerializerOptions);
+            catch (Exception ex)
+            {
+                GrpcServerLog.ErrorSendingMessage(Logger, ex);
+                throw;
+            }
         }
 
         private bool CanBindQueryStringVariable(string variable)
