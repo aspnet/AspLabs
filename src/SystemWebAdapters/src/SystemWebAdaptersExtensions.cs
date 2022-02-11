@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
@@ -11,6 +12,7 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddTransient<IStartupFilter, SystemWebStartupFilter>();
         }
 
         [return: NotNullIfNotNull("context")]
@@ -75,5 +77,18 @@ namespace System.Web
 
         [return: NotNullIfNotNull("response")]
         internal static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
+
+        internal static SystemWebAdapterMetadata GetMetadata(this HttpContextCore context)
+        {
+            var metadata = context.Features.Get<SystemWebAdapterMetadata>();
+
+            if (metadata is null)
+            {
+                metadata = new();
+                context.Features.Set(metadata);
+            }
+
+            return metadata;
+        }
     }
 }

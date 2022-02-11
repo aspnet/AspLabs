@@ -21,7 +21,7 @@ namespace System.Web
 
         public override byte[] BinaryRead(int count) => _request.BinaryRead(count);
 
-        public override Encoding ContentEncoding => _request.ContentEncoding;
+        public override Encoding? ContentEncoding => _request.ContentEncoding;
 
         public override int ContentLength => _request.ContentLength;
 
@@ -63,7 +63,7 @@ namespace System.Web
 
         public override string UserHostAddress => _request.UserHostAddress;
 
-        public override string UserHostName => _request.UserHostName;
+        public override string? UserHostName => _request.UserHostName;
 
         public override string[] UserLanguages => _request.UserLanguages;
     }

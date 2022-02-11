@@ -60,9 +60,9 @@ namespace System.Web
 
         public virtual IIdentity LogonUserIdentity => throw new NotImplementedException();
 
-        public virtual Encoding ContentEncoding => throw new NotImplementedException();
+        public virtual Encoding? ContentEncoding => throw new NotImplementedException();
 
-        public virtual string UserHostName => throw new NotImplementedException();
+        public virtual string? UserHostName => throw new NotImplementedException();
 
         public HttpBrowserCapabilities Browser => throw new NotImplementedException();
 
