@@ -14,6 +14,7 @@ using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 using Grpc.Shared.HttpApi;
 using Grpc.Shared.Server;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
         private readonly GrpcHttpApiOptions _httpApiOptions;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
         internal HttpApiProviderServiceBinder(
@@ -52,6 +54,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _serviceActivator = serviceActivator;
             _httpApiOptions = httpApiOptions;
             _serializerOptions = serializerOptions;
+            _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<HttpApiProviderServiceBinder<TService>>();
         }
 
@@ -161,14 +164,18 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                     }
                 }
 
-                var unaryInvoker = new UnaryServerMethodInvoker<TService, TRequest, TResponse>(invoker, method, methodContext, _serviceActivator);
-                var unaryServerCallHandler = new UnaryServerCallHandler<TService, TRequest, TResponse>(
-                    unaryInvoker,
+                var descriptorInfo = new CallHandlerDescriptorInfo(
                     responseBodyDescriptor,
                     bodyDescriptor?.Descriptor,
                     bodyDescriptor?.IsDescriptorRepeated ?? false,
                     bodyDescriptor?.FieldDescriptors,
-                    routeParameterDescriptors,
+                    routeParameterDescriptors);
+
+                var unaryInvoker = new UnaryServerMethodInvoker<TService, TRequest, TResponse>(invoker, method, methodContext, _serviceActivator);
+                var unaryServerCallHandler = new UnaryServerCallHandler<TService, TRequest, TResponse>(
+                    unaryInvoker,
+                    _loggerFactory,
+                    descriptorInfo,
                     _serializerOptions);
 
                 _context.AddMethod<TRequest, TResponse>(method, routePattern, metadata, unaryServerCallHandler.HandleCallAsync);

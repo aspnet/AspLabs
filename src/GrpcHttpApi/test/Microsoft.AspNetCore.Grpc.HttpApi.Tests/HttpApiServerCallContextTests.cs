@@ -3,11 +3,15 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
+using Grpc.AspNetCore.Server;
+using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
@@ -20,7 +24,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Arrange
             var cts = new CancellationTokenSource();
             var httpContext = CreateHttpContext(cancellationToken: cts.Token);
-            var serverCallContext = new HttpApiServerCallContext(httpContext, string.Empty);
+            var serverCallContext = CreateServerCallContext(httpContext);
 
             // Act
             var ct = serverCallContext.CancellationToken;
@@ -39,7 +43,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             httpContext.Request.Headers.Add("grpc-encoding", "identity");
             httpContext.Request.Headers.Add("grpc-timeout", "1S");
             httpContext.Request.Headers.Add("hello-bin", Convert.ToBase64String(new byte[] { 1, 2, 3 }));
-            var serverCallContext = new HttpApiServerCallContext(httpContext, string.Empty);
+            var serverCallContext = CreateServerCallContext(httpContext);
 
             // Act
             var headers = serverCallContext.RequestHeaders;
@@ -78,6 +82,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             public void Abort()
             {
             }
+        }
+
+        private static HttpApiServerCallContext CreateServerCallContext(DefaultHttpContext httpContext)
+        {
+            return new HttpApiServerCallContext(
+                httpContext,
+                MethodOptions.Create(Enumerable.Empty<GrpcServiceOptions>()),
+                string.Empty,
+                NullLogger.Instance);
         }
     }
 }
