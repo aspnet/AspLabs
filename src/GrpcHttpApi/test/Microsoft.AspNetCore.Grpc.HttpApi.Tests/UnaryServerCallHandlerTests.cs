@@ -24,6 +24,7 @@ using Grpc.Tests.Shared;
 using HttpApi;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
+using Microsoft.AspNetCore.Grpc.HttpApi.Tests.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Testing;
@@ -62,8 +63,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                     HelloRequest.Types.SubMessage.Descriptor.FindFieldByNumber(HelloRequest.Types.SubMessage.SubfieldFieldNumber)
                 })
             };
-            var unaryServerCallHandler = CreateCallHandler(invoker, routeParameterDescriptors: routeParameterDescriptors);
-            var httpContext = CreateHttpContext();
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(routeParameterDescriptors: routeParameterDescriptors);
+            var unaryServerCallHandler = CreateCallHandler(invoker, descriptorInfo: descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.RouteValues["name"] = "TestName!";
             httpContext.Request.RouteValues["sub.subfield"] = "Subfield!";
 
@@ -97,11 +99,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             {
                 ["name"] = new List<FieldDescriptor>(new[] { HelloRequest.Descriptor.FindFieldByNumber(HelloRequest.NameFieldNumber) })
             };
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(
+                responseBodyDescriptor: HelloReply.Descriptor.FindFieldByNumber(HelloReply.MessageFieldNumber),
+                routeParameterDescriptors: routeParameterDescriptors);
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                HelloReply.Descriptor.FindFieldByNumber(HelloReply.MessageFieldNumber),
-                routeParameterDescriptors);
-            var httpContext = CreateHttpContext();
+                descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.RouteValues["name"] = name;
 
             // Act
@@ -129,11 +133,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             {
                 ["name"] = new List<FieldDescriptor>(new[] { HelloRequest.Descriptor.FindFieldByNumber(HelloRequest.NameFieldNumber) })
             };
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(
+                responseBodyDescriptor: HelloReply.Descriptor.FindFieldByNumber(HelloReply.NullableMessageFieldNumber),
+                routeParameterDescriptors: routeParameterDescriptors);
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                HelloReply.Descriptor.FindFieldByNumber(HelloReply.NullableMessageFieldNumber),
-                routeParameterDescriptors);
-            var httpContext = CreateHttpContext();
+                descriptorInfo: descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.RouteValues["name"] = "Doesn't matter";
 
             // Act
@@ -160,8 +166,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                HelloReply.Descriptor.FindFieldByNumber(HelloReply.ValuesFieldNumber));
-            var httpContext = CreateHttpContext();
+                descriptorInfo: TestHelpers.CreateDescriptorInfo(responseBodyDescriptor: HelloReply.Descriptor.FindFieldByNumber(HelloReply.ValuesFieldNumber)));
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -190,8 +196,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                bodyDescriptor: HelloRequest.Descriptor);
-            var httpContext = CreateHttpContext();
+                descriptorInfo: TestHelpers.CreateDescriptorInfo(bodyDescriptor: HelloRequest.Descriptor));
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(JsonFormatter.Default.Format(new HelloRequest
             {
                 Name = "TestName!"
@@ -225,11 +231,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "sub", out var bodyFieldDescriptors);
 
-            var unaryServerCallHandler = CreateCallHandler(
-                invoker,
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(
                 bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
                 bodyFieldDescriptors: bodyFieldDescriptors);
-            var httpContext = CreateHttpContext();
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(JsonFormatter.Default.Format(new HelloRequest.Types.SubMessage
             {
                 Subfield = "Subfield!"
@@ -265,12 +273,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "repeated_strings", out var bodyFieldDescriptors);
 
-            var unaryServerCallHandler = CreateCallHandler(
-                invoker,
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(
                 bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
                 bodyDescriptorRepeated: true,
                 bodyFieldDescriptors: bodyFieldDescriptors);
-            var httpContext = CreateHttpContext();
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
 
             var sdf = new RepeatedField<string>
             {
@@ -317,12 +327,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             ServiceDescriptorHelpers.TryResolveDescriptors(HelloRequest.Descriptor, "sub.subfields", out var bodyFieldDescriptors);
 
-            var unaryServerCallHandler = CreateCallHandler(
-                invoker,
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(
                 bodyDescriptor: HelloRequest.Types.SubMessage.Descriptor,
                 bodyDescriptorRepeated: true,
                 bodyFieldDescriptors: bodyFieldDescriptors);
-            var httpContext = CreateHttpContext();
+            var unaryServerCallHandler = CreateCallHandler(
+                invoker,
+                descriptorInfo);
+            var httpContext = TestHelpers.CreateHttpContext();
 
             var sdf = new RepeatedField<string>
             {
@@ -364,7 +376,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
             {
                 ["name"] = "TestName!",
@@ -392,7 +404,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
             {
                 ["name"] = "TestName!"
@@ -424,8 +436,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                bodyDescriptor: HelloRequest.Descriptor);
-            var httpContext = CreateHttpContext();
+                descriptorInfo: TestHelpers.CreateDescriptorInfo(bodyDescriptor: HelloRequest.Descriptor));
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(json));
             httpContext.Request.ContentType = "application/json";
             // Act
@@ -454,8 +466,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                bodyDescriptor: HelloRequest.Descriptor);
-            var httpContext = CreateHttpContext();
+                descriptorInfo: TestHelpers.CreateDescriptorInfo(bodyDescriptor: HelloRequest.Descriptor));
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes("{}"));
             httpContext.Request.ContentType = contentType;
             // Act
@@ -482,7 +494,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -507,7 +519,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -533,7 +545,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -561,7 +573,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -586,7 +598,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             interceptors.Add((typeof(TestInterceptor), Args: Array.Empty<object>()));
 
             var unaryServerCallHandler = CreateCallHandler(invoker, interceptors: interceptors);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -621,7 +633,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -642,7 +654,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
 
             // Act
             await unaryServerCallHandler.HandleCallAsync(httpContext);
@@ -669,7 +681,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
             {
                 ["sub.subfields"] = new StringValues(new[] { "TestSubfields1!", "TestSubfields2!" })
@@ -697,7 +709,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
             {
                 ["data.single_int32"] = "1",
@@ -821,7 +833,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             configureHttpContext?.Invoke(httpContext);
 
             // Act
@@ -841,7 +853,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             };
 
             var unaryServerCallHandler = CreateCallHandler(invoker);
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
             {
                 ["wrappers.string_value"] = "1",
@@ -890,7 +902,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             var unaryServerCallHandler = CreateCallHandler(
                 invoker,
-                bodyDescriptor: HelloRequest.Descriptor,
+                descriptorInfo: TestHelpers.CreateDescriptorInfo(bodyDescriptor: HelloRequest.Descriptor),
                 httpApiOptions: new GrpcHttpApiOptions
                 {
                     JsonSettings = new JsonSettings
@@ -898,7 +910,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                         TypeRegistry = typeRegistry
                     }
                 });
-            var httpContext = CreateHttpContext();
+            var httpContext = TestHelpers.CreateHttpContext();
             var requestJson = jsonFormatter.Format(new HelloRequest
             {
                 Name = "Test",
@@ -923,55 +935,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal("A value!", anyMessage.GetProperty("value").GetString());
         }
 
-        private static DefaultHttpContext CreateHttpContext(CancellationToken cancellationToken = default)
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<HttpApiGreeterService>();
-            serviceCollection.AddSingleton(typeof(IGrpcInterceptorActivator<>), typeof(TestInterceptorActivator<>));
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Host = new HostString("localhost");
-            httpContext.RequestServices = serviceProvider;
-            httpContext.Response.Body = new MemoryStream();
-            httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
-            httpContext.Features.Set<IHttpRequestLifetimeFeature>(new HttpRequestLifetimeFeature(cancellationToken));
-            return httpContext;
-        }
-
-        private class TestInterceptorActivator<T> : IGrpcInterceptorActivator<T> where T : Interceptor
-        {
-            public GrpcActivatorHandle<Interceptor> Create(IServiceProvider serviceProvider, InterceptorRegistration interceptorRegistration)
-            {
-                return new GrpcActivatorHandle<Interceptor>(Activator.CreateInstance<T>(), created: true, state: null);
-            }
-
-            public ValueTask ReleaseAsync(GrpcActivatorHandle<Interceptor> interceptor)
-            {
-                return default;
-            }
-        }
-
-        private class HttpRequestLifetimeFeature : IHttpRequestLifetimeFeature
-        {
-            public HttpRequestLifetimeFeature(CancellationToken cancellationToken)
-            {
-                RequestAborted = cancellationToken;
-            }
-
-            public CancellationToken RequestAborted { get; set; }
-
-            public void Abort()
-            {
-            }
-        }
-
         private UnaryServerCallHandler<HttpApiGreeterService, HelloRequest, HelloReply> CreateCallHandler(
             UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker,
-            FieldDescriptor? responseBodyDescriptor = null,
-            Dictionary<string, List<FieldDescriptor>>? routeParameterDescriptors = null,
-            MessageDescriptor? bodyDescriptor = null,
-            bool? bodyDescriptorRepeated = null,
-            List<FieldDescriptor>? bodyFieldDescriptors = null,
+            CallHandlerDescriptorInfo? descriptorInfo = null,
             List<(Type Type, object[] Args)>? interceptors = null,
             GrpcHttpApiOptions? httpApiOptions = null)
         {
@@ -995,21 +961,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             return new UnaryServerCallHandler<HttpApiGreeterService, HelloRequest, HelloReply>(
                 unaryServerCallInvoker,
                 LoggerFactory,
-                new CallHandlerDescriptorInfo(
-                    responseBodyDescriptor,
-                    bodyDescriptor,
-                    bodyDescriptorRepeated ?? false,
-                    bodyFieldDescriptors,
-                    routeParameterDescriptors ?? new Dictionary<string, List<FieldDescriptor>>()),
+                descriptorInfo ?? TestHelpers.CreateDescriptorInfo(),
                 JsonConverterHelper.CreateSerializerOptions(jsonSettings));
-        }
-
-        private class HttpApiGreeterService : HttpApiGreeter.HttpApiGreeterBase
-        {
-            public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
-            {
-                return base.SayHello(request, context);
-            }
         }
 
         public static Marshaller<TMessage> GetMarshaller<TMessage>(MessageParser<TMessage> parser) where TMessage : IMessage<TMessage> =>
