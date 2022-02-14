@@ -7,6 +7,7 @@ using System.Linq;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
