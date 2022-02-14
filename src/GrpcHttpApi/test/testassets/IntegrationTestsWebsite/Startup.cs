@@ -3,7 +3,6 @@
 
 using Grpc.AspNetCore.Server.Model;
 using IntegrationTestsWebsite.Infrastructure;
-using IntegrationTestsWebsite.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace IntegrationTestsWebsite
