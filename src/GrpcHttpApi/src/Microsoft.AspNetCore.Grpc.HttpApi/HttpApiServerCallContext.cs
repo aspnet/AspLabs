@@ -13,6 +13,7 @@ using Grpc.Core;
 using Grpc.Gateway.Runtime;
 using Grpc.Shared.Server;
 using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
@@ -21,10 +22,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
     internal class HttpApiServerCallContext : ServerCallContext, IServerCallContextFeature
     {
-        private readonly string _methodFullName;
+        private readonly IMethod _method;
 
         public HttpContext HttpContext { get; }
         public MethodOptions Options { get; }
+        public CallHandlerDescriptorInfo DescriptorInfo { get; }
         public bool IsJsonRequestContent { get; }
         public Encoding RequestEncoding { get; }
 
@@ -33,11 +35,12 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private string? _peer;
         private Metadata? _requestHeaders;
 
-        public HttpApiServerCallContext(HttpContext httpContext, MethodOptions options, string methodFullName, ILogger logger)
+        public HttpApiServerCallContext(HttpContext httpContext, MethodOptions options, IMethod method, CallHandlerDescriptorInfo descriptorInfo, ILogger logger)
         {
             HttpContext = httpContext;
             Options = options;
-            _methodFullName = methodFullName;
+            _method = method;
+            DescriptorInfo = descriptorInfo;
             Logger = logger;
             IsJsonRequestContent = JsonRequestHelpers.HasJsonContentType(httpContext.Request, out var charset);
             RequestEncoding = JsonRequestHelpers.GetEncodingFromCharset(charset) ?? Encoding.UTF8;
@@ -48,7 +51,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
 
         public ServerCallContext ServerCallContext => this;
 
-        protected override string MethodCore => _methodFullName;
+        protected override string MethodCore => _method.FullName;
 
         protected override string HostCore => HttpContext.Request.Host.Value;
 
@@ -82,7 +85,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             }
         }
 
-        internal Task ProcessHandlerErrorAsync(Exception ex, string method, JsonSerializerOptions options)
+        internal async Task ProcessHandlerErrorAsync(Exception ex, string method, bool isStreaming, JsonSerializerOptions options)
         {
             Status status;
             if (ex is RpcException rpcException)
@@ -104,7 +107,11 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 status = new Status(StatusCode.Unknown, message, ex);
             }
 
-            return JsonRequestHelpers.SendErrorResponse(HttpContext.Response, RequestEncoding, status, options);
+            await JsonRequestHelpers.SendErrorResponse(HttpContext.Response, RequestEncoding, status, options);
+            if (isStreaming)
+            {
+                await HttpContext.Response.Body.WriteAsync(GrpcProtocolConstants.StreamingDelimiter);
+            }
         }
 
         internal Task EndCallAsync()

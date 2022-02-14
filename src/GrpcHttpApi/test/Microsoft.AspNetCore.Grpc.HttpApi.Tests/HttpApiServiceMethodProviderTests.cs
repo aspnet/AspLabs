@@ -97,9 +97,15 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
                 });
 
             // Assert
-            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetServerStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
             Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetClientStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
             Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetBidiStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
+
+            var matchedEndpoints = FindGrpcEndpoints(endpoints, nameof(HttpApiStreamingService.GetServerStreaming));
+            var endpoint = Assert.Single(matchedEndpoints);
+
+            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/server_greeter/{name}", endpoint.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Get);
+            Assert.Equal("/v1/server_greeter/{name}", endpoint.RoutePattern.RawText);
         }
 
         [Fact]

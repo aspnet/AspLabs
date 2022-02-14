@@ -2,17 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
+using Grpc.Core;
 using Grpc.Shared.Server;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+using MethodOptions = Grpc.Shared.Server.MethodOptions;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
@@ -89,7 +94,18 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             return new HttpApiServerCallContext(
                 httpContext,
                 MethodOptions.Create(Enumerable.Empty<GrpcServiceOptions>()),
-                string.Empty,
+                new Method<object, object>(
+                    MethodType.Unary,
+                    "Server",
+                    "Method",
+                    new Marshaller<object>(o => null, c => null!),
+                    new Marshaller<object>(o => null, c => null!)),
+                new CallHandlerDescriptorInfo(
+                    null,
+                    null,
+                    false,
+                    null,
+                    new Dictionary<string, List<FieldDescriptor>>()),
                 NullLogger.Instance);
         }
     }
