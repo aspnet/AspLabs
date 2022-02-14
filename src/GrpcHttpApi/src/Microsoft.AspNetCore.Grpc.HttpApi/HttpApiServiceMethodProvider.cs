@@ -24,7 +24,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
-        private readonly JsonSerializerOptions _serializerOptions;
 
         public HttpApiServiceMethodProvider(
             ILoggerFactory loggerFactory,
@@ -41,7 +40,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             _loggerFactory = loggerFactory;
             _serviceProvider = serviceProvider;
             _serviceActivator = serviceActivator;
-            _serializerOptions = JsonConverterHelper.CreateSerializerOptions(_httpApiOptions.JsonSettings);
         }
 
         public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TService> context)
@@ -68,15 +66,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 {
                     var binder = new HttpApiProviderServiceBinder<TService>(
                         context,
-                        serviceParameter.ParameterType,
+                        new ReflectionServiceInvokerResolver<TService>(serviceParameter.ParameterType),
                         serviceDescriptor,
                         _globalOptions,
                         _serviceOptions,
                         _serviceProvider,
                         _loggerFactory,
                         _serviceActivator,
-                        _httpApiOptions,
-                        _serializerOptions);
+                        _httpApiOptions);
 
                     try
                     {

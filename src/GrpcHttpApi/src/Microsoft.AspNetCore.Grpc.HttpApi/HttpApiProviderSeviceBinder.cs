@@ -23,6 +23,92 @@ using MethodOptions = global::Grpc.Shared.Server.MethodOptions;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
+    internal interface IServiceInvokerResolver<TService> where TService : class
+    {
+        (TDelegate invoker, List<object> metadata) CreateModelCore<TDelegate>(
+            string methodName,
+            Type[] methodParameters,
+            string verb,
+            HttpRule httpRule,
+            MethodDescriptor methodDescriptor) where TDelegate : Delegate;
+    }
+
+    internal class ReflectionServiceInvokerResolver<TService>
+        : IServiceInvokerResolver<TService> where TService : class
+    {
+        private readonly Type _declaringType;
+
+        public ReflectionServiceInvokerResolver(Type declaringType)
+        {
+            _declaringType = declaringType;
+        }
+
+        public (TDelegate invoker, List<object> metadata) CreateModelCore<TDelegate>(
+            string methodName,
+            Type[] methodParameters,
+            string verb,
+            HttpRule httpRule,
+            MethodDescriptor methodDescriptor) where TDelegate : Delegate
+        {
+            var handlerMethod = GetMethod(methodName, methodParameters);
+
+            if (handlerMethod == null)
+            {
+                throw new InvalidOperationException($"Could not find '{methodName}' on {typeof(TService)}.");
+            }
+
+            var invoker = (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), handlerMethod);
+
+            var metadata = new List<object>();
+            // Add type metadata first so it has a lower priority
+            metadata.AddRange(typeof(TService).GetCustomAttributes(inherit: true));
+            // Add method metadata last so it has a higher priority
+            metadata.AddRange(handlerMethod.GetCustomAttributes(inherit: true));
+            metadata.Add(new HttpMethodMetadata(new[] { verb }));
+
+            // Add protobuf service method descriptor.
+            // Is used by swagger generation to identify gRPC HTTP APIs.
+            metadata.Add(new GrpcHttpMetadata(methodDescriptor, httpRule));
+
+            return (invoker, metadata);
+        }
+
+        private MethodInfo? GetMethod(string methodName, Type[] methodParameters)
+        {
+            Type? currentType = typeof(TService);
+            while (currentType != null)
+            {
+                var matchingMethod = currentType.GetMethod(
+                    methodName,
+                    BindingFlags.Public | BindingFlags.Instance,
+                    binder: null,
+                    types: methodParameters,
+                    modifiers: null);
+
+                if (matchingMethod == null)
+                {
+                    return null;
+                }
+
+                // Validate that the method overrides the virtual method on the base service type.
+                // If there is a method with the same name it will hide the base method. Ignore it,
+                // and continue searching on the base type.
+                if (matchingMethod.IsVirtual)
+                {
+                    var baseDefinitionMethod = matchingMethod.GetBaseDefinition();
+                    if (baseDefinitionMethod != null && baseDefinitionMethod.DeclaringType == _declaringType)
+                    {
+                        return matchingMethod;
+                    }
+                }
+
+                currentType = currentType.BaseType;
+            }
+
+            return null;
+        }
+    }
+
     internal class HttpApiProviderServiceBinder<TService> : ServiceBinderBase where TService : class
     {
         private delegate (RequestDelegate RequestDelegate, List<object> Metadata) CreateRequestDelegate<TRequest, TResponse>(
@@ -34,36 +120,33 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             MethodOptions methodOptions);
 
         private readonly ServiceMethodProviderContext<TService> _context;
-        private readonly Type _declaringType;
+        private readonly IServiceInvokerResolver<TService> _invokerResolver;
         private readonly ServiceDescriptor _serviceDescriptor;
         private readonly GrpcServiceOptions _globalOptions;
         private readonly GrpcServiceOptions<TService> _serviceOptions;
         private readonly IGrpcServiceActivator<TService> _serviceActivator;
         private readonly GrpcHttpApiOptions _httpApiOptions;
-        private readonly JsonSerializerOptions _serializerOptions;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
         internal HttpApiProviderServiceBinder(
             ServiceMethodProviderContext<TService> context,
-            Type declaringType,
+            IServiceInvokerResolver<TService> invokerResolver,
             ServiceDescriptor serviceDescriptor,
             GrpcServiceOptions globalOptions,
             GrpcServiceOptions<TService> serviceOptions,
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
             IGrpcServiceActivator<TService> serviceActivator,
-            GrpcHttpApiOptions httpApiOptions,
-            JsonSerializerOptions serializerOptions)
+            GrpcHttpApiOptions httpApiOptions)
         {
             _context = context;
-            _declaringType = declaringType;
+            _invokerResolver = invokerResolver;
             _serviceDescriptor = serviceDescriptor;
             _globalOptions = globalOptions;
             _serviceOptions = serviceOptions;
             _serviceActivator = serviceActivator;
             _httpApiOptions = httpApiOptions;
-            _serializerOptions = serializerOptions;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<HttpApiProviderServiceBinder<TService>>();
         }
@@ -155,7 +238,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             where TRequest : class
             where TResponse : class
         {
-            var (invoker, metadata) = CreateModelCore<UnaryServerMethod<TService, TRequest, TResponse>>(
+            var (invoker, metadata) = _invokerResolver.CreateModelCore<UnaryServerMethod<TService, TRequest, TResponse>>(
                 method.Name,
                 new[] { typeof(TRequest), typeof(ServerCallContext) },
                 httpVerb,
@@ -167,7 +250,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 methodInvoker,
                 _loggerFactory,
                 descriptorInfo,
-                _serializerOptions);
+                _httpApiOptions.JsonSettings.UnarySerializerOptions);
 
             return (callHandler.HandleCallAsync, metadata);
         }
@@ -182,7 +265,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
             where TRequest : class
             where TResponse : class
         {
-            var (invoker, metadata) = CreateModelCore<ServerStreamingServerMethod<TService, TRequest, TResponse>>(
+            var (invoker, metadata) = _invokerResolver.CreateModelCore<ServerStreamingServerMethod<TService, TRequest, TResponse>>(
                 method.Name,
                 new[] { typeof(TRequest), typeof(IServerStreamWriter<TResponse>), typeof(ServerCallContext) },
                 httpVerb,
@@ -194,7 +277,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
                 methodInvoker,
                 _loggerFactory,
                 descriptorInfo,
-                _serializerOptions);
+                _httpApiOptions.JsonSettings.ServerStreamingSerializerOptions);
 
             return (callHandler.HandleCallAsync, metadata);
         }
@@ -268,66 +351,6 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         {
             methodDescriptor = _serviceDescriptor.Methods.SingleOrDefault(m => m.Name == methodName);
             return (methodDescriptor != null);
-        }
-
-        private (TDelegate invoker, List<object> metadata) CreateModelCore<TDelegate>(string methodName, Type[] methodParameters, string verb, HttpRule httpRule, MethodDescriptor methodDescriptor) where TDelegate : Delegate
-        {
-            var handlerMethod = GetMethod(methodName, methodParameters);
-
-            if (handlerMethod == null)
-            {
-                throw new InvalidOperationException($"Could not find '{methodName}' on {typeof(TService)}.");
-            }
-
-            var invoker = (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), handlerMethod);
-
-            var metadata = new List<object>();
-            // Add type metadata first so it has a lower priority
-            metadata.AddRange(typeof(TService).GetCustomAttributes(inherit: true));
-            // Add method metadata last so it has a higher priority
-            metadata.AddRange(handlerMethod.GetCustomAttributes(inherit: true));
-            metadata.Add(new HttpMethodMetadata(new[] { verb }));
-
-            // Add protobuf service method descriptor.
-            // Is used by swagger generation to identify gRPC HTTP APIs.
-            metadata.Add(new GrpcHttpMetadata(methodDescriptor, httpRule));
-
-            return (invoker, metadata);
-        }
-
-        private MethodInfo? GetMethod(string methodName, Type[] methodParameters)
-        {
-            Type? currentType = typeof(TService);
-            while (currentType != null)
-            {
-                var matchingMethod = currentType.GetMethod(
-                    methodName,
-                    BindingFlags.Public | BindingFlags.Instance,
-                    binder: null,
-                    types: methodParameters,
-                    modifiers: null);
-
-                if (matchingMethod == null)
-                {
-                    return null;
-                }
-
-                // Validate that the method overrides the virtual method on the base service type.
-                // If there is a method with the same name it will hide the base method. Ignore it,
-                // and continue searching on the base type.
-                if (matchingMethod.IsVirtual)
-                {
-                    var baseDefinitionMethod = matchingMethod.GetBaseDefinition();
-                    if (baseDefinitionMethod != null && baseDefinitionMethod.DeclaringType == _declaringType)
-                    {
-                        return matchingMethod;
-                    }
-                }
-
-                currentType = currentType.BaseType;
-            }
-
-            return null;
         }
 
         private static class Log
