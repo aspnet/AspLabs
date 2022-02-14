@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal
 {
     internal class HttpApiServiceMethodProvider<TService> : IServiceMethodProvider<TService> where TService : class
     {
