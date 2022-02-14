@@ -1,11 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.16.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore"/>
+    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore"/>
+    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore"/>
   </ItemGroup>
 
   <ItemGroup>

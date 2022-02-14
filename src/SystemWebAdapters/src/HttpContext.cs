@@ -2,35 +2,107 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Caching;
+using Microsoft.AspNetCore.Http;
 
 namespace System.Web
 {
     public class HttpContext : IServiceProvider
     {
-        public static HttpContext Current => throw new NotImplementedException();
+        private static readonly HttpContextAccessor _accessor = new();
 
-        public HttpRequest Request => throw new NotImplementedException();
+        private readonly HttpContextCore _context;
 
-        public HttpResponse Response => throw new NotImplementedException();
+        private HttpRequest? _request;
+        private HttpResponse? _response;
+        private HttpServerUtility? _server;
+
+        public static HttpContext? Current => _accessor.HttpContext;
+
+        public HttpContext(HttpContextCore context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            _context = context;
+        }
+
+        public HttpRequest Request
+        {
+            get
+            {
+                if (_request is null)
+                {
+                    _request = new(_context.Request);
+                }
+
+                return _request;
+            }
+        }
+
+        public HttpResponse Response
+        {
+            get
+            {
+                if (_response is null)
+                {
+                    _response = new(_context.Response);
+                }
+
+                return _response;
+            }
+        }
 
         public IDictionary Items => throw new NotImplementedException();
 
-        public HttpServerUtility Server => throw new NotImplementedException();
+        public HttpServerUtility Server
+        {
+            get
+            {
+                if (_server is null)
+                {
+                    _server = new(_context);
+                }
+
+                return _server;
+            }
+        }
 
         public Cache Cache => throw new NotImplementedException();
 
         public IPrincipal User
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _context.User;
+            set => _context.User = value is ClaimsPrincipal claims ? claims : new ClaimsPrincipal(value);
         }
 
-        public object GetService(Type serviceType)
+        public object? GetService(Type service)
         {
-            throw new NotImplementedException();
+            if (service == typeof(HttpRequest))
+            {
+                return Request;
+            }
+            else if (service == typeof(HttpResponse))
+            {
+                return Response;
+            }
+            else if (service == typeof(HttpServerUtility))
+            {
+                return Server;
+            }
+
+            return null;
         }
-        public static implicit operator HttpContext(HttpContextCore context) => throw new NotImplementedException();
+
+        [return: NotNullIfNotNull("context")]
+        public static implicit operator HttpContext?(HttpContextCore? context) => context?.GetAdapter();
+
+        [return: NotNullIfNotNull("context")]
+        public static implicit operator HttpContextCore?(HttpContext? context) => context?._context;
     }
 }

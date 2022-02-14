@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Security.Principal;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Web
 {
@@ -26,9 +27,9 @@ namespace System.Web
 
         public HttpServerUtilityBase Server => throw new NotImplementedException();
 
-        public virtual object GetService(Type serviceType)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual object? GetService(Type serviceType) => throw new NotImplementedException();
+
+        [return: NotNullIfNotNull("context")]
+        public static implicit operator HttpContextBase?(HttpContextCore? context) => context?.GetAdapterBase();
     }
 }
