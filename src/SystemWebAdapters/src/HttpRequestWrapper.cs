@@ -25,7 +25,7 @@ namespace System.Web
 
         public override int ContentLength => _request.ContentLength;
 
-        public override string ContentType
+        public override string? ContentType
         {
             get => _request.ContentType;
             set => _request.ContentType = value;
@@ -43,9 +43,9 @@ namespace System.Web
 
         public override bool IsLocal => _request.IsLocal;
 
-        public override IIdentity LogonUserIdentity => _request.LogonUserIdentity;
+        public override IIdentity? LogonUserIdentity => _request.LogonUserIdentity;
 
-        public override string Path => _request.Path;
+        public override string? Path => _request.Path;
 
         public override NameValueCollection QueryString => _request.QueryString;
 
@@ -57,7 +57,7 @@ namespace System.Web
 
         public override Uri Url => _request.Url;
 
-        public override Uri UrlReferrer => _request.UrlReferrer;
+        public override Uri? UrlReferrer => _request.UrlReferrer;
 
         public override string UserAgent => _request.UserAgent;
 

@@ -26,7 +26,7 @@ namespace System.Web
             _request = request;
         }
 
-        public string Path => _request.Path.Value;
+        public string? Path => _request.Path.Value;
 
         public NameValueCollection Headers => throw new NotImplementedException();
 
@@ -64,7 +64,7 @@ namespace System.Web
 
         public int ContentLength => (int)(_request.ContentLength ?? 0);
 
-        public string ContentType
+        public string? ContentType
         {
             get => _request.ContentType;
             set => _request.ContentType = value;
@@ -121,13 +121,13 @@ namespace System.Web
 
         public string ApplicationPath => _request.PathBase;
 
-        public Uri UrlReferrer => TypedHeaders.Referer;
+        public Uri? UrlReferrer => TypedHeaders.Referer;
 
         public int TotalBytes => (int)_request.ContentLength.GetValueOrDefault();
 
-        public bool IsAuthenticated => LogonUserIdentity.IsAuthenticated;
+        public bool IsAuthenticated => LogonUserIdentity?.IsAuthenticated ?? false;
 
-        public IIdentity LogonUserIdentity => _request.HttpContext.User.Identity;
+        public IIdentity? LogonUserIdentity => _request.HttpContext.User.Identity;
 
         public Encoding? ContentEncoding => TypedHeaders.ContentType?.Encoding;
 

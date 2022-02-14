@@ -158,12 +158,13 @@ namespace System.Web
         public void UserLanguagesTwoItems()
         {
             // Arrange
-            var acceptLanguage = "en;q=0.9, ru;q=0.5, de;q=0.7";
-            var headers = new Mock<IHeaderDictionary>();
-            headers.Setup(c => c.AcceptLanguage).Returns(acceptLanguage);
+            var headers = new HeaderDictionary
+            {
+                { HeaderNames.AcceptLanguage, "en;q=0.9, ru;q=0.5, de;q=0.7"}
+            };
 
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.Headers).Returns(headers.Object);
+            coreRequest.Setup(c => c.Headers).Returns(headers);
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -180,11 +181,13 @@ namespace System.Web
         {
             // Arrange
             var userAgent = _fixture.Create<string>();
-            var headers = new Mock<IHeaderDictionary>();
-            headers.Setup(c => c[HeaderNames.UserAgent]).Returns(userAgent);
+            var headers = new HeaderDictionary
+            {
+                { HeaderNames.UserAgent, userAgent }
+            };
 
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.Headers).Returns(headers.Object);
+            coreRequest.Setup(c => c.Headers).Returns(headers);
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -427,11 +430,13 @@ namespace System.Web
         {
             // Arrange
             var referrer = "http://contoso.com";
-            var headers = new Mock<IHeaderDictionary>();
-            headers.Setup(h => h.Referer).Returns(referrer);
+            var headers = new HeaderDictionary
+            {
+                { HeaderNames.Referer, referrer },
+            };
 
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.Headers).Returns(headers.Object);
+            coreRequest.Setup(c => c.Headers).Returns(headers);
 
             var request = new HttpRequest(coreRequest.Object);
 
