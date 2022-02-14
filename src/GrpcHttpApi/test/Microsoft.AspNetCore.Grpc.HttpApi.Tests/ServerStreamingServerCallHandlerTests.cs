@@ -112,6 +112,40 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             await callTask.DefaultTimeout();
         }
 
+        [Fact]
+        public async Task HandleCallAsync_ErrorWithDetailedErrors_DetailedErrorResponse()
+        {
+            // Arrange
+            ServerStreamingServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, w, c) =>
+            {
+                return Task.FromException<HelloReply>(new Exception("Exception!"));
+            };
+
+            var pipe = new Pipe();
+
+            var routeParameterDescriptors = new Dictionary<string, List<FieldDescriptor>>
+            {
+                ["name"] = new List<FieldDescriptor>(new[] { HelloRequest.Descriptor.FindFieldByNumber(HelloRequest.NameFieldNumber) })
+            };
+            var descriptorInfo = TestHelpers.CreateDescriptorInfo(routeParameterDescriptors: routeParameterDescriptors);
+            var serviceOptions = new GrpcServiceOptions { EnableDetailedErrors = true };
+            var callHandler = CreateCallHandler(invoker, descriptorInfo: descriptorInfo, serviceOptions: serviceOptions);
+            var httpContext = TestHelpers.CreateHttpContext(bodyStream: pipe.Writer.AsStream());
+            httpContext.Request.RouteValues["name"] = "TestName!";
+
+            // Act
+            var callTask = callHandler.HandleCallAsync(httpContext);
+
+            // Assert
+            var line = await ReadLineAsync(pipe.Reader).DefaultTimeout();
+            using var responseJson = JsonDocument.Parse(line!);
+            Assert.Equal("Exception was thrown by handler. Exception: Exception!", responseJson.RootElement.GetProperty("message").GetString());
+            Assert.Equal("Exception was thrown by handler. Exception: Exception!", responseJson.RootElement.GetProperty("error").GetString());
+            Assert.Equal(2, responseJson.RootElement.GetProperty("code").GetInt32());
+
+            await callTask.DefaultTimeout();
+        }
+
         public async Task<string?> ReadLineAsync(PipeReader pipeReader)
         {
             string? str;
@@ -158,9 +192,10 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             ServerStreamingServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker,
             CallHandlerDescriptorInfo? descriptorInfo = null,
             List<(Type Type, object[] Args)>? interceptors = null,
-            GrpcHttpApiOptions? httpApiOptions = null)
+            GrpcHttpApiOptions? httpApiOptions = null,
+            GrpcServiceOptions? serviceOptions = null)
         {
-            var serviceOptions = new GrpcServiceOptions();
+            serviceOptions ??= new GrpcServiceOptions();
             if (interceptors != null)
             {
                 foreach (var interceptor in interceptors)
