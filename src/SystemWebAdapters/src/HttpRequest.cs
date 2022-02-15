@@ -122,12 +122,6 @@ namespace System.Web
             }
         }
 
-        /// <summary>
-        /// Same as CurrentExecutionFilePath, but made relative to the application root, so it is application-agnostic.
-        /// </summary>
-        /// <remarks>
-        /// See https://stackoverflow.com/questions/9701309/get-app-relative-url-from-request-url-absolutepath.
-        /// </remarks>
         public string AppRelativeCurrentExecutionFilePath => $"~{_request.Path.Value}";
 
         public string ApplicationPath => _request.PathBase;
