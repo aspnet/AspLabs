@@ -63,7 +63,7 @@ namespace System.Web
 
                         for (var i = 0; i < length; i++)
                         {
-                            userLanguages[i] = qualityArray[i].Value.ToString();
+                            userLanguages[i] = qualityArray[i].Value.Value;
                         }
 
                         ArrayPool<StringWithQualityHeaderValue>.Shared.Return(qualityArray);
