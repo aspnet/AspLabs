@@ -20,7 +20,7 @@ namespace System.Web
 
         public virtual string HttpMethod => throw new NotImplementedException();
 
-        public virtual string UserHostAddress => throw new NotImplementedException();
+        public virtual string? UserHostAddress => throw new NotImplementedException();
 
         public virtual string[] UserLanguages => throw new NotImplementedException();
 

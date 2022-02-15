@@ -33,11 +33,12 @@ namespace System.Web
 
         public Uri Url => new(_request.GetEncodedUrl());
 
-        public string RawUrl => Uri.UnescapeDataString(_request.GetDisplayUrl());
+        // TODO: https://github.com/aspnet/AspLabs/pull/435#discussion_r807128348
+        public string RawUrl => throw new NotImplementedException();
 
         public string HttpMethod => _request.Method;
 
-        public string UserHostAddress => _request.Host.Value;
+        public string? UserHostAddress => _request.HttpContext.Connection.RemoteIpAddress?.ToString();
 
         public string[] UserLanguages
         {
@@ -57,20 +58,15 @@ namespace System.Web
                         var qualityArray = ArrayPool<StringWithQualityHeaderValue>.Shared.Rent(length);
                         var userLanguages = new string[length];
 
-                        try
-                        {
-                            languages.CopyTo(qualityArray, 0);
-                            Array.Sort(qualityArray, 0, length, StringWithQualityHeaderValueComparer.Instance);
+                        languages.CopyTo(qualityArray, 0);
+                        Array.Sort(qualityArray, 0, length, StringWithQualityHeaderValueComparer.Instance);
 
-                            for (var i = 0; i < length; i++)
-                            {
-                                userLanguages[i] = qualityArray[i].Value.ToString();
-                            }
-                        }
-                        finally
+                        for (var i = 0; i < length; i++)
                         {
-                            ArrayPool<StringWithQualityHeaderValue>.Shared.Return(qualityArray);
+                            userLanguages[i] = qualityArray[i].Value.ToString();
                         }
+
+                        ArrayPool<StringWithQualityHeaderValue>.Shared.Return(qualityArray);
 
                         _userLanguages = userLanguages;
                     }
@@ -149,6 +145,7 @@ namespace System.Web
 
         public Uri? UrlReferrer => TypedHeaders.Referer;
 
+        // TODO: Since System.Web buffered by default, TotalBytes probably also worked for Chunked requests. We'll want to revisit this when we look at the request body buffering.
         public int TotalBytes => (int)_request.ContentLength.GetValueOrDefault();
 
         public bool IsAuthenticated => LogonUserIdentity?.IsAuthenticated ?? false;

@@ -1,14 +1,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using AutoFixture;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -62,25 +60,6 @@ namespace System.Web
         }
 
         [Fact]
-        public void RawUrl()
-        {
-            // Arrange
-            var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.Scheme).Returns("http");
-            coreRequest.Setup(c => c.Host).Returns(new HostString("microsoft.com"));
-            coreRequest.Setup(c => c.PathBase).Returns("/path/base");
-            coreRequest.Setup(c => c.QueryString).Returns(new QueryString("?key=value&key2=value%20with%20space"));
-
-            var request = new HttpRequest(coreRequest.Object);
-
-            // Act
-            var result = request.RawUrl;
-
-            // Assert
-            Assert.Equal("http://microsoft.com/path/base?key=value&key2=value with space", result);
-        }
-
-        [Fact]
         public void HttpMethod()
         {
             // Arrange
@@ -97,13 +76,21 @@ namespace System.Web
             Assert.Equal(method, result);
         }
 
-        [Fact]
-        public void UserHostAddress()
+        [InlineData(true)]
+        [InlineData(false)]
+        [Theory]
+        public void UserHostAddress(bool hasRemote)
         {
             // Arrange
-            var host = new HostString(_fixture.Create<string>());
+            var info = new Mock<ConnectionInfo>();
+            var remoteIp = hasRemote ? _fixture.Create<IPAddress>() : null;
+            info.Setup(i => i.RemoteIpAddress).Returns(remoteIp!);
+
+            var coreContext = new Mock<HttpContextCore>();
+            coreContext.Setup(c => c.Connection).Returns(info.Object);
+
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.Host).Returns(host);
+            coreRequest.Setup(r => r.HttpContext).Returns(coreContext.Object);
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -111,7 +98,7 @@ namespace System.Web
             var result = request.UserHostAddress;
 
             // Assert
-            Assert.Equal(host.Value, result);
+            Assert.Equal(remoteIp?.ToString(), result);
         }
 
         [Fact]

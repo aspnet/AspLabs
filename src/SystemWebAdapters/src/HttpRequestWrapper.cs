@@ -61,7 +61,7 @@ namespace System.Web
 
         public override string UserAgent => _request.UserAgent;
 
-        public override string UserHostAddress => _request.UserHostAddress;
+        public override string? UserHostAddress => _request.UserHostAddress;
 
         public override string? UserHostName => _request.UserHostName;
 
