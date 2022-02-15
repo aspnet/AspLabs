@@ -124,7 +124,7 @@ namespace System.Web
 
         public string AppRelativeCurrentExecutionFilePath => $"~{_request.Path.Value}";
 
-        public string ApplicationPath => _request.PathBase;
+        public string? ApplicationPath => _request.PathBase.Value;
 
         public Uri? UrlReferrer => TypedHeaders.Referer;
 

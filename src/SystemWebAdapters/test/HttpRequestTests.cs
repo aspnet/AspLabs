@@ -404,7 +404,7 @@ namespace System.Web
             coreRequest.Setup(c => c.Host).Returns(new HostString("www.A.com"));
             coreRequest.Setup(c => c.Path).Returns("/B/C");
             coreRequest.Setup(c => c.QueryString).Returns(new QueryString("?D=E"));
-            coreRequest.Setup(c => c.PathBase).Returns("/F");
+            coreRequest.Setup(c => c.PathBase).Returns("/F/ C");
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -413,7 +413,7 @@ namespace System.Web
             var result = request.ApplicationPath;
 
             // Assert
-            Assert.Equal("/F", result);
+            Assert.Equal("/F/ C", result);
         }
 
         [Fact]
