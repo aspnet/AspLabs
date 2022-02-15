@@ -32,7 +32,7 @@ namespace System.Web
 
         public Uri Url => new(_request.GetEncodedUrl());
 
-        public string RawUrl => _request.HttpContext.GetMetadata().RawUrl ?? throw new InvalidOperationException(LocalizedStrings.RawUrlNotAvailable);
+        public string RawUrl => _request.HttpContext.GetMetadata().RawUrl ?? throw new InvalidOperationException("RawUrl is not available. Ensure `IServiceCollection.AddSystemWebAdapters()` has been called.");
 
         public string HttpMethod => _request.Method;
 
