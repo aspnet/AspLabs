@@ -65,15 +65,11 @@ namespace System.Web
         public void RawUrl()
         {
             // Arrange
-            var rawurl = _fixture.Create<string>();
-            var features = new FeatureCollection();
-            features.Set(new SystemWebAdapterMetadata { RawUrl = rawurl });
-
-            var context = new Mock<HttpContextCore>();
-            context.Setup(c => c.Features).Returns(features);
-
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.HttpContext).Returns(context.Object);
+            coreRequest.Setup(c => c.Scheme).Returns("http");
+            coreRequest.Setup(c => c.Host).Returns(new HostString("microsoft.com"));
+            coreRequest.Setup(c => c.PathBase).Returns("/path/base");
+            coreRequest.Setup(c => c.QueryString).Returns(new QueryString("?key=value&key2=value%20with%20space"));
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -81,24 +77,7 @@ namespace System.Web
             var result = request.RawUrl;
 
             // Assert
-            Assert.Equal(rawurl, result);
-        }
-
-        [Fact]
-        public void RawUrlNotAvailable()
-        {
-            // Arrange
-            var features = new FeatureCollection();
-            var context = new Mock<HttpContextCore>();
-            context.Setup(c => c.Features).Returns(features);
-
-            var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.HttpContext).Returns(context.Object);
-
-            var request = new HttpRequest(coreRequest.Object);
-
-            // Act
-            Assert.Throws<InvalidOperationException>(() => request.RawUrl);
+            Assert.Equal("http://microsoft.com/path/base?key=value&key2=value with space", result);
         }
 
         [Fact]

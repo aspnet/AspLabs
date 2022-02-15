@@ -12,7 +12,6 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.AddTransient<IStartupFilter, SystemWebStartupFilter>();
         }
 
         [return: NotNullIfNotNull("context")]
@@ -77,18 +76,5 @@ namespace System.Web
 
         [return: NotNullIfNotNull("response")]
         internal static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
-
-        internal static SystemWebAdapterMetadata GetMetadata(this HttpContextCore context)
-        {
-            var metadata = context.Features.Get<SystemWebAdapterMetadata>();
-
-            if (metadata is null)
-            {
-                metadata = new();
-                context.Features.Set(metadata);
-            }
-
-            return metadata;
-        }
     }
 }
