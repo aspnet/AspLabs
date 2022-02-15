@@ -105,31 +105,20 @@ namespace System.Web
             get
             {
                 var connectionInfo = _request.HttpContext.Connection;
-                var local = connectionInfo.LocalIpAddress;
-                var remote = connectionInfo.RemoteIpAddress;
 
-                if (local is null && remote is null)
+                // If unknown, assume not local
+                if (connectionInfo.RemoteIpAddress is null)
+                {
+                    return false;
+                }
+
+                // Check if localhost
+                if (IPAddress.IsLoopback(connectionInfo.RemoteIpAddress))
                 {
                     return true;
                 }
 
-                if (remote is not null)
-                {
-                    if (local is not null)
-                    {
-                        if (Equals(local, remote) ||
-                            (IPAddress.IsLoopback(local) && IPAddress.IsLoopback(remote)))
-                        {
-                            return true;
-                        }
-                    }
-                    else if (IPAddress.IsLoopback(remote))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                return connectionInfo.RemoteIpAddress.Equals(connectionInfo.LocalIpAddress);
             }
         }
 

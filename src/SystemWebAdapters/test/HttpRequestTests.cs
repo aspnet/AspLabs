@@ -269,11 +269,15 @@ namespace System.Web
             Assert.Equal(isHttps, result);
         }
 
-        [Fact]
-        public void IsLocalNoAddresses()
+        [InlineData(false)]
+        [InlineData(true)]
+        [Theory]
+        public void IsLocalRemoteNull(bool isLoopback)
         {
             // Arrange
+            var local = isLoopback ? IPAddress.Loopback : _fixture.Create<IPAddress>();
             var info = new Mock<ConnectionInfo>();
+            info.Setup(i => i.LocalIpAddress).Returns(local);
 
             var coreContext = new Mock<HttpContextCore>();
             coreContext.Setup(c => c.Connection).Returns(info.Object);
@@ -287,7 +291,7 @@ namespace System.Web
             var result = request.IsLocal;
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
         }
 
         [Fact]
@@ -315,7 +319,7 @@ namespace System.Web
         }
 
         [InlineData(true, true, true)]
-        [InlineData(true, false, false)]
+        [InlineData(true, false, true)]
         [InlineData(false, true, false)]
         [InlineData(false, false, false)]
         [Theory]
