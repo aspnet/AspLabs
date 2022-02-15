@@ -377,7 +377,7 @@ namespace System.Web
             var coreRequest = new Mock<HttpRequestCore>();
             coreRequest.Setup(c => c.Scheme).Returns("http");
             coreRequest.Setup(c => c.Host).Returns(new HostString("www.A.com"));
-            coreRequest.Setup(c => c.Path).Returns("/B/C");
+            coreRequest.Setup(c => c.Path).Returns("/B/ C");
             coreRequest.Setup(c => c.QueryString).Returns(new QueryString("?D=E"));
             coreRequest.Setup(c => c.PathBase).Returns("/F");
 
@@ -388,7 +388,7 @@ namespace System.Web
             var result = request.AppRelativeCurrentExecutionFilePath;
 
             // Assert
-            Assert.Equal("~/B/C", result);
+            Assert.Equal("~/B/ C", result);
         }
 
         [Fact]
