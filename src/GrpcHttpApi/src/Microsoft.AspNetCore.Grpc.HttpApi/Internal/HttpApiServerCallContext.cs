@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.AspNetCore.Grpc.HttpApi
+namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal
 {
     internal class HttpApiServerCallContext : ServerCallContext, IServerCallContextFeature
     {
