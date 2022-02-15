@@ -153,7 +153,6 @@ namespace System.Web
             Assert.Same(Array.Empty<string>(), result);
         }
 
-
         [Fact]
         public void UserLanguagesTwoItems()
         {
@@ -173,6 +172,28 @@ namespace System.Web
 
             // Assert
             Assert.Equal(new[] { "en", "de", "ru" }, result);
+            Assert.Same(result, request.UserLanguages);
+        }
+
+        [Fact]
+        public void UserLanguagesTwoItemsNoQuality()
+        {
+            // Arrange
+            var headers = new HeaderDictionary
+            {
+                { HeaderNames.AcceptLanguage, "en;q=0.9, ru, de;q=0.7"}
+            };
+
+            var coreRequest = new Mock<HttpRequestCore>();
+            coreRequest.Setup(c => c.Headers).Returns(headers);
+
+            var request = new HttpRequest(coreRequest.Object);
+
+            // Act
+            var result = request.UserLanguages;
+
+            // Assert
+            Assert.Equal(new[] { "ru", "en", "de" }, result);
             Assert.Same(result, request.UserLanguages);
         }
 

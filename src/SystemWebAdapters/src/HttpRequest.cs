@@ -1,11 +1,14 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Buffers;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -44,10 +47,35 @@ namespace System.Web
             {
                 if (_userLanguages is null)
                 {
-                    _userLanguages = TypedHeaders.AcceptLanguage
-                         ?.OrderByDescending(static lang => lang.Quality ?? 1)
-                         .Select(static lang => lang.Value.ToString())
-                         .ToArray() ?? Array.Empty<string>();
+                    var languages = TypedHeaders.AcceptLanguage;
+                    var length = languages.Count;
+
+                    if (length == 0)
+                    {
+                        _userLanguages = Array.Empty<string>();
+                    }
+                    else
+                    {
+                        var qualityArray = ArrayPool<StringWithQualityHeaderValue>.Shared.Rent(length);
+                        var userLanguages = new string[length];
+
+                        try
+                        {
+                            languages.CopyTo(qualityArray, 0);
+                            Array.Sort(qualityArray, 0, length, StringWithQualityHeaderValueComparer.Instance);
+
+                            for (var i = 0; i < length; i++)
+                            {
+                                userLanguages[i] = qualityArray[i].Value.ToString();
+                            }
+                        }
+                        finally
+                        {
+                            ArrayPool<StringWithQualityHeaderValue>.Shared.Return(qualityArray);
+                        }
+
+                        _userLanguages = userLanguages;
+                    }
                 }
 
                 return _userLanguages;
@@ -157,5 +185,18 @@ namespace System.Web
 
         [return: NotNullIfNotNull("request")]
         public static implicit operator HttpRequestCore?(HttpRequest? request) => request?._request;
+
+        private class StringWithQualityHeaderValueComparer : IComparer<StringWithQualityHeaderValue>
+        {
+            public static StringWithQualityHeaderValueComparer Instance { get; } = new();
+
+            public int Compare(StringWithQualityHeaderValue? x, StringWithQualityHeaderValue? y)
+            {
+                var xValue = x?.Quality ?? 1;
+                var yValue = y?.Quality ?? 1;
+
+                return yValue.CompareTo(xValue);
+            }
+        }
     }
 }
