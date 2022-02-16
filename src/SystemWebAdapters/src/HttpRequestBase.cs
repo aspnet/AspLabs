@@ -10,7 +10,7 @@ namespace System.Web
 {
     public abstract class HttpRequestBase
     {
-        public virtual string Path => throw new NotImplementedException();
+        public virtual string? Path => throw new NotImplementedException();
 
         public virtual NameValueCollection Headers => throw new NotImplementedException();
 
@@ -20,7 +20,7 @@ namespace System.Web
 
         public virtual string HttpMethod => throw new NotImplementedException();
 
-        public virtual string UserHostAddress => throw new NotImplementedException();
+        public virtual string? UserHostAddress => throw new NotImplementedException();
 
         public virtual string[] UserLanguages => throw new NotImplementedException();
 
@@ -32,7 +32,7 @@ namespace System.Web
 
         public virtual int ContentLength => throw new NotImplementedException();
 
-        public virtual string ContentType
+        public virtual string? ContentType
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
@@ -52,17 +52,17 @@ namespace System.Web
 
         public string ApplicationPath => throw new NotImplementedException();
 
-        public virtual Uri UrlReferrer => throw new NotImplementedException();
+        public virtual Uri? UrlReferrer => throw new NotImplementedException();
 
         public virtual int TotalBytes => throw new NotImplementedException();
 
         public virtual bool IsAuthenticated => throw new NotImplementedException();
 
-        public virtual IIdentity LogonUserIdentity => throw new NotImplementedException();
+        public virtual IIdentity? LogonUserIdentity => throw new NotImplementedException();
 
-        public virtual Encoding ContentEncoding => throw new NotImplementedException();
+        public virtual Encoding? ContentEncoding => throw new NotImplementedException();
 
-        public virtual string UserHostName => throw new NotImplementedException();
+        public virtual string? UserHostName => throw new NotImplementedException();
 
         public HttpBrowserCapabilities Browser => throw new NotImplementedException();
 

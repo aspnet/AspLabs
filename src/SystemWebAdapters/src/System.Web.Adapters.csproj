@@ -1,10 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
+    <HasImplementation>false</HasImplementation>
+    <HasImplementation Condition=" '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'netcoreapp3.1' ">true</HasImplementation>
     <LangVersion>10</LangVersion>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
+    <RootNamespace>System.Web</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +19,7 @@
     <Compile Include="NetStandard/**" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+  <ItemGroup Condition="$(HasImplementation)">
     <Compile Remove="Framework/**" />
     <Compile Remove="NetStandard/**" />
 
@@ -33,6 +36,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
 
-  <Import Condition=" '$(TargetFramework)' == 'netcoreapp3.1' " Project="GenerateApis.targets" />
+  <Import Condition="$(HasImplementation)" Project="GenerateApis.targets" />
 
 </Project>
