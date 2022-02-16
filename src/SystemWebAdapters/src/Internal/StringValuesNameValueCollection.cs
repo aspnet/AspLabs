@@ -71,7 +71,6 @@ namespace System.Web.Internal
                 return;
             }
 
-            _headers.Remove(name);
             _headers[name] = value;
         }
 
