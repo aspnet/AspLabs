@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using System.Web.Internal;
 using AutoFixture;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -603,6 +604,26 @@ namespace System.Web
 
             // Assert
             coreContext.Verify(c => c.Abort(), Times.Once());
+        }
+
+        [Fact]
+        public void Headers()
+        {
+            // Arrange
+            var headersCore = new HeaderDictionary();
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Headers).Returns(headersCore);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var headers1 = request.Headers;
+            var headers2 = request.Headers;
+
+            // Assert
+            Assert.Same(headers1, headers2);
+            Assert.IsType<StringValuesNameValueCollection>(headers1);
         }
     }
 }

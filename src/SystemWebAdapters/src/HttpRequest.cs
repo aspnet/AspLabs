@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
+using System.Web.Internal;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Net.Http.Headers;
@@ -21,6 +22,7 @@ namespace System.Web
 
         private RequestHeaders? _typedHeaders;
         private string[]? _userLanguages;
+        private NameValueCollection? _headers;
 
         public HttpRequest(HttpRequestCore request)
         {
@@ -29,7 +31,18 @@ namespace System.Web
 
         public string? Path => _request.Path.Value;
 
-        public NameValueCollection Headers => throw new NotImplementedException();
+        public NameValueCollection Headers
+        {
+            get
+            {
+                if (_headers is null)
+                {
+                    _headers = new StringValuesNameValueCollection(_request.Headers);
+                }
+
+                return _headers;
+            }
+        }
 
         public Uri Url => new(_request.GetEncodedUrl());
 
