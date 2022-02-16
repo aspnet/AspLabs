@@ -80,7 +80,7 @@ namespace System.Web
         internal static HttpResponseCore? UnwrapAdapter(this HttpResponse? response) => response;
 
         internal static IDictionary AsNonGeneric(this IDictionary<object, object?> dictionary)
-         => dictionary is IDictionary d ? d : new NonGenericDictionaryWrapper(dictionary);
+             => dictionary is IDictionary d ? d : new NonGenericDictionaryWrapper(dictionary);
 
         internal static ICollection AsNonGeneric<T>(this ICollection<T> collection)
             => collection is ICollection c ? c : new NonGenericCollectionWrapper<T>(collection);
