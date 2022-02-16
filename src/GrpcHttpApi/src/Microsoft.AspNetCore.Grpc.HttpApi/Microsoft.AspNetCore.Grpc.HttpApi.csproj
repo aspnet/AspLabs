@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>HTTP API for gRPC ASP.NET Core</Description>
@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.HttpApi.IntegrationTests" />
     <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.HttpApi.Tests" />
     <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.Microbenchmarks" />
   </ItemGroup>

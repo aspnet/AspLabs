@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
@@ -32,12 +33,16 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Internal.Json
             "google/protobuf/type.proto",
         };
 
-        internal static JsonSerializerOptions CreateSerializerOptions(JsonSettings settings)
+        internal static JsonSerializerOptions CreateSerializerOptions(JsonSettings settings, bool isStreamingOptions = false)
         {
+            // Streaming is line delimited between messages. That means JSON can't be indented as it adds new lines.
+            // For streaming to work, indenting must be disabled when streaming.
+            var writeIndented = !isStreamingOptions ? settings.WriteIndented : false;
+
             var options = new JsonSerializerOptions
             {
-                WriteIndented = settings.WriteIndented,
-                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                WriteIndented = writeIndented,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
             options.Converters.Add(new NullValueConverter());
