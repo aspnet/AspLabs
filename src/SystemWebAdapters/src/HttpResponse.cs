@@ -4,12 +4,15 @@
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Web.Internal;
 
 namespace System.Web
 {
     public class HttpResponse
     {
         private readonly HttpResponseCore _response;
+
+        private NameValueCollection? _headers;
 
         public HttpResponse(HttpResponseCore response)
         {
@@ -30,7 +33,15 @@ namespace System.Web
 
         public NameValueCollection Headers
         {
-            get => throw new NotImplementedException();
+            get
+            {
+                if (_headers is null)
+                {
+                    _headers = new StringValuesNameValueCollection(_response.Headers);
+                }
+
+                return _headers;
+            }
         }
 
         public bool TrySkipIisCustomErrors

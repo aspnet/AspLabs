@@ -59,3 +59,9 @@ Notice that since there's a `Controller.Context` property, they can pass that th
   - Services that can be implemented to override some functionality such as session/caching/etc that may need to be customized to match experience.
 - .NET Standard 2.0: This will essentially be a reference assembly. There will be no constructors for the types as ASP.NET Core will construct them based on their `HttpContext` and on framework there are already other constructors. However, this will allow class libraries to target .NET Standard instead of needing to multi-target which will then require everything it depends on to multi-target.
 - .NET Framework 4.7.2: This will type forward the adapter classes to `System.Web` so that they can be unified and enable libraries built against .NET Standard 2.0 to run on .NET Framework instances.
+
+## Known Limitations
+
+Below are some of the limitations of the APIs in the adapters. These are usually due to building off of types used in ASP.NET Core that cannot be fully implemented in ASP.NET Core. In the future, analyzers may be used to flag usage to recommend better patterns.
+
+- `HttpRequest.Headers` and `HttpResponse.Headers` are backed by `NameValueCollection` which exposes methods to `Get(int)`. This throws on the ASP.NET Core implementation since there is no concept of indexing for headers in ASP.NET Core
