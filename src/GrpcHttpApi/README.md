@@ -87,6 +87,6 @@ Improvement would be to write a new runtime serializer for protobuf types with t
 
 ### Experimental project
 
-This project is experimental. It has known issues, it is not complete and it is not supported. We are interested in this technology but there is no commitment to completing it.
+This project is experimental. It has known issues, it is not complete and it is not supported. We are planning to add a supported implementation of this feature in .NET 7.
 
 We want to gauge developer interest in gRPC HTTP API. If gRPC HTTP API is interesting to you then please [give feedback](https://github.com/grpc/grpc-dotnet/issues/167).
