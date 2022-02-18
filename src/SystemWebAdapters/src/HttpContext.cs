@@ -19,6 +19,7 @@ namespace System.Web
         private HttpRequest? _request;
         private HttpResponse? _response;
         private HttpServerUtility? _server;
+        private IDictionary? _items;
 
         public static HttpContext? Current => _accessor.HttpContext;
 
@@ -58,7 +59,18 @@ namespace System.Web
             }
         }
 
-        public IDictionary Items => throw new NotImplementedException();
+        public IDictionary Items
+        {
+            get
+            {
+                if (_items is null)
+                {
+                    _items = _context.Items.AsNonGeneric();
+                }
+
+                return _items;
+            }
+        }
 
         public HttpServerUtility Server
         {

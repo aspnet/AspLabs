@@ -13,15 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore"/>
-    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore"/>
-    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore"/>
+    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\src\System.Web.Adapters.csproj" />
   </ItemGroup>
 
-  <Import Project="CopyFrameworkAdapters.targets"/>
+  <Import Project="CopyFrameworkAdapters.targets" />
 
 </Project>
