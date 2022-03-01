@@ -101,7 +101,7 @@ namespace System.Web.Internal
             Assert.Null(results);
         }
 
-            [Fact]
+        [Fact]
         public void HandleNullKey()
         {
             // Arrange
