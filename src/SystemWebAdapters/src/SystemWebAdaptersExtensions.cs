@@ -16,7 +16,6 @@ namespace System.Web
         {
             services.AddHttpContextAccessor();
             services.AddSingleton<Cache>();
-            services.AddMemoryCache();
         }
 
         [return: NotNullIfNotNull("context")]
