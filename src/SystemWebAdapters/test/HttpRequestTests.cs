@@ -21,7 +21,17 @@ namespace System.Web
         public HttpRequestTests()
         {
             _fixture = new Fixture();
-            _fixture.Register(() => new IPAddress(_fixture.Create<long>()));
+            _fixture.Register(() =>
+            {
+                var address = IPAddress.Loopback;
+
+                while (IPAddress.IsLoopback(address))
+                {
+                    address = new IPAddress(_fixture.Create<long>());
+                }
+
+                return address;
+            });
         }
 
         [Fact]
