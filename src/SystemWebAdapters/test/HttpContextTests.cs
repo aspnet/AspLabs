@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Web.Caching;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -122,6 +123,27 @@ namespace System.Web.Adapters.Tests
 
             // Assert
             Assert.Same(items, result);
+        }
+
+        [Fact]
+        public void CacheFromServices()
+        {
+            // Arrange
+            var cache = new Cache();
+
+            var serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider.Setup(s => s.GetService(typeof(Cache))).Returns(cache);
+
+            var coreContext = new Mock<HttpContextCore>();
+            coreContext.Setup(c => c.RequestServices).Returns(serviceProvider.Object);
+
+            var context = new HttpContext(coreContext.Object);
+
+            // Act
+            var result = context.Cache;
+
+            // Assert
+            Assert.Same(cache, result);
         }
     }
 }

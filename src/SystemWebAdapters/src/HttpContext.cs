@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Caching;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
 {
@@ -85,7 +86,7 @@ namespace System.Web
             }
         }
 
-        public Cache Cache => throw new NotImplementedException();
+        public Cache Cache => _context.RequestServices.GetRequiredService<Cache>();
 
         public IPrincipal User
         {

@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Web.Caching;
 using System.Web.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,8 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<Cache>();
+            services.AddMemoryCache();
         }
 
         [return: NotNullIfNotNull("context")]

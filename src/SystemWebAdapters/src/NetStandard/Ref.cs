@@ -251,14 +251,48 @@ namespace System.Web
 }
 namespace System.Web.Caching
 {
-    public partial class Cache
+    public partial class Cache : System.Collections.IEnumerable
     {
         public static readonly System.DateTime NoAbsoluteExpiration;
         public static readonly System.TimeSpan NoSlidingExpiration;
         public Cache() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public object this[string key] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public object Add(string key, object value, System.Web.Caching.CacheDependency dependencies, System.DateTime absoluteExpiration, System.TimeSpan slidingExpiration, System.Web.Caching.CacheItemPriority priority, System.Web.Caching.CacheItemRemovedCallback onRemoveCallback) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public object Get(string key) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public System.Collections.IEnumerator GetEnumerator() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Insert(string key, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public void Insert(string key, object value, System.Web.Caching.CacheDependency dependencies, System.DateTime absoluteExpiration, System.TimeSpan slidingExpiration) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public void Insert(string key, object value, System.Web.Caching.CacheDependency dependencies, System.DateTime absoluteExpiration, System.TimeSpan slidingExpiration, System.Web.Caching.CacheItemPriority priority, System.Web.Caching.CacheItemRemovedCallback onRemoveCallback) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public void Insert(string key, object value, System.Web.Caching.CacheDependency dependencies, System.DateTime absoluteExpiration, System.TimeSpan slidingExpiration, System.Web.Caching.CacheItemUpdateCallback onUpdateCallback) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public object Remove(string key) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+    }
+    public partial class CacheDependency
+    {
+        internal CacheDependency() { }
+    }
+    public enum CacheItemPriority
+    {
+        AboveNormal = 4,
+        BelowNormal = 2,
+        Default = 3,
+        High = 5,
+        Low = 1,
+        Normal = 3,
+        NotRemovable = 6,
+    }
+    public delegate void CacheItemRemovedCallback(string key, object value, System.Web.Caching.CacheItemRemovedReason reason);
+    public enum CacheItemRemovedReason
+    {
+        DependencyChanged = 4,
+        Expired = 2,
+        Removed = 1,
+        Underused = 3,
+    }
+    public delegate void CacheItemUpdateCallback(string key, System.Web.Caching.CacheItemUpdateReason reason, out object expensiveObject, out System.Web.Caching.CacheDependency dependency, out System.DateTime absoluteExpiration, out System.TimeSpan slidingExpiration);
+    public enum CacheItemUpdateReason
+    {
+        DependencyChanged = 2,
+        Expired = 1,
     }
 }

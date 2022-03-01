@@ -18,6 +18,4 @@ M:System.Web.SessionState.HttpSessionState.#ctor(Microsoft.AspNetCore.Http.HttpC
 
 M:System.Web.HttpServerUtility.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 
-M:System.Web.Caching.Cache.#ctor(Microsoft.AspNetCore.Http.HttpContext)
-
-M:System.Web.Caching.Cache.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache)
+M:System.Web.Caching.Cache.#ctor(System.Runtime.Caching.MemoryCache)

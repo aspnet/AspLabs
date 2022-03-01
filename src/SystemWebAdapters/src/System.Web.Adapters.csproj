@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
@@ -24,6 +24,8 @@
     <Compile Remove="NetStandard/**" />
 
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+    <PackageReference Include="System.Runtime.Caching" Version="6.0.0" />
 
     <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
     <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
