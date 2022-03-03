@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Internal;
 using AutoFixture;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -624,6 +625,50 @@ namespace System.Web
             // Assert
             Assert.Same(headers1, headers2);
             Assert.IsType<StringValuesNameValueCollection>(headers1);
+        }
+
+        [Fact]
+        public void ServerVariables()
+        {
+            // Arrange
+            var serverVariables = new Mock<IServerVariablesFeature>();
+
+            var features = new Mock<IFeatureCollection>();
+            features.Setup(f => f.Get<IServerVariablesFeature>()).Returns(serverVariables.Object);
+
+            var contextCore = new Mock<HttpContextCore>();
+            contextCore.Setup(c => c.Features).Returns(features.Object);
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.HttpContext).Returns(contextCore.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var serverVariables1 = request.ServerVariables;
+            var serverVariables2 = request.ServerVariables;
+
+            // Assert
+            Assert.Same(serverVariables1, serverVariables2);
+            Assert.IsType<ServerVariablesNameValueCollection>(serverVariables1);
+        }
+
+        [Fact]
+        public void ServerVariableFeatureNotAvailable()
+        {
+            // Arrange
+            var features = new Mock<IFeatureCollection>();
+
+            var contextCore = new Mock<HttpContextCore>();
+            contextCore.Setup(c => c.Features).Returns(features.Object);
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.HttpContext).Returns(contextCore.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            Assert.Throws<PlatformNotSupportedException>(() => request.ServerVariables);
         }
     }
 }
