@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MvcCoreApp.Controllers
 {
+    [SystemWebAdapter]
     public class DataController : Controller
     {
         [HttpGet]
@@ -16,6 +17,7 @@ namespace MvcCoreApp.Controllers
 
         [HttpGet]
         [Route("/api/data2")]
+        [SystemWebAdapter(Enabled = false)]
         public RequestInfo Get2() => RequestInfo.Current;
     }
 }

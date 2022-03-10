@@ -1,4 +1,5 @@
 T:System.Web.SystemWebAdaptersExtensions
+T:System.Web.SystemWebAdapterAttribute
 
 M:System.Web.HttpContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 M:System.Web.HttpContext.op_Implicit(Microsoft.AspNetCore.Http.HttpContext)~System.Web.HttpContext

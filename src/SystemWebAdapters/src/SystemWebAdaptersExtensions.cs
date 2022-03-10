@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
@@ -14,7 +16,22 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<SystemWebAdapterMiddleware>();
         }
+
+        public static void UseSystemWebAdapters(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<SystemWebAdapterMiddleware>();
+        }
+
+        public static TBuilder RequireSystemWebAdapter<TBuilder>(this TBuilder builder, SystemWebAdapterAttribute? options = null)
+            where TBuilder : IEndpointConventionBuilder
+        {
+            return builder.WithMetadata(options ?? new());
+        }
+
+        internal static SystemWebAdapterAttribute? GetSystemWebMetadata(this HttpContextCore context)
+            => context.GetEndpoint()?.Metadata.GetMetadata<SystemWebAdapterAttribute>();
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)

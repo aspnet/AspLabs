@@ -23,6 +23,13 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseSystemWebAdapters();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
