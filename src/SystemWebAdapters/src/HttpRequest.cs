@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Net.Http.Headers;
 
@@ -22,7 +23,8 @@ namespace System.Web
 
         private RequestHeaders? _typedHeaders;
         private string[]? _userLanguages;
-        private NameValueCollection? _headers;
+        private StringValuesNameValueCollection? _headers;
+        private ServerVariablesNameValueCollection? _serverVariables;
 
         public HttpRequest(HttpRequestCore request)
         {
@@ -31,18 +33,7 @@ namespace System.Web
 
         public string? Path => _request.Path.Value;
 
-        public NameValueCollection Headers
-        {
-            get
-            {
-                if (_headers is null)
-                {
-                    _headers = new StringValuesNameValueCollection(_request.Headers);
-                }
-
-                return _headers;
-            }
-        }
+        public NameValueCollection Headers => _headers ??= new(_request.Headers);
 
         public Uri Url => new(_request.GetEncodedUrl());
 
@@ -107,7 +98,25 @@ namespace System.Web
 
         public Stream InputStream => throw new NotImplementedException();
 
-        public NameValueCollection ServerVariables => throw new NotImplementedException();
+        public NameValueCollection ServerVariables
+        {
+            get
+            {
+                if (_serverVariables is null)
+                {
+                    if (_request.HttpContext.Features.Get<IServerVariablesFeature>() is IServerVariablesFeature feature)
+                    {
+                        _serverVariables = new(feature);
+                    }
+                    else
+                    {
+                        throw new PlatformNotSupportedException("IServerVariablesFeature is not available.");
+                    }
+                }
+
+                return _serverVariables;
+            }
+        }
 
         public bool IsSecureConnection => _request.IsHttps;
 
@@ -158,18 +167,7 @@ namespace System.Web
 
         public void Abort() => _request.HttpContext.Abort();
 
-        private RequestHeaders TypedHeaders
-        {
-            get
-            {
-                if (_typedHeaders is null)
-                {
-                    _typedHeaders = new(_request.Headers);
-                }
-
-                return _typedHeaders;
-            }
-        }
+        private RequestHeaders TypedHeaders => _typedHeaders ??= new(_request.Headers);
 
         [return: NotNullIfNotNull("request")]
         public static implicit operator HttpRequest?(HttpRequestCore? request) => request.GetAdapter();
