@@ -40,20 +40,7 @@ namespace System.Web.Internal
 
             context.Request.EnableBuffering();
 
-            var bytes = ArrayPool<byte>.Shared.Rent(1024);
-
-            try
-            {
-                while (await context.Request.Body.ReadAsync(bytes, context.RequestAborted) > 0)
-                {
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(bytes);
-            }
-
-            context.Request.Body.Position = 0;
-        }
+await context.Request.Body.DrainAsync(context.RequestAborted);
+context.Request.Body.Position = 0
     }
 }
