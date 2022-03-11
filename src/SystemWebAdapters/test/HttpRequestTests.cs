@@ -9,6 +9,7 @@ using System.Web.Internal;
 using AutoFixture;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -634,7 +635,7 @@ namespace System.Web
 
             // Assert
             Assert.Same(headers1, headers2);
-            Assert.IsType<StringValuesNameValueCollection>(headers1);
+            Assert.IsType<StringValuesDictionaryNameValueCollection>(headers1);
         }
 
         [Fact]
@@ -679,6 +680,82 @@ namespace System.Web
 
             // Act
             Assert.Throws<PlatformNotSupportedException>(() => request.ServerVariables);
+        }
+
+        [Fact]
+        public void Form()
+        {
+            // Arrange
+            var form = new Mock<IFormCollection>();
+            form.Setup(f => f.Count).Returns(0);
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Form).Returns(form.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var formCollection1 = request.Form;
+            var formCollection2 = request.Form;
+
+            // Assert
+            Assert.Same(formCollection1, formCollection2);
+            Assert.IsType<StringValuesNameValueCollection>(formCollection1);
+        }
+
+        [Fact]
+        public void Form3Items()
+        {
+            // Arrange
+            var key1 = _fixture.Create<string>();
+            var value1 = _fixture.Create<string>();
+            var key2 = _fixture.Create<string>();
+            var value2 = _fixture.Create<string>();
+            var value3 = _fixture.Create<string>();
+
+            var formCollection = new FormCollection(new()
+            {
+                { key1, value1 },
+                { key2, new StringValues(new[] { value2, value3 }) },
+            });
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Form).Returns(formCollection);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var form = request.Form;
+
+            // Assert
+            Assert.Equal(2, form.Count);
+            Assert.Equal(key1, form.GetKey(0));
+            Assert.Equal(new[] { value1 }, form.GetValues(0));
+            Assert.Equal(value1, form.Get(0));
+            Assert.Equal(key2, form.GetKey(1));
+            Assert.Equal(new[] { value2, value3 }, form.GetValues(1));
+            Assert.Equal($"{value2},{value3}", form.Get(1));
+        }
+
+        [Fact]
+        public void Query()
+        {
+            // Arrange
+            var query = new Mock<IQueryCollection>();
+            query.Setup(f => f.Count).Returns(0);
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Query).Returns(query.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var queryCollection1 = request.QueryString;
+            var queryCollection2 = request.QueryString;
+
+            // Assert
+            Assert.Same(queryCollection1, queryCollection2);
+            Assert.IsType<StringValuesNameValueCollection>(queryCollection1);
         }
     }
 }

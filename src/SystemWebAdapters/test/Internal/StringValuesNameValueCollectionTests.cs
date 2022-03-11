@@ -1,11 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
 using AutoFixture;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
-using StringValuesDictionary = System.Collections.Generic.Dictionary<string, Microsoft.Extensions.Primitives.StringValues>;
-
 namespace System.Web.Internal
 {
+    [Diagnostics.CodeAnalysis.SuppressMessage("Assertions", "xUnit2013:Do not use equality check to check for collection size.", Justification = "Need to test collection implementation")]
     public class StringValuesNameValueCollectionTests
     {
         private readonly Fixture _fixture;
@@ -16,222 +17,95 @@ namespace System.Web.Internal
         }
 
         [Fact]
-        public void PlatformNotSupportedExceptions()
-        {
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            Assert.Throws<PlatformNotSupportedException>(() => collection.Keys);
-            Assert.Throws<PlatformNotSupportedException>(() => collection.Get(0));
-            Assert.Throws<PlatformNotSupportedException>(() => collection.GetValues(0));
-            Assert.Throws<PlatformNotSupportedException>(() => collection.GetKey(0));
-        }
-
-        [Fact]
-        public void Empty()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            var result = collection.Count;
-
-            // Assert
-            Assert.Equal(0, result);
-        }
-
-        [Fact]
-        public void AddGetValue()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            var newKey = _fixture.Create<string>();
-            var newValue1 = _fixture.Create<string>();
-            var newValue2 = _fixture.Create<string>();
-
-            var expected = new StringValues(new[] { newValue1, newValue2 });
-
-            // Act
-            collection.Add(newKey, newValue1);
-            collection.Add(newKey, newValue2);
-
-            // Assert
-            Assert.Equal(expected.ToArray(), collection.GetValues(newKey));
-            Assert.Equal(expected.ToString(), collection.Get(newKey));
-            Assert.Equal(expected, dictionary[newKey]);
-        }
-
-        [Fact]
-        public void SetValue()
-        {
-            // Arrange
-            var key = _fixture.Create<string>();
-            var dictionary = new StringValuesDictionary
-            {
-                { key, _fixture.Create<string>() }
-            };
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            var newValue = _fixture.Create<string>();
-
-            // Act
-            collection.Set(key, newValue);
-
-            // Assert
-            Assert.Equal(newValue, collection.Get(key));
-            Assert.Equal(newValue, dictionary[key]);
-        }
-
-        [Fact]
-        public void GetKeyNotPresent()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            var result = collection.Get(_fixture.Create<string>());
-            var results = collection.GetValues(_fixture.Create<string>());
-
-            // Assert
-            Assert.Null(result);
-            Assert.Null(results);
-        }
-
-        [Fact]
-        public void HandleNullKey()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            collection.Add(null, _fixture.Create<string>());
-
-            // Assert
-            Assert.Empty(collection);
-            Assert.Empty(dictionary);
-        }
-
-        [Fact]
-        public void EmptyKeys()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary();
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            var keys = collection.AllKeys;
-
-            // Assert
-            Assert.Empty(keys);
-        }
-
-        [Fact]
-        public void AllKeys()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary
-            {
-                { _fixture.Create<string>(), _fixture.Create<string>() },
-                { _fixture.Create<string>(), _fixture.Create<string>() },
-                { _fixture.Create<string>(), _fixture.Create<string>() },
-                { _fixture.Create<string>(), _fixture.Create<string>() },
-            };
-
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            var keys1 = collection.AllKeys;
-            var keys2 = collection.AllKeys;
-
-            // Assert
-            Assert.NotSame(keys1, keys2);
-            Assert.Equal(dictionary.Keys, keys1);
-        }
-
-        [Fact]
-        public void Remove()
+        public void OneItem()
         {
             // Arrange
             var key = _fixture.Create<string>();
             var value = _fixture.Create<string>();
-            var dictionary = new StringValuesDictionary
+
+            var items = new Builder
             {
-                { key, value }
+                { key, value },
             };
 
-            var collection = new StringValuesNameValueCollection(dictionary);
-
             // Act
-            collection.Remove(key);
+            var collection = new StringValuesNameValueCollection(items);
 
             // Assert
-            Assert.False(dictionary.ContainsKey(key));
+            Assert.Equal(1, collection.Count);
+            Assert.Equal(key, collection.GetKey(0));
+            Assert.Equal(value, collection.Get(0));
+            Assert.Equal(new[] { value }, collection.GetValues(0));
         }
 
         [Fact]
-        public void RemoveKeyNotPresent()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary
-            {
-                { _fixture.Create<string>(), _fixture.Create<string>() }
-            };
-
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            collection.Remove(_fixture.Create<string>());
-
-            // Assert
-            Assert.Single(collection);
-            Assert.Single(dictionary);
-        }
-
-        [Fact]
-        public void Clear()
-        {
-            // Arrange
-            var dictionary = new StringValuesDictionary
-            {
-                { _fixture.Create<string>(), _fixture.Create<string>() }
-            };
-
-            var collection = new StringValuesNameValueCollection(dictionary);
-
-            // Act
-            collection.Clear();
-
-            // Assert
-            Assert.Empty(collection);
-            Assert.Empty(dictionary);
-        }
-
-        [Fact]
-        public void GetEnumerator()
+        public void OneItemDuplicateKey()
         {
             // Arrange
             var key = _fixture.Create<string>();
-            var dictionary = new StringValuesDictionary
+            var value1 = _fixture.Create<string>();
+            var value2 = _fixture.Create<string>();
+
+            var items = new Builder
             {
-                { key, _fixture.Create<string>()}
+                { key, value1 },
+                { key, value2 },
             };
 
-            var collection = new StringValuesNameValueCollection(dictionary);
-            var enumerator = collection.GetEnumerator();
+            // Act
+            var collection = new StringValuesNameValueCollection(items);
+
+            // Assert
+            Assert.Equal(1, collection.Count);
+            Assert.Equal(key, collection.GetKey(0));
+            Assert.Equal($"{value1},{value2}", collection.Get(0));
+            Assert.Equal(new[] { value1, value2 }, collection.GetValues(0));
+        }
+
+        [Fact]
+        public void OneItemMultipleStringValue()
+        {
+            // Arrange
+            var key = _fixture.Create<string>();
+            var value1 = _fixture.Create<string>();
+            var value2 = _fixture.Create<string>();
+            var value3 = _fixture.Create<string>();
+
+            var items = new Builder
+            {
+                { key, new StringValues(new[] { value1, value2 }) },
+                { key, value3 },
+            };
+
+            // Act
+            var collection = new StringValuesNameValueCollection(items);
+
+            // Assert
+            Assert.Equal(1, collection.Count);
+            Assert.Equal(key, collection.GetKey(0));
+            Assert.Equal($"{value1},{value2},{value3}", collection.Get(0));
+            Assert.Equal(new[] { value1, value2, value3 }, collection.GetValues(0));
+        }
+
+        [Fact]
+        public void IsReadOnly()
+        {
+            // Arrange
+            var collection = new StringValuesNameValueCollection();
 
             // Act/Assert
-            Assert.True(enumerator.MoveNext());
-            Assert.Equal(key, enumerator.Current);
-            Assert.False(enumerator.MoveNext());
-            enumerator.Reset();
-            Assert.True(enumerator.MoveNext());
-            Assert.Equal(key, enumerator.Current);
-            Assert.False(enumerator.MoveNext());
+            Assert.Throws<NotSupportedException>(() => collection.Add(_fixture.Create<string>(), _fixture.Create<string>()));
+        }
+
+        private class Builder : IEnumerable<KeyValuePair<string, StringValues>>
+        {
+            private List<KeyValuePair<string, StringValues>> _items = new();
+
+            public void Add(string key, StringValues values) => _items.Add(new(key, values));
+
+            public IEnumerator<KeyValuePair<string, StringValues>> GetEnumerator() => _items.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

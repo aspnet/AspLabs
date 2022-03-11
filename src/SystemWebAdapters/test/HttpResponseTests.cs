@@ -27,7 +27,7 @@ namespace System.Web
 
             // Assert
             Assert.Same(headers1, headers2);
-            Assert.IsType<StringValuesNameValueCollection>(headers1);
+            Assert.IsType<StringValuesDictionaryNameValueCollection>(headers1);
         }
     }
 }
