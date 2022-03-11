@@ -98,7 +98,7 @@ namespace System.Web
 
         public Stream InputStream => _request.Body.CanSeek
             ? _request.Body
-            : throw new InvalidOperationException("Input stream must be seekable. Ensure you are calling IApplicationBuilder.UseSystemWebAdapters in your startup configuration");
+            : throw new InvalidOperationException("Input stream must be seekable. Ensure your endpoints are either annotated with BufferRequestStreamAttribute or you've called .RequireRequestStreamBuffering() on them.");
 
         public NameValueCollection ServerVariables
         {

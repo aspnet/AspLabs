@@ -5,8 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
+using System.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
@@ -16,22 +16,27 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.AddSingleton<SystemWebAdapterMiddleware>();
+            services.AddSingleton<BufferRequestStreamMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
         {
-            app.UseMiddleware<SystemWebAdapterMiddleware>();
+            app.UseMiddleware<BufferRequestStreamMiddleware>();
         }
 
-        public static TBuilder RequireSystemWebAdapter<TBuilder>(this TBuilder builder, SystemWebAdapterAttribute? options = null)
+        /// <summary>
+        /// Adds all features needed to support System.Web adapters to the endpoint(s)
+        /// </summary>
+        public static TBuilder RequireSystemWebAdapters<TBuilder>(this TBuilder builder)
             where TBuilder : IEndpointConventionBuilder
-        {
-            return builder.WithMetadata(options ?? new());
-        }
+            => builder.RequireRequestStreamBuffering();
 
-        internal static SystemWebAdapterAttribute? GetSystemWebMetadata(this HttpContextCore context)
-            => context.GetEndpoint()?.Metadata.GetMetadata<SystemWebAdapterAttribute>();
+        /// <summary>
+        /// Adds request stream bufferingto the endpoint(s)
+        /// </summary>
+        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(new BufferRequestStreamAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)
