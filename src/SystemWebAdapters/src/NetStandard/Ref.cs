@@ -1,6 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 namespace System.Web
 {
     public partial class HttpBrowserCapabilities
@@ -248,10 +245,11 @@ namespace System.Web
         public virtual byte[] UrlTokenDecode(string input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual string UrlTokenEncode(byte[] input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
-    public partial class HttpSessionStateBase
+    public abstract partial class HttpSessionStateBase
     {
-        public HttpSessionStateBase() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        protected HttpSessionStateBase() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public virtual bool IsNewSession { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
@@ -266,6 +264,7 @@ namespace System.Web
     {
         public HttpSessionStateWrapper(System.Web.SessionState.HttpSessionState session) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public override int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public override bool IsNewSession { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public override bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public override object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public override string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
@@ -297,8 +296,9 @@ namespace System.Web.SessionState
 {
     public partial class HttpSessionState
     {
-        internal HttpSessionState() { }
+        public HttpSessionState(System.Web.SessionState.IHttpSessionState container) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public bool IsNewSession { [System.Runtime.CompilerServices.CompilerGeneratedAttribute]get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
@@ -308,17 +308,5 @@ namespace System.Web.SessionState
         public void Clear() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
-    }
-    public partial interface IHttpSessionContainer
-    {
-        int Count { get; }
-        bool IsReadOnly { get; }
-        object this[string name] { get; set; }
-        string SessionID { get; }
-        int TimeOut { get; set; }
-        void Abandon();
-        void Add(string name, object value);
-        void Clear();
-        void Remove(string name);
     }
 }

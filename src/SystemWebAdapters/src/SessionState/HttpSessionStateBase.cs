@@ -3,7 +3,7 @@
 
 namespace System.Web;
 
-public class HttpSessionStateBase
+public abstract class HttpSessionStateBase
 {
     public virtual string SessionID => throw new NotImplementedException();
 

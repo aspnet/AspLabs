@@ -1,4 +1,6 @@
 T:System.Web.SystemWebAdaptersExtensions
+T:System.Web.SessionState.IHttpSessionState
+T:System.Web.SessionState.IHttpSessionStateFactory
 
 M:System.Web.HttpContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 M:System.Web.HttpContext.op_Implicit(Microsoft.AspNetCore.Http.HttpContext)~System.Web.HttpContext

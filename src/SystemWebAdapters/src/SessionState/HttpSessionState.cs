@@ -5,9 +5,9 @@ namespace System.Web.SessionState;
 
 public class HttpSessionState
 {
-    private readonly IHttpSessionContainer _container;
+    private readonly IHttpSessionState _container;
 
-    public HttpSessionState(IHttpSessionContainer container)
+    public HttpSessionState(IHttpSessionState container)
     {
         _container = container;
     }
