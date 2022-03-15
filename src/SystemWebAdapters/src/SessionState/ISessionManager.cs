@@ -6,9 +6,21 @@ using System.Web.Metadata;
 
 namespace System.Web.SessionState;
 
+/// <summary>
+/// Manages creation and completion of session state.
+/// </summary>
 public interface ISessionManager
 {
-    Task<ISessionState> InitializeAsync(HttpContextCore context, ISessionMetadata metadata);
+    /// <summary>
+    /// Creates an instance of <see cref="ISessionState"/> for a given content and metadata.
+    /// </summary>
+    /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
+    /// <param name="metadata">Metadata for the session.</param>
+    Task<ISessionState> CreateAsync(HttpContextCore context, ISessionMetadata metadata);
 
-    Task CompleteAsync(HttpContextCore context, ISessionState state);
+    /// <summary>
+    /// Completes a session.
+    /// </summary>
+    /// <param name="context">Current <see cref="HttpContextCore"/></param>
+    Task CompleteAsync(HttpContextCore context);
 }

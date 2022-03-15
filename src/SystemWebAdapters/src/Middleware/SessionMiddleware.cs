@@ -38,7 +38,7 @@ namespace System.Web.Middleware
             _logger.LogTrace("Initializing session state");
 
             var manager = context.RequestServices.GetRequiredService<ISessionManager>();
-            var state = await manager.InitializeAsync(context, metadata);
+            var state = await manager.CreateAsync(context, metadata);
             context.Features.Set(new HttpSessionState(state));
 
             try
@@ -48,7 +48,7 @@ namespace System.Web.Middleware
             finally
             {
                 _logger.LogTrace("Completing session state");
-                await manager.CompleteAsync(context, state);
+                await manager.CompleteAsync(context);
             }
         }
     }
