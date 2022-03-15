@@ -23,9 +23,9 @@ namespace System.Web.Adapters
         }
 
         /// <summary>
-        /// Adds request stream bufferingto the endpoint(s)
+        /// Adds request stream buffering to the endpoint(s)
         /// </summary>
-        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder, IPreBufferRequestStreamMetadata? metadata = null)
+        public static TBuilder PreBufferRequestStream<TBuilder>(this TBuilder builder, IPreBufferRequestStreamMetadata? metadata = null)
             where TBuilder : IEndpointConventionBuilder
             => builder.WithMetadata(metadata ?? new PreBufferRequestStreamAttribute());
 

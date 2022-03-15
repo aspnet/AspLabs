@@ -30,18 +30,10 @@ internal class PreBufferRequestStreamMiddleware : IMiddleware
 
     private async Task PreBufferAsync(HttpContextCore context, IPreBufferRequestStreamMetadata metadata, RequestDelegate next)
     {
-        var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
-        var bufferLimit = (feature?.MaxRequestBodySize, metadata.BufferLimit) switch
-        {
-            (null, long limit) => limit,
-            (long limit, null) => limit,
-            (long featureLimit, long metadataLimit) => Math.Min(featureLimit, metadataLimit),
-            _ => long.MaxValue,
-        };
-
+        // TODO: Should this enforce MaxRequestBodySize? https://github.com/aspnet/AspLabs/pull/447#discussion_r827314309
         _logger.LogTrace("Buffering request stream");
 
-        context.Request.EnableBuffering(metadata.BufferThreshold, bufferLimit);
+        context.Request.EnableBuffering(metadata.BufferThreshold, metadata.BufferLimit ?? long.MaxValue);
 
         await context.Request.Body.DrainAsync(context.RequestAborted);
         context.Request.Body.Position = 0;
