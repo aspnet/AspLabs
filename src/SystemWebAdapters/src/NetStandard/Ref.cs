@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 namespace System.Web
 {
     public partial class HttpBrowserCapabilities
@@ -296,7 +299,7 @@ namespace System.Web.SessionState
 {
     public partial class HttpSessionState
     {
-        public HttpSessionState(System.Web.SessionState.IHttpSessionState container) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        internal HttpSessionState() { }
         public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsNewSession { [System.Runtime.CompilerServices.CompilerGeneratedAttribute]get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
