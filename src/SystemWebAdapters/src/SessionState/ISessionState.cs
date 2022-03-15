@@ -3,7 +3,7 @@
 
 namespace System.Web.SessionState;
 
-public interface IHttpSessionState
+public interface ISessionState
 {
     string SessionID { get; }
 

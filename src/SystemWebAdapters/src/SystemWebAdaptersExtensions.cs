@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
+using System.Web.Metadata;
+using System.Web.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web
@@ -14,7 +17,20 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<SessionMiddleware>();
         }
+
+        public static void UseSystemWebAdapters(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<SessionMiddleware>();
+        }
+
+        /// <summary>
+        /// Adds session support for System.Web adapters for the endpoint(s)
+        /// </summary>
+        public static TBuilder RequireSystemWebAdapterSession<TBuilder>(this TBuilder builder, ISessionMetadata? metadata = null)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(metadata ?? new SessionAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)
