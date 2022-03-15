@@ -22,7 +22,7 @@ internal class BufferRequestStreamMiddleware : IMiddleware
     {
         var metadata = context.GetEndpoint()?.Metadata.GetMetadata<IBufferRequestStreamMetadata>();
 
-        if (metadata is not null && metadata.IsEnabled)
+        if (metadata is { IsEnabled: true })
         {
             _logger.LogTrace("Buffering request stream");
 
