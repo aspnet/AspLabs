@@ -15,6 +15,7 @@ namespace System.Web.Adapters
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<PreBufferRequestStreamMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
