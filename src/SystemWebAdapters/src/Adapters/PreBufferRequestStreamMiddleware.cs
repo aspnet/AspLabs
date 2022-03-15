@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -21,16 +22,18 @@ internal class PreBufferRequestStreamMiddleware : IMiddleware
     {
         if (context.GetEndpoint()?.Metadata.GetMetadata<IPreBufferRequestStreamMetadata>() is { IsEnabled: true } metadata)
         {
+            var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+            var bufferLimit = (feature?.MaxRequestBodySize, metadata.BufferLimit) switch
+            {
+                (null, long limit) => limit, 
+                (long limit, null) => limit,
+                (long featureLimit, long metadataLimit) => Math.Min(featureLimit, metadataLimit),
+                _ => long.MaxValue,
+            };
+
             _logger.LogTrace("Buffering request stream");
 
-            if (metadata.BufferLimit.HasValue)
-            {
-                context.Request.EnableBuffering(metadata.BufferThreshold, metadata.BufferLimit.Value);
-            }
-            else
-            {
-                context.Request.EnableBuffering(metadata.BufferThreshold);
-            }
+            context.Request.EnableBuffering(metadata.BufferThreshold, bufferLimit);
 
             await context.Request.Body.DrainAsync(context.RequestAborted);
             context.Request.Body.Position = 0;
