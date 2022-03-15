@@ -3,7 +3,8 @@
 
 namespace System.Web.Adapters;
 
-public class SessionAttribute : ISessionMetadata
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public sealed class SessionAttribute : Attribute, ISessionMetadata
 {
     public bool IsEnabled { get; set; } = true;
 

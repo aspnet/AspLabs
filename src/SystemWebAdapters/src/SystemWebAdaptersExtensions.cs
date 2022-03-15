@@ -16,6 +16,7 @@ namespace System.Web
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<SessionMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
