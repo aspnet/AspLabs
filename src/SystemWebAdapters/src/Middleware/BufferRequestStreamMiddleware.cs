@@ -20,9 +20,7 @@ internal class BufferRequestStreamMiddleware : IMiddleware
 
     public async Task InvokeAsync(HttpContextCore context, RequestDelegate next)
     {
-        var metadata = context.GetEndpoint()?.Metadata.GetMetadata<IBufferRequestStreamMetadata>();
-
-        if (metadata is { IsEnabled: true })
+        if (context.GetEndpoint()?.Metadata.GetMetadata<IBufferRequestStreamMetadata>() is { IsEnabled: true } metadata)
         {
             _logger.LogTrace("Buffering request stream");
 
