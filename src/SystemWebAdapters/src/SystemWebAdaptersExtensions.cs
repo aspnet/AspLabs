@@ -4,18 +4,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace System.Web.Adapters
+namespace System.Web
 {
     public static class SystemWebAdaptersExtensions
     {
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.AddSingleton<SessionMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)

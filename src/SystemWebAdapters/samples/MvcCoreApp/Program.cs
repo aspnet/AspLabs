@@ -1,4 +1,4 @@
-using System.Web.Adapters;
+using System.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
