@@ -5,12 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
-using System.Web.Metadata;
 using System.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace System.Web
+namespace System.Web.Adapters
 {
     public static class SystemWebAdaptersExtensions
     {
@@ -44,7 +43,7 @@ namespace System.Web
             if (result is null)
             {
                 result = new(context);
-                context.Features.Set<HttpContext>(result);
+                context.Features.Set(result);
             }
 
             return result;

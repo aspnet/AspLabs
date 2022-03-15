@@ -6,12 +6,11 @@ using Autofac.Extras.Moq;
 using Moq;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http;
-using System.Web.Metadata;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.IO;
 
-namespace System.Web.Middleware;
+namespace System.Web.Adapters;
 
 public class BufferRequestStreamMiddlewareTests
 {
