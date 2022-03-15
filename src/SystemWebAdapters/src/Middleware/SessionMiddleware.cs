@@ -38,18 +38,12 @@ namespace System.Web.Middleware
             _logger.LogTrace("Initializing session state");
 
             var manager = context.RequestServices.GetRequiredService<ISessionManager>();
-            var state = await manager.CreateAsync(context, metadata);
+
+            await using var state = await manager.CreateAsync(context, metadata);
+
             context.Features.Set(new HttpSessionState(state));
 
-            try
-            {
-                await next(context);
-            }
-            finally
-            {
-                _logger.LogTrace("Completing session state");
-                await manager.CompleteAsync(context);
-            }
+            await next(context);
         }
     }
 }

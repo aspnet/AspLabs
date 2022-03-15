@@ -17,10 +17,4 @@ public interface ISessionManager
     /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
     /// <param name="metadata">Metadata for the session.</param>
     Task<ISessionState> CreateAsync(HttpContextCore context, ISessionMetadata metadata);
-
-    /// <summary>
-    /// Completes a session.
-    /// </summary>
-    /// <param name="context">Current <see cref="HttpContextCore"/></param>
-    Task CompleteAsync(HttpContextCore context);
 }
