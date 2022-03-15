@@ -1,9 +1,9 @@
 T:System.Web.SystemWebAdaptersExtensions
 
-T:System.Web.SessionAttribute
-T:System.Web.SessionState.ISessionState
-T:System.Web.Metadata.ISessionMetadata
-T:System.Web.SessionState.ISessionManager
+T:System.Web.Adapters.SessionAttribute
+T:System.Web.Adapters.ISessionState
+T:System.Web.Adapters.ISessionMetadata
+T:System.Web.Adapters.ISessionManager
 
 M:System.Web.HttpContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 M:System.Web.HttpContext.op_Implicit(Microsoft.AspNetCore.Http.HttpContext)~System.Web.HttpContext
@@ -27,4 +27,4 @@ M:System.Web.Caching.Cache.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 
 M:System.Web.Caching.Cache.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache)
 
-M:System.Web.SessionState.HttpSessionState.#ctor(System.Web.SessionState.ISessionState)
+M:System.Web.SessionState.HttpSessionState.#ctor(System.Web.Adapters.ISessionState)
