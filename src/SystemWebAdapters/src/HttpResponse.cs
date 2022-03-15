@@ -4,6 +4,7 @@
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Web.Adapters;
 using System.Web.Internal;
 
 namespace System.Web

@@ -2,9 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Threading.Tasks;
-using System.Web.Metadata;
 
-namespace System.Web.SessionState;
+namespace System.Web.Adapters;
 
 /// <summary>
 /// Manages creation and completion of session state.

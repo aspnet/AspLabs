@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
+using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
