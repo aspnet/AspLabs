@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
+using System.Web.Metadata;
 using System.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,18 +26,11 @@ namespace System.Web
         }
 
         /// <summary>
-        /// Adds all features needed to support System.Web adapters to the endpoint(s)
-        /// </summary>
-        public static TBuilder RequireSystemWebAdapters<TBuilder>(this TBuilder builder)
-            where TBuilder : IEndpointConventionBuilder
-            => builder.RequireRequestStreamBuffering();
-
-        /// <summary>
         /// Adds request stream bufferingto the endpoint(s)
         /// </summary>
-        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder)
+        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder, IBufferRequestStreamMetadata? metadata = null)
             where TBuilder : IEndpointConventionBuilder
-            => builder.WithMetadata(new BufferRequestStreamAttribute());
+            => builder.WithMetadata(metadata ?? new BufferRequestStreamAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)
