@@ -12,7 +12,7 @@ using System.IO;
 
 namespace System.Web.Adapters;
 
-public class BufferRequestStreamMiddlewareTests
+public class PreBufferRequestStreamMiddlewareTests
 {
     [InlineData(true)]
     [InlineData(false)]
@@ -22,9 +22,9 @@ public class BufferRequestStreamMiddlewareTests
         // Arrange
         using var mock = AutoMock.GetLoose();
 
-        var logger = new Mock<ILogger<BufferRequestStreamMiddleware>>();
+        var logger = new Mock<ILogger<PreBufferRequestStreamMiddleware>>();
 
-        var metadata = new Mock<IBufferRequestStreamMetadata>();
+        var metadata = new Mock<IPreBufferRequestStreamMetadata>();
         metadata.Setup(m => m.IsEnabled).Returns(isEnabled);
 
         var metadataCollection = new EndpointMetadataCollection(metadata.Object);
@@ -50,7 +50,7 @@ public class BufferRequestStreamMiddlewareTests
         var requestDelegate = new Mock<RequestDelegate>();
 
         // Act
-        await mock.Create<BufferRequestStreamMiddleware>().InvokeAsync(context, requestDelegate.Object);
+        await mock.Create<PreBufferRequestStreamMiddleware>().InvokeAsync(context, requestDelegate.Object);
 
         // Assert
         Assert.Equal(isEnabled, context.Request.Body.CanSeek);

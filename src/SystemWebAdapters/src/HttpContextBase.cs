@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Security.Principal;
 using System.Diagnostics.CodeAnalysis;
+using System.Web.Adapters;
 
 namespace System.Web
 {

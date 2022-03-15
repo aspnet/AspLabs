@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
-namespace System.Web.Middleware;
+namespace System.Web.Adapters;
 
-internal class BufferRequestStreamMiddleware : IMiddleware
+internal class PreBufferRequestStreamMiddleware : IMiddleware
 {
-    private readonly ILogger<BufferRequestStreamMiddleware> _logger;
+    private readonly ILogger<PreBufferRequestStreamMiddleware> _logger;
 
-    public BufferRequestStreamMiddleware(ILogger<BufferRequestStreamMiddleware> logger)
+    public PreBufferRequestStreamMiddleware(ILogger<PreBufferRequestStreamMiddleware> logger)
     {
         _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContextCore context, RequestDelegate next)
     {
-        if (context.GetEndpoint()?.Metadata.GetMetadata<IBufferRequestStreamMetadata>() is { IsEnabled: true } metadata)
+        if (context.GetEndpoint()?.Metadata.GetMetadata<IPreBufferRequestStreamMetadata>() is { IsEnabled: true } metadata)
         {
             _logger.LogTrace("Buffering request stream");
 

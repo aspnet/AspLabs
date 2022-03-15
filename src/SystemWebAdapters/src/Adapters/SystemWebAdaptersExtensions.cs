@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Internal;
-using System.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,15 +19,15 @@ namespace System.Web.Adapters
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
         {
-            app.UseMiddleware<BufferRequestStreamMiddleware>();
+            app.UseMiddleware<PreBufferRequestStreamMiddleware>();
         }
 
         /// <summary>
         /// Adds request stream bufferingto the endpoint(s)
         /// </summary>
-        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder, IBufferRequestStreamMetadata? metadata = null)
+        public static TBuilder RequireRequestStreamBuffering<TBuilder>(this TBuilder builder, IPreBufferRequestStreamMetadata? metadata = null)
             where TBuilder : IEndpointConventionBuilder
-            => builder.WithMetadata(metadata ?? new BufferRequestStreamAttribute());
+            => builder.WithMetadata(metadata ?? new PreBufferRequestStreamAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)

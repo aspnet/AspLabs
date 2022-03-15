@@ -3,7 +3,7 @@
 
 namespace System.Web.Adapters;
 
-public interface IBufferRequestStreamMetadata
+public interface IPreBufferRequestStreamMetadata
 {
     bool IsEnabled { get; }
 

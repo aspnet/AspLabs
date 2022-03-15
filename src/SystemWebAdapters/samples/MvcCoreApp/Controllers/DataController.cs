@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MvcCoreApp.Controllers
 {
-    [BufferRequestStream]
+    [PreBufferRequestStream]
     public class DataController : Controller
     {
         [HttpGet]
@@ -18,7 +18,7 @@ namespace MvcCoreApp.Controllers
 
         [HttpGet]
         [Route("/api/data2")]
-        [BufferRequestStream(IsEnabled = false)]
+        [PreBufferRequestStream(IsEnabled = false)]
         public RequestInfo Get2() => RequestInfo.Current;
     }
 }
