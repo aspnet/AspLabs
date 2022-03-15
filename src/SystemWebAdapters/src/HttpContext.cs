@@ -5,7 +5,6 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Web.Adapters;
 using System.Web.Caching;
 using System.Web.SessionState;
 using Microsoft.AspNetCore.Http;
