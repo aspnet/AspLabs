@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Web.Adapters;
 
 namespace System.Web.Internal
 {

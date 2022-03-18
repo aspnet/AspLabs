@@ -9,20 +9,29 @@ using System.Web.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace System.Web
+namespace System.Web.Adapters
 {
     public static class SystemWebAdaptersExtensions
     {
         public static void AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<PreBufferRequestStreamMiddleware>();
             services.AddSingleton<SessionMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
         {
+            app.UseMiddleware<PreBufferRequestStreamMiddleware>();
             app.UseMiddleware<SessionMiddleware>();
         }
+
+        /// <summary>
+        /// Adds request stream buffering to the endpoint(s)
+        /// </summary>
+        public static TBuilder PreBufferRequestStream<TBuilder>(this TBuilder builder, IPreBufferRequestStreamMetadata? metadata = null)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(metadata ?? new PreBufferRequestStreamAttribute());
 
         /// <summary>
         /// Adds session support for System.Web adapters for the endpoint(s)

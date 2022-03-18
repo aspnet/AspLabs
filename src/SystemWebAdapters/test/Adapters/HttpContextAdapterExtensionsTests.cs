@@ -5,7 +5,7 @@ using System.Web.Adapters;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace System.Web
+namespace System.Web.Adapters
 {
     public class HttpContextAdapterExtensionsTests
     {
