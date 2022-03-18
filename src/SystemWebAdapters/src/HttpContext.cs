@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Adapters;
 using System.Web.Caching;
+using System.Web.SessionState;
 using Microsoft.AspNetCore.Http;
 
 namespace System.Web
@@ -93,6 +94,8 @@ namespace System.Web
             get => _context.User;
             set => _context.User = value is ClaimsPrincipal claims ? claims : new ClaimsPrincipal(value);
         }
+
+        public HttpSessionState? Session => _context.Features.Get<HttpSessionState>();
 
         public object? GetService(Type service)
         {
