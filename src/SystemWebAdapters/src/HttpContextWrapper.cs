@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Security.Principal;
+using System.Web.SessionState;
 
 namespace System.Web
 {
@@ -12,6 +13,7 @@ namespace System.Web
 
         private HttpRequestBase? _request;
         private HttpResponseBase? _response;
+        private HttpSessionStateBase? _session;
 
         public HttpContextWrapper(HttpContext httpContext)
         {
@@ -48,6 +50,19 @@ namespace System.Web
                 }
 
                 return _response;
+            }
+        }
+
+        public override HttpSessionStateBase? Session
+        {
+            get
+            {
+                if (_session is null && _context.Session is HttpSessionState sessionState)
+                {
+                    _session = new HttpSessionStateWrapper(sessionState);
+                }
+
+                return _session;
             }
         }
 
