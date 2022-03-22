@@ -5,10 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Caching;
+using System.Web.Adapters;
 using System.Web.Internal;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace System.Web
+namespace System.Web.Adapters
 {
     public static class SystemWebAdaptersExtensions
     {
@@ -16,7 +18,29 @@ namespace System.Web
         {
             services.AddHttpContextAccessor();
             services.AddSingleton<Cache>();
+            services.AddSingleton<PreBufferRequestStreamMiddleware>();
+            services.AddSingleton<SessionMiddleware>();
         }
+
+        public static void UseSystemWebAdapters(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<PreBufferRequestStreamMiddleware>();
+            app.UseMiddleware<SessionMiddleware>();
+        }
+
+        /// <summary>
+        /// Adds request stream buffering to the endpoint(s)
+        /// </summary>
+        public static TBuilder PreBufferRequestStream<TBuilder>(this TBuilder builder, IPreBufferRequestStreamMetadata? metadata = null)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(metadata ?? new PreBufferRequestStreamAttribute());
+
+        /// <summary>
+        /// Adds session support for System.Web adapters for the endpoint(s)
+        /// </summary>
+        public static TBuilder RequireSystemWebAdapterSession<TBuilder>(this TBuilder builder, ISessionMetadata? metadata = null)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(metadata ?? new SessionAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)
@@ -31,7 +55,7 @@ namespace System.Web
             if (result is null)
             {
                 result = new(context);
-                context.Features.Set<HttpContext>(result);
+                context.Features.Set(result);
             }
 
             return result;

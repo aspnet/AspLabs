@@ -1,4 +1,4 @@
-using System.Web;
+using System.Web.Adapters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +22,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSystemWebAdapters();
 
 app.MapControllerRoute(
     name: "default",

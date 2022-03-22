@@ -1,9 +1,11 @@
 using System.Web;
+using System.Web.Adapters;
 using ClassLibrary;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MvcCoreApp.Controllers
 {
+    [PreBufferRequestStream]
     public class DataController : Controller
     {
         [HttpGet]
@@ -16,6 +18,7 @@ namespace MvcCoreApp.Controllers
 
         [HttpGet]
         [Route("/api/data2")]
+        [PreBufferRequestStream(IsEnabled = false)]
         public RequestInfo Get2() => RequestInfo.Current;
     }
 }

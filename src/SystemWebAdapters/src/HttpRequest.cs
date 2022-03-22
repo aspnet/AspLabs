@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Security.Principal;
 using System.Text;
+using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
@@ -96,7 +97,9 @@ namespace System.Web
             set => _request.ContentType = value;
         }
 
-        public Stream InputStream => throw new NotImplementedException();
+        public Stream InputStream => _request.Body.CanSeek
+            ? _request.Body
+            : throw new InvalidOperationException("Input stream must be seekable. Ensure your endpoints are either annotated with BufferRequestStreamAttribute or you've called .RequireRequestStreamBuffering() on them.");
 
         public NameValueCollection ServerVariables
         {

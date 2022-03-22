@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Security.Principal;
 using System.Diagnostics.CodeAnalysis;
+using System.Web.Adapters;
 
 namespace System.Web
 {
@@ -25,7 +26,9 @@ namespace System.Web
             set => throw new NotImplementedException();
         }
 
-        public HttpServerUtilityBase Server => throw new NotImplementedException();
+        public virtual HttpServerUtilityBase Server => throw new NotImplementedException();
+
+        public virtual HttpSessionStateBase? Session => throw new NotImplementedException();
 
         public virtual object? GetService(Type serviceType) => throw new NotImplementedException();
 
