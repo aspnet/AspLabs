@@ -729,12 +729,10 @@ namespace System.Web
 
             // Assert
             Assert.Equal(2, form.Count);
-            Assert.Equal(key1, form.GetKey(0));
-            Assert.Equal(new[] { value1 }, form.GetValues(0));
-            Assert.Equal(value1, form.Get(0));
-            Assert.Equal(key2, form.GetKey(1));
-            Assert.Equal(new[] { value2, value3 }, form.GetValues(1));
-            Assert.Equal($"{value2},{value3}", form.Get(1));
+            Assert.Equal(value1, form.Get(key1));
+            Assert.Equal(new[] { value1 }, form.GetValues(key1));
+            Assert.Equal($"{value2},{value3}", form.Get(key2));
+            Assert.Equal(new[] { value2, value3 }, form.GetValues(key2));
         }
 
         [Fact]
