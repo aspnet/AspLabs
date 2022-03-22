@@ -7,4 +7,8 @@ namespace System.Web.Adapters;
 public class BufferResponseStreamAttribute : Attribute, IBufferResponseStreamMetadata
 {
     public bool IsEnabled { get; set; } = true;
+
+    public int MemoryThreshold { get; set; } = 32768; // Same default as FileBufferingWriteStream
+
+    public long? BufferLimit { get; set; }
 }

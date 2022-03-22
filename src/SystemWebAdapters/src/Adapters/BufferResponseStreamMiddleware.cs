@@ -22,15 +22,15 @@ internal class BufferResponseStreamMiddleware
 
     public Task InvokeAsync(HttpContextCore context)
         => context.GetEndpoint()?.Metadata.GetMetadata<IBufferResponseStreamMetadata>() is { IsEnabled: true } metadata && context.Features.Get<IHttpResponseBodyFeature>() is { } feature
-            ? BufferResponseStreamAsync(context, feature)
+            ? BufferResponseStreamAsync(context, feature, metadata)
             : _next(context);
 
-    private async Task BufferResponseStreamAsync(HttpContextCore context, IHttpResponseBodyFeature feature)
+    private async Task BufferResponseStreamAsync(HttpContextCore context, IHttpResponseBodyFeature feature, IBufferResponseStreamMetadata metadata)
     {
         var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
         var originalBufferedResponseFeature = context.Features.Get<IBufferedResponseFeature>();
 
-        var bufferedFeature = new BufferedHttpResponseFeature(context.Response, feature);
+        var bufferedFeature = new BufferedHttpResponseFeature(context.Response, feature, metadata);
 
         context.Features.Set<IHttpResponseBodyFeature>(bufferedFeature);
         context.Features.Set<IBufferedResponseFeature>(bufferedFeature);

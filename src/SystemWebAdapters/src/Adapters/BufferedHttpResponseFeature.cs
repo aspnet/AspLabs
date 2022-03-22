@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace System.Web.Adapters;
 
@@ -19,7 +20,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     private PipeWriter? _pipeWriter;
 
-    public BufferedHttpResponseFeature(HttpResponseCore response, IHttpResponseBodyFeature other)
+    public BufferedHttpResponseFeature(HttpResponseCore response, IHttpResponseBodyFeature other, IBufferResponseStreamMetadata metadata)
     {
         _other = other;
         _response = response;
@@ -31,7 +32,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         }
         else
         {
-            _stream = new MemoryStream();
+            _stream = new FileBufferingWriteStream(metadata.MemoryThreshold, metadata.BufferLimit);
         }
     }
 

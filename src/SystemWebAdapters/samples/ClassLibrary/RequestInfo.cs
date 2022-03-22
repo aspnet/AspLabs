@@ -8,12 +8,14 @@ namespace ClassLibrary
         public static void WriteRequestInfo(bool suppress)
         {
             var context = HttpContext.Current;
+            var isSeekable = context.Response.OutputStream.CanSeek;
 
             using (var writer = new SimpleJsonWriter(context.Response))
             {
                 writer.Write("Path", context.Request.Path);
                 writer.Write("Length", context.Request.InputStream.Length);
                 writer.Write("Charset", context.Response.Charset);
+                context.Response.Output.Flush();
                 writer.Write("StatusCode", context.Response.StatusCode);
                 writer.Write("StatusDescription", context.Response.StatusDescription);
             }
