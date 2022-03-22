@@ -88,6 +88,7 @@ namespace System.Web
                 else
                 {
                     contentType.Encoding = value;
+                    TypedHeaders.ContentType = contentType;
                 }
             }
         }
