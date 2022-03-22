@@ -129,7 +129,7 @@ namespace System.Web
             set => _writer = value;
         }
 
-        public bool IsClientConnected => _response.HttpContext.RequestAborted.IsCancellationRequested;
+        public bool IsClientConnected => !_response.HttpContext.RequestAborted.IsCancellationRequested;
 
         public void AddHeader(string name, string value) => _response.Headers.Add(name, value);
 
