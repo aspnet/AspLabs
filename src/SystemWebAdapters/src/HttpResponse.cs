@@ -19,7 +19,7 @@ namespace System.Web
     {
         private readonly HttpResponseCore _response;
 
-        private StringValuesNameValueCollection? _headers;
+        private NameValueCollection? _headers;
         private ResponseHeaders? _typedHeaders;
         private IBufferedResponseFeature? _bufferedFeature;
         private TextWriter? _writer;
@@ -45,8 +45,8 @@ namespace System.Web
             set => _response.HttpContext.Features.GetRequired<IHttpResponseFeature>().ReasonPhrase = value;
         }
 
-        public NameValueCollection Headers => _headers ??= new(_response.Headers);
-
+        public NameValueCollection Headers => _headers ??= _response.Headers.ToNameValueCollection();
+     
         public bool TrySkipIisCustomErrors
         {
             get => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled;
