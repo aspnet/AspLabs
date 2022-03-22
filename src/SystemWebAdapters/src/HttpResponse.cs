@@ -4,8 +4,14 @@
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Web.Adapters;
 using System.Web.Internal;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Headers;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace System.Web
 {
@@ -13,51 +19,47 @@ namespace System.Web
     {
         private readonly HttpResponseCore _response;
 
-        private NameValueCollection? _headers;
+        private StringValuesNameValueCollection? _headers;
+        private ResponseHeaders? _typedHeaders;
+        private IBufferedResponseFeature? _bufferedFeature;
+        private TextWriter? _writer;
 
         public HttpResponse(HttpResponseCore response)
         {
             _response = response;
         }
 
+        private IBufferedResponseFeature BufferedFeature => _bufferedFeature ??= _response.HttpContext.Features.Get<IBufferedResponseFeature>() ?? throw new InvalidOperationException("Response buffering must be enabled on this endpoint for this feature via the IBufferResponseStreamMetadata metadata item");
+
+        private ResponseHeaders TypedHeaders => _typedHeaders ??= new(_response.Headers);
+
         public int StatusCode
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.StatusCode;
+            set => _response.StatusCode = value;
         }
 
         public string StatusDescription
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.HttpContext.Features.GetRequired<IHttpResponseFeature>().ReasonPhrase ?? ReasonPhrases.GetReasonPhrase(_response.StatusCode);
+            set => _response.HttpContext.Features.GetRequired<IHttpResponseFeature>().ReasonPhrase = value;
         }
 
-        public NameValueCollection Headers
-        {
-            get
-            {
-                if (_headers is null)
-                {
-                    _headers = new StringValuesNameValueCollection(_response.Headers);
-                }
-
-                return _headers;
-            }
-        }
+        public NameValueCollection Headers => _headers ??= new(_response.Headers);
 
         public bool TrySkipIisCustomErrors
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled;
+            set => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled = value;
         }
 
         public string ContentType
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.ContentType;
+            set => _response.ContentType = value;
         }
 
-        public Stream OutputStream => throw new NotImplementedException();
+        public Stream OutputStream => BufferedFeature.Stream;
 
         public HttpCookieCollection Cookies
         {
@@ -67,43 +69,98 @@ namespace System.Web
 
         public bool SuppressContent
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => BufferedFeature.SuppressContent;
+            set => BufferedFeature.SuppressContent = value;
+        }
+
+        public Encoding ContentEncoding
+        {
+            get => TypedHeaders.ContentType?.Encoding ?? Encoding.UTF8;
+            set
+            {
+                var contentType = TypedHeaders.ContentType;
+
+                if (contentType is null)
+                {
+                    contentType = new(value.WebName);
+                    TypedHeaders.ContentType = contentType;
+                }
+                else
+                {
+                    contentType.Encoding = value;
+                }
+            }
         }
 
         public string Charset
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => TypedHeaders.ContentType?.Charset.Value ?? Encoding.UTF8.WebName;
+            set
+            {
+                var contentType = TypedHeaders.ContentType;
+
+                if (contentType is null)
+                {
+                    contentType = new(value);
+                    TypedHeaders.ContentType = contentType;
+                }
+                else
+                {
+                    contentType.Charset = value;
+                }
+            }
         }
 
         public TextWriter Output
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get
+            {
+                if (_writer is null)
+                {
+                    _writer = new StreamWriter(_response.Body, ContentEncoding, leaveOpen: true)
+                    {
+                        AutoFlush = true,
+                    };
+                }
+
+                return _writer;
+            }
+
+            set => _writer = value;
         }
 
-        public bool IsClientConnected => throw new NotImplementedException();
+        public bool IsClientConnected => _response.HttpContext.RequestAborted.IsCancellationRequested;
 
-        public void AddHeader(string name, string value) => throw new NotImplementedException();
+        public void AddHeader(string name, string value) => _response.Headers.Add(name, value);
 
-        public void AppendHeader(string name, string value) => throw new NotImplementedException();
-
+        public void AppendHeader(string name, string value)
+        {
+            if (_response.Headers.TryGetValue(name, out var existing))
+            {
+                _response.Headers.Add(name, StringValues.Concat(existing, value));
+            }
+            else
+            {
+                _response.Headers.Add(name, value);
+            }
+        }
         public void SetCookie(HttpCookie cookie) => throw new NotImplementedException();
 
-        public void End() => throw new NotImplementedException();
+        // On .NET Framework, this throws a ThreadAbortException. The goal is to not allow any more output after this, so this flag does that rather than throwing as that ends up with a much larger perf overhead.
+        // Any additional writes will end up throwing an exception since it's marked as ended.
+        public void End() => BufferedFeature.IsEnded = true;
 
-        public void Write(char ch) => throw new NotImplementedException();
+        public void Write(char ch) => Output.Write(ch);
 
-        public void Write(string s) => throw new NotImplementedException();
+        public void Write(string s) => Output.Write(s);
 
-        public void Write(object obj) => throw new NotImplementedException();
+        public void Write(object obj) => Output.Write(obj);
 
-        public void Clear() => throw new NotImplementedException();
+        public void Clear() => BufferedFeature.Clear();
 
-        public void ClearContent() => throw new NotImplementedException();
+        public void ClearContent() => BufferedFeature.ClearContent();
 
-        public void Abort() => throw new NotImplementedException();
+        public void Abort() => _response.HttpContext.Abort();
 
         [return: NotNullIfNotNull("response")]
         public static implicit operator HttpResponse?(HttpResponseCore? response) => response?.GetAdapter();
