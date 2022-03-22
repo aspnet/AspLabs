@@ -32,19 +32,8 @@ namespace System.Web
             set => throw new NotImplementedException();
         }
 
-        public NameValueCollection Headers
-        {
-            get
-            {
-                if (_headers is null)
-                {
-                    _headers = new StringValuesNameValueCollection(_response.Headers);
-                }
-
-                return _headers;
-            }
-        }
-
+        public NameValueCollection Headers => _headers ??= _response.Headers.ToNameValueCollection();
+     
         public bool TrySkipIisCustomErrors
         {
             get => throw new NotImplementedException();
