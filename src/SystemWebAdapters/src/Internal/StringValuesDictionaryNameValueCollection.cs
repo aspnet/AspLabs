@@ -1,25 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
 
 namespace System.Web.Internal
 {
-    internal class StringValuesDictionaryNameValueCollection : NameValueCollection
+    internal class StringValuesDictionaryNameValueCollection : WrappingNameValueCollection
     {
-        private const string GetByIntNotSupported = "Get by index is not available on this platform";
-
-        private readonly IDictionary<string, StringValues> _headers;
+        private readonly IDictionary<string, StringValues> _values;
 
         public StringValuesDictionaryNameValueCollection(IDictionary<string, StringValues> headers)
         {
-            _headers = headers;
+            _values = headers;
         }
 
-        public override string?[] AllKeys => _headers.Keys.ToArray();
+        public override string?[] AllKeys => _values.Keys.ToArray();
 
-        public override int Count => _headers.Count;
+        public override int Count => _values.Count;
 
         public override void Add(string? name, string? value)
         {
@@ -28,39 +25,24 @@ namespace System.Web.Internal
                 return;
             }
 
-            if (_headers.TryGetValue(name, out var existing))
+            if (_values.TryGetValue(name, out var existing))
             {
-                _headers[name] = StringValues.Concat(existing, value);
+                _values[name] = StringValues.Concat(existing, value);
             }
             else
             {
-                _headers.Add(name, value);
+                _values.Add(name, value);
             }
         }
-
-        public override KeysCollection Keys => throw new PlatformNotSupportedException("KeysCollection is not supported as Get(int) is not available.");
-
-        public override string? Get(int index) => throw new PlatformNotSupportedException(GetByIntNotSupported);
-
-        public override string? GetKey(int index) => throw new PlatformNotSupportedException(GetByIntNotSupported);
-
-        public override string[]? GetValues(int index) => throw new PlatformNotSupportedException(GetByIntNotSupported);
 
         public override string[]? GetValues(string? name)
-        {
-            if (name is not null && _headers.TryGetValue(name, out var values))
-            {
-                return values;
-            }
-
-            return null;
-        }
+            => name is not null && _values.TryGetValue(name, out var values) ? values : default;
 
         public override void Remove(string? name)
         {
             if (name is not null)
             {
-                _headers.Remove(name);
+                _values.Remove(name);
             }
         }
 
@@ -71,21 +53,14 @@ namespace System.Web.Internal
                 return;
             }
 
-            _headers[name] = value;
+            _values[name] = value;
         }
 
         public override string? Get(string? name)
-        {
-            if (name is not null && _headers.TryGetValue(name, out var value))
-            {
-                return value;
-            }
+            => name is not null && _values.TryGetValue(name, out var values) ? values : default;
 
-            return null;
-        }
+        public override void Clear() => _values.Clear();
 
-        public override void Clear() => _headers.Clear();
-
-        public override IEnumerator GetEnumerator() => _headers.Keys.GetEnumerator();
+        public override IEnumerator GetEnumerator() => _values.Keys.GetEnumerator();
     }
 }

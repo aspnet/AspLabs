@@ -700,7 +700,7 @@ namespace System.Web
 
             // Assert
             Assert.Same(formCollection1, formCollection2);
-            Assert.IsType<StringValuesNameValueCollection>(formCollection1);
+            Assert.IsType<StringValuesReadOnlyDictionaryNameValueCollection>(formCollection1);
         }
 
         [Fact]
@@ -755,7 +755,7 @@ namespace System.Web
 
             // Assert
             Assert.Same(queryCollection1, queryCollection2);
-            Assert.IsType<StringValuesNameValueCollection>(queryCollection1);
+            Assert.IsType<StringValuesReadOnlyDictionaryNameValueCollection>(queryCollection1);
         }
     }
 }

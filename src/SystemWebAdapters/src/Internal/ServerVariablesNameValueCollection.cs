@@ -1,14 +1,13 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Http.Features;
 
 namespace System.Web.Internal
 {
-    internal class ServerVariablesNameValueCollection : NameValueCollection
+    internal class ServerVariablesNameValueCollection : WrappingNameValueCollection
     {
         private const string EnumerationErrorMessage = "ASP.NET Core doesn't support enumerating server variables.";
-        private const string IndexErrorMessage = "ASP.NET Core doesn't support accessing server variables by index.";
         private const string SerializationErrorMessage = "ASP.NET Core doesn't suppor serialization of server variables.";
 
         private readonly IServerVariablesFeature _serverVariables;
@@ -32,14 +31,6 @@ namespace System.Web.Internal
 
             _serverVariables[name] = value;
         }
-
-        public override KeysCollection Keys => throw new PlatformNotSupportedException("KeysCollection is not supported as Get(int) is not available.");
-
-        public override string? Get(int index) => throw new PlatformNotSupportedException(IndexErrorMessage);
-
-        public override string? GetKey(int index) => throw new PlatformNotSupportedException(IndexErrorMessage);
-
-        public override string[]? GetValues(int index) => throw new PlatformNotSupportedException(IndexErrorMessage);
 
         public override string[]? GetValues(string? name)
         {
@@ -87,6 +78,6 @@ namespace System.Web.Internal
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context) => throw new PlatformNotSupportedException(SerializationErrorMessage);
 
-        public override void OnDeserialization(object? sender)=> throw new PlatformNotSupportedException(SerializationErrorMessage);
+        public override void OnDeserialization(object? sender) => throw new PlatformNotSupportedException(SerializationErrorMessage);
     }
 }
