@@ -14,133 +14,113 @@ namespace System.Web.Adapters;
 
 internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, IBufferedResponseFeature
 {
-    private readonly IHttpResponseBodyFeature _other;
-    private readonly HttpResponseCore _response;
-    private readonly Stream _stream;
+    public enum StreamState
+    {
+        NotStarted,
+        Buffering,
+        NotBuffering,
+    }
 
+    private readonly IHttpResponseBodyFeature _other;
+    private readonly IBufferResponseStreamMetadata _metadata;
+
+    private FileBufferingWriteStream? _bufferedStream;
     private PipeWriter? _pipeWriter;
 
-    public BufferedHttpResponseFeature(HttpResponseCore response, IHttpResponseBodyFeature other, IBufferResponseStreamMetadata metadata)
+    public BufferedHttpResponseFeature(IHttpResponseBodyFeature other, IBufferResponseStreamMetadata metadata)
     {
         _other = other;
-        _response = response;
-
-        if (other.Stream.CanSeek)
-        {
-            _stream = other.Stream;
-            _pipeWriter = other.Writer;
-        }
-        else
-        {
-            _stream = new FileBufferingWriteStream(metadata.MemoryThreshold, metadata.BufferLimit);
-        }
+        _metadata = metadata;
+        State = StreamState.NotStarted;
     }
+
+    public StreamState State { get; private set; }
 
     public Stream Stream => this;
 
-    public PipeWriter Writer => _pipeWriter ??= PipeWriter.Create(Stream, new StreamPipeWriterOptions(leaveOpen: true));
+    public PipeWriter Writer => _pipeWriter ??= PipeWriter.Create(this, new StreamPipeWriterOptions(leaveOpen: true));
 
     public bool IsEnded { get; set; }
 
     public bool SuppressContent { get; set; }
 
+    private Stream BufferedStream
+    {
+        get
+        {
+            if (State == StreamState.NotBuffering)
+            {
+                return _other.Stream;
+            }
+            else
+            {
+                State = StreamState.Buffering;
+                return _bufferedStream ??= new FileBufferingWriteStream(_metadata.MemoryThreshold, _metadata.BufferLimit);
+            }
+        }
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (_bufferedStream is not null)
+        {
+            await _bufferedStream.DisposeAsync();
+        }
+
+        await base.DisposeAsync();
+    }
+
     public async ValueTask FlushBufferedStreamAsync()
     {
-        if (SuppressContent)
+        if (_bufferedStream is not null && !SuppressContent)
         {
-            _stream.SetLength(0);
-        }
-        else if (!ReferenceEquals(_stream, _other.Stream))
-        {
-            _stream.Position = 0;
-            await _stream.CopyToAsync(_other.Stream);
+            await _bufferedStream.DrainBufferAsync(_other.Stream);
         }
     }
 
-    public override bool CanRead
-    {
-        get
-        {
-            VerifyNotEnded();
-            return _stream.CanRead;
-        }
-    }
+    public override bool CanRead => true;
 
-    public override bool CanSeek
-    {
-        get
-        {
-            VerifyNotEnded();
-            return _stream.CanSeek;
-        }
-    }
+    public override bool CanSeek => false;
 
-    public override bool CanWrite
-    {
-        get
-        {
-            VerifyNotEnded();
-            return _stream.CanWrite;
-        }
-    }
+    public override bool CanWrite => !IsEnded;
 
-    public override long Length
-    {
-        get
-        {
-            VerifyNotEnded();
-            return _stream.Length;
-        }
-    }
+    public override long Length => BufferedStream.Length;
 
     public override long Position
     {
-        get
-        {
-            VerifyNotEnded();
-            return _stream.Position;
-        }
-
-        set
-        {
-            VerifyNotEnded();
-            _stream.Position = value;
-        }
+        get => throw new NotSupportedException();
+        set => throw new NotSupportedException();
     }
 
-    public Task CompleteAsync() => _other.CompleteAsync();
+    public async Task CompleteAsync()
+    {
+        await FlushBufferedStreamAsync();
+        await _other.CompleteAsync();
+    }
 
     public void DisableBuffering()
     {
-        _other.DisableBuffering();
+        if (State == StreamState.NotStarted)
+        {
+            State = StreamState.NotBuffering;
+            _other.DisableBuffering();
+            _pipeWriter = _other.Writer;
+        }
     }
 
-    public override void Flush()
-    {
-        VerifyNotEnded();
-        _stream.Flush();
-    }
+    public override void Flush() => _bufferedStream?.Flush();
 
-    public override int Read(byte[] buffer, int offset, int count)
-    {
-        VerifyNotEnded();
-        return _stream.Read(buffer, offset, count);
-    }
+    public override Task FlushAsync(CancellationToken cancellationToken)
+        => _bufferedStream?.FlushAsync(cancellationToken) ?? Task.CompletedTask;
 
-    public override long Seek(long offset, SeekOrigin origin)
-    {
-        VerifyNotEnded();
-        return _stream.Seek(offset, origin);
-    }
+    public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
     public Task SendFileAsync(string path, long offset, long? count, CancellationToken cancellationToken = default)
-        => _other.SendFileAsync(path, offset, count, cancellationToken);
+        => SendFileFallback.SendFileAsync(BufferedStream, path, offset, count, cancellationToken);
 
-    public override void SetLength(long value)
-    {
-        VerifyNotEnded();
-        _stream.SetLength(value);
-    }
+    public override void SetLength(long value) => throw new NotSupportedException();
 
     public Task StartAsync(CancellationToken cancellationToken = default)
         => _other.StartAsync(cancellationToken);
@@ -148,7 +128,40 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
     public override void Write(byte[] buffer, int offset, int count)
     {
         VerifyNotEnded();
-        _stream.Write(buffer, offset, count);
+        BufferedStream.Write(buffer, offset, count);
+    }
+
+    public override void Write(ReadOnlySpan<byte> buffer)
+    {
+        VerifyNotEnded();
+        BufferedStream.Write(buffer);
+    }
+
+    public override void WriteByte(byte value)
+    {
+        VerifyNotEnded();
+        BufferedStream.WriteByte(value);
+    }
+
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        VerifyNotEnded();
+        return BufferedStream.WriteAsync(buffer, cancellationToken);
+    }
+
+    public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    {
+        VerifyNotEnded();
+        return BufferedStream.WriteAsync(buffer, offset, count, cancellationToken);
+    }
+
+    public void ClearContent()
+    {
+        if (_bufferedStream is not null)
+        {
+            _bufferedStream.Dispose();
+            _bufferedStream = null;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -158,15 +171,5 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         {
             throw new InvalidOperationException("End() has been called on the response.");
         }
-    }
-
-    public void Clear()
-    {
-        _response.Clear();
-    }
-
-    public void ClearContent()
-    {
-        SetLength(0);
     }
 }

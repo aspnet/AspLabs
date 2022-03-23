@@ -13,7 +13,5 @@ internal interface IBufferedResponseFeature
 
     Stream Stream { get; }
 
-    void Clear();
-
     void ClearContent();
 }

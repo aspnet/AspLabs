@@ -8,7 +8,6 @@ namespace ClassLibrary
         public static void WriteRequestInfo(bool suppress)
         {
             var context = HttpContext.Current;
-            var isSeekable = context.Response.OutputStream.CanSeek;
 
             using (var writer = new SimpleJsonWriter(context.Response))
             {

@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.WebUtilities;
@@ -59,7 +60,7 @@ namespace System.Web
             set => _response.ContentType = value;
         }
 
-        public Stream OutputStream => BufferedFeature.Stream;
+        public Stream OutputStream => _response.Body;
 
         public HttpCookieCollection Cookies
         {
@@ -157,9 +158,23 @@ namespace System.Web
 
         public void Write(object obj) => Output.Write(obj);
 
-        public void Clear() => BufferedFeature.Clear();
+        public void Clear()
+        {
+            _response.Clear();
+            ClearContent();
+        }
 
-        public void ClearContent() => BufferedFeature.ClearContent();
+        public void ClearContent()
+        {
+            if (_response.Body.CanSeek)
+            {
+                _response.Body.SetLength(0);
+            }
+            else
+            {
+                BufferedFeature.ClearContent();
+            }
+        }
 
         public void Abort() => _response.HttpContext.Abort();
 
