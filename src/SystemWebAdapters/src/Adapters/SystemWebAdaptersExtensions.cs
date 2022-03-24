@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Web.Caching;
-using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
