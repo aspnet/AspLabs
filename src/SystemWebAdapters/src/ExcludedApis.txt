@@ -10,6 +10,10 @@ T:System.Web.Adapters.ISessionState
 T:System.Web.Adapters.ISessionMetadata
 T:System.Web.Adapters.ISessionManager
 
+# Buffering
+T:System.Web.Adapters.BufferResponseStreamAttribute
+T:System.Web.Adapters.IBufferResponseStreamMetadata
+
 # Internal constructors
 M:System.Web.HttpContext.#ctor(Microsoft.AspNetCore.Http.HttpContext)
 M:System.Web.HttpContext.op_Implicit(Microsoft.AspNetCore.Http.HttpContext)~System.Web.HttpContext

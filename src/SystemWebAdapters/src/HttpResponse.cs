@@ -4,60 +4,60 @@
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Web.Adapters;
 using System.Web.Internal;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Headers;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace System.Web
 {
     public class HttpResponse
     {
+        private const string NoContentTypeMessage = "No content type declared";
+
         private readonly HttpResponseCore _response;
 
         private NameValueCollection? _headers;
+        private ResponseHeaders? _typedHeaders;
+        private IBufferedResponseFeature? _bufferedFeature;
+        private TextWriter? _writer;
 
         public HttpResponse(HttpResponseCore response)
         {
             _response = response;
         }
 
+        private IBufferedResponseFeature BufferedFeature => _bufferedFeature ??= _response.HttpContext.Features.Get<IBufferedResponseFeature>()
+            ?? throw new InvalidOperationException("Response buffering must be enabled on this endpoint for this feature via the IBufferResponseStreamMetadata metadata item");
+
+        private ResponseHeaders TypedHeaders => _typedHeaders ??= new(_response.Headers);
+
         public int StatusCode
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.StatusCode;
+            set => _response.StatusCode = value;
         }
 
         public string StatusDescription
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.HttpContext.Features.GetRequired<IHttpResponseFeature>().ReasonPhrase ?? ReasonPhrases.GetReasonPhrase(_response.StatusCode);
+            set => _response.HttpContext.Features.GetRequired<IHttpResponseFeature>().ReasonPhrase = value;
         }
 
-        public NameValueCollection Headers
-        {
-            get
-            {
-                if (_headers is null)
-                {
-                    _headers = new StringValuesNameValueCollection(_response.Headers);
-                }
-
-                return _headers;
-            }
-        }
+        public NameValueCollection Headers => _headers ??= _response.Headers.ToNameValueCollection();
 
         public bool TrySkipIisCustomErrors
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled;
+            set => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled = value;
         }
 
-        public string ContentType
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
-
-        public Stream OutputStream => throw new NotImplementedException();
+        public Stream OutputStream => _response.Body;
 
         public HttpCookieCollection Cookies
         {
@@ -67,43 +67,131 @@ namespace System.Web
 
         public bool SuppressContent
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => BufferedFeature.SuppressContent;
+            set => BufferedFeature.SuppressContent = value;
+        }
+
+        public Encoding ContentEncoding
+        {
+            get => TypedHeaders.ContentType?.Encoding ?? Encoding.UTF8;
+            set
+            {
+                if (TypedHeaders.ContentType is { } contentType)
+                {
+                    if (contentType.Encoding == value)
+                    {
+                        return;
+                    }
+
+                    contentType.Encoding = value;
+                    TypedHeaders.ContentType = contentType;
+
+                    // Reset the writer for change in encoding
+                    _writer = null;
+                }
+                else
+                {
+                    throw new InvalidOperationException(NoContentTypeMessage);
+                }
+            }
+        }
+
+        public string? ContentType
+        {
+            get => TypedHeaders.ContentType?.MediaType.ToString();
+            set
+            {
+                if (TypedHeaders.ContentType is { } contentType)
+                {
+                    contentType.MediaType = value;
+                    TypedHeaders.ContentType = contentType;
+                }
+                else
+                {
+                    TypedHeaders.ContentType = new(value);
+                }
+            }
         }
 
         public string Charset
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => TypedHeaders.ContentType?.Charset.Value ?? Encoding.UTF8.WebName;
+            set
+            {
+                if (TypedHeaders.ContentType is { } contentType)
+                {
+                    contentType.Charset = value;
+                    TypedHeaders.ContentType = contentType;
+                }
+                else
+                {
+                    throw new InvalidOperationException(NoContentTypeMessage);
+                }
+            }
         }
 
         public TextWriter Output
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get
+            {
+                if (_writer is null)
+                {
+                    _writer = new StreamWriter(_response.Body, ContentEncoding, leaveOpen: true)
+                    {
+                        AutoFlush = true,
+                    };
+                }
+
+                return _writer;
+            }
+
+            set => _writer = value;
         }
 
-        public bool IsClientConnected => throw new NotImplementedException();
+        public bool IsClientConnected => !_response.HttpContext.RequestAborted.IsCancellationRequested;
 
-        public void AddHeader(string name, string value) => throw new NotImplementedException();
+        public void AddHeader(string name, string value) => _response.Headers.Add(name, value);
 
-        public void AppendHeader(string name, string value) => throw new NotImplementedException();
-
+        public void AppendHeader(string name, string value)
+        {
+            if (_response.Headers.TryGetValue(name, out var existing))
+            {
+                _response.Headers.Add(name, StringValues.Concat(existing, value));
+            }
+            else
+            {
+                _response.Headers.Add(name, value);
+            }
+        }
         public void SetCookie(HttpCookie cookie) => throw new NotImplementedException();
 
-        public void End() => throw new NotImplementedException();
+        public void End() => BufferedFeature.End();
 
-        public void Write(char ch) => throw new NotImplementedException();
+        public void Write(char ch) => Output.Write(ch);
 
-        public void Write(string s) => throw new NotImplementedException();
+        public void Write(string s) => Output.Write(s);
 
-        public void Write(object obj) => throw new NotImplementedException();
+        public void Write(object obj) => Output.Write(obj);
 
-        public void Clear() => throw new NotImplementedException();
+        public void Clear()
+        {
+            _response.Clear();
+            ClearContent();
+        }
 
-        public void ClearContent() => throw new NotImplementedException();
+        public void ClearContent()
+        {
+            if (_response.Body.CanSeek)
+            {
+                _response.Body.SetLength(0);
+            }
+            else
+            {
+                BufferedFeature.ClearContent();
+            }
+        }
 
-        public void Abort() => throw new NotImplementedException();
+        public void Abort() => _response.HttpContext.Abort();
 
         [return: NotNullIfNotNull("response")]
         public static implicit operator HttpResponse?(HttpResponseCore? response) => response?.GetAdapter();
