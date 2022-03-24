@@ -9,6 +9,6 @@ namespace MvcApp.Controllers
         [Route("")]
         [HttpGet]
         [HttpPost]
-        public void GetData() => RequestInfo.WriteRequestInfo(true);
+        public void GetData() => RequestInfo.WriteRequestInfo(false);
     }
 }

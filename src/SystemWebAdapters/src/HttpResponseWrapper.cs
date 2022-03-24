@@ -3,6 +3,7 @@
 
 using System.Collections.Specialized;
 using System.IO;
+using System.Text;
 
 namespace System.Web
 {
@@ -19,10 +20,16 @@ namespace System.Web
 
         public override void AddHeader(string name, string value) => _response.AddHeader(name, value);
 
-        public override string ContentType
+        public override string? ContentType
         {
             get => _response.ContentType;
             set => _response.ContentType = value;
+        }
+
+        public override Encoding ContentEncoding
+        {
+            get => _response.ContentEncoding;
+            set => _response.ContentEncoding = value;
         }
 
         public override HttpCookieCollection Cookies

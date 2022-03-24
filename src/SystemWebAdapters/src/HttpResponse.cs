@@ -48,17 +48,11 @@ namespace System.Web
         }
 
         public NameValueCollection Headers => _headers ??= _response.Headers.ToNameValueCollection();
-     
+
         public bool TrySkipIisCustomErrors
         {
             get => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled;
             set => _response.HttpContext.Features.GetRequired<IStatusCodePagesFeature>().Enabled = value;
-        }
-
-        public string ContentType
-        {
-            get => _response.ContentType;
-            set => _response.ContentType = value;
         }
 
         public Stream OutputStream => _response.Body;
@@ -84,15 +78,27 @@ namespace System.Web
 
                 if (contentType is null)
                 {
-                    contentType = new(value.WebName);
-                    TypedHeaders.ContentType = contentType;
+                    throw new InvalidOperationException("Not content type declared");
                 }
                 else
                 {
-                    contentType.Encoding = value;
-                    TypedHeaders.ContentType = contentType;
+                    if (value == contentType.Encoding)
+                    {
+                        return;
+                    }
+
+                    TypedHeaders.ContentType = new(contentType.MediaType) { Encoding = value };
+
+                    // Reset the writer for change in encoding
+                    _writer = null;
                 }
             }
+        }
+
+        public string? ContentType
+        {
+            get => TypedHeaders.ContentType?.MediaType.ToString();
+            set => TypedHeaders.ContentType = value is null ? null : new(value) { Encoding = ContentEncoding };
         }
 
         public string Charset
@@ -149,9 +155,7 @@ namespace System.Web
         }
         public void SetCookie(HttpCookie cookie) => throw new NotImplementedException();
 
-        // On .NET Framework, this throws a ThreadAbortException. The goal is to not allow any more output after this, so this flag does that rather than throwing as that ends up with a much larger perf overhead.
-        // Any additional writes will end up throwing an exception since it's marked as ended.
-        public void End() => BufferedFeature.IsEnded = true;
+        public void End() => BufferedFeature.End();
 
         public void Write(char ch) => Output.Write(ch);
 

@@ -3,6 +3,7 @@
 
 using System.Collections.Specialized;
 using System.IO;
+using System.Text;
 
 namespace System.Web
 {
@@ -31,7 +32,13 @@ namespace System.Web
             set => throw new NotImplementedException();
         }
 
-        public virtual string ContentType
+        public virtual string? ContentType
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public virtual Encoding ContentEncoding
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();

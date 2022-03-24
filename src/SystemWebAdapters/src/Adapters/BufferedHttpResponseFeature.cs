@@ -3,7 +3,6 @@
 
 using System.IO;
 using System.IO.Pipelines;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +18,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         NotStarted,
         Buffering,
         NotBuffering,
+        Complete,
     }
 
     private readonly IHttpResponseBodyFeature _other;
@@ -40,8 +40,6 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     public PipeWriter Writer => _pipeWriter ??= PipeWriter.Create(this, new StreamPipeWriterOptions(leaveOpen: true));
 
-    public bool IsEnded { get; set; }
-
     public bool SuppressContent { get; set; }
 
     private Stream CurrentStream
@@ -52,6 +50,10 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
             {
                 return _other.Stream;
             }
+            else if (State == StreamState.Complete)
+            {
+                return Stream.Null;
+            }
             else
             {
                 State = StreamState.Buffering;
@@ -59,6 +61,8 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
             }
         }
     }
+
+    public void End() => Task.Run(async () => await CompleteAsync()).GetAwaiter().GetResult();
 
     public override async ValueTask DisposeAsync()
     {
@@ -72,7 +76,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     public async ValueTask FlushBufferedStreamAsync()
     {
-        if (_bufferedStream is not null && !SuppressContent)
+        if (State is StreamState.Buffering && _bufferedStream is not null && !SuppressContent)
         {
             await _bufferedStream.DrainBufferAsync(_other.Stream);
         }
@@ -82,7 +86,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     public override bool CanSeek => false;
 
-    public override bool CanWrite => !IsEnded;
+    public override bool CanWrite => true;
 
     public override long Length => CurrentStream.Length;
 
@@ -96,7 +100,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
     {
         await FlushBufferedStreamAsync();
         await _other.CompleteAsync();
-        IsEnded = true;
+        State = StreamState.Complete;
     }
 
     public void DisableBuffering()
@@ -133,35 +137,17 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         return _other.StartAsync(cancellationToken);
     }
 
-    public override void Write(byte[] buffer, int offset, int count)
-    {
-        VerifyNotEnded();
-        CurrentStream.Write(buffer, offset, count);
-    }
+    public override void Write(byte[] buffer, int offset, int count) => CurrentStream.Write(buffer, offset, count);
 
-    public override void Write(ReadOnlySpan<byte> buffer)
-    {
-        VerifyNotEnded();
-        CurrentStream.Write(buffer);
-    }
+    public override void Write(ReadOnlySpan<byte> buffer) => CurrentStream.Write(buffer);
 
-    public override void WriteByte(byte value)
-    {
-        VerifyNotEnded();
-        CurrentStream.WriteByte(value);
-    }
+    public override void WriteByte(byte value) => CurrentStream.WriteByte(value);
 
     public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        VerifyNotEnded();
-        return CurrentStream.WriteAsync(buffer, cancellationToken);
-    }
+        => CurrentStream.WriteAsync(buffer, cancellationToken);
 
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-    {
-        VerifyNotEnded();
-        return CurrentStream.WriteAsync(buffer, offset, count, cancellationToken);
-    }
+        => CurrentStream.WriteAsync(buffer, offset, count, cancellationToken);
 
     public void ClearContent()
     {
@@ -169,15 +155,6 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         {
             _bufferedStream.Dispose();
             _bufferedStream = null;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void VerifyNotEnded()
-    {
-        if (IsEnded)
-        {
-            throw new InvalidOperationException("End() has been called on the response.");
         }
     }
 }

@@ -7,11 +7,11 @@ namespace System.Web.Adapters;
 
 internal interface IBufferedResponseFeature
 {
-    bool IsEnded { get; set; }
+    Stream Stream { get; }
 
     bool SuppressContent { get; set; }
 
-    Stream Stream { get; }
+    void End();
 
     void ClearContent();
 }
