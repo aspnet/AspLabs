@@ -44,7 +44,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     public bool SuppressContent { get; set; }
 
-    private Stream BufferedStream
+    private Stream CurrentStream
     {
         get
         {
@@ -84,7 +84,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
 
     public override bool CanWrite => !IsEnded;
 
-    public override long Length => BufferedStream.Length;
+    public override long Length => CurrentStream.Length;
 
     public override long Position
     {
@@ -119,41 +119,48 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
     public Task SendFileAsync(string path, long offset, long? count, CancellationToken cancellationToken = default)
-        => SendFileFallback.SendFileAsync(BufferedStream, path, offset, count, cancellationToken);
+        => SendFileFallback.SendFileAsync(CurrentStream, path, offset, count, cancellationToken);
 
     public override void SetLength(long value) => throw new NotSupportedException();
 
     public Task StartAsync(CancellationToken cancellationToken = default)
-        => _other.StartAsync(cancellationToken);
+    {
+        if (State == StreamState.NotStarted)
+        {
+            State = StreamState.Buffering;
+        }
+
+        return _other.StartAsync(cancellationToken);
+    }
 
     public override void Write(byte[] buffer, int offset, int count)
     {
         VerifyNotEnded();
-        BufferedStream.Write(buffer, offset, count);
+        CurrentStream.Write(buffer, offset, count);
     }
 
     public override void Write(ReadOnlySpan<byte> buffer)
     {
         VerifyNotEnded();
-        BufferedStream.Write(buffer);
+        CurrentStream.Write(buffer);
     }
 
     public override void WriteByte(byte value)
     {
         VerifyNotEnded();
-        BufferedStream.WriteByte(value);
+        CurrentStream.WriteByte(value);
     }
 
     public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
     {
         VerifyNotEnded();
-        return BufferedStream.WriteAsync(buffer, cancellationToken);
+        return CurrentStream.WriteAsync(buffer, cancellationToken);
     }
 
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
         VerifyNotEnded();
-        return BufferedStream.WriteAsync(buffer, offset, count, cancellationToken);
+        return CurrentStream.WriteAsync(buffer, offset, count, cancellationToken);
     }
 
     public void ClearContent()
