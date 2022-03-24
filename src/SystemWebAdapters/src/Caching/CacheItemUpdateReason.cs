@@ -1,11 +1,10 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace System.Web.Caching
+namespace System.Web.Caching;
+
+public enum CacheItemUpdateReason
 {
-    public enum CacheItemUpdateReason
-    {
-        Expired = 1,
-        DependencyChanged
-    }
+    Expired = 1,
+    DependencyChanged
 }

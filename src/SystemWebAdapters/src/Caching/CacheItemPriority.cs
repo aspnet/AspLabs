@@ -1,16 +1,15 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace System.Web.Caching
+namespace System.Web.Caching;
+
+public enum CacheItemPriority
 {
-    public enum CacheItemPriority
-    {
-        Low = 1,
-        BelowNormal,
-        Normal,
-        AboveNormal,
-        High,
-        NotRemovable,
-        Default = Normal
-    }
+    Low = 1,
+    BelowNormal,
+    Normal,
+    AboveNormal,
+    High,
+    NotRemovable,
+    Default = Normal
 }
