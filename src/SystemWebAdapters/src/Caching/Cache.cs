@@ -48,8 +48,7 @@ namespace System.Web.Caching
 
         public object Get(string key) => _cache.Get(key);
 
-        public void Insert(string key, object value)
-            => _cache.Set(key, value, DateTimeOffset.MaxValue);
+        public void Insert(string key, object value) => _cache.Set(key, value, DateTimeOffset.MaxValue);
 
         public void Insert(string key, object value, CacheDependency? dependencies, DateTime absoluteExpiration, TimeSpan slidingExpiration)
         {
@@ -113,8 +112,7 @@ namespace System.Web.Caching
             return args => callback(args.CacheItem.Key, args.CacheItem.Value, Convert(args.RemovedReason));
         }
 
-        private static DateTimeOffset Convert(DateTime dt)
-            => dt == NoAbsoluteExpiration ? DateTimeOffset.MaxValue : dt;
+        private static DateTimeOffset Convert(DateTime dt) => dt == NoAbsoluteExpiration ? DateTimeOffset.MaxValue : dt;
 
         private static CacheEntryUpdateCallback? Convert(CacheItemUpdateCallback? callback)
         {
@@ -150,9 +148,6 @@ namespace System.Web.Caching
 
         public int Count => (int)_cache.GetCount();
 
-        public IEnumerator GetEnumerator()
-        {
-            return ((IEnumerable)_cache).GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() => ((IEnumerable)_cache).GetEnumerator();
     }
 }
