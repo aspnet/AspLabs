@@ -318,6 +318,18 @@ namespace Grpc.Shared.HttpApi
             return null;
         }
 
+        public static FieldDescriptor ResolveResponseBodyDescriptor(string responseBody, MethodDescriptor methodDescriptor)
+        {
+            if (!TryResolveDescriptors(methodDescriptor.OutputType, responseBody, out var responseBodyFieldDescriptors))
+            {
+                throw new InvalidOperationException($"Couldn't find matching field for response-body '{responseBody}' on {methodDescriptor.OutputType.Name}.");
+            }
+
+            var fieldDescriptor = responseBodyFieldDescriptors.Last();
+            return fieldDescriptor;
+
+        }
+
         public record BodyDescriptorInfo(
             MessageDescriptor Descriptor,
             List<FieldDescriptor>? FieldDescriptors,
