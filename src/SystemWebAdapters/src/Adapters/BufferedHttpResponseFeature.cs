@@ -113,10 +113,9 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         }
     }
 
-    public override void Flush() => _bufferedStream?.Flush();
+    public override void Flush() => CurrentStream.Flush();
 
-    public override Task FlushAsync(CancellationToken cancellationToken)
-        => _bufferedStream?.FlushAsync(cancellationToken) ?? Task.CompletedTask;
+    public override Task FlushAsync(CancellationToken cancellationToken) => CurrentStream.FlushAsync(cancellationToken);
 
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
