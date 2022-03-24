@@ -4,9 +4,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Web.Adapters;
 using System.Web.Internal;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web.Adapters
@@ -24,6 +24,7 @@ namespace System.Web.Adapters
         {
             app.UseMiddleware<PreBufferRequestStreamMiddleware>();
             app.UseMiddleware<SessionMiddleware>();
+            app.UseMiddleware<BufferResponseStreamMiddleware>();
         }
 
         /// <summary>
@@ -39,6 +40,13 @@ namespace System.Web.Adapters
         public static TBuilder RequireSystemWebAdapterSession<TBuilder>(this TBuilder builder, ISessionMetadata? metadata = null)
             where TBuilder : IEndpointConventionBuilder
             => builder.WithMetadata(metadata ?? new SessionAttribute());
+
+        /// <summary>
+        /// Ensure response stream is buffered to enable synchronous actions on it for the endpoint(s)
+        /// </summary>
+        public static TBuilder BufferResponseStream<TBuilder>(this TBuilder builder, IBufferResponseStreamMetadata? metadata = null)
+            where TBuilder : IEndpointConventionBuilder
+            => builder.WithMetadata(metadata ?? new BufferResponseStreamAttribute());
 
         [return: NotNullIfNotNull("context")]
         internal static HttpContext? GetAdapter(this HttpContextCore? context)
@@ -108,5 +116,15 @@ namespace System.Web.Adapters
 
         internal static ICollection AsNonGeneric<T>(this ICollection<T> collection)
             => collection is ICollection c ? c : new NonGenericCollectionWrapper<T>(collection);
+
+        internal static TFeature GetRequired<TFeature>(this IFeatureCollection features)
+        {
+            if (features.Get<TFeature>() is TFeature feature)
+            {
+                return feature;
+            }
+
+            throw new InvalidOperationException($"Feature {typeof(TFeature)} is not available");
+        }
     }
 }
