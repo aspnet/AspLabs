@@ -18,8 +18,6 @@ namespace System.Web.Adapters
         {
             services.AddHttpContextAccessor();
             services.AddSingleton<Cache>();
-            services.AddSingleton<PreBufferRequestStreamMiddleware>();
-            services.AddSingleton<SessionMiddleware>();
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)

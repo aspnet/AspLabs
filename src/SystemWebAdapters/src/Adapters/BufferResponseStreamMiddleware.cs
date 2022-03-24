@@ -8,16 +8,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Logging;
 
 namespace System.Web.Adapters;
 
 internal class BufferResponseStreamMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<BufferResponseStreamMiddleware> _logger;
 
-    public BufferResponseStreamMiddleware(RequestDelegate next)
+    public BufferResponseStreamMiddleware(RequestDelegate next, ILogger<BufferResponseStreamMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public Task InvokeAsync(HttpContextCore context)
@@ -27,6 +30,8 @@ internal class BufferResponseStreamMiddleware
 
     private async Task BufferResponseStreamAsync(HttpContextCore context, IHttpResponseBodyFeature feature, IBufferResponseStreamMetadata metadata)
     {
+        _logger.LogTrace("Buffering response stream");
+
         var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
         var originalBufferedResponseFeature = context.Features.Get<IBufferedResponseFeature>();
 
