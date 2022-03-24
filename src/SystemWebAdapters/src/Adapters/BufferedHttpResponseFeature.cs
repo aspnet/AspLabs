@@ -62,7 +62,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
         }
     }
 
-    public void End() => Task.Run(async () => await CompleteAsync()).GetAwaiter().GetResult();
+    public void End() => CompleteAsync().GetAwaiter().GetResult();
 
     public override async ValueTask DisposeAsync()
     {
