@@ -20,7 +20,8 @@ public class PreBufferRequestStreamMiddlewareTests
     public async Task RequestBuffering(bool isEnabled)
     {
         // Arrange
-        using var mock = AutoMock.GetLoose();
+        var next = new Mock<RequestDelegate>();
+        using var mock = AutoMock.GetLoose(c => c.RegisterMock(next));
 
         var logger = new Mock<ILogger<PreBufferRequestStreamMiddleware>>();
 
@@ -47,10 +48,8 @@ public class PreBufferRequestStreamMiddlewareTests
 
         var context = new DefaultHttpContext(features.Object);
 
-        var requestDelegate = new Mock<RequestDelegate>();
-
         // Act
-        await mock.Create<PreBufferRequestStreamMiddleware>().InvokeAsync(context, requestDelegate.Object);
+        await mock.Create<PreBufferRequestStreamMiddleware>().InvokeAsync(context);
 
         // Assert
         Assert.Equal(isEnabled, context.Request.Body.CanSeek);

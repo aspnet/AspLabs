@@ -8,26 +8,23 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Adapters;
 
-internal class PreBufferRequestStreamMiddleware : IMiddleware
+internal class PreBufferRequestStreamMiddleware
 {
+    private readonly RequestDelegate _next;
     private readonly ILogger<PreBufferRequestStreamMiddleware> _logger;
 
-    public PreBufferRequestStreamMiddleware(ILogger<PreBufferRequestStreamMiddleware> logger)
+    public PreBufferRequestStreamMiddleware(RequestDelegate next, ILogger<PreBufferRequestStreamMiddleware> logger)
     {
+        _next = next;
         _logger = logger;
     }
 
-    public Task InvokeAsync(HttpContextCore context, RequestDelegate next)
-    {
-        if (context.GetEndpoint()?.Metadata.GetMetadata<IPreBufferRequestStreamMetadata>() is { IsEnabled: true } metadata)
-        {
-            return PreBufferAsync(context, metadata, next);
-        }
+    public Task InvokeAsync(HttpContextCore context)
+        => context.GetEndpoint()?.Metadata.GetMetadata<IPreBufferRequestStreamMetadata>() is { IsEnabled: true } metadata
+            ? PreBufferAsync(context, metadata)
+            : _next(context);
 
-        return next(context);
-    }
-
-    private async Task PreBufferAsync(HttpContextCore context, IPreBufferRequestStreamMetadata metadata, RequestDelegate next)
+    private async Task PreBufferAsync(HttpContextCore context, IPreBufferRequestStreamMetadata metadata)
     {
         // TODO: Should this enforce MaxRequestBodySize? https://github.com/aspnet/AspLabs/pull/447#discussion_r827314309
         _logger.LogTrace("Buffering request stream");
@@ -37,6 +34,6 @@ internal class PreBufferRequestStreamMiddleware : IMiddleware
         await context.Request.Body.DrainAsync(context.RequestAborted);
         context.Request.Body.Position = 0;
 
-        await next(context);
+        await _next(context);
     }
 }

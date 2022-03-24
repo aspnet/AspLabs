@@ -9,28 +9,23 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Adapters;
 
-internal class SessionMiddleware : IMiddleware
+internal class SessionMiddleware
 {
+    private readonly RequestDelegate _next;
     private readonly ILogger<SessionMiddleware> _logger;
 
-    public SessionMiddleware(ILogger<SessionMiddleware> logger)
+    public SessionMiddleware(RequestDelegate next, ILogger<SessionMiddleware> logger)
     {
+        _next = next;
         _logger = logger;
     }
 
-    public Task InvokeAsync(HttpContextCore context, RequestDelegate next)
-    {
-        if (context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { IsEnabled: true } metadata)
-        {
-            return ManageStateAsync(context, metadata, next);
-        }
-        else
-        {
-            return next(context);
-        }
-    }
+    public Task InvokeAsync(HttpContextCore context)
+        => context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { IsEnabled: true } metadata
+            ? ManageStateAsync(context, metadata)
+            : _next(context);
 
-    private async Task ManageStateAsync(HttpContextCore context, ISessionMetadata metadata, RequestDelegate next)
+    private async Task ManageStateAsync(HttpContextCore context, ISessionMetadata metadata)
     {
         _logger.LogTrace("Initializing session state");
 
@@ -40,6 +35,6 @@ internal class SessionMiddleware : IMiddleware
 
         context.Features.Set(new HttpSessionState(state));
 
-        await next(context);
+        await _next(context);
     }
 }
