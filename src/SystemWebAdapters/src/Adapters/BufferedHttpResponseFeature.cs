@@ -96,6 +96,7 @@ internal class BufferedHttpResponseFeature : Stream, IHttpResponseBodyFeature, I
     {
         await FlushBufferedStreamAsync();
         await _other.CompleteAsync();
+        IsEnded = true;
     }
 
     public void DisableBuffering()
