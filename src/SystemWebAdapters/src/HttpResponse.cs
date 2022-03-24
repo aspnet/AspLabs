@@ -18,6 +18,8 @@ namespace System.Web
 {
     public class HttpResponse
     {
+        private const string NoContentTypeMessage = "No content type declared";
+
         private readonly HttpResponseCore _response;
 
         private NameValueCollection? _headers;
@@ -74,23 +76,22 @@ namespace System.Web
             get => TypedHeaders.ContentType?.Encoding ?? Encoding.UTF8;
             set
             {
-                var contentType = TypedHeaders.ContentType;
-
-                if (contentType is null)
+                if (TypedHeaders.ContentType is { } contentType)
                 {
-                    throw new InvalidOperationException("Not content type declared");
-                }
-                else
-                {
-                    if (value == contentType.Encoding)
+                    if (contentType.Encoding == value)
                     {
                         return;
                     }
 
-                    TypedHeaders.ContentType = new(contentType.MediaType) { Encoding = value };
+                    contentType.Encoding = value;
+                    TypedHeaders.ContentType = contentType;
 
                     // Reset the writer for change in encoding
                     _writer = null;
+                }
+                else
+                {
+                    throw new InvalidOperationException(NoContentTypeMessage);
                 }
             }
         }
@@ -98,7 +99,18 @@ namespace System.Web
         public string? ContentType
         {
             get => TypedHeaders.ContentType?.MediaType.ToString();
-            set => TypedHeaders.ContentType = value is null ? null : new(value) { Encoding = ContentEncoding };
+            set
+            {
+                if (TypedHeaders.ContentType is { } contentType)
+                {
+                    contentType.MediaType = value;
+                    TypedHeaders.ContentType = contentType;
+                }
+                else
+                {
+                    TypedHeaders.ContentType = new(value);
+                }
+            }
         }
 
         public string Charset
@@ -106,16 +118,14 @@ namespace System.Web
             get => TypedHeaders.ContentType?.Charset.Value ?? Encoding.UTF8.WebName;
             set
             {
-                var contentType = TypedHeaders.ContentType;
-
-                if (contentType is null)
+                if (TypedHeaders.ContentType is { } contentType)
                 {
-                    contentType = new(value);
+                    contentType.Charset = value;
                     TypedHeaders.ContentType = contentType;
                 }
                 else
                 {
-                    contentType.Charset = value;
+                    throw new InvalidOperationException(NoContentTypeMessage);
                 }
             }
         }
