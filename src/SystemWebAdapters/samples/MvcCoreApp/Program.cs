@@ -1,6 +1,7 @@
 using System.Web.Adapters;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(MigrationWebApplicationOptions.CreateWithRelativeContentRoute(args));
+builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -25,8 +26,10 @@ app.UseAuthorization();
 
 app.UseSystemWebAdapters();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapDefaultControllerRoute();
+    endpoints.MapReverseProxy();
+});
 
 app.Run();
