@@ -13,9 +13,18 @@ namespace System.Web.Adapters
 {
     public static class SystemWebAdaptersExtensions
     {
-        public static void AddSystemWebAdapters(this IServiceCollection services)
+        public static ISystemWebAdapterBuilder AddSystemWebAdapters(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+
+            return new Builder(services);
+        }
+
+        public static ISystemWebAdapterBuilder AddSessionManager<TManager>(this ISystemWebAdapterBuilder builder)
+            where TManager : ISessionManager
+        {
+            builder.Services.AddSingleton<ISessionManager>();
+            return builder;
         }
 
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
@@ -123,6 +132,16 @@ namespace System.Web.Adapters
             }
 
             throw new InvalidOperationException($"Feature {typeof(TFeature)} is not available");
+        }
+
+        private class Builder : ISystemWebAdapterBuilder
+        {
+            public Builder(IServiceCollection services)
+            {
+                Services = services;
+            }
+
+            public IServiceCollection Services { get; }
         }
     }
 }
