@@ -21,6 +21,8 @@ namespace ClassLibrary
                 writer.Write("ContentEncoding", context.Response.ContentEncoding);
                 context.Response.Output.Flush();
 
+                writer.Write("test-value", context?.Session["test-value"]);
+
                 // Check content type
                 context.Response.ContentEncoding = Encoding.UTF32;
                 writer.Write("ContentType", context.Response.ContentType);

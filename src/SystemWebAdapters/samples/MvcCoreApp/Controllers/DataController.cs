@@ -10,6 +10,7 @@ namespace MvcCoreApp.Controllers
     {
         [HttpGet]
         [HttpPost]
+        [Session]
         [Route("/api/data")]
         public void Get([FromQuery] bool? suppress = false) => RequestInfo.WriteRequestInfo(suppress ?? false);
     }
