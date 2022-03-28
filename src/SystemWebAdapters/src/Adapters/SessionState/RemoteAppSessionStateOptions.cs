@@ -16,7 +16,10 @@ public class RemoteAppSessionStateOptions
 
     public string ApiKeyHeader { get; set; } = ApiKeyHeaderName;
 
-    public string? ApiKey { get; set; }
+#if NETCOREAPP3_1_OR_GREATER
+    [Required]
+#endif
+    public string ApiKey { get; set; } = null!;
 
 #if NETCOREAPP3_1_OR_GREATER
     [Required]

@@ -9,6 +9,7 @@ namespace ClassLibrary
     {
         public static void RegisterSessionKeys(RemoteAppSessionStateOptions options)
         {
+            options.ApiKey = "test-key";
             options.RegisterKey<int>("test-value");
         }
     }

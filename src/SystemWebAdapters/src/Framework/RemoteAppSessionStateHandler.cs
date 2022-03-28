@@ -25,6 +25,11 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
                 var options = new RemoteAppSessionStateOptions();
                 RegisterOptions(options);
                 _options = options;
+
+                if (string.IsNullOrEmpty(_options.ApiKey))
+                {
+                    throw new InvalidOperationException("Must have ApiKey set");
+                }
             }
 
             return _options;
@@ -56,14 +61,7 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
     }
 
     protected virtual bool ValidateRequest(HttpContext context)
-    {
-        if (Options.ApiKey is { } apiKey)
-        {
-            return !string.Equals(apiKey, context.Request.Headers.Get(Options.ApiKeyHeader), StringComparison.OrdinalIgnoreCase);
-        }
-
-        return true;
-    }
+        => !string.Equals(Options.ApiKey, context.Request.Headers.Get(Options.ApiKey), StringComparison.OrdinalIgnoreCase);
 
     protected virtual void RegisterOptions(RemoteAppSessionStateOptions options)
     {
