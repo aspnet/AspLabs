@@ -1,7 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Configuration;
 using System.Threading.Tasks;
 using System.Web.SessionState;
 
@@ -9,32 +8,13 @@ namespace System.Web.Adapters.SessionState;
 
 public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessionState, IReadOnlySessionState
 {
-    private const string AppSettingsApiKey = "RemoteAppSessionStateApiKey";
-
     private SessionSerializer? _serializer;
-    private RemoteAppSessionStateOptions? _options;
+
+    private static readonly RemoteAppSessionStateOptions _options = new();
 
     public override bool IsReusable => true;
 
-    protected RemoteAppSessionStateOptions Options
-    {
-        get
-        {
-            if (_options is null)
-            {
-                var options = new RemoteAppSessionStateOptions();
-                RegisterOptions(options);
-                _options = options;
-
-                if (string.IsNullOrEmpty(_options.ApiKey))
-                {
-                    throw new InvalidOperationException("Must have ApiKey set");
-                }
-            }
-
-            return _options;
-        }
-    }
+    public static void Configure(Action<RemoteAppSessionStateOptions> configure) => configure(_options);
 
     private SessionSerializer Serializer
     {
@@ -42,7 +22,7 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
         {
             if (_serializer is null)
             {
-                _serializer = new SessionSerializer(Options.KnownKeys);
+                _serializer = new SessionSerializer(_options.KnownKeys);
             }
 
             return _serializer;
@@ -51,21 +31,13 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
 
     public sealed override async Task ProcessRequestAsync(HttpContext context)
     {
-        if (!ValidateRequest(context))
+        if (_options.ApiKey is null || !string.Equals(_options.ApiKey, context.Request.Headers.Get(_options.ApiKeyHeader), StringComparison.OrdinalIgnoreCase))
         {
             context.Response.StatusCode = 401;
             return;
         }
 
         await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
-    }
-
-    protected virtual bool ValidateRequest(HttpContext context)
-        => !string.Equals(Options.ApiKey, context.Request.Headers.Get(Options.ApiKey), StringComparison.OrdinalIgnoreCase);
-
-    protected virtual void RegisterOptions(RemoteAppSessionStateOptions options)
-    {
-        options.ApiKey = ConfigurationManager.AppSettings[AppSettingsApiKey];
     }
 
     public sealed override void ProcessRequest(HttpContext context) => base.ProcessRequest(context);
