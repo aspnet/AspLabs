@@ -6,7 +6,7 @@ using System.Web.SessionState;
 
 namespace System.Web.Adapters.SessionState;
 
-public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessionState, IReadOnlySessionState
+public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessionState, IReadOnlySessionState
 {
     private SessionSerializer? _serializer;
 
@@ -29,7 +29,7 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
         }
     }
 
-    public sealed override async Task ProcessRequestAsync(HttpContext context)
+    public override async Task ProcessRequestAsync(HttpContext context)
     {
         if (_options.ApiKey is null || !string.Equals(_options.ApiKey, context.Request.Headers.Get(_options.ApiKeyHeader), StringComparison.OrdinalIgnoreCase))
         {
@@ -44,6 +44,4 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
 
         context.Response.End();
     }
-
-    public sealed override void ProcessRequest(HttpContext context) => base.ProcessRequest(context);
 }
