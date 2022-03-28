@@ -39,6 +39,9 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
 
         await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
 
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = 200;
+
         context.Response.End();
     }
 
