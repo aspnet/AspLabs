@@ -54,7 +54,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
     private static HttpRequestMessage? PrepareHttpRequestMessage(HttpContextCore context, RemoteAppSessionStateOptions options, ISessionMetadata metadata)
     {
-        var cookie = GetAspNetCookie(context);
+        var cookie = GetAspNetCookie(context, options);
 
         if (cookie is null)
         {
@@ -63,7 +63,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         var message = new HttpRequestMessage(HttpMethod.Get, options.RemoteAppUrl);
 
-        SetAspNetCookie(message, cookie);
+        SetAspNetCookie(message, options, cookie);
         SetReadOnly(message, metadata);
         SetApiKey(message, options);
 
@@ -76,11 +76,11 @@ internal class RemoteAppSessionStateManager : ISessionManager
     private static void SetApiKey(HttpRequestMessage message, RemoteAppSessionStateOptions options)
         => message.Headers.TryAddWithoutValidation(options.ApiKeyHeader, options.ApiKey);
 
-    private static string? GetAspNetCookie(HttpContextCore context)
-        => context.Request.Headers.TryGetValue(HeaderNames.Cookie, out var cookies) ? string.Join(";", cookies) : null;
+    private static string? GetAspNetCookie(HttpContextCore context, RemoteAppSessionStateOptions options)
+        => context.Request.Cookies.TryGetValue(options.CookieName, out var cookie) ? cookie : null;
 
-    private static void SetAspNetCookie(HttpRequestMessage message, string cookie)
-        => message.Headers.TryAddWithoutValidation(HeaderNames.Cookie, cookie);
+    private static void SetAspNetCookie(HttpRequestMessage message, RemoteAppSessionStateOptions options, string cookie)
+        => message.Headers.TryAddWithoutValidation(HeaderNames.Cookie, $"{options.CookieName}={cookie}");
 
     private class ReadonlySessionState : ISessionState
     {
