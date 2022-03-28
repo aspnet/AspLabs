@@ -21,7 +21,10 @@ namespace ClassLibrary
                 writer.Write("ContentEncoding", context.Response.ContentEncoding);
                 context.Response.Output.Flush();
 
-                writer.Write("test-value", context?.Session["test-value"]);
+                if (context.Session["test-value"] is int value)
+                {
+                    writer.Write("test-value", value);
+                }
 
                 // Check content type
                 context.Response.ContentEncoding = Encoding.UTF32;
@@ -39,7 +42,7 @@ namespace ClassLibrary
                 // Status code
                 writer.Write("StatusCode", context.Response.StatusCode);
                 writer.Write("StatusDescription", context.Response.StatusDescription);
-            context.Response.End();
+                context.Response.End();
             }
 
             context.Response.SuppressContent = suppress;
