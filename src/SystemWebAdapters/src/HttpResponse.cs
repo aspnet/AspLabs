@@ -26,6 +26,7 @@ namespace System.Web
         private ResponseHeaders? _typedHeaders;
         private IBufferedResponseFeature? _bufferedFeature;
         private TextWriter? _writer;
+        private HttpCookieCollection? _cookies;
 
         public HttpResponse(HttpResponseCore response)
         {
@@ -61,8 +62,7 @@ namespace System.Web
 
         public HttpCookieCollection Cookies
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => _cookies ??= new(_response.Cookies);
         }
 
         public bool SuppressContent

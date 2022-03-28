@@ -755,5 +755,24 @@ namespace System.Web
             Assert.Same(queryCollection1, queryCollection2);
             Assert.IsType<StringValuesReadOnlyDictionaryNameValueCollection>(queryCollection1);
         }
+
+        [Fact]
+        public void Cookies()
+        {
+            // Arrange
+            var cookies = new Mock<IRequestCookieCollection>();
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Cookies).Returns(cookies.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var cookies1 = request.Cookies;
+            var cookies2 = request.Cookies;
+
+            // Assert
+            Assert.Same(cookies1, cookies2);
+        }
     }
 }

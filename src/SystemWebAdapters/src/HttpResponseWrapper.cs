@@ -35,7 +35,6 @@ namespace System.Web
         public override HttpCookieCollection Cookies
         {
             get => _response.Cookies;
-            set => _response.Cookies = value;
         }
 
         public override NameValueCollection Headers => _response.Headers;

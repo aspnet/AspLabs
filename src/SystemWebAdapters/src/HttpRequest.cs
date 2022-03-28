@@ -28,6 +28,7 @@ namespace System.Web
         private NameValueCollection? _serverVariables;
         private NameValueCollection? _form;
         private NameValueCollection? _query;
+        private HttpCookieCollection? _cookies;
 
         public HttpRequest(HttpRequestCore request)
         {
@@ -89,7 +90,7 @@ namespace System.Web
 
         public NameValueCollection Form => _form ??= _request.Form.ToNameValueCollection();
 
-        public HttpCookieCollection Cookies => throw new NotImplementedException();
+        public HttpCookieCollection Cookies => _cookies ??= new(_request.Cookies);
 
         public int ContentLength => (int)(_request.ContentLength ?? 0);
 

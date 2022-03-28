@@ -376,4 +376,23 @@ public class HttpResponseTests
         // Assert
         Assert.Equal(isConnected, result);
     }
+
+    [Fact]
+    public void Cookies()
+    {
+        // Arrange
+        var cookies = new Mock<IResponseCookies>();
+
+        var responseCore = new Mock<HttpResponseCore>();
+        responseCore.Setup(r => r.Cookies).Returns(cookies.Object);
+
+        var response = new HttpResponse(responseCore.Object);
+
+        // Act
+        var cookies1 = response.Cookies;
+        var cookies2 = response.Cookies;
+
+        // Assert
+        Assert.Same(cookies1, cookies2);
+    }
 }
