@@ -11,7 +11,7 @@ public delegate void CacheItemUpdateCallback(string key, CacheItemUpdateReason r
 
 public class Cache : IEnumerable
 {
-    private readonly MemoryCache _cache;
+    private readonly ObjectCache _cache;
 
     public static readonly DateTime NoAbsoluteExpiration = DateTime.MaxValue;
 
@@ -22,7 +22,7 @@ public class Cache : IEnumerable
     {
     }
 
-    public Cache(MemoryCache cache)
+    public Cache(ObjectCache cache)
     {
         _cache = cache;
     }
