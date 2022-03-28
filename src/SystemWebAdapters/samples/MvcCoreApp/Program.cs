@@ -32,9 +32,10 @@ app.UseAuthorization();
 
 app.UseSystemWebAdapters();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapReverseProxy();
+app.UseEndpoints(endpoints =>
+{
+    app.MapDefaultControllerRoute();
+    app.MapReverseProxy();
+});
 
 app.Run();
