@@ -56,14 +56,18 @@ internal class RemoteAppSessionStateManager : ISessionManager
     {
         var cookie = GetAspNetCookie(context, options);
 
-        if (cookie is null)
+        if (cookie is null && metadata.IsReadOnly)
         {
             return null;
         }
 
         var message = new HttpRequestMessage(HttpMethod.Get, options.RemoteAppUrl);
 
-        SetAspNetCookie(message, options, cookie);
+        if (cookie is not null)
+        {
+            SetAspNetCookie(message, options, cookie);
+        }
+
         SetReadOnly(message, metadata);
         SetApiKey(message, options);
 
