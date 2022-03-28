@@ -38,6 +38,8 @@ public class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessi
         }
 
         await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
+
+        context.Response.End();
     }
 
     public sealed override void ProcessRequest(HttpContext context) => base.ProcessRequest(context);
