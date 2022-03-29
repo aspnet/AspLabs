@@ -1,4 +1,5 @@
 T:System.Web.Adapters.SystemWebAdaptersExtensions
+T:System.Web.Adapters.ISystemWebAdapterBuilder
 
 # Prebuffering
 T:System.Web.Adapters.IPreBufferRequestStreamMetadata

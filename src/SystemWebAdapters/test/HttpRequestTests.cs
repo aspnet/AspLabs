@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -754,6 +756,26 @@ namespace System.Web
             // Assert
             Assert.Same(queryCollection1, queryCollection2);
             Assert.IsType<StringValuesReadOnlyDictionaryNameValueCollection>(queryCollection1);
+        }
+
+        [Fact]
+        public void Cookies()
+        {
+            // Arrange
+            var cookies = new Mock<IRequestCookieCollection>();
+            cookies.Setup(c => c.GetEnumerator()).Returns(Enumerable.Empty<KeyValuePair<string, string>>().GetEnumerator());
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Cookies).Returns(cookies.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var cookies1 = request.Cookies;
+            var cookies2 = request.Cookies;
+
+            // Assert
+            Assert.Same(cookies1, cookies2);
         }
     }
 }
