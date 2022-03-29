@@ -21,9 +21,9 @@ namespace System.Web.Adapters
         }
 
         public static ISystemWebAdapterBuilder AddSessionManager<TManager>(this ISystemWebAdapterBuilder builder)
-            where TManager : ISessionManager
+            where TManager : class, ISessionManager
         {
-            builder.Services.AddSingleton<ISessionManager>();
+            builder.Services.AddSingleton<ISessionManager, TManager>();
             return builder;
         }
 
