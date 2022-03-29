@@ -35,6 +35,8 @@ namespace System.Web
             _request = request;
         }
 
+        internal RequestHeaders TypedHeaders => _typedHeaders ??= new(_request.Headers);
+
         public string? Path => _request.Path.Value;
 
         public NameValueCollection Headers => _headers ??= _request.Headers.ToNameValueCollection();
@@ -90,7 +92,7 @@ namespace System.Web
 
         public NameValueCollection Form => _form ??= _request.Form.ToNameValueCollection();
 
-        public HttpCookieCollection Cookies => _cookies ??= new(_request.Cookies);
+        public HttpCookieCollection Cookies => _cookies ??= new(this);
 
         public int ContentLength => (int)(_request.ContentLength ?? 0);
 
@@ -172,8 +174,6 @@ namespace System.Web
         public byte[] BinaryRead(int count) => throw new NotImplementedException();
 
         public void Abort() => _request.HttpContext.Abort();
-
-        private RequestHeaders TypedHeaders => _typedHeaders ??= new(_request.Headers);
 
         [return: NotNullIfNotNull("request")]
         public static implicit operator HttpRequest?(HttpRequestCore? request) => request.GetAdapter();

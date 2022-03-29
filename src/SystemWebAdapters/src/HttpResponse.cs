@@ -36,7 +36,7 @@ namespace System.Web
         private IBufferedResponseFeature BufferedFeature => _bufferedFeature ??= _response.HttpContext.Features.Get<IBufferedResponseFeature>()
             ?? throw new InvalidOperationException("Response buffering must be enabled on this endpoint for this feature via the IBufferResponseStreamMetadata metadata item");
 
-        private ResponseHeaders TypedHeaders => _typedHeaders ??= new(_response.Headers);
+        internal ResponseHeaders TypedHeaders => _typedHeaders ??= new(_response.Headers);
 
         public int StatusCode
         {
@@ -62,7 +62,7 @@ namespace System.Web
 
         public HttpCookieCollection Cookies
         {
-            get => _cookies ??= new(_response.Cookies);
+            get => _cookies ??= new(this);
         }
 
         public bool SuppressContent
@@ -163,7 +163,8 @@ namespace System.Web
                 _response.Headers.Add(name, value);
             }
         }
-        public void SetCookie(HttpCookie cookie) => throw new NotImplementedException();
+
+        public void SetCookie(HttpCookie cookie) => Cookies.Set(cookie);
 
         public void End() => BufferedFeature.End();
 

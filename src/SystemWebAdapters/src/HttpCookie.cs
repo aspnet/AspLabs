@@ -76,6 +76,21 @@ public class HttpCookie
         }
     }
 
+    internal void CopyTo(HttpValueCollection other)
+    {
+        if (_holder is string s)
+        {
+            other.Add(null, s);
+        }
+        else if (_holder is HttpValueCollection collection)
+        {
+            for (var i = 0; i < collection.Count; i++)
+            {
+                other.Add(collection.GetKey(i), collection[i]);
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets the expiration date and time for the cookie.
     /// </summary>

@@ -56,9 +56,8 @@ namespace System.Web
     }
     public sealed partial class HttpCookieCollection : System.Collections.Specialized.NameObjectCollectionBase
     {
-        internal HttpCookieCollection() { }
+        public HttpCookieCollection() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public string[] AllKeys { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public override int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Web.HttpCookie this[int index] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public System.Web.HttpCookie this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public void Add(System.Web.HttpCookie cookie) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
