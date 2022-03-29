@@ -3,6 +3,7 @@
 
 using System.Collections.Specialized;
 using System.Web.Internal;
+using Microsoft.AspNetCore.Http;
 
 namespace System.Web;
 
@@ -119,4 +120,14 @@ public class HttpCookie
     /// Gets or sets the domain to associate the cookie with.
     /// </summary>
     public string? Domain { get; set; }
+
+    internal CookieOptions ToCookieOptions() => new()
+    {
+        Domain = Domain,
+        Expires = (Expires == DateTime.MinValue) ? null : new DateTimeOffset(Expires),
+        HttpOnly = HttpOnly,
+        Path = Path,
+        SameSite = (Microsoft.AspNetCore.Http.SameSiteMode)SameSite,
+        Secure = Secure,
+    };
 }

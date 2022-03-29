@@ -33,22 +33,11 @@ public sealed class HttpCookieCollection : NameObjectCollectionBase
             {
                 if (response.Cookies[i] is { } cookie)
                 {
-                    cookies.Append(cookie.Name, cookie.Value ?? string.Empty, ToCookieOptions(cookie));
+                    cookies.Append(cookie.Name, cookie.Value ?? string.Empty, cookie.ToCookieOptions());
                 }
             }
 
             return Task.CompletedTask;
-
-            static CookieOptions ToCookieOptions(HttpCookie cookie) => new()
-            {
-                Domain = cookie.Domain,
-                Expires = (cookie.Expires == DateTime.MinValue) ? null : new DateTimeOffset(cookie.Expires),
-                HttpOnly = cookie.HttpOnly,
-                Path = cookie.Path,
-                SameSite = (Microsoft.AspNetCore.Http.SameSiteMode)cookie.SameSite,
-                Secure = cookie.Secure,
-            };
-
         }, response);
     }
 
