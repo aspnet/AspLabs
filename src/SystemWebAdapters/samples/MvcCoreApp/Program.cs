@@ -1,10 +1,17 @@
 using System.Web.Adapters;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder();
+builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSystemWebAdapters();
+builder.Services.AddSystemWebAdapters()
+    .AddRemoteAppSession(options =>
+    {
+        options.RemoteAppUrl = new Uri("https://localhost:44339/fallback/session-state");
+
+        ClassLibrary.SessionUtils.RegisterSessionKeys(options);
+    });
 
 var app = builder.Build();
 
@@ -25,8 +32,10 @@ app.UseAuthorization();
 
 app.UseSystemWebAdapters();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    app.MapDefaultControllerRoute();
+    app.MapReverseProxy();
+});
 
 app.Run();

@@ -30,7 +30,7 @@ public class HttpSessionStateWrapper : HttpSessionStateBase
 
     public override void Abandon() => _session.Abandon();
 
-    public override object this[string name]
+    public override object? this[string name]
     {
         get => _session[name];
         set => _session[name] = value;
