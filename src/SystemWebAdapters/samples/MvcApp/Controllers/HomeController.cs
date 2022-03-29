@@ -11,6 +11,7 @@ namespace MvcApp.Controllers
     {
         public ActionResult Index()
         {
+            Session.Add("test-value", 5);
             return View();
         }
 

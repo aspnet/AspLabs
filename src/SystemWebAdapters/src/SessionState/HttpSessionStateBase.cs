@@ -21,7 +21,7 @@ public abstract class HttpSessionStateBase
 
     public virtual void Abandon() => throw new NotImplementedException();
 
-    public virtual object this[string name]
+    public virtual object? this[string name]
     {
         get => throw new NotImplementedException();
         set => throw new NotImplementedException();

@@ -30,7 +30,7 @@ public class HttpSessionState
 
     public void Abandon() => _container.Abandon();
 
-    public object this[string name]
+    public object? this[string name]
     {
         get => _container[name];
         set => _container[name] = value;

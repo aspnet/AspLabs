@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
@@ -18,6 +18,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <Compile Remove="**/*" />
     <Compile Include="NetStandard/**" />
+    <Compile Include="Adapters/SessionState/RemoteAppSessionStateOptions.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="$(HasImplementation)">
@@ -34,7 +35,13 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Compile Remove="**/*" />
     <Compile Include="Framework/*.cs" />
+    <Compile Include="Adapters/SessionState/RemoteAppSessionStateOptions.cs" />
+    <Compile Include="Adapters/SessionState/SessionSerializer.cs" />
+
     <Reference Include="System.Web" />
+    <Reference Include="System.Configuration" />
+
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
   </ItemGroup>
 
   <Import Condition="$(HasImplementation)" Project="GenerateApis.targets" />
