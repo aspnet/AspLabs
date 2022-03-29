@@ -763,7 +763,7 @@ namespace System.Web
         {
             // Arrange
             var cookies = new Mock<IRequestCookieCollection>();
-            cookies.Setup(c => c.GetEnumerator()).Returns(Enumerable.Empty<KeyValuePair<string, string?>>().GetEnumerator());
+            cookies.Setup(c => c.GetEnumerator()).Returns(Enumerable.Empty<KeyValuePair<string, string>>().GetEnumerator());
 
             var requestCore = new Mock<HttpRequestCore>();
             requestCore.Setup(r => r.Cookies).Returns(cookies.Object);
