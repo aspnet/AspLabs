@@ -34,14 +34,15 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequir
         if (_options.ApiKey is null || !string.Equals(_options.ApiKey, context.Request.Headers.Get(_options.ApiKeyHeader), StringComparison.OrdinalIgnoreCase))
         {
             context.Response.StatusCode = 401;
-            return;
+        }
+        else
+        {
+            await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = 200;
         }
 
-        await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
-
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = 200;
-
-        context.Response.End();
+        context.ApplicationInstance.CompleteRequest();
     }
 }
