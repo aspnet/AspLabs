@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Caching;
+using System.Web.SessionState;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -76,11 +77,14 @@ namespace System.Web.Adapters.Tests
         public void GetServiceReturnsExpected()
         {
             var coreContext = new DefaultHttpContext();
+            coreContext.Features.Set(new HttpSessionState(new Mock<ISessionState>().Object));
+
             var context = new HttpContext(coreContext);
 
             Assert.Same(context.Request, context.GetService(typeof(HttpRequest)));
             Assert.Same(context.Response, context.GetService(typeof(HttpResponse)));
             Assert.Same(context.Server, context.GetService(typeof(HttpServerUtility)));
+            Assert.Same(context.Session, context.GetService(typeof(HttpSessionState)));
 
             Assert.Null(context.GetService(typeof(HttpContext)));
         }
