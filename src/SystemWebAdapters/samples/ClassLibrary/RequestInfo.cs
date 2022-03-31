@@ -13,6 +13,7 @@ public class RequestInfo
 
         using (var writer = new SimpleJsonWriter(context.Response))
         {
+            writer.Write("RawUrl", context.Request.RawUrl);
             writer.Write("Path", context.Request.Path);
             writer.Write("Length", context.Request.InputStream.Length);
             writer.Write("Charset", context.Response.Charset);
@@ -20,17 +21,11 @@ public class RequestInfo
             writer.Write("ContentEncoding", context.Response.ContentEncoding);
             context.Response.Output.Flush();
 
-            if (context.Session["test-value"] is int value)
+            if (context.Session is { } state && state["test-value"] is int value)
             {
                 writer.Write("test-value", value);
             }
 
-            // Check content type
-            context.Response.ContentEncoding = Encoding.UTF32;
-            writer.Write("ContentType", context.Response.ContentType);
-            writer.Write("ContentEncoding", context.Response.ContentEncoding.WebName);
-
-            context.Response.ContentEncoding = Encoding.UTF8;
             writer.Write("ContentType", context.Response.ContentType);
             writer.Write("ContentEncoding", context.Response.ContentEncoding.WebName);
 
