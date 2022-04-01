@@ -43,6 +43,8 @@ stages:
       enablePublishBuildAssets: true
       enablePublishUsingPipelines: true
       helixRepo: aspnet/AspLabs
+      # Align w/ Maestro++ default channel when generating software bills of materials (SBOMs).
+      PackageVersion: 6.0.0
       # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
       ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
         enableMicrobuild: true
