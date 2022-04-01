@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -14,6 +14,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Grpc.HttpApi\Microsoft.AspNetCore.Grpc.HttpApi.csproj" />
+
+    <PackageReference Include="Microsoft.Extensions.Logging.Testing" Version="$(MicrosoftExtensionsLoggingTestingPackageVersion)" />
 
     <PackageReference Include="Grpc.Tools" Version="$(GrpcCorePackageVersion)">
       <PrivateAssets>all</PrivateAssets>

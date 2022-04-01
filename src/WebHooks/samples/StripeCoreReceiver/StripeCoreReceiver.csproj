@@ -5,6 +5,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="$(MicrosoftAspNetCorePackageVersion)" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.5.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Stripe\Microsoft.AspNetCore.WebHooks.Receivers.Stripe.csproj" />
   </ItemGroup>
 </Project>

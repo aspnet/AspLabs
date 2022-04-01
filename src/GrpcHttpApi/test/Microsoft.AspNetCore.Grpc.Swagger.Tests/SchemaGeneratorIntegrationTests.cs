@@ -3,7 +3,7 @@
 
 using System.Text.Json;
 using Google.Protobuf.WellKnownTypes;
-using HttpApi;
+using Messages;
 using Microsoft.AspNetCore.Grpc.Swagger.Internal;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;

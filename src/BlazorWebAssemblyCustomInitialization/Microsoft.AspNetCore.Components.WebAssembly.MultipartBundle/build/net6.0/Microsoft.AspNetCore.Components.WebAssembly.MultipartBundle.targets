@@ -1,0 +1,17 @@
+<Project>
+  <UsingTask TaskName="Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks.BundleBlazorAssets" AssemblyFile="$(MSBuildThisProjectFileDirectory)..\..\tasks\Microsoft.AspNetCore.Components.WebAssembly.MultipartBundle.Tasks.dll" />
+
+  <PropertyGroup>
+    <ComputeBlazorExtensionsDependsOn>$(ComputeBlazorExtensionsDependsOn);_BundleBlazorDlls</ComputeBlazorExtensionsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_BundleBlazorDlls">
+    <BundleBlazorAssets
+      PublishBlazorBootStaticWebAsset="@(PublishBlazorBootStaticWebAsset)"
+      BundlePath="$(IntermediateOutputPath)bundle.multipart"
+    >
+      <Output TaskParameter="Extension" ItemName="BlazorPublishExtension"/>
+    </BundleBlazorAssets>
+  </Target>
+
+</Project>

@@ -7,11 +7,14 @@ using System.Linq;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
 using Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
@@ -27,7 +30,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.SayHello));
 
-            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
             Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
             Assert.Equal(1, endpoint.RoutePattern.Parameters.Count);
             Assert.Equal("name", endpoint.RoutePattern.Parameters[0].Name);
@@ -43,7 +46,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             var endpoint = FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.Custom));
 
             Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
-            Assert.Equal("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
+            Assert.Equal("HEAD", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
         }
 
         [Fact]
@@ -58,13 +61,13 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             Assert.Equal(2, matchedEndpoints.Count);
 
             var getMethodModel = matchedEndpoints[0];
-            Assert.Equal("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Get);
+            Assert.Equal("GET", getMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Get);
             Assert.Equal("/v1/additional_bindings/{name}", getMethodModel.RoutePattern.RawText);
 
             var additionalMethodModel = matchedEndpoints[1];
-            Assert.Equal("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>().HttpMethods.Single());
-            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>().HttpRule.Delete);
+            Assert.Equal("DELETE", additionalMethodModel.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Delete);
             Assert.Equal("/v1/additional_bindings/{name}", additionalMethodModel.RoutePattern.RawText);
         }
 
@@ -77,6 +80,33 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Assert
             var ex = Assert.Throws<InvalidOperationException>(() => FindGrpcEndpoint(endpoints, nameof(HttpApiGreeterService.NoOption)));
             Assert.Equal("Couldn't find gRPC endpoint for method NoOption.", ex.Message);
+        }
+
+        [Fact]
+        public void AddMethod_StreamingMethods_ThrowNotFoundError()
+        {
+            // Arrange
+            var testSink = new TestSink();
+            var testProvider = new TestLoggerProvider(testSink);
+
+            // Act
+            var endpoints = MapEndpoints<HttpApiStreamingService>(
+                configureLogging: c =>
+                {
+                    c.AddProvider(testProvider);
+                    c.SetMinimumLevel(LogLevel.Trace);
+                });
+
+            // Assert
+            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetClientStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
+            Assert.Contains(testSink.Writes, c => c.Message == "Unable to bind GetBidiStreaming on Microsoft.AspNetCore.Grpc.HttpApi.Tests.TestObjects.HttpApiStreamingService to HTTP API. Streaming methods are not supported.");
+
+            var matchedEndpoints = FindGrpcEndpoints(endpoints, nameof(HttpApiStreamingService.GetServerStreaming));
+            var endpoint = Assert.Single(matchedEndpoints);
+
+            Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
+            Assert.Equal("/v1/server_greeter/{name}", endpoint.Metadata.GetMetadata<GrpcHttpMetadata>()?.HttpRule.Get);
+            Assert.Equal("/v1/server_greeter/{name}", endpoint.RoutePattern.RawText);
         }
 
         [Fact]
@@ -153,11 +183,14 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             }
         }
 
-        private IReadOnlyList<Endpoint> MapEndpoints<TService>()
+        private IReadOnlyList<Endpoint> MapEndpoints<TService>(Action<ILoggingBuilder>? configureLogging = null)
             where TService : class
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging();
+            serviceCollection.AddLogging(log =>
+            {
+                configureLogging?.Invoke(log);
+            });
             serviceCollection.AddGrpc();
             serviceCollection.RemoveAll(typeof(IServiceMethodProvider<>));
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>), typeof(HttpApiServiceMethodProvider<>)));

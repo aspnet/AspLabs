@@ -6,12 +6,18 @@
     <IsPackable>true</IsPackable>
     <IsShipping>true</IsShipping>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <!-- Disable analysis for ConfigureAwait(false) -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors);CA2007</WarningsNotAsErrors>
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.HttpApi.IntegrationTests" />
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.HttpApi.Tests" />
+    <InternalsVisibleTo Include="Microsoft.AspNetCore.Grpc.Microbenchmarks" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Shared\Server\BindMethodFinder.cs" Link="Internal\Shared\Server\BindMethodFinder.cs" />
@@ -29,7 +35,6 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="System.IO.Pipelines" Version="4.7.2" />
 
     <PackageReference Include="Google.Api.CommonProtos" Version="$(GoogleApiCommonProtosPackageVersion)" />
     <PackageReference Include="Google.Protobuf" Version="$(GoogleProtobufPackageVersion)" />

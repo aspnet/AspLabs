@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <Import Project="js\WebpackBuild.targets" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0-rc.1.21381.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="js\**" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Supress the warning about the assemblies we are putting in the task folder. -->
+    <NoWarn>NU5100</NoWarn>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Package demonstrating how to integrate third party tools with Razor Class Libraries.</Description>
+    <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="build\**" Pack="true" PackagePath="%(Identity)" />
+    <Content Include="_._" Pack="true" PackagePath="lib\netstandard2.0\_._" />
+  </ItemGroup>
+
+</Project>

@@ -116,10 +116,13 @@ namespace Grpc.Shared.HttpApi
                     {
                         if (value is string s)
                         {
-                            var enumValueDescriptor = descriptor.EnumType.FindValueByName(s);
+                            var enumValueDescriptor = int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
+                                ? descriptor.EnumType.FindValueByNumber(i)
+                                : descriptor.EnumType.FindValueByName(s);
+
                             if (enumValueDescriptor == null)
                             {
-                                throw new InvalidOperationException($"Invalid enum value '{s}' for enum type {descriptor.EnumType.Name}.");
+                                throw new InvalidOperationException($"Invalid value '{s}' for enum type {descriptor.EnumType.Name}.");
                             }
 
                             return enumValueDescriptor.Number;
@@ -152,6 +155,13 @@ namespace Grpc.Shared.HttpApi
                         if (values is StringValues stringValues)
                         {
                             foreach (var value in stringValues)
+                            {
+                                list.Add(ConvertValue(value, field));
+                            }
+                        }
+                        else if (values is IList listValues)
+                        {
+                            foreach (var value in listValues)
                             {
                                 list.Add(ConvertValue(value, field));
                             }
@@ -267,38 +277,108 @@ namespace Grpc.Shared.HttpApi
             return routeParameterDescriptors;
         }
 
-        public static void ResolveBodyDescriptor(string body, MethodDescriptor methodDescriptor, out MessageDescriptor? bodyDescriptor, out List<FieldDescriptor>? bodyFieldDescriptors, out bool bodyDescriptorRepeated)
+        public static BodyDescriptorInfo? ResolveBodyDescriptor(string body, Type serviceType, MethodDescriptor methodDescriptor)
         {
-            bodyDescriptor = null;
-            bodyFieldDescriptors = null;
-            bodyDescriptorRepeated = false;
-
             if (!string.IsNullOrEmpty(body))
             {
                 if (!string.Equals(body, "*", StringComparison.Ordinal))
                 {
-                    if (!TryResolveDescriptors(methodDescriptor.InputType, body, out bodyFieldDescriptors))
+                    if (!TryResolveDescriptors(methodDescriptor.InputType, body, out var bodyFieldDescriptors))
                     {
                         throw new InvalidOperationException($"Couldn't find matching field for body '{body}' on {methodDescriptor.InputType.Name}.");
                     }
                     var leafDescriptor = bodyFieldDescriptors.Last();
+                    var propertyName = FormatUnderscoreName(leafDescriptor.Name, pascalCase: true, preservePeriod: false);
+                    var propertyInfo = leafDescriptor.ContainingType.ClrType.GetProperty(propertyName);
+
                     if (leafDescriptor.IsRepeated)
                     {
                         // A repeating field isn't a message type. The JSON parser will parse using the containing
                         // type to get the repeating collection.
-                        bodyDescriptor = leafDescriptor.ContainingType;
-                        bodyDescriptorRepeated = true;
+                        return new BodyDescriptorInfo(leafDescriptor.ContainingType, bodyFieldDescriptors, IsDescriptorRepeated: true, propertyInfo);
                     }
                     else
                     {
-                        bodyDescriptor = leafDescriptor.MessageType;
+                        return new BodyDescriptorInfo(leafDescriptor.MessageType, bodyFieldDescriptors, IsDescriptorRepeated: false, propertyInfo);
                     }
                 }
                 else
                 {
-                    bodyDescriptor = methodDescriptor.InputType;
+                    ParameterInfo? requestParameter = null;
+                    var methodInfo = serviceType.GetMethod(methodDescriptor.Name);
+                    if (methodInfo != null)
+                    {
+                        requestParameter = methodInfo.GetParameters().SingleOrDefault(p => p.Name == "request");
+                    }
+
+                    return new BodyDescriptorInfo(methodDescriptor.InputType, FieldDescriptors: null, IsDescriptorRepeated: false, ParameterInfo: requestParameter);
                 }
             }
+
+            return null;
+        }
+
+        public record BodyDescriptorInfo(
+            MessageDescriptor Descriptor,
+            List<FieldDescriptor>? FieldDescriptors,
+            bool IsDescriptorRepeated,
+            PropertyInfo? PropertyInfo = null,
+            ParameterInfo? ParameterInfo = null);
+
+        public static string FormatUnderscoreName(string input, bool pascalCase, bool preservePeriod)
+        {
+            var capitalizeNext = pascalCase;
+            var result = string.Empty;
+
+            for (var i = 0; i < input.Length; i++)
+            {
+                if (char.IsLower(input[i]))
+                {
+                    if (capitalizeNext)
+                    {
+                        result += char.ToUpper(input[i]);
+                    }
+                    else
+                    {
+                        result += input[i];
+                    }
+                    capitalizeNext = false;
+                }
+                else if (char.IsUpper(input[i]))
+                {
+                    if (i == 0 && !capitalizeNext)
+                    {
+                        // Force first letter to lower-case unless explicitly told to
+                        // capitalize it.
+                        result += char.ToLower(input[i]);
+                    }
+                    else
+                    {
+                        // Capital letters after the first are left as-is.
+                        result += input[i];
+                    }
+                    capitalizeNext = false;
+                }
+                else if (char.IsDigit(input[i]))
+                {
+                    result += input[i];
+                    capitalizeNext = true;
+                }
+                else
+                {
+                    capitalizeNext = true;
+                    if (input[i] == '.' && preservePeriod)
+                    {
+                        result += '.';
+                    }
+                }
+            }
+            // Add a trailing "_" if the name should be altered.
+            if (input.Length > 0 && input[input.Length - 1] == '#')
+            {
+                result += '_';
+            }
+            return result;
         }
     }
 }

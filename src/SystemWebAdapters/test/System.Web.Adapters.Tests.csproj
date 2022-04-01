@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>10</LangVersion>
+    <RootNamespace>System.Web</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extras.Moq" Version="6.0.0" />
+    <PackageReference Include="AutoFixture" Version="4.15.0" />
+    <PackageReference Include="Moq" Version="4.16.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore" />
+    <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\System.Web.Adapters.csproj" />
+  </ItemGroup>
+
+  <Import Project="CopyFrameworkAdapters.targets" />
+
+</Project>

@@ -2,14 +2,23 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
-using Microsoft.AspNetCore.Grpc.HttpApi;
+using Google.Protobuf.Reflection;
+using Grpc.AspNetCore.Server;
+using Grpc.Core;
+using Grpc.Shared.Server;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal;
+using Microsoft.AspNetCore.Grpc.HttpApi.Internal.CallHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+using MethodOptions = Grpc.Shared.Server.MethodOptions;
 
 namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 {
@@ -21,7 +30,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             // Arrange
             var cts = new CancellationTokenSource();
             var httpContext = CreateHttpContext(cancellationToken: cts.Token);
-            var serverCallContext = new HttpApiServerCallContext(httpContext, string.Empty);
+            var serverCallContext = CreateServerCallContext(httpContext);
 
             // Act
             var ct = serverCallContext.CancellationToken;
@@ -40,7 +49,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             httpContext.Request.Headers.Add("grpc-encoding", "identity");
             httpContext.Request.Headers.Add("grpc-timeout", "1S");
             httpContext.Request.Headers.Add("hello-bin", Convert.ToBase64String(new byte[] { 1, 2, 3 }));
-            var serverCallContext = new HttpApiServerCallContext(httpContext, string.Empty);
+            var serverCallContext = CreateServerCallContext(httpContext);
 
             // Act
             var headers = serverCallContext.RequestHeaders;
@@ -79,6 +88,26 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
             public void Abort()
             {
             }
+        }
+
+        private static HttpApiServerCallContext CreateServerCallContext(DefaultHttpContext httpContext)
+        {
+            return new HttpApiServerCallContext(
+                httpContext,
+                MethodOptions.Create(Enumerable.Empty<GrpcServiceOptions>()),
+                new Method<object, object>(
+                    MethodType.Unary,
+                    "Server",
+                    "Method",
+                    new Marshaller<object>(o => null, c => null!),
+                    new Marshaller<object>(o => null, c => null!)),
+                new CallHandlerDescriptorInfo(
+                    null,
+                    null,
+                    false,
+                    null,
+                    new Dictionary<string, List<FieldDescriptor>>()),
+                NullLogger.Instance);
         }
     }
 }
