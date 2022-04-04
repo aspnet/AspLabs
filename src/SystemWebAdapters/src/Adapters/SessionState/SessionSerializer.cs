@@ -42,10 +42,10 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-#if NETCOREAPP3_1_OR_GREATER
     public async ValueTask<ISessionState?> DeserializeAsync(Stream stream)
         => await JsonSerializer.DeserializeAsync<SessionState>(stream, Options);
 
+#if NETCOREAPP3_1_OR_GREATER
     public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
     {
         var session = (SessionState)sessionState;
@@ -146,9 +146,7 @@ internal class SessionSerializer
     }
 
     private class SessionState
-#if NETCOREAPP3_1_OR_GREATER
         : ISessionState
-#endif
     {
         public object? this[string name]
         {
