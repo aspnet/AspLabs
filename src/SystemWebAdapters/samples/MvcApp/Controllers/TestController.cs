@@ -4,7 +4,7 @@ using ClassLibrary;
 
 namespace MvcApp.Controllers
 {
-    [RoutePrefix("api/tests")]
+    [RoutePrefix("api/test")]
     public class TestController : ApiController
     {
         [Route("request/info")]
