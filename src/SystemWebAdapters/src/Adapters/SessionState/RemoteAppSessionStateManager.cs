@@ -49,7 +49,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         using var stream = await response.Content.ReadAsStreamAsync();
 
-        return await _serializer.DeserializeAsync(stream) ?? throw new InvalidOperationException("No session was found.");
+        return await _serializer.DeserializeSessionStateAsync(stream) ?? throw new InvalidOperationException("No session was found.");
     }
 
     private static HttpRequestMessage? PrepareHttpRequestMessage(HttpContextCore context, RemoteAppSessionStateOptions options, ISessionMetadata metadata)

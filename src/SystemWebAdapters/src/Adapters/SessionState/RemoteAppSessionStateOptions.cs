@@ -36,7 +36,7 @@ public class RemoteAppSessionStateOptions
 #endif
 
     /// <summary>
-    /// Gets or sets the cookie name that the ASP.NET framework app is expecting tol hold the session id
+    /// Gets or sets the cookie name that the ASP.NET framework app is expecting to hold the session id
     /// </summary>
 #if NETCOREAPP3_1_OR_GREATER
     [Required]

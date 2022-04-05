@@ -27,7 +27,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeAsync(stream);
+        var result = await serializer.DeserializeSessionStateAsync(stream);
 
         // Assert
         Assert.NotNull(result);
@@ -54,7 +54,7 @@ public class SessionStateSerialization
         serializer.Options.WriteIndented = true;
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
-        var sessionState = await serializer.DeserializeAsync(stream);
+        var sessionState = await serializer.DeserializeSessionStateAsync(stream);
 
         var result = new MemoryStream();
 
@@ -100,7 +100,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeAsync(stream);
+        var result = await serializer.DeserializeSessionStateAsync(stream);
 
         // Assert
         Assert.NotNull(result);
@@ -130,7 +130,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeAsync(stream);
+        var result = await serializer.DeserializeSessionStateAsync(stream);
 
         // Assert
         var obj = Assert.IsType<SomeObject>(result!["Key1"]);

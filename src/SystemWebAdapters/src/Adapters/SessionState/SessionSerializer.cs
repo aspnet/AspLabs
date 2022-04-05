@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Specialized;
 
 #if NETCOREAPP3_1_OR_GREATER
 using System.Web.Adapters;
@@ -42,8 +41,11 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-    public async ValueTask<ISessionState?> DeserializeAsync(Stream stream)
+    public async ValueTask<ISessionState?> DeserializeSessionStateAsync(Stream stream)
         => await JsonSerializer.DeserializeAsync<SessionState>(stream, Options);
+
+    public async ValueTask<ISessionUpdate?> DeserializeSessionUpdateAsync(Stream stream)
+        => await JsonSerializer.DeserializeAsync<SessionUpdate>(stream, Options);
 
 #if NETCOREAPP3_1_OR_GREATER
     public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
@@ -109,10 +111,7 @@ internal class SessionSerializer
                     throw new InvalidOperationException();
                 }
 
-                if (JsonSerializer.Deserialize(ref reader, type, options) is { } result)
-                {
-                    state.Add(key, result);
-                }
+                state.Add(key, JsonSerializer.Deserialize(ref reader, type, options));
             }
 
             return state;
@@ -179,32 +178,21 @@ internal class SessionSerializer
         public void Remove(string name) => Values.Remove(name);
     }
 
-    private class SessionValues : NameObjectCollectionBase
+    /// <summary>
+    /// SessionUpdate encapsulates changes to an ISessionState.
+    /// It's used as a means of clients sending modifications to session
+    /// state without having to re-send all session state items that
+    /// haven't changed.
+    /// </summary>
+    private class SessionUpdate
+        : ISessionUpdate
     {
-        public void Add(string key, object value) => BaseAdd(key, value);
+        public int? Timeout { get; set; }
 
-        public void Clear() => BaseClear();
+        public bool Abandon { get; set; }
 
-        public void Remove(string key) => BaseRemove(key);
+        public IEnumerable<string> RemovedItems { get; set; } = new List<string>();
 
-        public IEnumerable<(string, object?)> KeyValues
-        {
-            get
-            {
-                foreach (string? key in Keys)
-                {
-                    if (key is not null)
-                    {
-                        yield return (key, BaseGet(key));
-                    }
-                }
-            }
-        }
-
-        public object? this[string key]
-        {
-            get => BaseGet(key);
-            set => BaseSet(key, value);
-        }
+        public SessionValues SessionValues { get; set; } = new SessionValues();
     }
 }

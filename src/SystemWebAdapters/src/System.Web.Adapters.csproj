@@ -40,6 +40,8 @@
     <Compile Remove="**/*" />
     <Compile Include="Framework/*.cs" />
     <Compile Include="Adapters/ISessionState.cs" />
+    <Compile Include="Adapters/SessionState/ISessionUpdate.cs" />
+    <Compile Include="Adapters/SessionState/SessionValues.cs" />
     <Compile Include="Adapters/SessionState/RemoteAppSessionStateOptions.cs" />
     <Compile Include="Adapters/SessionState/SessionSerializer.cs" />
 
