@@ -61,7 +61,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
             return null;
         }
 
-        var message = new HttpRequestMessage(HttpMethod.Get, options.RemoteAppUrl);
+        var message = new HttpRequestMessage(HttpMethod.Get, new Uri(options.RemoteApp, options.SessionEndpointPath));
 
         if (cookie is not null)
         {
