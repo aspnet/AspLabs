@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0;net472</TargetFrameworks>
@@ -9,6 +9,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>System.Web</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Content\*" Pack="true" PackagePath="Content\" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="System.Web.Adapters.Tests" />

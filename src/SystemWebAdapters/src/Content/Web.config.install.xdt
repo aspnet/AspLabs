@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <!-- If system.webServer tag is absent -->
+  <system.webServer xdt:Transform="InsertIfMissing">
+    <handlers>
+    </handlers>
+  </system.webServer>
+
+  <!-- If system.webServer tag is present, but handlers tag is absent -->
+  <system.webServer>
+    <handlers xdt:Transform="InsertIfMissing">
+    </handlers>
+  </system.webServer>
+
+  <!-- If the handler is already present, the existing entry needs to be removed before inserting the new entry-->
+  <system.webServer>
+    <handlers>
+      <remove xdt:Transform="Remove"
+          xdt:Locator="Condition(./@name='RemoteAppSessionStateHandler')" >
+      </remove>
+      <add xdt:Transform="Remove"
+          xdt:Locator="Condition(./@name='RemoteAppSessionStateHandler')" >
+      </add>
+    </handlers>
+  </system.webServer>
+
+  <!-- Inserting the handler -->
+  <system.webServer>
+    <handlers>
+      <remove xdt:Transform="Insert" name="RemoteAppSessionStateHandler" />
+      <add xdt:Transform="Insert" name="RemoteAppSessionStateHandler" path="session-state" verb="GET" type="System.Web.Adapters.SessionState.RemoteAppSessionStateHandler, System.Web.Adapters"/>
+    </handlers>
+  </system.webServer>
+</configuration>
