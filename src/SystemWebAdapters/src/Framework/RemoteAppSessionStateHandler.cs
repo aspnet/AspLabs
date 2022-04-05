@@ -6,28 +6,18 @@ using System.Web.SessionState;
 
 namespace System.Web.Adapters.SessionState;
 
-public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessionState, IReadOnlySessionState
+internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequiresSessionState, IReadOnlySessionState
 {
-    private SessionSerializer? _serializer;
+    private readonly RemoteAppSessionStateOptions _options;
+    private readonly SessionSerializer _serializer;
 
-    private static readonly RemoteAppSessionStateOptions _options = new();
+    public RemoteAppSessionStateHandler(RemoteAppSessionStateOptions options)
+    {
+        _options = options;
+        _serializer = new SessionSerializer(options.KnownKeys);
+    }
 
     public override bool IsReusable => true;
-
-    public static void Configure(Action<RemoteAppSessionStateOptions> configure) => configure(_options);
-
-    private SessionSerializer Serializer
-    {
-        get
-        {
-            if (_serializer is null)
-            {
-                _serializer = new SessionSerializer(_options.KnownKeys);
-            }
-
-            return _serializer;
-        }
-    }
 
     public override async Task ProcessRequestAsync(HttpContext context)
     {
@@ -37,7 +27,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler, IRequir
         }
         else
         {
-            await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
+            await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, context.Request.TimedOutToken);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200;
