@@ -11,7 +11,7 @@ internal class SessionValues : NameObjectCollectionBase
 
     public void Remove(string key) => BaseRemove(key);
 
-    public IEnumerable<(string, object?)> KeyValues
+    public IEnumerable<(string Key, object? Value)> KeyValues
     {
         get
         {

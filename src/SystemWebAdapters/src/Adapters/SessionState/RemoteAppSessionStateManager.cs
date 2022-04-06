@@ -1,121 +1,195 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.SessionState;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
 namespace System.Web.Adapters.SessionState;
 
-internal class RemoteAppSessionStateManager : ISessionManager
+internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
 {
+    private readonly HttpContextCore _context;
     private readonly IOptionsMonitor<RemoteAppSessionStateOptions> _options;
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly HttpClient _httpClient;
     private readonly SessionSerializer _serializer;
+    private readonly ILogger<RemoteAppSessionStateManager> _logger;
+    private readonly SemaphoreSlim _remoteLoadSemaphore = new(1, 1);
+
+    private HttpSessionState? _session;
+    private HttpResponseMessage? _responseMessage;
 
     public RemoteAppSessionStateManager(
+        HttpContextCore context,
         IOptionsMonitor<RemoteAppSessionStateOptions> options,
-        IHttpClientFactory clientFactory,
-        SessionSerializer serializer)
+        HttpClient httpClient,
+        SessionSerializer serializer,
+        ILogger<RemoteAppSessionStateManager> logger)
     {
-        _options = options;
-        _clientFactory = clientFactory;
-        _serializer = serializer;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<ISessionState> CreateAsync(HttpContextCore context, ISessionMetadata metadata)
+    public async Task<HttpSessionState> LoadAsync(bool readOnly)
     {
-        if (!metadata.IsReadOnly)
+        if (_session is null)
         {
-            throw new NotSupportedException("Only readonly session is currently supported");
+            using var timeout = new CancellationTokenSource(_options.CurrentValue.IOTimeoutSeconds * 1000);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, _context.RequestAborted);
+
+            // Ensure that session state is only loaded once, even if multiple threads attempt to access session state simultaneously.
+            // Even though ASP.NET Core request handling is usually expected to be single-threaded, it's good to guarantee only one thread
+            // loads session data since if two threads were to make the call, one would end up blocked waiting for the session state to
+            // unlock.
+            await _remoteLoadSemaphore.WaitAsync(cts.Token).ConfigureAwait(false);
+
+            try
+            {
+                if (_session is null)
+                {
+                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(readOnly), cts.Token).ConfigureAwait(false);
+                    _logger.LogTrace("Received {StatusCode} response loading remote session state", _responseMessage.StatusCode);
+                    _responseMessage.EnsureSuccessStatusCode();
+
+                    // Propagate headers back to the caller since a new session ID may have been set
+                    // by the remote app if there was no session active previously or if the previous
+                    // session expired.
+                    PropagateHeaders(_responseMessage, _context.Response, HeaderNames.SetCookie);
+
+                    // Only read until the first new line since the response is expected to remain open until
+                    // RemoteAppSessionStateManager.CommitAsync is called.
+                    using var streamReader = new StreamReader(await _responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false));
+                    var json = await streamReader.ReadLineAsync().ConfigureAwait(false);
+                    var remoteSessionState = _serializer.DeserializeSessionState(json ?? "{}");
+
+                    if (remoteSessionState is null)
+                    {
+                        throw new InvalidOperationException("Failed to retrieve session state from remote session");
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Loaded {SessionItemCount} items from remote session state for session {SessionId}", remoteSessionState.Count, remoteSessionState.SessionID);
+                        _session = new HttpSessionState(remoteSessionState);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Unable to load remote session state");
+                throw;
+            }
+            finally
+            {
+                _remoteLoadSemaphore.Release();
+            }
         }
 
+        return _session;
+    }
+
+    public async Task CommitAsync()
+    {
+        if (_session is null)
+        {
+            return;
+        }
+
+        using var timeout = new CancellationTokenSource(_options.CurrentValue.IOTimeoutSeconds * 1000);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, _context.RequestAborted);
+
+        try
+        {
+            // Mark the session complete so that no additional changes can be made
+            _session.Complete();
+
+            var request = await PrepareWriteRequestAsync(_session, cts.Token).ConfigureAwait(false);
+            using var response = await _httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+            _logger.LogTrace("Received {StatusCode} response committing remote session state", response.StatusCode);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError(exc, "Unable to commit remote session state for session {SessionKey}", _session.SessionID);
+            throw;
+        }
+        finally
+        {
+            _responseMessage?.Dispose();
+            _responseMessage = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        _responseMessage?.Dispose();
+    }
+
+    private HttpRequestMessage PrepareReadRequest(bool readOnly)
+    {
         var options = _options.CurrentValue;
-
-        using var message = PrepareHttpRequestMessage(context, options, metadata);
-
-        if (message is null)
-        {
-            return new ReadonlySessionState();
-        }
-
-        using var client = _clientFactory.CreateClient();
-
-        using var response = await client.SendAsync(message, context.RequestAborted);
-
-        response.EnsureSuccessStatusCode();
-
-        using var stream = await response.Content.ReadAsStreamAsync();
-
-        return await _serializer.DeserializeSessionStateAsync(stream) ?? throw new InvalidOperationException("No session was found.");
-    }
-
-    private static HttpRequestMessage? PrepareHttpRequestMessage(HttpContextCore context, RemoteAppSessionStateOptions options, ISessionMetadata metadata)
-    {
-        var cookie = GetAspNetCookie(context, options);
-
-        if (cookie is null && metadata.IsReadOnly)
-        {
-            return null;
-        }
-
+        var cookie = GetAspNetSessionCookie(_context, options);
         var message = new HttpRequestMessage(HttpMethod.Get, options.RemoteAppUrl);
 
         if (cookie is not null)
         {
-            SetAspNetCookie(message, options, cookie);
+            SetAspNetSessionCookie(message, options, cookie);
         }
 
-        SetReadOnly(message, metadata);
+        SetReadOnly(message, readOnly);
         SetApiKey(message, options);
 
         return message;
     }
 
-    private static void SetReadOnly(HttpRequestMessage message, ISessionMetadata metadata)
-        => message.Headers.TryAddWithoutValidation(RemoteAppSessionStateOptions.ReadOnlyHeaderName, metadata.IsReadOnly.ToString());
+    private async Task<HttpRequestMessage> PrepareWriteRequestAsync(HttpSessionState session, CancellationToken token)
+    {
+        var options = _options.CurrentValue;
+        var memoryStream = new MemoryStream();
+        await _serializer.SerializeAsync(session.Updates, memoryStream, token).ConfigureAwait(false);
+        var message = new HttpRequestMessage(HttpMethod.Put, options.RemoteAppUrl)
+        {
+            Content = new StreamContent(memoryStream)
+        };
+
+        message.Content.Headers.ContentType = new("application/json") { CharSet = "utf-8" };
+
+        // Don't get the cookie from the current context since the session ID may have been set or changed
+        // by the initial call to retrieve session state; instead, construct the cookie based on current
+        // session ID
+        var cookie = new Cookie(options.CookieName, session.SessionID).ToString();
+        SetAspNetSessionCookie(message, options, cookie);
+        SetApiKey(message, options);
+
+        return message;
+    }
+
+    private static void PropagateHeaders(HttpResponseMessage responseMessage, HttpResponseCore response, string cookieName)
+    {
+        if (responseMessage.Headers.TryGetValues(cookieName, out var cookieValues))
+        {
+            response.Headers.Add(cookieName, cookieValues.ToArray());
+        }
+    }
+
+    private static void SetReadOnly(HttpRequestMessage message, bool readOnly)
+        => message.Headers.TryAddWithoutValidation(RemoteAppSessionStateOptions.ReadOnlyHeaderName, readOnly.ToString());
 
     private static void SetApiKey(HttpRequestMessage message, RemoteAppSessionStateOptions options)
         => message.Headers.TryAddWithoutValidation(options.ApiKeyHeader, options.ApiKey);
 
-    private static string? GetAspNetCookie(HttpContextCore context, RemoteAppSessionStateOptions options)
+    private static string? GetAspNetSessionCookie(HttpContextCore context, RemoteAppSessionStateOptions options)
         => context.Request.Cookies.TryGetValue(options.CookieName, out var cookie) ? cookie : null;
 
-    private static void SetAspNetCookie(HttpRequestMessage message, RemoteAppSessionStateOptions options, string cookie)
+    private static void SetAspNetSessionCookie(HttpRequestMessage message, RemoteAppSessionStateOptions options, string cookie)
         => message.Headers.TryAddWithoutValidation(HeaderNames.Cookie, $"{options.CookieName}={cookie}");
-
-    private class ReadonlySessionState : ISessionState
-    {
-        private readonly Dictionary<string, object?> _state = new();
-
-        public object? this[string name]
-        {
-            get => _state.TryGetValue(name, out var existing) ? existing : null;
-            set => _state[name] = value;
-        }
-
-        public string SessionID => Guid.NewGuid().ToString();
-
-        public int Count => _state.Count;
-
-        public bool IsReadOnly => true;
-
-        public int TimeOut { get; set; } = 0;
-
-        public bool IsNewSession => true;
-
-        public void Abandon()
-        {
-        }
-
-        public void Add(string name, object value) => _state[name] = value;
-
-        public void Clear() => _state.Clear();
-
-        public ValueTask DisposeAsync() => default;
-
-        public void Remove(string name) => _state.Remove(name);
-    }
 }

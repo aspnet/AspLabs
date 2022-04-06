@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace System.Web.Adapters.SessionState;
+namespace System.Web.Adapters;
 
 /// <summary>
 /// ISessionUpdate encapsulates changes to an ISessionState.
@@ -8,13 +8,15 @@ namespace System.Web.Adapters.SessionState;
 /// state without having to re-send all session state items that
 /// haven't changed.
 /// </summary>
-internal interface ISessionUpdate
+public interface ISessionUpdate
 {
-    int? Timeout { get; }
+    int? Timeout { get; set; }
 
-    bool Abandon { get; }
+    bool Abandon { get; set; }
 
-    IEnumerable<string> RemovedItems { get; }
+    IList<string> RemovedKeys { get; }
 
-    SessionValues SessionValues { get; }
+    object? this[string name] { get; set; }
+
+    IEnumerable<string> UpdatedKeys { get; }
 }

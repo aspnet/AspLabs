@@ -165,12 +165,12 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     {
         session.Timeout = updatedSessionState.Timeout ?? session.Timeout;
 
-        foreach ((string key, object? value) update in updatedSessionState.SessionValues)
+        foreach (var key in updatedSessionState.UpdatedKeys)
         {
-            session[update.key] = update.value;
+            session[key] = updatedSessionState[key];
         }
 
-        foreach (var removedItem in updatedSessionState.RemovedItems)
+        foreach (var removedItem in updatedSessionState.RemovedKeys)
         {
             session.Remove(removedItem);
         }

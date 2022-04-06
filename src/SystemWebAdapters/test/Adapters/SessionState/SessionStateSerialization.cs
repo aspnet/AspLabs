@@ -69,10 +69,8 @@ public class SessionStateSerialization
   ""Values"": {
     ""Key1"": 5
   },
-  ""Count"": 1,
-  ""TimeOut"": 0,
-  ""IsNewSession"": false,
-  ""IsAbandoned"": false
+  ""Timeout"": 0,
+  ""IsNewSession"": false
 }";
         Assert.Equal(Expected, str);
     }

@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Threading.Tasks;
-using System.Web.SessionState;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,12 +28,23 @@ internal class SessionMiddleware
     {
         _logger.LogTrace("Initializing session state");
 
-        var manager = context.RequestServices.GetRequiredService<ISessionManager>();
+        using var manager = context.RequestServices.GetRequiredService<ISessionManager>();
 
-        await using var state = await manager.CreateAsync(context, metadata);
+        var state = await manager.LoadAsync(metadata.IsReadOnly);
 
-        context.Features.Set(new HttpSessionState(state));
-
-        await _next(context);
+        try
+        {
+            context.Features.Set(state);
+            await _next(context);
+        }
+        finally
+        {
+            if (!metadata.IsReadOnly)
+            {
+                // If session access is not read-only, commit changes (if any)
+                // and release the session lock
+                await manager.CommitAsync();
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -32,6 +33,7 @@ internal class SessionSerializer
     {
         Options = new JsonSerializerOptions
         {
+            IgnoreReadOnlyProperties = true,
             Converters =
             {
                 new SerializedSessionConverter(map),
@@ -41,20 +43,28 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
+    public ISessionState? DeserializeSessionState(string jsonString)
+        => JsonSerializer.Deserialize<SessionState>(jsonString, Options);
+
     public async ValueTask<ISessionState?> DeserializeSessionStateAsync(Stream stream)
         => await JsonSerializer.DeserializeAsync<SessionState>(stream, Options);
 
     public async ValueTask<ISessionUpdate?> DeserializeSessionUpdateAsync(Stream stream)
         => await JsonSerializer.DeserializeAsync<SessionUpdate>(stream, Options);
 
-#if NETCOREAPP3_1_OR_GREATER
     public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
     {
         var session = (SessionState)sessionState;
 
         await JsonSerializer.SerializeAsync(stream, session, Options, token);
     }
-#endif
+
+    public async ValueTask SerializeAsync(ISessionUpdate sessionUpdate, Stream stream, CancellationToken token)
+    {
+        var session = (SessionUpdate)sessionUpdate;
+
+        await JsonSerializer.SerializeAsync(stream, session, Options, token);
+    }
 
 #if NET472
     public async ValueTask SerializeAsync(HttpSessionState state, Stream stream, CancellationToken token)
@@ -71,7 +81,7 @@ internal class SessionSerializer
             IsNewSession = state.IsNewSession,
             IsReadOnly = state.IsReadOnly,
             SessionID = state.SessionID,
-            TimeOut = state.Timeout,
+            Timeout = state.Timeout,
             Values = values
         };
 
@@ -161,38 +171,11 @@ internal class SessionSerializer
 
         public int Count => Values.Count;
 
-        public int TimeOut { get; set; }
+        public int Timeout { get; set; }
 
         public bool IsNewSession { get; set; }
 
-        public bool IsAbandoned { get; set; }
-
-        public void Abandon() => IsAbandoned = true;
-
-        public void Add(string name, object value) => Values.Add(name, value);
-
-        public void Clear() => Values.Clear();
-
-        public ValueTask DisposeAsync() => default;
-
-        public void Remove(string name) => Values.Remove(name);
-    }
-
-    /// <summary>
-    /// SessionUpdate encapsulates changes to an ISessionState.
-    /// It's used as a means of clients sending modifications to session
-    /// state without having to re-send all session state items that
-    /// haven't changed.
-    /// </summary>
-    private class SessionUpdate
-        : ISessionUpdate
-    {
-        public int? Timeout { get; set; }
-
-        public bool Abandon { get; set; }
-
-        public IEnumerable<string> RemovedItems { get; set; } = new List<string>();
-
-        public SessionValues SessionValues { get; set; } = new SessionValues();
+        [JsonIgnore]
+        public IEnumerable<string> Keys => Values.KeyValues.Select(kvp => kvp.Key);
     }
 }
