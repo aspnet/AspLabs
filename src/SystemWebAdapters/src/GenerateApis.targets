@@ -8,8 +8,8 @@
     <__Generate>false</__Generate>
     <__Generate Condition="$(GenerateTypeForwards) OR $(GenerateStandard)">true</__Generate>
 
-    <GenAPITargetPath Condition="$(GenerateTypeForwards)">$(MSBuildProjectDirectory)\Framework\TypeForwards.cs</GenAPITargetPath>
-    <GenAPITargetPath Condition="!$(GenerateTypeForwards)">$(MSBuildProjectDirectory)\NetStandard\Ref.cs</GenAPITargetPath>
+    <GenAPITargetPath Condition="$(GenerateTypeForwards)">$(MSBuildProjectDirectory)\TypeForwards.Framework.cs</GenAPITargetPath>
+    <GenAPITargetPath Condition="!$(GenerateTypeForwards)">$(MSBuildProjectDirectory)\Ref.Standard.cs</GenAPITargetPath>
     <GenAPIAdditionalParameters>-excludeApiList $(MSBuildThisFileDirectory)ExcludedApis.txt -throw "$(PlatformNotSupportedMessage)"</GenAPIAdditionalParameters>
     <GenAPIAdditionalParameters Condition="$(GenerateTypeForwards)"> -writer TypeForwards</GenAPIAdditionalParameters>
   </PropertyGroup>

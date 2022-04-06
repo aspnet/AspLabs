@@ -3,7 +3,7 @@
 
 namespace System.Web.Adapters.SessionState;
 
-public static class SystemWebAdapterExtensions
+public static class SystemWebAdaptersExtensions
 {
     private const string RemoteAppSessionOptions = "system-web-adapter-remote-app-session-options";
 
