@@ -10,8 +10,8 @@ T:System.Web.Adapters.SessionAttribute
 T:System.Web.Adapters.ISessionState
 T:System.Web.Adapters.ISessionMetadata
 T:System.Web.Adapters.ISessionManager
-M:System.Web.SessionState.HttpSessionState.#ctor(System.Web.Adapters.ISessionState)
-M:System.Web.SessionState.HttpSessionState.#ctor(Microsoft.AspNetCore.Http.HttpContext)
+T:System.Web.Adapters.RemoteAppSessionStateExtensions
+T:System.Web.Adapters.SessionState.RemoteAppSessionStateOptions
 
 # Buffering
 T:System.Web.Adapters.BufferResponseStreamAttribute
