@@ -35,7 +35,7 @@ public sealed class RemoteAppSessionStateModule : IHttpModule
             }
 
             // Getting the session with non-exclusive access requires read-only session
-            if (!exclusive && httpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase))
+            else if (!exclusive && httpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
                 context.SetSessionStateBehavior(SessionStateBehavior.ReadOnly);
             }
@@ -45,7 +45,7 @@ public sealed class RemoteAppSessionStateModule : IHttpModule
             // PUT calls should typically be exclusive, but callers might pass !exclusive
             // if there are no updates being made and the call is only made to release a lock
             // on read-only session state.
-            if (httpMethod.Equals("PUT", StringComparison.OrdinalIgnoreCase))
+            else if (httpMethod.Equals("PUT", StringComparison.OrdinalIgnoreCase))
             {
                 context.SetSessionStateBehavior(SessionStateBehavior.Disabled);
             }
@@ -55,12 +55,5 @@ public sealed class RemoteAppSessionStateModule : IHttpModule
     }
 
     private bool GetExclusiveParameter(HttpRequest request)
-    {
-        if (!bool.TryParse(request.QueryString[RemoteAppSessionStateHandler.ExclusiveParameterName], out var exclusive))
-        {
-            exclusive = true;
-        }
-
-        return exclusive;
-    }
+        => !string.Equals(request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), true.ToString(), StringComparison.OrdinalIgnoreCase);
 }

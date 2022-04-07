@@ -11,8 +11,6 @@ namespace System.Web.Adapters.SessionState;
 
 public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 {
-    internal const string ExclusiveParameterName = "exclusive";
-
     private SessionSerializer? _serializer;
 
     private static readonly RemoteAppSessionStateOptions _options = new();
@@ -45,11 +43,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         }
         else
         {
-            // Check the query string for whether session state should be read exclusively (with lock) or not
-            if (!bool.TryParse(context.Request.QueryString[ExclusiveParameterName], out var exclusive))
-            {
-                exclusive = true;
-            }
+            var readOnly = string.Equals(context.Request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), true.ToString(), StringComparison.OrdinalIgnoreCase);
 
             // Dispatch the work depending on the HTTP method used
             var method = context.Request.HttpMethod;
@@ -59,7 +53,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             }
             else if (method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
-                await GetSessionStateAsync(context, exclusive).ConfigureAwait(false);
+                await GetSessionStateAsync(context, !readOnly).ConfigureAwait(false);
             }
             else
             {
