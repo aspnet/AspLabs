@@ -25,6 +25,10 @@ public sealed class RemoteAppSessionStateModule : IHttpModule
         // Check whether the request is for the session state path
         if (context.Request.AppRelativeCurrentExecutionFilePath.Equals("~/session-state", StringComparison.OrdinalIgnoreCase))
         {
+            // Set the handler before setting session state behavior since
+            // setting the handler can override session state behavior
+            context.Handler = new RemoteAppSessionStateHandler();
+
             var exclusive = GetExclusiveParameter(context.Request);
             var httpMethod = context.Request.HttpMethod;
 
@@ -49,8 +53,6 @@ public sealed class RemoteAppSessionStateModule : IHttpModule
             {
                 context.SetSessionStateBehavior(SessionStateBehavior.Disabled);
             }
-
-            context.Handler = new RemoteAppSessionStateHandler();
         }
     }
 
