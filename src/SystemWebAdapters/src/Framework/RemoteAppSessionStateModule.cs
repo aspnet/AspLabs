@@ -9,7 +9,7 @@ namespace System.Web.Adapters.SessionState;
 /// Custom module for enabling session and enabling a custom handler
 /// for requests sent to remote session store/commit endpoints.
 /// </summary>
-public sealed class SessionSharingModule : IHttpModule
+public sealed class RemoteAppSessionStateModule : IHttpModule
 {
     public void Dispose() { }
 
