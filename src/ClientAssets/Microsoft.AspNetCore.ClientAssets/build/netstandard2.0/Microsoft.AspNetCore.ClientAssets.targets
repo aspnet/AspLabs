@@ -47,7 +47,7 @@
       <FileWrites Include="$(IntermediateOutputPath)clientassetsbuild.complete.txt" />
 
       <Content
-        Condition="'$(TargetFramework)' != 'net6.0'"
+        Condition="'$(TargetFramework)' != 'net6.0' And '$(TargetFramework)' != 'net7.0'"
         Include="@(_ClientAssetsBuildOutput)"
         Link="wwwroot\%(_ClientAssetsBuildOutput.RecursiveDir)\%(_ClientAssetsBuildOutput.FileName)%(_ClientAssetsBuildOutput.Extension)" />
 
@@ -58,7 +58,7 @@
       the ability to consume them from project references. As a workaround, we are using the Task directly on this package, to make sure this scenario works. In a future
       release we will address this by aligning DiscoverStaticWebAssets behavior with DefineStaticWebAssets to follow the same heuristics for determining the content root.
     -->
-    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'"
+    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'"
       CandidateAssets="@(_ClientAssetsBuildOutput)"
       SourceId="$(PackageId)"
       SourceType="Computed"
