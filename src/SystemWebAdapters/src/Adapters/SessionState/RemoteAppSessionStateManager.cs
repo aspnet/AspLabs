@@ -47,7 +47,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
             // Even though ASP.NET Core request handling is usually expected to be single-threaded, it's good to guarantee only one thread
             // loads session data since if two threads were to make the call, one would end up blocked waiting for the session state to
             // unlock.
-            await _remoteLoadSemaphore.WaitAsync(cts.Token).ConfigureAwait(false);
+            await _remoteLoadSemaphore.WaitAsync(cts.Token);
 
             try
             {
@@ -56,7 +56,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
                     // HttpCompletionOption.ResponseHeadersRead is important so that this call doesn't block
                     // waiting for the response to complete. It is expected that the response won't complete
                     // until the follow-up PUT call from CommitAsync.
-                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(context, readOnly), HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
+                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(context, readOnly), HttpCompletionOption.ResponseHeadersRead, cts.Token);
                     _logger.LogTrace("Received {StatusCode} response loading remote session state", _responseMessage.StatusCode);
                     _responseMessage.EnsureSuccessStatusCode();
 
@@ -67,8 +67,8 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
 
                     // Only read until the first new line since the response is expected to remain open until
                     // RemoteAppSessionStateManager.CommitAsync is called.
-                    using var streamReader = new StreamReader(await _responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false));
-                    var json = await streamReader.ReadLineAsync().ConfigureAwait(false);
+                    using var streamReader = new StreamReader(await _responseMessage.Content.ReadAsStreamAsync());
+                    var json = await streamReader.ReadLineAsync();
                     var remoteSessionState = _serializer.DeserializeSessionState(json);
 
                     if (remoteSessionState is null)
@@ -111,8 +111,8 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
             // Mark the session complete so that no additional changes can be made
             _session.Complete();
 
-            using var request = await PrepareWriteRequestAsync(_session, cts.Token).ConfigureAwait(false);
-            using var response = await _httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+            using var request = await PrepareWriteRequestAsync(_session, cts.Token);
+            using var response = await _httpClient.SendAsync(request, cts.Token);
             _logger.LogTrace("Received {StatusCode} response committing remote session state", response.StatusCode);
             response.EnsureSuccessStatusCode();
         }
@@ -164,7 +164,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
         if (session.HasUpdates)
         {
             var memoryStream = new MemoryStream();
-            await _serializer.SerializeAsync(session.Updates, memoryStream, token).ConfigureAwait(false);
+            await _serializer.SerializeAsync(session.Updates, memoryStream, token);
             memoryStream.Position = 0;
             message.Content = new StreamContent(memoryStream);
             message.Content.Headers.ContentType = new("application/json") { CharSet = "utf-8" };
