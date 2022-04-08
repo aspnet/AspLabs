@@ -1,6 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 namespace System.Web
 {
     public partial class HttpBrowserCapabilities
@@ -290,6 +287,17 @@ namespace System.Web
         Strict = 2,
     }
 }
+namespace System.Web.Adapters
+{
+    public partial interface ISessionUpdate
+    {
+        bool Abandon { get; set; }
+        object this[string name] { get; set; }
+        System.Collections.Generic.IList<string> RemovedKeys { get; }
+        System.Nullable<int> Timeout { get; set; }
+        System.Collections.Generic.IEnumerable<string> UpdatedKeys { get; }
+    }
+}
 namespace System.Web.Caching
 {
     public partial class Cache
@@ -305,18 +313,23 @@ namespace System.Web.Caching
 }
 namespace System.Web.SessionState
 {
-    public partial class HttpSessionState
+    public partial class HttpSessionState : System.Collections.ICollection, System.Collections.IEnumerable
     {
         internal HttpSessionState() { }
         public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
-        public bool IsNewSession { [System.Runtime.CompilerServices.CompilerGeneratedAttribute]get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public bool HasUpdates { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public bool IsNewSession { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public bool IsSynchronized { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public object SyncRoot { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public int TimeOut { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public void Abandon() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Add(string name, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Clear() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public void CopyTo(System.Array array, int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public System.Collections.IEnumerator GetEnumerator() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
