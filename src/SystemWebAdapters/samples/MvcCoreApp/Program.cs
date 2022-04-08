@@ -34,7 +34,9 @@ app.UseSystemWebAdapters();
 
 app.UseEndpoints(endpoints =>
 {
-    app.MapDefaultControllerRoute();
+    app.MapDefaultControllerRoute()
+        .RequireSystemWebAdapterSession();
+
     app.MapReverseProxy();
 });
 

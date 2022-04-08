@@ -5,7 +5,6 @@ using RemoteContext = System.Web.HttpContext;
 
 namespace MvcApp.Controllers;
 
-[Session]
 public class AspNetCoreSessionController : Controller
 {
     // GET: AspNetCoreSession
