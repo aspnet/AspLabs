@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MvcApp.Models;
+namespace ClassLibrary;
 public class SessionDemoModel
 {
-    public const string IntSessionItemName = "IntSessionItem";
-    public const string StringSessionItemName = "StringSessionItem";
-
     [Display(Name = "Integer session item")]
     public int? IntSessionItem { get; set; }
 

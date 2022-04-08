@@ -1,7 +1,6 @@
-using MvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Web.Adapters;
 using RemoteContext = System.Web.HttpContext;
+using ClassLibrary;
 
 namespace MvcApp.Controllers;
 
@@ -10,11 +9,7 @@ public class AspNetCoreSessionController : Controller
     // GET: AspNetCoreSession
     public ActionResult Index()
     {
-        var model = new SessionDemoModel
-        {
-            IntSessionItem = RemoteContext.Current?.Session?[SessionDemoModel.IntSessionItemName] as int?,
-            StringSessionItem = RemoteContext.Current?.Session?[SessionDemoModel.StringSessionItemName] as string
-        };
+        var model = RemoteContext.Current?.Session?["SampleSessionItem"] as SessionDemoModel;
 
         return View(model);
     }
@@ -26,16 +21,7 @@ public class AspNetCoreSessionController : Controller
     {
         if (RemoteContext.Current?.Session is not null)
         {
-            if (demoModel.IntSessionItem.HasValue)
-            {
-                RemoteContext.Current.Session[SessionDemoModel.IntSessionItemName] = demoModel.IntSessionItem.Value;
-            }
-            else
-            {
-                RemoteContext.Current.Session.Remove(SessionDemoModel.IntSessionItemName);
-            }
-
-            RemoteContext.Current.Session[SessionDemoModel.StringSessionItemName] = demoModel.StringSessionItem;
+            RemoteContext.Current.Session["SampleSessionItem"] = demoModel;
         }
 
         return View(demoModel);

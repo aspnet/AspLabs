@@ -1,5 +1,5 @@
 using System.Web.Mvc;
-using MvcApp.Models;
+using ClassLibrary;
 
 namespace MvcApp.Controllers
 {
@@ -8,11 +8,7 @@ namespace MvcApp.Controllers
         // GET: AspNetCoreSession
         public ActionResult Index()
         {
-            var model = new SessionDemoModel
-            {
-                IntSessionItem = HttpContext.Session[SessionDemoModel.IntSessionItemName] as int?,
-                StringSessionItem = HttpContext.Session[SessionDemoModel.StringSessionItemName] as string,
-            };
+            var model = HttpContext.Session["SampleSessionItem"] as SessionDemoModel;
 
             return View(model);
         }
@@ -22,16 +18,7 @@ namespace MvcApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Index(SessionDemoModel demoModel)
         {
-            if (demoModel.IntSessionItem.HasValue)
-            {
-                HttpContext.Session[SessionDemoModel.IntSessionItemName] = demoModel.IntSessionItem.Value;
-            }
-            else
-            {
-                HttpContext.Session.Remove(SessionDemoModel.IntSessionItemName);
-            }
-
-            HttpContext.Session[SessionDemoModel.StringSessionItemName] = demoModel.StringSessionItem;
+            HttpContext.Session["SampleSessionItem"] = demoModel;
 
             return View(demoModel);
         }
