@@ -16,7 +16,7 @@ namespace System.Web
 
         public virtual Uri Url => throw new NotImplementedException();
 
-        public virtual string RawUrl => throw new NotImplementedException();
+        public virtual string? RawUrl => throw new NotImplementedException();
 
         public virtual string HttpMethod => throw new NotImplementedException();
 

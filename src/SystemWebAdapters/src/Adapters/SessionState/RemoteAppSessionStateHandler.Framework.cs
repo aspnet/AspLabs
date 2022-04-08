@@ -9,30 +9,20 @@ using System.Web.SessionState;
 
 namespace System.Web.Adapters.SessionState;
 
-public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
+internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 {
-    private SessionSerializer? _serializer;
-
-    private static readonly RemoteAppSessionStateOptions _options = new();
+    private readonly RemoteAppSessionStateOptions _options;
+    private readonly SessionSerializer _serializer;
 
     // Track locked sessions awaiting updates or release
     private static readonly ConcurrentDictionary<string, Channel<ISessionUpdate?>> SessionDataChannels = new();
 
     public override bool IsReusable => true;
 
-    public static void Configure(Action<RemoteAppSessionStateOptions> configure) => configure(_options);
-
-    private SessionSerializer Serializer
+    public RemoteAppSessionStateHandler(RemoteAppSessionStateOptions options)
     {
-        get
-        {
-            if (_serializer is null)
-            {
-                _serializer = new SessionSerializer(_options.KnownKeys);
-            }
-
-            return _serializer;
-        }
+        _options = options;
+        _serializer = new SessionSerializer(options.KnownKeys);
     }
 
     public override async Task ProcessRequestAsync(HttpContext context)
@@ -87,7 +77,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
                 // Send the initial snapshot of session data
                 context.Response.ContentType = "text/event-stream";
                 context.Response.StatusCode = 200;
-                await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
+                await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
 
                 // Delimit the json body with a new line to mark the end of content
                 context.Response.Write('\n');
@@ -112,14 +102,14 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             // session state can be returned directly, completing this request.
             context.Response.ContentType = "application/json; charset=utf-8";
             context.Response.StatusCode = 200;
-            await Serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
+            await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
         }
     }
 
     private async Task StoreSessionStateAsync(HttpContext context)
     {
         using var requestContent = context.Request.GetBufferlessInputStream();
-        var sessionData = await Serializer.DeserializeSessionUpdateAsync(requestContent).ConfigureAwait(false);
+        var sessionData = await _serializer.DeserializeSessionUpdateAsync(requestContent).ConfigureAwait(false);
 
         var sessionId = GetSessionId(context.Request);
 
@@ -172,7 +162,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         if (updatedSessionState.Abandon)
         {
             session.Abandon();
-        }        
+        }
     }
 
     // context.Session will intentionally not be populated in PUT scenarios (to avoid needing a lock),

@@ -152,7 +152,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
     {
         var options = _options.CurrentValue;
         var cookie = GetAspNetSessionCookie(context, options);
-        var message = new HttpRequestMessage(HttpMethod.Get, options.RemoteAppUrl);
+        var message = new HttpRequestMessage(HttpMethod.Get, new Uri(options.RemoteApp, options.SessionEndpointPath));
 
         if (cookie is not null)
         {
@@ -168,7 +168,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
     private async Task<HttpRequestMessage> PrepareWriteRequestAsync(HttpSessionState session, CancellationToken token)
     {
         var options = _options.CurrentValue;
-        var message = new HttpRequestMessage(HttpMethod.Put, options.RemoteAppUrl);
+        var message = new HttpRequestMessage(HttpMethod.Put, new Uri(options.RemoteApp, options.SessionEndpointPath));
 
         // Don't get the cookie from the current context since the session ID may have been set or changed
         // by the initial call to retrieve session state; instead, construct the cookie based on current

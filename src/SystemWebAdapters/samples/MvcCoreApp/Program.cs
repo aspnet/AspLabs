@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSystemWebAdapters()
     .AddRemoteAppSession(options =>
     {
-        options.RemoteAppUrl = new Uri("https://localhost:44339/fallback/session-state");
+        options.RemoteApp = new("https://localhost:44339/fallback");
 
         ClassLibrary.SessionUtils.RegisterSessionKeys(options);
     });

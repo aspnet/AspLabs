@@ -75,6 +75,11 @@ internal class SessionSerializer
 #if NET472
     public async ValueTask SerializeAsync(HttpSessionState state, Stream stream, CancellationToken token)
     {
+        if (state is null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
+
         var values = new SessionValues();
 
         foreach (string key in state.Keys)
