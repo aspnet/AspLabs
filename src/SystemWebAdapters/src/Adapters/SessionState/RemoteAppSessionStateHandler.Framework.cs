@@ -33,7 +33,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         }
         else
         {
-            var readOnly = string.Equals(context.Request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), true.ToString(), StringComparison.OrdinalIgnoreCase);
+            var readOnly = bool.TryParse(context.Request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), out var result) && result;
 
             // Dispatch the work depending on the HTTP method used
             var method = context.Request.HttpMethod;
@@ -147,6 +147,12 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
     private void UpdateSessionState(HttpSessionState session, ISessionUpdate updatedSessionState)
     {
+        if (updatedSessionState.Abandon)
+        {
+            session.Abandon();
+            return;
+        }
+
         session.Timeout = updatedSessionState.Timeout ?? session.Timeout;
 
         foreach (var key in updatedSessionState.UpdatedKeys)
@@ -157,11 +163,6 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         foreach (var removedItem in updatedSessionState.RemovedKeys)
         {
             session.Remove(removedItem);
-        }
-
-        if (updatedSessionState.Abandon)
-        {
-            session.Abandon();
         }
     }
 

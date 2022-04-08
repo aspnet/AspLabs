@@ -12,11 +12,15 @@ namespace System.Web.Adapters;
 public interface ISessionManager : IDisposable
 {
     /// <summary>
-    /// Creates an instance of <see cref="ISessionState"/> for a given content and metadata.
+    /// Creates an instance of <see cref="HttpSessionState"/> for a given context.
     /// </summary>
     /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
-    /// <param name="metadata">Metadata for the session.</param>
-    Task<HttpSessionState> LoadAsync(bool readOnly);
+    /// <param name="readOnly">Whether the session state should be loaded read-only or for read-write.</param>
+    Task<HttpSessionState> LoadAsync(HttpContextCore context, bool readOnly);
 
-    Task CommitAsync();
+    /// <summary>
+    /// Commits changes made in a <see cref="HttpSessionState"/> to the remote app the session state was originally loaded from.
+    /// </summary>
+    /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
+    Task CommitAsync(HttpContextCore context);
 }

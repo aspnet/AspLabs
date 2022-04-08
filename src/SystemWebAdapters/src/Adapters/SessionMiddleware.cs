@@ -30,7 +30,7 @@ internal class SessionMiddleware
 
         using var manager = context.RequestServices.GetRequiredService<ISessionManager>();
 
-        var state = await manager.LoadAsync(metadata.IsReadOnly);
+        var state = await manager.LoadAsync(context, metadata.IsReadOnly);
 
         try
         {
@@ -43,7 +43,7 @@ internal class SessionMiddleware
             {
                 // If session access is not read-only, commit changes (if any)
                 // and release the session lock
-                await manager.CommitAsync();
+                await manager.CommitAsync(context);
             }
         }
     }

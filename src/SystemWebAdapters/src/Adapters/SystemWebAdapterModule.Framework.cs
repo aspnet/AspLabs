@@ -67,5 +67,5 @@ public sealed class SystemWebAdapterModule : IHttpModule
     }
 
     private bool GetExclusiveParameter(HttpRequest request)
-        => !string.Equals(request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), true.ToString(), StringComparison.OrdinalIgnoreCase);
+        => !(bool.TryParse(request.Headers.Get(RemoteAppSessionStateOptions.ReadOnlyHeaderName), out var result) && result);
 }

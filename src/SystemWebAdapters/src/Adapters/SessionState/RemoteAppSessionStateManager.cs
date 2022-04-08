@@ -3,12 +3,10 @@
 
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.SessionState;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -17,7 +15,6 @@ namespace System.Web.Adapters.SessionState;
 
 internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
 {
-    private readonly IHttpContextAccessor _contextAccessor;
     private readonly IOptionsMonitor<RemoteAppSessionStateOptions> _options;
     private readonly HttpClient _httpClient;
     private readonly SessionSerializer _serializer;
@@ -28,30 +25,23 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
     private HttpResponseMessage? _responseMessage;
 
     public RemoteAppSessionStateManager(
-        IHttpContextAccessor contextAccessor,
         IOptionsMonitor<RemoteAppSessionStateOptions> options,
         HttpClient httpClient,
         SessionSerializer serializer,
         ILogger<RemoteAppSessionStateManager> logger)
     {
-        _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<HttpSessionState> LoadAsync(bool readOnly)
+    public async Task<HttpSessionState> LoadAsync(HttpContextCore context, bool readOnly)
     {
         if (_session is null)
         {
-            if (_contextAccessor.HttpContext is null)
-            {
-                throw new InvalidOperationException("Loading remote session state requires a current ASP.NET Core HttpContext");
-            }
-
-            using var timeout = new CancellationTokenSource(_options.CurrentValue.IOTimeoutSeconds * 1000);
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, _contextAccessor.HttpContext.RequestAborted);
+            using var timeout = new CancellationTokenSource(_options.CurrentValue.NetworkTimeout);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted);
 
             // Ensure that session state is only loaded once, even if multiple threads attempt to access session state simultaneously.
             // Even though ASP.NET Core request handling is usually expected to be single-threaded, it's good to guarantee only one thread
@@ -66,14 +56,14 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
                     // HttpCompletionOption.ResponseHeadersRead is important so that this call doesn't block
                     // waiting for the response to complete. It is expected that the response won't complete
                     // until the follow-up PUT call from CommitAsync.
-                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(_contextAccessor.HttpContext, readOnly), HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
+                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(context, readOnly), HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
                     _logger.LogTrace("Received {StatusCode} response loading remote session state", _responseMessage.StatusCode);
                     _responseMessage.EnsureSuccessStatusCode();
 
                     // Propagate headers back to the caller since a new session ID may have been set
                     // by the remote app if there was no session active previously or if the previous
                     // session expired.
-                    PropagateHeaders(_responseMessage, _contextAccessor.HttpContext.Response, HeaderNames.SetCookie);
+                    PropagateHeaders(_responseMessage, context.Response, HeaderNames.SetCookie);
 
                     // Only read until the first new line since the response is expected to remain open until
                     // RemoteAppSessionStateManager.CommitAsync is called.
@@ -106,20 +96,15 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
         return _session;
     }
 
-    public async Task CommitAsync()
+    public async Task CommitAsync(HttpContextCore context)
     {
         if (_session is null)
         {
             return;
         }
 
-        if (_contextAccessor.HttpContext is null)
-        {
-            throw new InvalidOperationException("Committing remote session state requires a current ASP.NET Core HttpContext");
-        }
-
-        using var timeout = new CancellationTokenSource(_options.CurrentValue.IOTimeoutSeconds * 1000);
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, _contextAccessor.HttpContext.RequestAborted);
+        using var timeout = new CancellationTokenSource(_options.CurrentValue.NetworkTimeout);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted);
 
         try
         {
@@ -148,7 +133,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
         _responseMessage?.Dispose();
     }
 
-    private HttpRequestMessage PrepareReadRequest(HttpContext context, bool readOnly)
+    private HttpRequestMessage PrepareReadRequest(HttpContextCore context, bool readOnly)
     {
         var options = _options.CurrentValue;
         var cookie = GetAspNetSessionCookie(context, options);
