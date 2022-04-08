@@ -54,6 +54,9 @@ public class HttpSessionState
 
     public object SyncRoot => this;
 
+    public bool HasUpdates =>
+        Updates.Abandon || Updates.Timeout.HasValue || Updates.RemovedKeys.Any() || Updates.UpdatedKeys.Any();
+
     public void Abandon()
     {
         CheckCompleted();

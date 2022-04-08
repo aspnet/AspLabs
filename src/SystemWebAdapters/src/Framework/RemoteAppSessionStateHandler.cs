@@ -16,7 +16,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private static readonly RemoteAppSessionStateOptions _options = new();
 
     // Track locked sessions awaiting updates or release
-    private static readonly ConcurrentDictionary<string, Channel<ISessionUpdate>> SessionDataChannels = new();
+    private static readonly ConcurrentDictionary<string, Channel<ISessionUpdate?>> SessionDataChannels = new();
 
     public override bool IsReusable => true;
 
@@ -79,7 +79,7 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             try
             {
                 // Generate a channel to wait for session data updates
-                var responseChannel = Channel.CreateBounded<ISessionUpdate>(1);
+                var responseChannel = Channel.CreateBounded<ISessionUpdate?>(1);
 
                 // Update the channels dictionary with the new channel
                 SessionDataChannels[context.Session.SessionID] = responseChannel;
@@ -127,14 +127,14 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         if (sessionId is null)
         {
             context.Response.StatusCode = 400;
-            context.Response.Status = "No session ID found";
+            context.Response.StatusDescription = "No session ID found";
             context.Response.End();
             return;
         }
 
         // Get the channel that will be used to write the updated session data
         // to the in-progress request that will update session data
-        if (sessionData is not null && SessionDataChannels.TryGetValue(sessionId, out var channel))
+        if (SessionDataChannels.TryGetValue(sessionId, out var channel))
         {
             if (channel.Writer.TryWrite(sessionData))
             {
@@ -144,13 +144,13 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             }
             else
             {
-                context.Response.Status = "Unable to update session state; state may have already been updated";
+                context.Response.StatusDescription = "Unable to update session state; state may have already been updated";
                 context.Response.StatusCode = 400;
             }
         }
         else
         {
-            context.Response.Status = "Specified session ID is not locked for writing";
+            context.Response.StatusDescription = "Specified session ID is not locked for writing";
             context.Response.StatusCode = 400;
         }
     }
@@ -175,13 +175,8 @@ public sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         }        
     }
 
+    // context.Session will intentionally not be populated in PUT scenarios (to avoid needing a lock),
+    // so read the session ID directly from the cookie instead
     private string? GetSessionId(HttpRequest request)
-    {
-        // context.Session will intentionally not be populated in PUT scenarios (to avoid needing a lock),
-        // so read the session ID directly from the cookie instead
-        var cookieName = _options.CookieName;
-        var sessionCookie = request.Cookies[cookieName];
-        return sessionCookie?.Value;
-    }
-
+        => request.Cookies[_options.CookieName]?.Value;
 }

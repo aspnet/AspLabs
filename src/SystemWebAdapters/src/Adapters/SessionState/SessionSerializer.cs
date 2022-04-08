@@ -43,14 +43,20 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-    public ISessionState? DeserializeSessionState(string jsonString)
-        => JsonSerializer.Deserialize<SessionState>(jsonString, Options);
+    public ISessionState? DeserializeSessionState(string? jsonString)
+        => jsonString?.Length > 0
+        ? JsonSerializer.Deserialize<SessionState>(jsonString, Options)
+        : null;
 
     public async ValueTask<ISessionState?> DeserializeSessionStateAsync(Stream stream)
-        => await JsonSerializer.DeserializeAsync<SessionState>(stream, Options);
+        => stream?.Length > 0
+        ? await JsonSerializer.DeserializeAsync<SessionState>(stream, Options)
+        : null;
 
     public async ValueTask<ISessionUpdate?> DeserializeSessionUpdateAsync(Stream stream)
-        => await JsonSerializer.DeserializeAsync<SessionUpdate>(stream, Options);
+        => stream?.Length > 0
+        ? await JsonSerializer.DeserializeAsync<SessionUpdate>(stream, Options)
+        : null;
 
     public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
     {

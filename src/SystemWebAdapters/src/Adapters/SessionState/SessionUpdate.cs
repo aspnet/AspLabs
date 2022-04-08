@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace System.Web.Adapters.SessionState;
 
@@ -24,8 +25,9 @@ internal class SessionUpdate
 
     public IList<string> RemovedKeys { get; set; } = new List<string>();
 
+    [JsonIgnore]
     public IEnumerable<string> UpdatedKeys => Values.KeyValues.Select(kvp => kvp.Key);
 
-    internal SessionValues Values { get; set; } = new SessionValues();
+    public SessionValues Values { get; set; } = new SessionValues();
 
 }

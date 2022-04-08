@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Experimental.AspNetCore.Migrations" Version="1.0.0-preview-0001" />
     <PackageReference Include="Yarp.ReverseProxy" Version="1.0.0" />
   </ItemGroup>
 

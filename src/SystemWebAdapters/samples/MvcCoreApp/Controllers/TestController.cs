@@ -9,7 +9,7 @@ namespace MvcCoreApp.Controllers
     public class TestController : Controller
     {
         [HttpGet]
-        [Session]
+        [Session(IsReadOnly = true)]
         [Route("/api/test/request/info")]
         public void Get([FromQuery] bool? suppress = false) => RequestInfo.WriteRequestInfo(suppress ?? false);
 

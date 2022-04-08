@@ -8,5 +8,7 @@ public class SessionUtils
     {
         options.ApiKey = "test-key";
         options.RegisterKey<int>("test-value");
+        options.RegisterKey<int>("IntSessionItem");
+        options.RegisterKey<string>("StringSessionItem");
     }
 }

@@ -63,7 +63,10 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
             {
                 if (_session is null)
                 {
-                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(_contextAccessor.HttpContext, readOnly), cts.Token).ConfigureAwait(false);
+                    // HttpCompletionOption.ResponseHeadersRead is important so that this call doesn't block
+                    // waiting for the response to complete. It is expected that the response won't complete
+                    // until the follow-up PUT call from CommitAsync.
+                    _responseMessage = await _httpClient.SendAsync(PrepareReadRequest(_contextAccessor.HttpContext, readOnly), HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
                     _logger.LogTrace("Received {StatusCode} response loading remote session state", _responseMessage.StatusCode);
                     _responseMessage.EnsureSuccessStatusCode();
 
@@ -76,11 +79,11 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
                     // RemoteAppSessionStateManager.CommitAsync is called.
                     using var streamReader = new StreamReader(await _responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false));
                     var json = await streamReader.ReadLineAsync().ConfigureAwait(false);
-                    var remoteSessionState = _serializer.DeserializeSessionState(json ?? "{}");
+                    var remoteSessionState = _serializer.DeserializeSessionState(json);
 
                     if (remoteSessionState is null)
                     {
-                        throw new InvalidOperationException("Failed to retrieve session state from remote session");
+                        throw new InvalidOperationException("Failed to retrieve session state from remote session; confirm session is enabled in remote app");
                     }
                     else
                     {
@@ -123,7 +126,7 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
             // Mark the session complete so that no additional changes can be made
             _session.Complete();
 
-            var request = await PrepareWriteRequestAsync(_session, cts.Token).ConfigureAwait(false);
+            using var request = await PrepareWriteRequestAsync(_session, cts.Token).ConfigureAwait(false);
             using var response = await _httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
             _logger.LogTrace("Received {StatusCode} response committing remote session state", response.StatusCode);
             response.EnsureSuccessStatusCode();
@@ -165,21 +168,22 @@ internal class RemoteAppSessionStateManager : ISessionManager, IDisposable
     private async Task<HttpRequestMessage> PrepareWriteRequestAsync(HttpSessionState session, CancellationToken token)
     {
         var options = _options.CurrentValue;
-        var memoryStream = new MemoryStream();
-        await _serializer.SerializeAsync(session.Updates, memoryStream, token).ConfigureAwait(false);
-        var message = new HttpRequestMessage(HttpMethod.Put, options.RemoteAppUrl)
-        {
-            Content = new StreamContent(memoryStream)
-        };
-
-        message.Content.Headers.ContentType = new("application/json") { CharSet = "utf-8" };
+        var message = new HttpRequestMessage(HttpMethod.Put, options.RemoteAppUrl);
 
         // Don't get the cookie from the current context since the session ID may have been set or changed
         // by the initial call to retrieve session state; instead, construct the cookie based on current
         // session ID
-        var cookie = new Cookie(options.CookieName, session.SessionID).ToString();
-        SetAspNetSessionCookie(message, options, cookie);
+        SetAspNetSessionCookie(message, options, session.SessionID);
         SetApiKey(message, options);
+
+        if (session.HasUpdates)
+        {
+            var memoryStream = new MemoryStream();
+            await _serializer.SerializeAsync(session.Updates, memoryStream, token).ConfigureAwait(false);
+            memoryStream.Position = 0;
+            message.Content = new StreamContent(memoryStream);
+            message.Content.Headers.ContentType = new("application/json") { CharSet = "utf-8" };
+        }
 
         return message;
     }
