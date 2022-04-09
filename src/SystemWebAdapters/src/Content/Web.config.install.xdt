@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <!-- If system.webServer tag is absent -->
+  <system.webServer xdt:Transform="InsertIfMissing">
+    <modules>
+    </modules>
+  </system.webServer>
+
+  <!-- If system.webServer tag is present, but handlers tag is absent -->
+  <system.webServer>
+    <modules xdt:Transform="InsertIfMissing">
+    </modules>
+  </system.webServer>
+
+  <!-- If the handler is already present, the existing entry needs to be removed before inserting the new entry-->
+  <system.webServer>
+    <modules>
+      <remove xdt:Transform="Remove"
+          xdt:Locator="Condition(./@name='SystemWebAdapterModule')" >
+      </remove>
+      <add xdt:Transform="Remove"
+          xdt:Locator="Condition(./@name='SystemWebAdapterModule')" >
+      </add>
+    </modules>
+  </system.webServer>
+
+  <!-- Inserting the handler -->
+  <system.webServer>
+    <modules>
+      <remove xdt:Transform="Insert" name="SystemWebAdapterModule" />
+      <add xdt:Transform="Insert" name="SystemWebAdapterModule" type="System.Web.Adapters.SystemWebAdapterModule, System.Web.Adapters" preCondition="managedHandler" />
+    </modules>
+  </system.webServer>
+</configuration>

@@ -28,11 +28,15 @@ namespace System.Web
         private NameValueCollection? _serverVariables;
         private NameValueCollection? _form;
         private NameValueCollection? _query;
+        private HttpCookieCollection? _cookies;
+        private HttpBrowserCapabilities? _browser;
 
         public HttpRequest(HttpRequestCore request)
         {
             _request = request;
         }
+
+        internal RequestHeaders TypedHeaders => _typedHeaders ??= new(_request.Headers);
 
         public string? Path => _request.Path.Value;
 
@@ -40,8 +44,7 @@ namespace System.Web
 
         public Uri Url => new(_request.GetEncodedUrl());
 
-        // TODO: https://github.com/aspnet/AspLabs/pull/435#discussion_r807128348
-        public string RawUrl => throw new NotImplementedException();
+        public string? RawUrl => _request.HttpContext.Features.Get<IHttpRequestFeature>()?.RawTarget;
 
         public string HttpMethod => _request.Method;
 
@@ -89,7 +92,7 @@ namespace System.Web
 
         public NameValueCollection Form => _form ??= _request.Form.ToNameValueCollection();
 
-        public HttpCookieCollection Cookies => throw new NotImplementedException();
+        public HttpCookieCollection Cookies => _cookies ??= new(this);
 
         public int ContentLength => (int)(_request.ContentLength ?? 0);
 
@@ -155,8 +158,7 @@ namespace System.Web
 
         public Uri? UrlReferrer => TypedHeaders.Referer;
 
-        // TODO: Since System.Web buffered by default, TotalBytes probably also worked for Chunked requests. We'll want to revisit this when we look at the request body buffering.
-        public int TotalBytes => (int)_request.ContentLength.GetValueOrDefault();
+        public int TotalBytes => (int)InputStream.Length;
 
         public bool IsAuthenticated => LogonUserIdentity?.IsAuthenticated ?? false;
 
@@ -166,13 +168,37 @@ namespace System.Web
 
         public string? UserHostName => _request.HttpContext.Connection.RemoteIpAddress?.ToString();
 
-        public HttpBrowserCapabilities Browser => throw new NotImplementedException();
+        public HttpBrowserCapabilities Browser => _browser ??= new();
 
-        public byte[] BinaryRead(int count) => throw new NotImplementedException();
+        public byte[] BinaryRead(int count)
+        {
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
+            if (count == 0)
+            {
+                return Array.Empty<byte>();
+            }
+
+            var buffer = new byte[count];
+            var read = InputStream.Read(buffer);
+
+            if (read == 0)
+            {
+                return Array.Empty<byte>();
+            }
+
+            if (read < count)
+            {
+                Array.Resize(ref buffer, read);
+            }
+
+            return buffer;
+        }
 
         public void Abort() => _request.HttpContext.Abort();
-
-        private RequestHeaders TypedHeaders => _typedHeaders ??= new(_request.Headers);
 
         [return: NotNullIfNotNull("request")]
         public static implicit operator HttpRequest?(HttpRequestCore? request) => request.GetAdapter();

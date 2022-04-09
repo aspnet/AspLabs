@@ -22,7 +22,7 @@ public interface ISessionState : IAsyncDisposable
 
     void Abandon();
 
-    object this[string name] { get; set; }
+    object? this[string name] { get; set; }
 
     void Add(string name, object value);
 

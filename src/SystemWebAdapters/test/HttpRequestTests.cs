@@ -1,6 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -214,7 +217,6 @@ namespace System.Web
             // Assert
             Assert.Equal(method, result);
         }
-
 
         [Fact]
         public void ContentLengthEmpty()
@@ -456,8 +458,13 @@ namespace System.Web
         {
             // Arrange
             var length = _fixture.Create<int>();
+
+            var stream = new Mock<Stream>();
+            stream.Setup(s => s.Length).Returns(length);
+            stream.Setup(s => s.CanSeek).Returns(true);
+
             var coreRequest = new Mock<HttpRequestCore>();
-            coreRequest.Setup(c => c.ContentLength).Returns(length);
+            coreRequest.Setup(c => c.Body).Returns(stream.Object);
 
             var request = new HttpRequest(coreRequest.Object);
 
@@ -754,6 +761,62 @@ namespace System.Web
             // Assert
             Assert.Same(queryCollection1, queryCollection2);
             Assert.IsType<StringValuesReadOnlyDictionaryNameValueCollection>(queryCollection1);
+        }
+
+        [Fact]
+        public void Cookies()
+        {
+            // Arrange
+            var cookies = new Mock<IRequestCookieCollection>();
+            cookies.Setup(c => c.GetEnumerator()).Returns(Enumerable.Empty<KeyValuePair<string, string>>().GetEnumerator());
+
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Cookies).Returns(cookies.Object);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var cookies1 = request.Cookies;
+            var cookies2 = request.Cookies;
+
+            // Assert
+            Assert.Same(cookies1, cookies2);
+        }
+
+        [Fact]
+        public void ReadLessBytes()
+        {
+            // Arrange
+            var bytes = _fixture.CreateMany<byte>(50).ToArray();
+            using var body = new MemoryStream(bytes);
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Body).Returns(body);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var bytesRead = request.BinaryRead(40);
+
+            // Arrange
+            Assert.True(bytes.Take(40).SequenceEqual(bytesRead));
+        }
+
+        [Fact]
+        public void ReadMoreBytes()
+        {
+            // Arrange
+            var bytes = _fixture.CreateMany<byte>(50).ToArray();
+            using var body = new MemoryStream(bytes);
+            var requestCore = new Mock<HttpRequestCore>();
+            requestCore.Setup(r => r.Body).Returns(body);
+
+            var request = new HttpRequest(requestCore.Object);
+
+            // Act
+            var bytesRead = request.BinaryRead(55);
+
+            // Arrange
+            Assert.True(bytes.SequenceEqual(bytesRead));
         }
     }
 }
