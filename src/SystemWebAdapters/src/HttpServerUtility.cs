@@ -16,8 +16,6 @@ public class HttpServerUtility
 
     public string MachineName => Environment.MachineName;
 
-    public string MapPath(string path) => throw new NotImplementedException();
-
     public Exception? GetLastError() => null;
 
     public void ClearError()

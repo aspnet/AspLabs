@@ -7,8 +7,6 @@ public class HttpServerUtilityBase
 {
     public virtual string MachineName => throw new NotImplementedException();
 
-    public virtual string MapPath(string path) => throw new NotImplementedException();
-
     public virtual Exception? GetLastError() => throw new NotImplementedException();
 
     public virtual byte[]? UrlTokenDecode(string input) => throw new NotImplementedException();

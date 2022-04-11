@@ -18,8 +18,6 @@ public class HttpServerUtilityWrapper : HttpServerUtilityBase
 
     public override string MachineName => _utility.MachineName;
 
-    public override string MapPath(string path) => _utility.MapPath(path);
-
     public override byte[]? UrlTokenDecode(string input) => HttpServerUtility.UrlTokenDecode(input);
 
     public override string? UrlTokenEncode(byte[] input) => HttpServerUtility.UrlTokenEncode(input);
