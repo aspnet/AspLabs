@@ -31,9 +31,10 @@ public class HttpServerUtilityTests
     }
 
     [Fact]
-    public void UrlTokenEncodeNull()
+    public void UrlTokenNull()
     {
         Assert.Throws<ArgumentNullException>(() => HttpServerUtility.UrlTokenDecode(null!));
+        Assert.Throws<ArgumentNullException>(() => HttpServerUtility.UrlTokenEncode(null!));
     }
 
     [InlineData(11)]
@@ -56,7 +57,7 @@ public class HttpServerUtilityTests
     [InlineData(new byte[] { 253, 7, 171 }, "_Qer0")] // base64 contains /
     [InlineData(new byte[] { 211, 90, 167, 128, 197 }, "01qngMU1")] // base64 contains padding
     [Theory]
-    public void UrlTokenEncodeBytes(byte[] bytes, string expected)
+    public void UrlTokenRoundtripBytes(byte[] bytes, string expected)
     {
         Assert.Equal(expected, HttpServerUtility.UrlTokenEncode(bytes));
         Assert.Equal(bytes, HttpServerUtility.UrlTokenDecode(expected));
@@ -66,7 +67,7 @@ public class HttpServerUtilityTests
     [InlineData("a", "YQ2")]
     [InlineData("j~", "an41")]
     [Theory]
-    public void UrlTokenEncode(string input, string expected)
+    public void UrlTokenRoundtrip(string input, string expected)
     {
         // Arrange
         var bytes = Encoding.UTF8.GetBytes(input);

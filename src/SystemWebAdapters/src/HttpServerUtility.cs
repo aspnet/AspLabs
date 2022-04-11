@@ -37,7 +37,7 @@ public class HttpServerUtility
         }
 
         // Calculate the number of padding chars to append to this string. The number of padding chars to append is stored in the last char of the string.
-        var numPadChars = input[input.Length - 1] - '0';
+        var numPadChars = input[^1] - '0';
         if (numPadChars < 0 || numPadChars > 10)
         {
             return null;
