@@ -18,6 +18,7 @@ public class HttpServerUtilityWrapper : HttpServerUtilityBase
 
     public override string MachineName => _utility.MachineName;
 
+    [Obsolete("Not implemented for ASP.NET Core")]
     public override string MapPath(string path) => _utility.MapPath(path);
 
     public override byte[]? UrlTokenDecode(string input) => HttpServerUtility.UrlTokenDecode(input);

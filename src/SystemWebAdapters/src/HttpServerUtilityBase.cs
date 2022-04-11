@@ -7,6 +7,7 @@ public class HttpServerUtilityBase
 {
     public virtual string MachineName => throw new NotImplementedException();
 
+    [Obsolete("Not implemented for ASP.NET Core")]
     public virtual string MapPath(string path) => throw new NotImplementedException();
 
     public virtual Exception? GetLastError() => throw new NotImplementedException();

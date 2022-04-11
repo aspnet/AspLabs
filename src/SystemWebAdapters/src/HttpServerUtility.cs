@@ -16,6 +16,7 @@ public class HttpServerUtility
 
     public string MachineName => Environment.MachineName;
 
+    [Obsolete("Not implemented for ASP.NET Core")]
     public string MapPath(string path) => throw new NotImplementedException();
 
     public Exception? GetLastError() => null;
