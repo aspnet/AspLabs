@@ -34,7 +34,7 @@ public class HttpServerUtility
     /// <exception cref="ArgumentNullException"></exception>
     public static byte[]? UrlTokenDecode(string input)
     {
-        if (input == null)
+        if (input is null)
         {
             throw new ArgumentNullException(nameof(input));
         }
@@ -44,14 +44,15 @@ public class HttpServerUtility
             return Array.Empty<byte>();
         }
 
-        // Calculate the number of padding chars to append to this string. The number of padding chars to append is stored in the last char of the string.
-        var numPadChars = input[^1] - '0';
-        if (numPadChars < 0 || numPadChars > 10)
+        // The number of padding chars is expected to be the final character of the string
+        if (!IsDigit(input[^1]))
         {
             return null;
         }
 
         return WebEncoders.Base64UrlDecode(input, 0, input.Length - 1);
+
+        static bool IsDigit(char c) => (uint)(c - '0') <= (uint)('9' - '0');
     }
 
     /// <summary>

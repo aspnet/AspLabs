@@ -37,13 +37,12 @@ public class HttpServerUtilityTests
         Assert.Throws<ArgumentNullException>(() => HttpServerUtility.UrlTokenEncode(null!));
     }
 
-    [InlineData(11)]
-    [InlineData(-1)]
+    [InlineData('9' + 1)]
+    [InlineData('0' - 1)]
     [Theory]
-    public void UrlTokenDecodeInvalidPaddingCount(int finalValue)
+    public void UrlTokenDecodeInvalidPaddingCount(char padChar)
     {
         // Arrange
-        var padChar = (char)('0' + finalValue);
         var input = "aa" + padChar;
 
         // Act
