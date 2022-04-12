@@ -23,5 +23,5 @@ public class HttpServerUtilityWrapper : HttpServerUtilityBase
 
     public override byte[]? UrlTokenDecode(string input) => HttpServerUtility.UrlTokenDecode(input);
 
-    public override string? UrlTokenEncode(byte[] input) => HttpServerUtility.UrlTokenEncode(input);
+    public override string UrlTokenEncode(byte[] input) => HttpServerUtility.UrlTokenEncode(input);
 }

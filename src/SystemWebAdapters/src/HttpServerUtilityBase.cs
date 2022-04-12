@@ -16,5 +16,5 @@ public class HttpServerUtilityBase
 
     public virtual void ClearError() => throw new NotImplementedException();
 
-    public virtual string? UrlTokenEncode(byte[] input) => throw new NotImplementedException();
+    public virtual string UrlTokenEncode(byte[] input) => throw new NotImplementedException();
 }
