@@ -15,7 +15,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private readonly SessionSerializer _serializer;
 
     // Track locked sessions awaiting updates or release
-    private static readonly ConcurrentDictionary<string, Channel<ISessionUpdate?>> SessionDataChannels = new();
+    private static readonly ConcurrentDictionary<string, Channel<RemoteSessionData?>> SessionDataChannels = new();
 
     public override bool IsReusable => true;
 
@@ -69,7 +69,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             try
             {
                 // Generate a channel to wait for session data updates
-                var responseChannel = Channel.CreateBounded<ISessionUpdate?>(1);
+                var responseChannel = Channel.CreateBounded<RemoteSessionData?>(1);
 
                 // Update the channels dictionary with the new channel
                 SessionDataChannels[context.Session.SessionID] = responseChannel;
@@ -109,7 +109,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private async Task StoreSessionStateAsync(HttpContext context)
     {
         using var requestContent = context.Request.GetBufferlessInputStream();
-        var sessionData = await _serializer.DeserializeSessionUpdateAsync(requestContent).ConfigureAwait(false);
+        var sessionData = await _serializer.DeserializeSessionStateAsync(requestContent).ConfigureAwait(false);
 
         var sessionId = GetSessionId(context.Request);
 
@@ -145,7 +145,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         }
     }
 
-    private void UpdateSessionState(HttpSessionState session, ISessionUpdate updatedSessionState)
+    private void UpdateSessionState(HttpSessionState session, RemoteSessionData updatedSessionState)
     {
         if (updatedSessionState.Abandon)
         {
@@ -153,16 +153,12 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             return;
         }
 
-        session.Timeout = updatedSessionState.Timeout ?? session.Timeout;
+        session.Timeout = updatedSessionState.Timeout;
 
-        foreach (var key in updatedSessionState.UpdatedKeys)
+        session.Clear();
+        foreach (var (key, value) in updatedSessionState.Values.KeyValues)
         {
-            session[key] = updatedSessionState[key];
-        }
-
-        foreach (var removedItem in updatedSessionState.RemovedKeys)
-        {
-            session.Remove(removedItem);
+            session[key] = value;
         }
     }
 

@@ -20,7 +20,7 @@ using System.Web.SessionState;
 
 namespace System.Web.Adapters.SessionState;
 
-internal class SessionSerializer
+internal partial class SessionSerializer
 {
 #if NETCOREAPP3_1_OR_GREATER
     public SessionSerializer(IOptions<RemoteAppSessionStateOptions> options)
@@ -43,33 +43,19 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-    public ISessionState? DeserializeSessionState(string? jsonString)
+    public RemoteSessionData? DeserializeSessionState(string? jsonString)
         => jsonString?.Length > 0
-        ? JsonSerializer.Deserialize<SessionState>(jsonString, Options)
+        ? JsonSerializer.Deserialize<RemoteSessionData>(jsonString, Options)
         : null;
 
-    public async ValueTask<ISessionState?> DeserializeSessionStateAsync(Stream stream)
+    public async ValueTask<RemoteSessionData?> DeserializeSessionStateAsync(Stream stream)
         => stream?.Length > 0
-        ? await JsonSerializer.DeserializeAsync<SessionState>(stream, Options)
+        ? await JsonSerializer.DeserializeAsync<RemoteSessionData>(stream, Options)
         : null;
 
-    public async ValueTask<ISessionUpdate?> DeserializeSessionUpdateAsync(Stream stream)
-        => stream?.Length > 0
-        ? await JsonSerializer.DeserializeAsync<SessionUpdate>(stream, Options)
-        : null;
-
-    public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
+    public async ValueTask SerializeAsync(RemoteSessionData remoteSessionState, Stream stream, CancellationToken token)
     {
-        var session = (SessionState)sessionState;
-
-        await JsonSerializer.SerializeAsync(stream, session, Options, token);
-    }
-
-    public async ValueTask SerializeAsync(ISessionUpdate sessionUpdate, Stream stream, CancellationToken token)
-    {
-        var session = (SessionUpdate)sessionUpdate;
-
-        await JsonSerializer.SerializeAsync(stream, session, Options, token);
+        await JsonSerializer.SerializeAsync(stream, remoteSessionState, Options, token);
     }
 
 #if NET472
@@ -87,7 +73,7 @@ internal class SessionSerializer
             values.Add(key, state[key]);
         }
 
-        var session = new SessionState
+        var session = new RemoteSessionData
         {
             IsNewSession = state.IsNewSession,
             IsReadOnly = state.IsReadOnly,
@@ -163,30 +149,5 @@ internal class SessionSerializer
 
             writer.WriteEndObject();
         }
-    }
-
-    private class SessionState
-        : ISessionState
-    {
-        public object? this[string name]
-        {
-            get => Values[name];
-            set => Values[name] = value;
-        }
-
-        public string SessionID { get; set; } = null!;
-
-        public bool IsReadOnly { get; set; }
-
-        public SessionValues Values { get; set; } = null!;
-
-        public int Count => Values.Count;
-
-        public int Timeout { get; set; }
-
-        public bool IsNewSession { get; set; }
-
-        [JsonIgnore]
-        public IEnumerable<string> Keys => Values.KeyValues.Select(kvp => kvp.Key);
     }
 }

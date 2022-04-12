@@ -2,123 +2,53 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
-using System.Linq;
 using System.Web.Adapters;
-using System.Web.Adapters.SessionState;
 
 namespace System.Web.SessionState;
 
 public class HttpSessionState
-    // Implement ICollection for compatibility with .NET Framework
     : ICollection
 {
-    private readonly ISessionState _remoteState;
-    private readonly SessionUpdate _stateUpdate;
-    private bool _completed;
+    private readonly ISessionState _container;
 
-    internal bool Completed => _completed;
-
-    internal ISessionUpdate Updates => _stateUpdate;
-
-    internal void Complete() => _completed = true;
-
-    public HttpSessionState(ISessionState remoteState)
+    public HttpSessionState(ISessionState container)
     {
-        _remoteState = remoteState;
-        _stateUpdate = new SessionUpdate();
-        _completed = false;
+        _container = container;
     }
 
-    public string SessionID => _remoteState.SessionID;
+    public string SessionID => _container.SessionID;
 
-    public int Count => _remoteState.Keys
-                        .Union(_stateUpdate.UpdatedKeys)
-                        .Where(k => !_stateUpdate.RemovedKeys.Contains(k))
-                        .Count();
+    public int Count => _container.Count;
 
-    public bool IsReadOnly => _remoteState.IsReadOnly;
+    public bool IsReadOnly => _container.IsReadOnly;
 
-    public bool IsNewSession => _remoteState.IsNewSession;
+    public bool IsNewSession { get; }
 
     public int TimeOut
     {
-        get => _stateUpdate.Timeout ?? _remoteState.Timeout;
-        set
-        {
-            CheckCompleted();
-            _stateUpdate.Timeout = value;
-        }
+        get => _container.Timeout;
+        set => _container.Timeout = value;
     }
 
     public bool IsSynchronized => false;
 
     public object SyncRoot => this;
 
-    public bool HasUpdates =>
-        Updates.Abandon || Updates.Timeout.HasValue || Updates.RemovedKeys.Any() || Updates.UpdatedKeys.Any();
-
-    public void Abandon()
-    {
-        CheckCompleted();
-        _stateUpdate.Abandon = true;
-    }
+    public void Abandon() => _container.Abandon();
 
     public object? this[string name]
     {
-        get
-        {
-            if (_stateUpdate.RemovedKeys.Contains(name))
-            {
-                return null;
-            }
-
-            return _stateUpdate[name] ?? _remoteState[name];
-        }
-        set
-        {
-            CheckCompleted();
-            _stateUpdate.RemovedKeys.Remove(name);
-            _stateUpdate[name] = value;
-        }
+        get => _container[name];
+        set => _container[name] = value;
     }
 
-    public void Add(string name, object value)
-    {
-        CheckCompleted();
-        _stateUpdate.RemovedKeys.Remove(name);
-        _stateUpdate[name] = value;
-    }
+    public void Add(string name, object value) => _container.Add(name, value);
 
-    public void Remove(string name)
-    {
-        CheckCompleted();
-        _stateUpdate.RemovedKeys.Add(name);
-        _stateUpdate.Values.Remove(name);
-    }
+    public void Remove(string name) => _container.Remove(name);
 
-    public void RemoveAll()
-    {
-        Clear();
-    }
+    public void RemoveAll() => _container.Clear();
 
-    public void Clear()
-    {
-        CheckCompleted();
-        _stateUpdate.RemovedKeys.Clear();
-        _stateUpdate.Values.Clear();
-        foreach (var key in _remoteState.Keys)
-        {
-            _stateUpdate.RemovedKeys.Add(key);
-        }
-    }
-
-    private void CheckCompleted()
-    {
-        if (Completed)
-        {
-            throw new InvalidOperationException("Session state cannot be changed after it is committed to remote session store");
-        }
-    }
+    public void Clear() => _container.Clear();
 
     public void CopyTo(Array array, int index)
     {
@@ -128,8 +58,5 @@ public class HttpSessionState
         }
     }
 
-    public IEnumerator GetEnumerator() => _remoteState.Keys
-                        .Union(_stateUpdate.UpdatedKeys)
-                        .Where(k => !_stateUpdate.RemovedKeys.Contains(k))
-                        .GetEnumerator();
+    public IEnumerator GetEnumerator() => _container.Keys.GetEnumerator();
 }

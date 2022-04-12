@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -19,6 +20,8 @@ public class SessionStateSerialization
         ""Key1"": 5
     }
 }";
+
+        var expected = new (string, object?)[] { ("Key1", 5) };
         var serializer = new SessionSerializer(new KeyDictionary
         {
             { "Key1", typeof(int) }
@@ -31,8 +34,7 @@ public class SessionStateSerialization
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(1, result!.Count);
-        Assert.Equal(5, result["Key1"]);
+        AssertValuesEqual(expected, result);
     }
 
     [Fact]
@@ -60,10 +62,11 @@ public class SessionStateSerialization
 
         // Act
         await serializer.SerializeAsync(sessionState!, result, default);
-        var str = GetStream(result);
+        var str = SessionStateSerialization.GetStream(result);
 
         // Assert
         const string Expected = @"{
+  ""Abandon"": false,
   ""SessionID"": ""5"",
   ""IsReadOnly"": false,
   ""Values"": {
@@ -75,7 +78,7 @@ public class SessionStateSerialization
         Assert.Equal(Expected, str);
     }
 
-    private string GetStream(MemoryStream stream)
+    private static string GetStream(MemoryStream stream)
         => Encoding.UTF8.GetString(stream.ToArray());
 
     [Fact]
@@ -89,6 +92,7 @@ public class SessionStateSerialization
         ""Key2"": ""hello""
     }
 }";
+        var expected = new (string, object?)[] { ("Key1", 5), ("Key2", "hello") };
         var serializer = new SessionSerializer(new KeyDictionary
         {
             { "Key1", typeof(int) },
@@ -102,9 +106,8 @@ public class SessionStateSerialization
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(2, result!.Count);
-        Assert.Equal(5, result["Key1"]);
-        Assert.Equal("hello", result["Key2"]);
+        Assert.Equal(2, result!.Values.Count);
+        AssertValuesEqual(expected, result);
     }
 
     [Fact]
@@ -131,10 +134,17 @@ public class SessionStateSerialization
         var result = await serializer.DeserializeSessionStateAsync(stream);
 
         // Assert
-        var obj = Assert.IsType<SomeObject>(result!["Key1"]);
+        var obj = Assert.IsType<SomeObject>(result!.Values["Key1"]);
         Assert.Equal(5, obj.IntKey);
         Assert.Equal("hello", obj.StringKey);
     }
+
+    private static void AssertValuesEqual((string, object?)[] expected, RemoteSessionData? result) =>
+    Assert.Collection(result!.Values.KeyValues, expected.Select<(string, object?), Action<(string, object?)>>(expected =>
+                 actual =>
+                 {
+                     Assert.Equal(expected.Item1, actual.Item1);
+                 }).ToArray());
 
     private class SomeObject
     {

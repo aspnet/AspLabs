@@ -23,7 +23,7 @@ namespace System.Web.Adapters
         public static ISystemWebAdapterBuilder AddSessionManager<TManager>(this ISystemWebAdapterBuilder builder)
             where TManager : class, ISessionManager
         {
-            builder.Services.AddScoped<ISessionManager, TManager>();
+            builder.Services.AddTransient<ISessionManager, TManager>();
             return builder;
         }
 

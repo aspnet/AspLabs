@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.SessionState;
 
 namespace System.Web.Adapters;
@@ -9,19 +11,19 @@ namespace System.Web.Adapters;
 /// <summary>
 /// Represents the state of a session and is used to create a <see cref="HttpSessionState"/>.
 /// </summary>
-public interface ISessionState
+public interface ISessionState : IDictionary<string, object?>, IDisposable
 {
+    bool IsAvailable { get; }
+
     string SessionID { get; }
 
-    int Count { get; }
-
-    bool IsReadOnly { get; }
-
-    int Timeout { get; }
+    int Timeout { get; set; }
 
     bool IsNewSession { get; }
 
-    object? this[string name] { get; set; }
+    void Abandon();
 
-    IEnumerable<string> Keys { get; }
+    Task LoadAsync(HttpContextCore context, bool readOnly, CancellationToken cancellationToken = default);
+
+    Task CommitAsync(HttpContextCore context, CancellationToken cancellationToken = default);
 }
