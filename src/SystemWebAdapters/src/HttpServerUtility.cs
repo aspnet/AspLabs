@@ -1,7 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Buffers;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace System.Web;
 
@@ -25,6 +25,13 @@ public class HttpServerUtility
     {
     }
 
+    /// <summary>
+    /// This method is similar to <see cref="WebEncoders.Base64UrlDecode(string)"/> but handles the trailing character that <see cref="UrlTokenEncode(byte[])"/>
+    /// appends to the string.
+    /// </summary>
+    /// <param name="input">Value to decode</param>
+    /// <returns>Decoded value.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static byte[]? UrlTokenDecode(string input)
     {
         if (input == null)
@@ -32,7 +39,7 @@ public class HttpServerUtility
             throw new ArgumentNullException(nameof(input));
         }
 
-        if (input.Length < 1)
+        if (input.Length == 0)
         {
             return Array.Empty<byte>();
         }
@@ -44,75 +51,37 @@ public class HttpServerUtility
             return null;
         }
 
-        var length = input.Length - 1 + numPadChars;
-        var base64Chars = ArrayPool<char>.Shared.Rent(length);
-
-        // Transform the "-" to "+", and "*" to "/"
-        for (int iter = 0; iter < input.Length - 1; iter++)
-        {
-            base64Chars[iter] = input[iter] switch
-            {
-                '-' => '+',
-                '_' => '/',
-                var c => c,
-            };
-        }
-
-        // Add padding chars
-        for (int iter = input.Length - 1; iter < length; iter++)
-        {
-            base64Chars[iter] = '=';
-        }
-
-        try
-        {
-            return Convert.FromBase64CharArray(base64Chars, 0, length);
-        }
-        finally
-        {
-            ArrayPool<char>.Shared.Return(base64Chars);
-        }
+        return WebEncoders.Base64UrlDecode(input, 0, input.Length - 1);
     }
 
-    // This method does a base64 encoding of the input, but replaces the `=` with a count of padding and transforms `+`->`-` and `/`->`_`
-    public static string? UrlTokenEncode(byte[] input)
+    /// <summary>
+    /// This method is similar to <see cref="WebEncoders.Base64UrlEncode(byte[])"/> but the resulting string includes an extra character
+    /// that is the count of how many padding characters where removed from the Base64 encoded value.
+    /// </summary>
+    /// <param name="input">Value to encode</param>
+    /// <returns>URL encoded value.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static string UrlTokenEncode(byte[] input)
     {
-        if (input == null)
+        if (input is null)
         {
             throw new ArgumentNullException(nameof(input));
         }
 
-        if (input.Length < 1)
+        if (input.Length == 0)
         {
             return string.Empty;
         }
 
-        var base64Str = Convert.ToBase64String(input);
-
-        // Find how many padding chars are present in the end
-        var endPos = 0;
-        for (endPos = base64Str.Length; endPos > 0; endPos--)
+        var encoded = WebEncoders.Base64UrlEncode(input);
+        var padding = (encoded.Length % 4) switch
         {
-            if (base64Str[endPos - 1] != '=') // Found a non-padding char!
-            {
-                break;
-            }
-        }
+            0 => 0,
+            2 => 2,
+            3 => 1,
+            _ => throw new FormatException("Invalid input"),
+        };
 
-        return string.Create(endPos + 1, base64Str, static (span, original) =>
-        {
-            var padding = original.Length - span.Length + 1;
-            span[^1] = (char)('0' + padding);
-
-            for (var iter = 0; iter < span.Length - 1; iter++)
-            {
-                span[iter] = original[iter] switch
-                {
-                    '+' => '-',
-                    '/' => '_',
-                    char c => c,
-                };
-            }
-        });
+        return $"{encoded}{padding}";
     }
 }
