@@ -16,7 +16,7 @@ public interface ISessionState : IAsyncDisposable
 
     bool IsReadOnly { get; }
 
-    int TimeOut { get; set; }
+    int Timeout { get; set; }
 
     bool IsNewSession { get; }
 

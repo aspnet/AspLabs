@@ -330,24 +330,6 @@ public class HttpResponseTests
         body.Verify(b => b.SetLength(0), Times.Once);
     }
 
-    [Fact]
-    public void Abort()
-    {
-        // Arrange
-        var context = new Mock<HttpContextCore>();
-
-        var responseCore = new Mock<HttpResponseCore>();
-        responseCore.Setup(r => r.HttpContext).Returns(context.Object);
-
-        var response = new HttpResponse(responseCore.Object);
-
-        // Act
-        response.Abort();
-
-        // Assert
-        context.Verify(f => f.Abort(), Times.Once);
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

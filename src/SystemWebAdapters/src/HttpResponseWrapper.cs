@@ -16,8 +16,6 @@ namespace System.Web
             _response = response;
         }
 
-        public override void Abort() => _response.Abort();
-
         public override void AddHeader(string name, string value) => _response.AddHeader(name, value);
 
         public override string? ContentType
