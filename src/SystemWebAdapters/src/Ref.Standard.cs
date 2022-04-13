@@ -289,7 +289,7 @@ namespace System.Web
 }
 namespace System.Web.Caching
 {
-    public partial class Cache : System.Collections.IEnumerable
+    public sealed partial class Cache : System.Collections.IEnumerable
     {
         public static readonly System.DateTime NoAbsoluteExpiration;
         public static readonly System.TimeSpan NoSlidingExpiration;

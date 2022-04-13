@@ -9,7 +9,7 @@ namespace System.Web.Caching;
 public delegate void CacheItemRemovedCallback(string key, object value, CacheItemRemovedReason reason);
 public delegate void CacheItemUpdateCallback(string key, CacheItemUpdateReason reason, out object? expensiveObject, out CacheDependency? dependency, out DateTime absoluteExpiration, out TimeSpan slidingExpiration);
 
-public class Cache : IEnumerable
+public sealed class Cache : IEnumerable
 {
     private readonly ObjectCache _cache;
 
