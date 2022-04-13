@@ -109,9 +109,7 @@ internal class RemoteSessionState : ISessionState
         }
     }
 
-#if NET6_0_OR_GREATER
     [MemberNotNullWhen(true, nameof(_remoteData))]
-#endif
     public bool IsAvailable => _remoteData is not null;
 
     public string SessionID
@@ -287,9 +285,7 @@ internal class RemoteSessionState : ISessionState
         _response?.Dispose();
     }
 
-#if NET6_0_OR_GREATER
     [MemberNotNull(nameof(_remoteData))]
-#endif
     private void ThrowIfNotAvailable()
     {
         if (!IsAvailable)
