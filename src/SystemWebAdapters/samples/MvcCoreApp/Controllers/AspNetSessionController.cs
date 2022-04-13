@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteContext = System.Web.HttpContext;
 using ClassLibrary;
+using System.Web.Adapters;
 
 namespace MvcApp.Controllers;
 
+[Session]
 public class AspNetCoreSessionController : Controller
 {
     // GET: AspNetCoreSession

@@ -34,8 +34,9 @@ app.UseSystemWebAdapters();
 
 app.UseEndpoints(endpoints =>
 {
-    app.MapDefaultControllerRoute()
-        .RequireSystemWebAdapterSession();
+    app.MapDefaultControllerRoute();
+        // This method can be used to enable session (or read-only session) on all controllers
+        //.RequireSystemWebAdapterSession();
 
     app.MapReverseProxy();
 });
