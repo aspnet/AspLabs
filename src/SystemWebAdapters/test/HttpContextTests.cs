@@ -79,13 +79,14 @@ namespace System.Web.Adapters.Tests
             coreContext.Features.Set(new HttpSessionState(new Mock<ISessionState>().Object));
 
             var context = new HttpContext(coreContext);
+            var provider = (IServiceProvider)context;
 
-            Assert.Same(context.Request, context.GetService(typeof(HttpRequest)));
-            Assert.Same(context.Response, context.GetService(typeof(HttpResponse)));
-            Assert.Same(context.Server, context.GetService(typeof(HttpServerUtility)));
-            Assert.Same(context.Session, context.GetService(typeof(HttpSessionState)));
+            Assert.Same(context.Request, provider.GetService(typeof(HttpRequest)));
+            Assert.Same(context.Response, provider.GetService(typeof(HttpResponse)));
+            Assert.Same(context.Server, provider.GetService(typeof(HttpServerUtility)));
+            Assert.Same(context.Session, provider.GetService(typeof(HttpSessionState)));
 
-            Assert.Null(context.GetService(typeof(HttpContext)));
+            Assert.Null(provider.GetService(typeof(HttpContext)));
         }
 
         [Fact]

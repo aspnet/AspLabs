@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace System.Web;
 
-public class HttpCookie
+public sealed class HttpCookie
 {
     // If the .Values collection hasn't been accessed, this will remain a string. However, once .Values is accessed,
     // this will become a HttpValueCollection. If .ToString is called on it, it will reconsistute the full string

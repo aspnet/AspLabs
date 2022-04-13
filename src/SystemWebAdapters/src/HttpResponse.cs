@@ -192,8 +192,6 @@ namespace System.Web
             }
         }
 
-        public void Abort() => _response.HttpContext.Abort();
-
         [return: NotNullIfNotNull("response")]
         public static implicit operator HttpResponse?(HttpResponseCore? response) => response?.GetAdapter();
 

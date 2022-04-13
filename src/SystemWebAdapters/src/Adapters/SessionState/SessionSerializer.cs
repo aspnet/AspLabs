@@ -74,7 +74,7 @@ internal class SessionSerializer
             IsNewSession = state.IsNewSession,
             IsReadOnly = state.IsReadOnly,
             SessionID = state.SessionID,
-            TimeOut = state.Timeout,
+            Timeout = state.Timeout,
             Values = values
         };
 
@@ -169,7 +169,7 @@ internal class SessionSerializer
 
         public int Count => Values.Count;
 
-        public int TimeOut { get; set; }
+        public int Timeout { get; set; }
 
         public bool IsNewSession { get; set; }
 

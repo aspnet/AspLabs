@@ -11,7 +11,7 @@ public abstract class HttpSessionStateBase
 
     public virtual bool IsReadOnly => throw new NotImplementedException();
 
-    public virtual int TimeOut
+    public virtual int Timeout
     {
         get => throw new NotImplementedException();
         set => throw new NotImplementedException();
