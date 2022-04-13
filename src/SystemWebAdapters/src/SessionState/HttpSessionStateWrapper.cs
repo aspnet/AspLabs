@@ -22,10 +22,10 @@ public class HttpSessionStateWrapper : HttpSessionStateBase
 
     public override bool IsNewSession => _session.IsNewSession;
 
-    public override int TimeOut
+    public override int Timeout
     {
-        get => _session.TimeOut;
-        set => _session.TimeOut = value;
+        get => _session.Timeout;
+        set => _session.Timeout = value;
     }
 
     public override void Abandon() => _session.Abandon();

@@ -102,7 +102,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         public bool IsReadOnly => true;
 
-        public int TimeOut { get; set; } = 0;
+        public int Timeout { get; set; } = 0;
 
         public bool IsNewSession => true;
 

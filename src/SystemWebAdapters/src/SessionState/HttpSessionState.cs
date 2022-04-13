@@ -22,10 +22,10 @@ public class HttpSessionState
 
     public bool IsNewSession { get; }
 
-    public int TimeOut
+    public int Timeout
     {
-        get => _container.TimeOut;
-        set => _container.TimeOut = value;
+        get => _container.Timeout;
+        set => _container.Timeout = value;
     }
 
     public void Abandon() => _container.Abandon();

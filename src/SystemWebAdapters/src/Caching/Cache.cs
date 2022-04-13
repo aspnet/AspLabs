@@ -3,7 +3,7 @@
 
 namespace System.Web.Caching
 {
-    public class Cache
+    public sealed class Cache
     {
         public static readonly DateTime NoAbsoluteExpiration = DateTime.MaxValue;
 

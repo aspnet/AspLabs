@@ -70,7 +70,7 @@ public class SessionStateSerialization
     ""Key1"": 5
   },
   ""Count"": 1,
-  ""TimeOut"": 0,
+  ""Timeout"": 0,
   ""IsNewSession"": false,
   ""IsAbandoned"": false
 }";
