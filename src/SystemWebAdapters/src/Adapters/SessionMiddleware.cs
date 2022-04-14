@@ -35,8 +35,8 @@ internal class SessionMiddleware
         using var state = metadata.Behavior switch
         {
             SessionBehavior.Eager => await manager.CreateAsync(context, metadata),
-            SessionBehavior.OnDemand => new LazySessionState(context, metadata, manager),
-            var b => throw new InvalidOperationException($"Unknown session behavior {b}"),
+            SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
+            var behavior => throw new InvalidOperationException($"Unknown session behavior {behavior}"),
         };
 #pragma warning restore CS0618 // Type or member is obsolete
 
@@ -57,9 +57,13 @@ internal class SessionMiddleware
     {
         private readonly Lazy<ISessionState> _state;
 
-        public LazySessionState(HttpContextCore context, ISessionMetadata metadata, ISessionManager manager)
+        public LazySessionState(HttpContextCore context, ILogger logger, ISessionMetadata metadata, ISessionManager manager)
         {
-            _state = new Lazy<ISessionState>(() => manager.CreateAsync(context, metadata).GetAwaiter().GetResult());
+            _state = new Lazy<ISessionState>(() =>
+            {
+                logger.LogWarning("Creating session on demand by synchronously waiting on a potential asynchronous connection");
+                return manager.CreateAsync(context, metadata).GetAwaiter().GetResult();
+            });
         }
 
         protected override ISessionState State => _state.Value;
