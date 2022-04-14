@@ -34,6 +34,10 @@ internal class SessionSerializer
     {
         Options = new JsonSerializerOptions
         {
+#if !NETCOREAPP3_1
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+#endif
+            AllowTrailingCommas = true,
             IgnoreReadOnlyProperties = true,
             Converters =
             {
@@ -157,6 +161,8 @@ internal class SessionSerializer
         : ISessionState
 #endif
     {
+        private SessionValues? _values;
+
         public object? this[string name]
         {
             get => Values[name];
@@ -167,7 +173,11 @@ internal class SessionSerializer
 
         public bool IsReadOnly { get; set; }
 
-        public SessionValues Values { get; set; } = null!;
+        public SessionValues Values
+        {
+            get => _values ??= new();
+            set => _values = value;
+        }
 
         public int Count => Values.Count;
 
