@@ -1,6 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpBrowserCapabilities))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpContext))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpContextBase))]
@@ -18,5 +15,19 @@
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpSessionStateBase))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.HttpSessionStateWrapper))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.SameSiteMode))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.BufferResponseStreamAttribute))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.DelegatingSessionState))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.IBufferResponseStreamMetadata))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.IPreBufferRequestStreamMetadata))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.ISessionManager))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.ISessionMetadata))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.ISessionState))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.ISystemWebAdapterBuilder))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.PreBufferRequestStreamAttribute))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.RemoteAppSessionStateExtensions))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.SessionAttribute))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.SessionBehavior))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.SystemWebAdaptersExtensions))]
+[assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Adapters.SessionState.RemoteAppSessionStateOptions))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.Caching.Cache))]
 [assembly:System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Web.SessionState.HttpSessionState))]

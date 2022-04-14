@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.SessionState;
@@ -10,11 +11,9 @@ namespace System.Web.Adapters;
 /// <summary>
 /// Represents the state of a session and is used to create a <see cref="HttpSessionState"/> . Disposing the state will handle any writing that may need to be done.
 /// </summary>
-public interface ISessionState : IDisposable
+public interface ISessionState : ICollection, IDisposable
 {
     string SessionID { get; }
-
-    int Count { get; }
 
     bool IsReadOnly { get; }
 

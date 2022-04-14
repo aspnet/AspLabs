@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -107,6 +108,10 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         public bool IsNewSession => true;
 
+        public bool IsSynchronized => false;
+
+        public object SyncRoot => ((ICollection)_state).SyncRoot;
+
         public void Abandon()
         {
         }
@@ -117,9 +122,19 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         public ValueTask CommitAsync(CancellationToken token) => default;
 
+        public void CopyTo(Array array, int index)
+        {
+            foreach (var item in _state.Keys)
+            {
+                array.SetValue(item, index);
+            }
+        }
+
         public void Dispose()
         {
         }
+
+        public IEnumerator GetEnumerator() => _state.Keys.GetEnumerator();
 
         public void Remove(string name) => _state.Remove(name);
     }

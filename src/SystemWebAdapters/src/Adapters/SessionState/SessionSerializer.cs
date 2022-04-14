@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
+using System.Collections;
 
 #if NETCOREAPP3_1_OR_GREATER
 using System.Web.Adapters;
@@ -175,6 +176,10 @@ internal class SessionSerializer
 
         public bool IsAbandoned { get; set; }
 
+        public bool IsSynchronized => ((ICollection)Values).IsSynchronized;
+
+        public object SyncRoot => ((ICollection)Values).SyncRoot;
+
         public void Abandon() => IsAbandoned = true;
 
         public void Add(string name, object value) => Values.Add(name, value);
@@ -188,6 +193,10 @@ internal class SessionSerializer
         public void Dispose()
         {
         }
+
+        public void CopyTo(Array array, int index) => ((ICollection)Values).CopyTo(array, index);
+
+        public IEnumerator GetEnumerator() => Values.GetEnumerator();
     }
 
     private class SessionValues : NameObjectCollectionBase
