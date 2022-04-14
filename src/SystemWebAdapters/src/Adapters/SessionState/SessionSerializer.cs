@@ -34,6 +34,7 @@ internal class SessionSerializer
     {
         Options = new JsonSerializerOptions
         {
+            IgnoreReadOnlyProperties = true,
             Converters =
             {
                 new SerializedSessionConverter(map),
