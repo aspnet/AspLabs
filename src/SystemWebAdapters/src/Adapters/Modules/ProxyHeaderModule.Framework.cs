@@ -48,7 +48,7 @@ internal class ProxyHeaderModule : IHttpModule
 
         if (request.Headers["x-forwarded-host"] is { } host)
         {
-            var value = new ProtoHost(host);
+            var value = new ForwardedHost(host);
 
             request.ServerVariables.Set("SERVER_NAME", value.ServerName);
             request.ServerVariables.Set("SERVER_PORT", value.Port);
@@ -69,16 +69,16 @@ internal class ProxyHeaderModule : IHttpModule
         }
     }
 
-    private struct ProtoHost
+    private struct ForwardedHost
     {
-        public ProtoHost(string host)
+        public ForwardedHost(string host)
         {
             var idx = host.IndexOf(":");
 
             if (idx < 0)
             {
                 ServerName = host;
-                Port = "80";
+                Port = "443";
             }
             else
             {
