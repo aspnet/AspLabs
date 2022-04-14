@@ -24,8 +24,9 @@ public class SessionStateSerialization
         var result = await serializer.DeserializeAsync(stream);
 
         // Assert
-        //Assert.NotNull(result);
-        //Assert.Equal(0, result!.Count);
+        Assert.NotNull(result);
+        Assert.Equal(0, result!.Count);
+        Assert.True(result.IsNewSession);
     }
 
     [Fact]
@@ -83,7 +84,7 @@ public class SessionStateSerialization
 
         // Assert
 #if NETCOREAPP3_1
-const string Expected= @"{
+        const string Expected = @"{
   ""SessionID"": ""5"",
   ""IsReadOnly"": false,
   ""Values"": {
@@ -102,7 +103,7 @@ const string Expected= @"{
   }
 }";
 #endif
-    Assert.Equal(Expected, str);
+        Assert.Equal(Expected, str);
     }
 
     private string GetStream(MemoryStream stream)
