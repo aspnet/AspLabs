@@ -51,7 +51,11 @@ internal class ProxyHeaderModule : IHttpModule
             var value = new ForwardedHost(host);
 
             request.ServerVariables.Set("SERVER_NAME", value.ServerName);
-            request.ServerVariables.Set("SERVER_PORT", value.Port);
+
+            if (value.Port is { })
+            {
+                request.ServerVariables.Set("SERVER_PORT", value.Port);
+            }
         }
 
         if (request.Headers["x-forwarded-proto"] is { } proto)
@@ -78,7 +82,7 @@ internal class ProxyHeaderModule : IHttpModule
             if (idx < 0)
             {
                 ServerName = host;
-                Port = "443";
+                Port = null;
             }
             else
             {
@@ -89,6 +93,6 @@ internal class ProxyHeaderModule : IHttpModule
 
         public string ServerName { get; }
 
-        public string Port { get; }
+        public string? Port { get; }
     }
 }
