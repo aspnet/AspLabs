@@ -1,41 +1,34 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Web.Adapters.SessionState;
-using System.Web.SessionState;
-
 namespace System.Web.Adapters;
 
-public sealed class SystemWebAdapterModule : IHttpModule, IReadOnlySessionState
+public sealed class SystemWebAdapterModule : IHttpModule
 {
+    private ISystemWebAdapterBuilder? _builder;
+
     public void Dispose()
     {
+        if (_builder is { } builder)
+        {
+            foreach (var module in builder.Modules)
+            {
+                module.Dispose();
+            }
+
+            _builder = null;
+        }
     }
 
     public void Init(HttpApplication context)
     {
-        RegisterRemoteSession(context);
-    }
+        _builder = context.Application.GetSystemWebBuilder();
 
-    private void RegisterRemoteSession(HttpApplication context)
-    {
-        if (context.Application.GetRemoteSessionOptions() is not { } options)
+        if (_builder is { } builder)
         {
-            return;
-        }
-
-        var handler = new RemoteAppSessionStateHandler(options);
-
-        context.PostMapRequestHandler += MapRemoteSessionHandler;
-
-        void MapRemoteSessionHandler(object sender, EventArgs e)
-        {
-            var context = ((HttpApplication)sender).Context;
-
-            if (string.Equals(context.Request.Path, options.SessionEndpointPath))
+            foreach (var module in builder.Modules)
             {
-                context.SetSessionStateBehavior(SessionStateBehavior.ReadOnly);
-                context.Handler = handler;
+                module.Init(context);
             }
         }
     }
