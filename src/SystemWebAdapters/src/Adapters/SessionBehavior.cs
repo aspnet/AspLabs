@@ -3,9 +3,11 @@
 
 namespace System.Web.Adapters;
 
-public interface ISessionMetadata
+public enum SessionBehavior
 {
-    SessionBehavior Behavior { get; }
+    None,
+    Eager,
 
-    bool IsReadOnly { get; }
+    [Obsolete("This will enable session on the endpoint but will resort to async over sync behavior")]
+    OnDemand,
 }

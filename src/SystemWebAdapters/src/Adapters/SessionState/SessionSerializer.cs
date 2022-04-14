@@ -181,9 +181,13 @@ internal class SessionSerializer
 
         public void Clear() => Values.Clear();
 
-        public ValueTask DisposeAsync() => default;
-
         public void Remove(string name) => Values.Remove(name);
+
+        public ValueTask CommitAsync(CancellationToken token) => default;
+
+        public void Dispose()
+        {
+        }
     }
 
     private class SessionValues : NameObjectCollectionBase

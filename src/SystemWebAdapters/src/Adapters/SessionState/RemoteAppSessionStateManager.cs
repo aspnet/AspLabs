@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -114,7 +115,11 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         public void Clear() => _state.Clear();
 
-        public ValueTask DisposeAsync() => default;
+        public ValueTask CommitAsync(CancellationToken token) => default;
+
+        public void Dispose()
+        {
+        }
 
         public void Remove(string name) => _state.Remove(name);
     }

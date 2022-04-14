@@ -21,7 +21,7 @@ internal class SessionMiddleware
     }
 
     public Task InvokeAsync(HttpContextCore context)
-        => context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { IsEnabled: true } metadata
+        => context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { Behavior: not SessionBehavior.None } metadata
             ? ManageStateAsync(context, metadata)
             : _next(context);
 
@@ -31,10 +31,45 @@ internal class SessionMiddleware
 
         var manager = context.RequestServices.GetRequiredService<ISessionManager>();
 
-        await using var state = await manager.CreateAsync(context, metadata);
+#pragma warning disable CS0618 // Type or member is obsolete
+        using var state = metadata.Behavior switch
+        {
+            SessionBehavior.Eager => await manager.CreateAsync(context, metadata),
+            SessionBehavior.OnDemand => new LazySessionState(context, metadata, manager),
+            var b => throw new InvalidOperationException($"Unknown session behavior {b}"),
+        };
+#pragma warning restore CS0618 // Type or member is obsolete
 
         context.Features.Set(new HttpSessionState(state));
 
-        await _next(context);
+        try
+        {
+            await _next(context);
+            await state.CommitAsync(context.RequestAborted);
+        }
+        finally
+        {
+            context.Features.Set<HttpSessionState?>(null);
+        }
+    }
+
+    private class LazySessionState : DelegatingSessionState
+    {
+        private readonly Lazy<ISessionState> _state;
+
+        public LazySessionState(HttpContextCore context, ISessionMetadata metadata, ISessionManager manager)
+        {
+            _state = new Lazy<ISessionState>(() => manager.CreateAsync(context, metadata).GetAwaiter().GetResult());
+        }
+
+        protected override ISessionState State => _state.Value;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_state.IsValueCreated)
+            {
+                base.Dispose(disposing);
+            }
+        }
     }
 }
