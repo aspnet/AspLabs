@@ -134,7 +134,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
         {
         }
 
-        public IEnumerator GetEnumerator() => _state.Keys.GetEnumerator();
+        public IEnumerable<string> Keys => _state.Keys;
 
         public void Remove(string name) => _state.Remove(name);
     }

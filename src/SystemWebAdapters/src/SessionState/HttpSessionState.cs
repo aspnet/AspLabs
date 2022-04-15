@@ -51,5 +51,5 @@ public class HttpSessionState : ICollection
 
     public void CopyTo(Array array, int index) => _container.CopyTo(array, index);
 
-    public IEnumerator GetEnumerator() => _container.GetEnumerator();
+    public IEnumerator GetEnumerator() => _container.Keys.GetEnumerator();
 }

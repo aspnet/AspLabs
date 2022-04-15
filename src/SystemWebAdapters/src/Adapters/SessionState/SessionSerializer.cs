@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.Collections;
+using System.Linq;
 
 #if NETCOREAPP3_1_OR_GREATER
 using System.Web.Adapters;
@@ -133,15 +134,11 @@ internal class SessionSerializer
         {
             writer.WriteStartObject();
 
-            foreach (var (key, value) in session.KeyValues)
+            foreach (var key in session.Keys)
             {
                 writer.WritePropertyName(key);
 
-                if (value is null)
-                {
-                    writer.WriteNullValue();
-                }
-                else
+                if (session[key] is { } value)
                 {
                     if (!_map.TryGetValue(key, out var type))
                     {
@@ -149,6 +146,10 @@ internal class SessionSerializer
                     }
 
                     JsonSerializer.Serialize(writer, value, type, options);
+                }
+                else
+                {
+                    writer.WriteNullValue();
                 }
             }
 
@@ -187,6 +188,9 @@ internal class SessionSerializer
 
         public bool IsAbandoned { get; set; }
 
+        [JsonIgnore]
+        public IEnumerable<string> Keys => _values?.Keys ?? Enumerable.Empty<string>();
+
         public bool IsSynchronized => ((ICollection)Values).IsSynchronized;
 
         public object SyncRoot => ((ICollection)Values).SyncRoot;
@@ -195,9 +199,9 @@ internal class SessionSerializer
 
         public void Add(string name, object value) => Values.Add(name, value);
 
-        public void Clear() => Values.Clear();
+        public void Clear() => _values?.Clear();
 
-        public void Remove(string name) => Values.Remove(name);
+        public void Remove(string name) => _values?.Remove(name);
 
         public ValueTask CommitAsync(CancellationToken token) => default;
 
@@ -218,16 +222,13 @@ internal class SessionSerializer
 
         public void Remove(string key) => BaseRemove(key);
 
-        public IEnumerable<(string, object?)> KeyValues
+        public new IEnumerable<string> Keys
         {
             get
             {
-                foreach (string? key in Keys)
+                foreach (var key in base.Keys)
                 {
-                    if (key is not null)
-                    {
-                        yield return (key, BaseGet(key));
-                    }
+                    yield return (string)key!;
                 }
             }
         }
