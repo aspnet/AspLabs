@@ -12,6 +12,8 @@ T:System.Web.Adapters.ISessionMetadata
 T:System.Web.Adapters.ISessionManager
 T:System.Web.Adapters.RemoteAppSessionStateExtensions
 T:System.Web.Adapters.SessionState.RemoteAppSessionStateOptions
+T:System.Web.Adapters.DelegatingSessionState
+T:System.Web.Adapters.SessionBehavior
 
 # Buffering
 T:System.Web.Adapters.BufferResponseStreamAttribute
