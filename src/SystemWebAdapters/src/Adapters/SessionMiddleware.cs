@@ -34,7 +34,7 @@ internal class SessionMiddleware
 #pragma warning disable CS0618 // Type or member is obsolete
         using var state = metadata.Behavior switch
         {
-            SessionBehavior.Eager => await manager.CreateAsync(context, metadata),
+            SessionBehavior.PreLoad => await manager.CreateAsync(context, metadata),
             SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
             var behavior => throw new InvalidOperationException($"Unknown session behavior {behavior}"),
         };
