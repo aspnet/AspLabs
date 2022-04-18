@@ -15,5 +15,5 @@ public interface ISessionManager
     /// </summary>
     /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
     /// <param name="readOnly">Whether the session should be created read-only.</param>
-    Task<ISessionState> CreateAsync(HttpContextCore context, bool readOnly);
+    Task<ISessionState> CreateAsync(HttpContextCore context, ISessionMetadata metadata);
 }

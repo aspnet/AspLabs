@@ -48,7 +48,7 @@ public class HttpContext : IServiceProvider
 
     public HttpSessionState? Session => _context.Features.Get<HttpSessionState>();
 
-    public object? GetService(Type service)
+    object? IServiceProvider.GetService(Type service)
     {
         if (service == typeof(HttpRequest))
         {

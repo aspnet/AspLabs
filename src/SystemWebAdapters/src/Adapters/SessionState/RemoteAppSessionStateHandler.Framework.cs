@@ -111,7 +111,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private async Task StoreSessionStateAsync(HttpContext context)
     {
         using var requestContent = context.Request.GetBufferlessInputStream();
-        var sessionData = await _serializer.DeserializeSessionStateAsync(requestContent).ConfigureAwait(false);
+        var sessionData = await _serializer.DeserializeAsync(requestContent).ConfigureAwait(false);
 
         var sessionId = GetSessionId(context.Request);
 
@@ -156,9 +156,9 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         session.Timeout = updatedSessionState.Timeout;
 
         session.Clear();
-        foreach (var (key, value) in updatedSessionState.Values.KeyValues)
+        foreach (var key in updatedSessionState.Values.Keys)
         {
-            session[key] = value;
+            session[key] = updatedSessionState.Values[key];
         }
     }
 

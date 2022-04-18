@@ -21,7 +21,7 @@ internal class SessionMiddleware
     }
 
     public Task InvokeAsync(HttpContextCore context)
-        => context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { IsEnabled: true } metadata
+        => context.GetEndpoint()?.Metadata.GetMetadata<ISessionMetadata>() is { Behavior: not SessionBehavior.None } metadata
             ? ManageStateAsync(context, metadata)
             : _next(context);
 
@@ -31,20 +31,51 @@ internal class SessionMiddleware
 
         var manager = context.RequestServices.GetRequiredService<ISessionManager>();
 
-        using var state = await manager.CreateAsync(context, metadata.IsReadOnly);
+#pragma warning disable CS0618 // Type or member is obsolete
+        using var state = metadata.Behavior switch
+        {
+            SessionBehavior.PreLoad => await manager.CreateAsync(context, metadata),
+            SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
+            var behavior => throw new InvalidOperationException($"Unknown session behavior {behavior}"),
+        };
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        context.Features.Set(new HttpSessionState(state));
 
         try
         {
-            context.Features.Set(new HttpSessionState(state));
             await _next(context);
         }
         finally
         {
-            if (!metadata.IsReadOnly)
+            context.Features.Set<HttpSessionState?>(null);
+
+            // Commit in the finally block so that session doesn't remain locked if
+            // an exception is thrown
+            await state.CommitAsync(context.RequestAborted);
+        }
+    }
+
+    private class LazySessionState : DelegatingSessionState
+    {
+        private readonly Lazy<ISessionState> _state;
+
+        public LazySessionState(HttpContextCore context, ILogger logger, ISessionMetadata metadata, ISessionManager manager)
+        {
+            _state = new Lazy<ISessionState>(() =>
             {
-                // If session access is not read-only, commit changes (if any)
-                // and release the session lock
-                await state.CommitAsync(context);
+                logger.LogWarning("Creating session on demand by synchronously waiting on a potential asynchronous connection");
+                return manager.CreateAsync(context, metadata).GetAwaiter().GetResult();
+            });
+        }
+
+        protected override ISessionState State => _state.Value;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_state.IsValueCreated)
+            {
+                base.Dispose(disposing);
             }
         }
     }

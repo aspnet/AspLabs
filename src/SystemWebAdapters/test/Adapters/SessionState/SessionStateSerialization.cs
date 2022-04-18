@@ -11,6 +11,26 @@ namespace System.Web.Adapters.SessionState;
 public class SessionStateSerialization
 {
     [Fact]
+    public async Task NewSession()
+    {
+        // Arrange
+        const string PayLoad = @"{
+    ""IsNewSession"": true,
+}";
+        var serializer = new SessionSerializer(new KeyDictionary());
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
+
+        // Act
+        var result = await serializer.DeserializeAsync(stream);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result!.Values);
+        Assert.True(result.IsNewSession);
+    }
+
+    [Fact]
     public async Task SingleValueInt()
     {
         // Arrange
@@ -30,7 +50,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeSessionStateAsync(stream);
+        var result = await serializer.DeserializeAsync(stream);
 
         // Assert
         Assert.NotNull(result);
@@ -56,7 +76,7 @@ public class SessionStateSerialization
         serializer.Options.WriteIndented = true;
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
-        var sessionState = await serializer.DeserializeSessionStateAsync(stream);
+        var sessionState = await serializer.DeserializeAsync(stream);
 
         var result = new MemoryStream();
 
@@ -65,6 +85,7 @@ public class SessionStateSerialization
         var str = SessionStateSerialization.GetStream(result);
 
         // Assert
+#if NETCOREAPP3_1
         const string Expected = @"{
   ""Abandon"": false,
   ""SessionID"": ""5"",
@@ -75,6 +96,15 @@ public class SessionStateSerialization
   ""Timeout"": 0,
   ""IsNewSession"": false
 }";
+
+#else
+        const string Expected = @"{
+  ""SessionID"": ""5"",
+  ""Values"": {
+    ""Key1"": 5
+  }
+}";
+#endif
         Assert.Equal(Expected, str);
     }
 
@@ -102,7 +132,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeSessionStateAsync(stream);
+        var result = await serializer.DeserializeAsync(stream);
 
         // Assert
         Assert.NotNull(result);
@@ -131,7 +161,7 @@ public class SessionStateSerialization
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
 
         // Act
-        var result = await serializer.DeserializeSessionStateAsync(stream);
+        var result = await serializer.DeserializeAsync(stream);
 
         // Assert
         var obj = Assert.IsType<SomeObject>(result!.Values["Key1"]);
@@ -140,10 +170,11 @@ public class SessionStateSerialization
     }
 
     private static void AssertValuesEqual((string, object?)[] expected, RemoteSessionData? result) =>
-    Assert.Collection(result!.Values.KeyValues, expected.Select<(string, object?), Action<(string, object?)>>(expected =>
+    Assert.Collection(result!.Values.Keys, expected.Select<(string, object?), Action<string>>(expected =>
                  actual =>
                  {
-                     Assert.Equal(expected.Item1, actual.Item1);
+                     Assert.Equal(expected.Item1, actual);
+                     Assert.Equal(expected.Item2, result.Values[actual]);
                  }).ToArray());
 
     private class SomeObject

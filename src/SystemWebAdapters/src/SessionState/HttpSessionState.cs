@@ -6,8 +6,7 @@ using System.Web.Adapters;
 
 namespace System.Web.SessionState;
 
-public class HttpSessionState
-    : ICollection
+public class HttpSessionState : ICollection
 {
     private readonly ISessionState _container;
 
@@ -24,15 +23,15 @@ public class HttpSessionState
 
     public bool IsNewSession { get; }
 
-    public int TimeOut
+    public int Timeout
     {
         get => _container.Timeout;
         set => _container.Timeout = value;
     }
 
-    public bool IsSynchronized => false;
+    public bool IsSynchronized => _container.IsSynchronized;
 
-    public object SyncRoot => this;
+    public object SyncRoot => _container.SyncRoot;
 
     public void Abandon() => _container.Abandon();
 
@@ -50,13 +49,7 @@ public class HttpSessionState
 
     public void Clear() => _container.Clear();
 
-    public void CopyTo(Array array, int index)
-    {
-        foreach (var keyName in this)
-        {
-            array.SetValue(keyName, index++);
-        }
-    }
+    public void CopyTo(Array array, int index) => _container.CopyTo(array, index);
 
     public IEnumerator GetEnumerator() => _container.Keys.GetEnumerator();
 }

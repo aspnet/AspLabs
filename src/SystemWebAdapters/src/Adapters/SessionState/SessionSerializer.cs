@@ -32,6 +32,10 @@ internal partial class SessionSerializer
     {
         Options = new JsonSerializerOptions
         {
+#if !NETCOREAPP3_1
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+#endif
+            AllowTrailingCommas = true,
             IgnoreReadOnlyProperties = true,
             Converters =
             {
@@ -42,12 +46,12 @@ internal partial class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-    public RemoteSessionData? DeserializeSessionState(string? jsonString)
+    public RemoteSessionData? Deserialize(string? jsonString)
         => jsonString?.Length > 0
         ? JsonSerializer.Deserialize<RemoteSessionData>(jsonString, Options)
         : null;
 
-    public async ValueTask<RemoteSessionData?> DeserializeSessionStateAsync(Stream stream)
+    public async ValueTask<RemoteSessionData?> DeserializeAsync(Stream stream)
         => stream?.Length > 0
         ? await JsonSerializer.DeserializeAsync<RemoteSessionData>(stream, Options)
         : null;
@@ -127,15 +131,11 @@ internal partial class SessionSerializer
         {
             writer.WriteStartObject();
 
-            foreach (var (key, value) in session.KeyValues)
+            foreach (var key in session.Keys)
             {
                 writer.WritePropertyName(key);
 
-                if (value is null)
-                {
-                    writer.WriteNullValue();
-                }
-                else
+                if (session[key] is { } value)
                 {
                     if (!_map.TryGetValue(key, out var type))
                     {
@@ -143,6 +143,10 @@ internal partial class SessionSerializer
                     }
 
                     JsonSerializer.Serialize(writer, value, type, options);
+                }
+                else
+                {
+                    writer.WriteNullValue();
                 }
             }
 

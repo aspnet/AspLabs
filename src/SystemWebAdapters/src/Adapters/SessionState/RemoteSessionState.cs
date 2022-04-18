@@ -56,7 +56,7 @@ internal class RemoteSessionState : ISessionState
         }
     }
 
-    public async Task CommitAsync(HttpContextCore context, CancellationToken cancellationToken = default)
+    public async ValueTask CommitAsync(CancellationToken cancellationToken = default)
     {
         if (RemoteData.IsReadOnly)
         {
@@ -65,7 +65,7 @@ internal class RemoteSessionState : ISessionState
         }
 
         using var timeout = new CancellationTokenSource(_options.NetworkTimeout);
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted, cancellationToken);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken);
 
         var sessionId = RemoteData.SessionID;
 
@@ -101,13 +101,16 @@ internal class RemoteSessionState : ISessionState
 
     public bool IsNewSession => RemoteData.IsNewSession;
 
-    public ICollection<string> Keys => RemoteData.Values.Keys.Cast<string>().ToList();
-
-    public ICollection<object?> Values => RemoteData.Values.KeyValues.Select(kvp => kvp.Value).ToList();
+    public IEnumerable<string> Keys => RemoteData.Values.Keys;
 
     public int Count => RemoteData.Values.Count;
 
     public bool IsReadOnly => RemoteData.IsReadOnly;
+
+    public bool IsSynchronized => false;
+
+    public object SyncRoot => this;
+
     public void Abandon() => RemoteData.Abandon = true;
 
     public void Add(string key, object? value) => RemoteData.Values[key] = value;
@@ -116,30 +119,13 @@ internal class RemoteSessionState : ISessionState
 
     public void Clear() => RemoteData.Values.Clear();
 
-    public bool Contains(KeyValuePair<string, object?> item) => RemoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(item.Key, item.Value)).Contains(item);
+    public bool Contains(KeyValuePair<string, object?> item) => ContainsKey(item.Key) && (this[item.Key]?.Equals(item.Value) ?? item.Value is null);
 
     public bool ContainsKey(string key) => RemoteData.Values.Keys.Cast<string>().Contains(key);
 
-    public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex)
-    {
-        foreach (var keyName in this)
-        {
-            array.SetValue(keyName, arrayIndex++);
-        }
-    }
+    public IEnumerator GetEnumerator() => RemoteData.Values.GetEnumerator();
 
-    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => RemoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(kvp.Key, kvp.Value)).GetEnumerator();
-
-    public bool Remove(string key)
-    {
-        if (ContainsKey(key))
-        {
-            RemoteData.Values.Remove(key);
-            return true;
-        }
-
-        return false;
-    }
+    public void Remove(string key) => RemoteData.Values.Remove(key);
 
     public bool Remove(KeyValuePair<string, object?> item)
     {
@@ -166,7 +152,7 @@ internal class RemoteSessionState : ISessionState
         }
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public void CopyTo(Array array, int index) => ((ICollection)RemoteData.Values).CopyTo(array, index);
 
     public void Dispose()
     {

@@ -8,6 +8,9 @@
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
     <RootNamespace>System.Web</RootNamespace>
+
+    <!-- This will validate that the package will unify correctly with System.Web.dll -->
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSystemWebAdapters()
     .AddRemoteAppSession(options =>
     {
-        options.RemoteApp = new("https://localhost:44339/fallback");
+        options.RemoteApp = new(builder.Configuration["ReverseProxy:Clusters:fallbackCluster:Destinations:fallbackApp:Address"]);
 
         ClassLibrary.SessionUtils.RegisterSessionKeys(options);
     });

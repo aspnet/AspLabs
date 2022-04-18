@@ -46,11 +46,7 @@ namespace System.Web
 
         public virtual Stream OutputStream => throw new NotImplementedException();
 
-        public virtual HttpCookieCollection Cookies
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+        public virtual HttpCookieCollection Cookies => throw new NotImplementedException();
 
         public virtual bool SuppressContent
         {
@@ -89,7 +85,5 @@ namespace System.Web
         public void Clear() => throw new NotImplementedException();
 
         public void ClearContent() => throw new NotImplementedException();
-
-        public virtual void Abort() => throw new NotImplementedException();
     }
 }

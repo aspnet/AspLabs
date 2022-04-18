@@ -41,7 +41,7 @@ internal class RemoteSessionService
         // RemoteAppSessionStateManager.CommitAsync is called.
         using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync());
         var json = await streamReader.ReadLineAsync();
-        var remoteSessionState = _serializer.DeserializeSessionState(json);
+        var remoteSessionState = _serializer.Deserialize(json);
 
         // Propagate headers back to the caller since a new session ID may have been set
         // by the remote app if there was no session active previously or if the previous

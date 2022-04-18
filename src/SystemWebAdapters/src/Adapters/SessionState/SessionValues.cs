@@ -11,16 +11,13 @@ internal class SessionValues : NameObjectCollectionBase
 
     public void Remove(string key) => BaseRemove(key);
 
-    public IEnumerable<(string Key, object? Value)> KeyValues
+    public new IEnumerable<string> Keys
     {
         get
         {
-            foreach (string? key in Keys)
+            foreach (var key in base.Keys)
             {
-                if (key is not null)
-                {
-                    yield return (key, BaseGet(key));
-                }
+                yield return (string)key!;
             }
         }
     }

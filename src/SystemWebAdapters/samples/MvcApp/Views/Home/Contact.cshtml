@@ -1,17 +1,22 @@
-﻿@{
+@{
     ViewBag.Title = "Contact";
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
+
+<p>
+    <b>Url:</b>&nbsp;@Context.Request.Url
+    <br />
+    <b>RawUrl:</b>&nbsp;@Context.Request.RawUrl
+    <br />
+    <b>REMOTE_ADDR:</b>&nbsp;@Context.Request.ServerVariables["REMOTE_ADDR"]
+    <br />
+    <b>REMOTE_HOST</b>&nbsp;@Context.Request.ServerVariables["REMOTE_HOST"]
+</p>
 
 <address>
     One Microsoft Way<br />
     Redmond, WA 98052-6399<br />
     <abbr title="Phone">P:</abbr>
     425.555.0100
-</address>
-
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
 </address>
