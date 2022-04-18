@@ -111,46 +111,13 @@ internal class RemoteSessionState : ISessionState
 
     public object SyncRoot => this;
 
-    public void Abandon() => RemoteData.Abandon = true;
+    public void Abandon() => RemoteData.IsAbandoned = true;
 
     public void Add(string key, object? value) => RemoteData.Values[key] = value;
 
-    public void Add(KeyValuePair<string, object?> item) => Add(item.Key, item.Value);
-
     public void Clear() => RemoteData.Values.Clear();
 
-    public bool Contains(KeyValuePair<string, object?> item) => ContainsKey(item.Key) && (this[item.Key]?.Equals(item.Value) ?? item.Value is null);
-
-    public bool ContainsKey(string key) => RemoteData.Values.Keys.Cast<string>().Contains(key);
-
-    public IEnumerator GetEnumerator() => RemoteData.Values.GetEnumerator();
-
     public void Remove(string key) => RemoteData.Values.Remove(key);
-
-    public bool Remove(KeyValuePair<string, object?> item)
-    {
-        if (Contains(item))
-        {
-            Remove(item.Key);
-            return true;
-        }
-
-        return false;
-    }
-
-    public bool TryGetValue(string key, out object? value)
-    {
-        if (ContainsKey(key))
-        {
-            value = this[key];
-            return true;
-        }
-        else
-        {
-            value = null;
-            return false;
-        }
-    }
 
     public void CopyTo(Array array, int index) => ((ICollection)RemoteData.Values).CopyTo(array, index);
 

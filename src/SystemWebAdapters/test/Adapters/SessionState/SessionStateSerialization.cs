@@ -87,7 +87,7 @@ public class SessionStateSerialization
         // Assert
 #if NETCOREAPP3_1
         const string Expected = @"{
-  ""Abandon"": false,
+  ""IsAbandoned"": false,
   ""SessionID"": ""5"",
   ""IsReadOnly"": false,
   ""Values"": {

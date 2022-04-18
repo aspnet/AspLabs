@@ -62,50 +62,60 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
         if (exclusive)
         {
-            // If session data is retrieved exclusively, then it needs sent to the client and
-            // this request needs to remain open while waiting for the client to either send updates
-            // or release the session without updates.
-            try
-            {
-                // Generate a channel to wait for session data updates
-                var responseTask = new TaskCompletionSource<RemoteSessionData?>();
-
-                // Cancel the task if this request is cancelled or timed out
-                cts.Token.Register(() => responseTask.SetCanceled());
-
-                // Update the channels dictionary with the new channel
-                SessionResponseTasks[context.Session.SessionID] = responseTask;
-
-                // Send the initial snapshot of session data
-                context.Response.ContentType = "text/event-stream";
-                context.Response.StatusCode = 200;
-                await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
-
-                // Delimit the json body with a new line to mark the end of content
-                context.Response.Write('\n');
-                await context.Response.FlushAsync().ConfigureAwait(false);
-
-                // Wait for up to request timeout for updated session state to be provided
-                // (or for null to be passed as updated session state to indicate no updates).
-                var updatedSessionState = await responseTask.Task.ConfigureAwait(false);
-                if (updatedSessionState is not null)
-                {
-                    UpdateSessionState(context.Session, updatedSessionState);
-                }
-            }
-            finally
-            {
-                SessionResponseTasks.TryRemove(context.Session.SessionID, out _);
-            }
+            await GetExclusiveSessionStateAsync(context, cts).ConfigureAwait(false);
         }
         else
         {
-            // If the session is retrieved non-exclusively, then no updates will be made and the
-            // session state can be returned directly, completing this request.
-            context.Response.ContentType = "application/json; charset=utf-8";
+            await GetNonExclusiveSessionStateAsync(context, cts).ConfigureAwait(false);
+        }
+    }
+
+    private async Task GetExclusiveSessionStateAsync(HttpContext context, CancellationTokenSource cts)
+    {
+        // If session data is retrieved exclusively, then it needs sent to the client and
+        // this request needs to remain open while waiting for the client to either send updates
+        // or release the session without updates.
+        try
+        {
+            // Generate a channel to wait for session data updates
+            var responseTask = new TaskCompletionSource<RemoteSessionData?>();
+
+            // Cancel the task if this request is cancelled or timed out
+            cts.Token.Register(() => responseTask.SetCanceled());
+
+            // Update the channels dictionary with the new channel
+            SessionResponseTasks[context.Session.SessionID] = responseTask;
+
+            // Send the initial snapshot of session data
+            context.Response.ContentType = "text/event-stream";
             context.Response.StatusCode = 200;
             await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
+
+            // Delimit the json body with a new line to mark the end of content
+            context.Response.Write('\n');
+            await context.Response.FlushAsync().ConfigureAwait(false);
+
+            // Wait for up to request timeout for updated session state to be provided
+            // (or for null to be passed as updated session state to indicate no updates).
+            var updatedSessionState = await responseTask.Task.ConfigureAwait(false);
+            if (updatedSessionState is not null)
+            {
+                UpdateSessionState(context.Session, updatedSessionState);
+            }
         }
+        finally
+        {
+            SessionResponseTasks.TryRemove(context.Session.SessionID, out _);
+        }
+    }
+
+    private async Task GetNonExclusiveSessionStateAsync(HttpContext context, CancellationTokenSource cts)
+    {
+        // If the session is retrieved non-exclusively, then no updates will be made and the
+        // session state can be returned directly, completing this request.
+        context.Response.ContentType = "application/json; charset=utf-8";
+        context.Response.StatusCode = 200;
+        await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, cts.Token).ConfigureAwait(false);
     }
 
     private async Task StoreSessionStateAsync(HttpContext context)
@@ -147,7 +157,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
     private void UpdateSessionState(HttpSessionState session, RemoteSessionData updatedSessionState)
     {
-        if (updatedSessionState.Abandon)
+        if (updatedSessionState.IsAbandoned)
         {
             session.Abandon();
             return;

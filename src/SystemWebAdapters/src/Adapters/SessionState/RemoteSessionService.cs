@@ -40,8 +40,7 @@ internal class RemoteSessionService
         // Only read until the first new line since the response is expected to remain open until
         // RemoteAppSessionStateManager.CommitAsync is called.
         using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync());
-        var json = await streamReader.ReadLineAsync();
-        var remoteSessionState = _serializer.Deserialize(json);
+        var remoteSessionState = await ReadSessionState(streamReader);
 
         // Propagate headers back to the caller since a new session ID may have been set
         // by the remote app if there was no session active previously or if the previous
@@ -54,6 +53,12 @@ internal class RemoteSessionService
         }
 
         return new RemoteSessionDataResponse(remoteSessionState, response);
+    }
+
+    private async Task<RemoteSessionData?> ReadSessionState(StreamReader streamReader)
+    {
+        var json = await streamReader.ReadLineAsync();
+        return _serializer.Deserialize(json);
     }
 
     public async Task SetOrReleaseSessionData(string sessionId, RemoteSessionData? remoteSessionData, CancellationToken cancellationToken = default)

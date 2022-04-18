@@ -5,7 +5,7 @@ namespace System.Web.Adapters.SessionState;
 
 internal class RemoteSessionData
 {
-    public bool Abandon { get; set; }
+    public bool IsAbandoned { get; set; }
 
     public string SessionID { get; set; } = null!;
 
