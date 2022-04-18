@@ -11,7 +11,7 @@ internal class RemoteSessionData
 
     public bool IsReadOnly { get; set; }
 
-    public SessionValues Values { get; set; } = null!;
+    public SessionValues Values { get; set; } = new SessionValues();
 
     public int Timeout { get; set; }
 
