@@ -6,7 +6,7 @@ namespace System.Web.Adapters;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public sealed class SessionAttribute : Attribute, ISessionMetadata
 {
-    public bool IsEnabled { get; set; } = true;
+    public SessionBehavior Behavior { get; set; } = SessionBehavior.PreLoad;
 
     public bool IsReadOnly { get; set; } = true;
 }

@@ -1,11 +1,11 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
+
 namespace System.Web.Adapters;
 
-public interface ISessionMetadata
+public interface ISystemWebAdapterBuilder
 {
-    SessionBehavior Behavior { get; }
-
-    bool IsReadOnly { get; }
+    ICollection<IHttpModule> Modules { get; }
 }

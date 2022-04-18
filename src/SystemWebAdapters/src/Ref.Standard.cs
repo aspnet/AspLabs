@@ -236,6 +236,7 @@ namespace System.Web
         public string MachineName { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public void ClearError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public System.Exception GetLastError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        [System.ObsoleteAttribute("Not implemented for ASP.NET Core")]
         public string MapPath(string path) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public static byte[] UrlTokenDecode(string input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public static string UrlTokenEncode(byte[] input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
@@ -246,9 +247,21 @@ namespace System.Web
         public virtual string MachineName { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public virtual void ClearError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual System.Exception GetLastError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        [System.ObsoleteAttribute("Not implemented for ASP.NET Core")]
         public virtual string MapPath(string path) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual byte[] UrlTokenDecode(string input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public virtual string UrlTokenEncode(byte[] input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+    }
+    public partial class HttpServerUtilityWrapper : System.Web.HttpServerUtilityBase
+    {
+        public HttpServerUtilityWrapper(System.Web.HttpServerUtility utility) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public override string MachineName { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public override void ClearError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public override System.Exception GetLastError() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        [System.ObsoleteAttribute("Not implemented for ASP.NET Core")]
+        public override string MapPath(string path) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public override byte[] UrlTokenDecode(string input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public override string UrlTokenEncode(byte[] input) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
     public abstract partial class HttpSessionStateBase
     {
@@ -336,18 +349,22 @@ namespace System.Web.Caching
 }
 namespace System.Web.SessionState
 {
-    public partial class HttpSessionState
+    public partial class HttpSessionState : System.Collections.ICollection, System.Collections.IEnumerable
     {
         internal HttpSessionState() { }
         public int Count { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsNewSession { [System.Runtime.CompilerServices.CompilerGeneratedAttribute]get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public bool IsReadOnly { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public bool IsSynchronized { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public object this[string name] { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public string SessionID { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        public object SyncRoot { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public int Timeout { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} set { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
         public void Abandon() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Add(string name, object value) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Clear() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public void CopyTo(System.Array array, int index) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public System.Collections.IEnumerator GetEnumerator() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }

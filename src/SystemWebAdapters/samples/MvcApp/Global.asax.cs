@@ -1,4 +1,4 @@
-using System.Web.Adapters.SessionState;
+using System.Web.Adapters;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -16,7 +16,9 @@ namespace MvcApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            Application.ConfigureRemoteSession(ClassLibrary.SessionUtils.RegisterSessionKeys);
+            Application.AddSystemWebAdapters()
+                .AddProxySupport(options => options.UseForwardedHeaders = true)
+                .AddRemoteSession(ClassLibrary.SessionUtils.RegisterSessionKeys);
         }
     }
 }

@@ -7,13 +7,13 @@
     </modules>
   </system.webServer>
 
-  <!-- If system.webServer tag is present, but handlers tag is absent -->
+  <!-- If system.webServer tag is present, but modules tag is absent -->
   <system.webServer>
     <modules xdt:Transform="InsertIfMissing">
     </modules>
   </system.webServer>
 
-  <!-- If the handler is already present, the existing entry needs to be removed before inserting the new entry-->
+  <!-- If the modules tag is already present, the existing entry needs to be removed before inserting the new entry -->
   <system.webServer>
     <modules>
       <remove xdt:Transform="Remove"
@@ -25,7 +25,7 @@
     </modules>
   </system.webServer>
 
-  <!-- Inserting the handler -->
+  <!-- Insert the module -->
   <system.webServer>
     <modules>
       <remove xdt:Transform="Insert" name="SystemWebAdapterModule" />

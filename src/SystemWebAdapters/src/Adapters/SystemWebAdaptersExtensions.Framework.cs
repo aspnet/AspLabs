@@ -1,31 +1,52 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace System.Web.Adapters.SessionState;
+using System.Collections.Generic;
+using System.Web.Adapters.SessionState;
+
+namespace System.Web.Adapters;
 
 public static class SystemWebAdaptersExtensions
 {
-    private const string RemoteAppSessionOptions = "system-web-adapter-remote-app-session-options";
+    private const string Key = "system-web-adapter-builder";
 
-    internal static RemoteAppSessionStateOptions? GetRemoteSessionOptions(this HttpApplicationState state)
-        => state.Get<RemoteAppSessionStateOptions>(RemoteAppSessionOptions);
-
-    public static HttpApplicationState ConfigureRemoteSession(this HttpApplicationState state, Action<RemoteAppSessionStateOptions> configure)
-        => state.ConfigureState(RemoteAppSessionOptions, configure);
-
-    private static T? Get<T>(this HttpApplicationState state, string name) => state[name] is T result ? result : default;
-
-    private static HttpApplicationState ConfigureState<T>(this HttpApplicationState state, string name, Action<T> configure)
-        where T : new()
+    public static ISystemWebAdapterBuilder AddSystemWebAdapters(this HttpApplicationState state)
     {
-        if (state[name] is not T existing)
+        if (state[Key] is not ISystemWebAdapterBuilder builder)
         {
-            existing = new();
-            state[name] = existing;
+            builder = new Builder();
+            state[Key] = builder;
         }
 
-        configure(existing);
+        return builder;
+    }
 
-        return state;
+    public static ISystemWebAdapterBuilder AddProxySupport(this ISystemWebAdapterBuilder builder, Action<ProxyOptions> configure)
+        => builder.AddModule(configure, static options => new ProxyHeaderModule(options));
+
+    public static ISystemWebAdapterBuilder AddRemoteSession(this ISystemWebAdapterBuilder builder, Action<RemoteAppSessionStateOptions> configure)
+        => builder.AddModule(configure, static options => new RemoteSessionModule(options));
+
+    internal static ISystemWebAdapterBuilder? GetSystemWebBuilder(this HttpApplicationState state)
+        => state[Key] as ISystemWebAdapterBuilder;
+
+    private static ISystemWebAdapterBuilder AddModule<TOptions>(this ISystemWebAdapterBuilder builder, Action<TOptions> configure, Func<TOptions, IHttpModule> factory)
+        where TOptions : class, new()
+    {
+        var options = new TOptions();
+        configure(options);
+
+        return builder.AddModule(factory(options));
+    }
+
+    private static ISystemWebAdapterBuilder AddModule(this ISystemWebAdapterBuilder builder, IHttpModule module)
+    {
+        builder.Modules.Add(module);
+        return builder;
+    }
+
+    private class Builder : ISystemWebAdapterBuilder
+    {
+        public ICollection<IHttpModule> Modules { get; } = new List<IHttpModule>();
     }
 }

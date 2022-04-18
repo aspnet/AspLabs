@@ -10,6 +10,26 @@ namespace System.Web.Adapters.SessionState;
 public class SessionStateSerialization
 {
     [Fact]
+    public async Task NewSession()
+    {
+        // Arrange
+        const string PayLoad = @"{
+    ""IsNewSession"": true,
+}";
+        var serializer = new SessionSerializer(new KeyDictionary());
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(PayLoad));
+
+        // Act
+        var result = await serializer.DeserializeAsync(stream);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(0, result!.Count);
+        Assert.True(result.IsNewSession);
+    }
+
+    [Fact]
     public async Task SingleValueInt()
     {
         // Arrange
@@ -63,17 +83,26 @@ public class SessionStateSerialization
         var str = GetStream(result);
 
         // Assert
+#if NETCOREAPP3_1
         const string Expected = @"{
   ""SessionID"": ""5"",
   ""IsReadOnly"": false,
   ""Values"": {
     ""Key1"": 5
   },
-  ""Count"": 1,
   ""Timeout"": 0,
   ""IsNewSession"": false,
   ""IsAbandoned"": false
 }";
+
+#else
+        const string Expected = @"{
+  ""SessionID"": ""5"",
+  ""Values"": {
+    ""Key1"": 5
+  }
+}";
+#endif
         Assert.Equal(Expected, str);
     }
 
