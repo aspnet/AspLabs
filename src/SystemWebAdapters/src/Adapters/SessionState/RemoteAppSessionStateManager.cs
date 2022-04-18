@@ -23,14 +23,6 @@ internal class RemoteAppSessionStateManager : ISessionManager
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
     }
 
-    public async Task<ISessionState> CreateAsync(HttpContextCore context, bool readOnly)
-    {
-        var state = new RemoteSessionState(_remoteSessionService, _options.Value, _loggerFactory.CreateLogger<RemoteSessionState>());
-
-        // Load session items from the remote app eagerly here
-        // to avoid needing to retrieve them later (during synchronous calls)
-        await state.LoadAsync(context, readOnly);
-
-        return state;
-    }
+    public async Task<ISessionState> CreateAsync(HttpContextCore context, bool readOnly) =>
+        await RemoteSessionState.CreateAsync(context, readOnly, _remoteSessionService, _options.Value, _loggerFactory.CreateLogger<RemoteSessionState>());
 }

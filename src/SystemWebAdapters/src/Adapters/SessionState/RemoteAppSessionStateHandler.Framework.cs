@@ -3,7 +3,6 @@
 
 using System.Collections.Concurrent;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Web.SessionState;
 
@@ -15,7 +14,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private readonly SessionSerializer _serializer;
 
     // Track locked sessions awaiting updates or release
-    private static readonly ConcurrentDictionary<string, Channel<RemoteSessionData?>> SessionDataChannels = new();
+    private static readonly ConcurrentDictionary<string, TaskCompletionSource<RemoteSessionData?>> SessionResponseTasks = new();
 
     public override bool IsReusable => true;
 
@@ -69,10 +68,13 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             try
             {
                 // Generate a channel to wait for session data updates
-                var responseChannel = Channel.CreateBounded<RemoteSessionData?>(1);
+                var responseTask = new TaskCompletionSource<RemoteSessionData?>();
+
+                // Cancel the task if this request is cancelled or timed out
+                cts.Token.Register(() => responseTask.SetCanceled());
 
                 // Update the channels dictionary with the new channel
-                SessionDataChannels[context.Session.SessionID] = responseChannel;
+                SessionResponseTasks[context.Session.SessionID] = responseTask;
 
                 // Send the initial snapshot of session data
                 context.Response.ContentType = "text/event-stream";
@@ -85,7 +87,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
                 // Wait for up to request timeout for updated session state to be provided
                 // (or for null to be passed as updated session state to indicate no updates).
-                var updatedSessionState = await responseChannel.Reader.ReadAsync(cts.Token).ConfigureAwait(false);
+                var updatedSessionState = await responseTask.Task.ConfigureAwait(false);
                 if (updatedSessionState is not null)
                 {
                     UpdateSessionState(context.Session, updatedSessionState);
@@ -93,7 +95,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             }
             finally
             {
-                SessionDataChannels.TryRemove(context.Session.SessionID, out _);
+                SessionResponseTasks.TryRemove(context.Session.SessionID, out _);
             }
         }
         else
@@ -124,12 +126,10 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
         // Get the channel that will be used to write the updated session data
         // to the in-progress request that will update session data
-        if (SessionDataChannels.TryGetValue(sessionId, out var channel))
+        if (SessionResponseTasks.TryGetValue(sessionId, out var responseTask))
         {
-            if (channel.Writer.TryWrite(sessionData))
+            if (responseTask.TrySetResult(sessionData))
             {
-                // Mark the WriteChannel as complete since only one session update is expected
-                channel.Writer.TryComplete();
                 context.Response.StatusCode = 200;
             }
             else

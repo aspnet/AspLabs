@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -15,71 +13,52 @@ internal class RemoteSessionState : ISessionState
     private readonly RemoteSessionService _remoteSessionService;
     private readonly RemoteAppSessionStateOptions _options;
     private readonly ILogger<RemoteSessionState> _logger;
-    private readonly SemaphoreSlim _remoteLoadSemaphore = new(1, 1);
 
-    private bool _loaded;
-    private HttpResponseMessage? _response;
+    private readonly RemoteSessionDataResponse _remoteDataResponse;
 
-    private RemoteSessionData? _remoteData;
+    private RemoteSessionData RemoteData => _remoteDataResponse.RemoteSessionData;
 
-    public RemoteSessionState(RemoteSessionService remoteSessionService, RemoteAppSessionStateOptions options, ILogger<RemoteSessionState> logger)
+    private RemoteSessionState(RemoteSessionDataResponse remoteDataResponse, RemoteSessionService remoteSessionService, RemoteAppSessionStateOptions options, ILogger<RemoteSessionState> logger)
     {
+        _remoteDataResponse = remoteDataResponse ?? throw new ArgumentNullException(nameof(remoteDataResponse));
         _remoteSessionService = remoteSessionService ?? throw new ArgumentNullException(nameof(remoteSessionService));
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task LoadAsync(HttpContextCore context, bool readOnly, CancellationToken cancellationToken = default)
+    public static async Task<RemoteSessionState> CreateAsync(HttpContextCore context,
+                                                      bool readOnly,
+                                                      RemoteSessionService remoteSessionService,
+                                                      RemoteAppSessionStateOptions options,
+                                                      ILogger<RemoteSessionState> logger,
+                                                      CancellationToken cancellationToken = default)
     {
-        if (!_loaded)
+        using var timeout = new CancellationTokenSource(options.NetworkTimeout);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted, cancellationToken);
+
+        // If an existing remote session ID is present in the request, use its session ID.
+        // Otherwise, leave session ID null for now; it will be provided by the remote service
+        // when session data is loaded.
+        var sessionId = context.Request.Cookies[options.CookieName];
+
+        try
         {
-            using var timeout = new CancellationTokenSource(_options.NetworkTimeout);
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted, cancellationToken);
+            // Get or create session data
+            var response = await remoteSessionService.GetSessionDataAsync(sessionId, readOnly, context, cts.Token);
+            logger.LogDebug("Loaded {SessionItemCount} items from remote session state for session {SessionId}", response.RemoteSessionData.Values.Count, sessionId);
 
-            // Ensure that session state is only loaded once, even if multiple threads attempt to access session state simultaneously.
-            // Even though ASP.NET Core request handling is usually expected to be single-threaded, it's good to guarantee only one thread
-            // loads session data since if two threads were to make the call one would end up blocked waiting for the session state to
-            // unlock.
-            await _remoteLoadSemaphore.WaitAsync(cts.Token);
-
-            // If an existing remote session ID is present in the request, use its session ID.
-            // Otherwise, leave session ID null for now; it will be provided by the remote service
-            // when session data is loaded.
-            var sessionId = context.Request.Cookies[_options.CookieName];
-
-            try
-            {
-                if (!_loaded)
-                {
-                    // Get or create session data
-                    var response = await _remoteSessionService.GetSessionDataAsync(sessionId, readOnly, context, cts.Token);
-                    _remoteData = response.RemoteSessionData;
-                    _response = response.HttpRespone;
-                    _logger.LogDebug("Loaded {SessionItemCount} items from remote session state for session {SessionId}", _remoteData.Values.Count, sessionId);
-                }
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(exc, "Unable to load remote session state for session {SessionId}", sessionId);
-                throw;
-            }
-            finally
-            {
-                _loaded = true;
-                _remoteLoadSemaphore.Release();
-            }
+            return new RemoteSessionState(response, remoteSessionService, options, logger);
+        }
+        catch (Exception exc)
+        {
+            logger.LogError(exc, "Unable to load remote session state for session {SessionId}", sessionId);
+            throw;
         }
     }
 
     public async Task CommitAsync(HttpContextCore context, CancellationToken cancellationToken = default)
     {
-        if (!_loaded || _remoteData is null)
-        {
-            _logger.LogInformation("No session available to commit");
-            return;
-        }
-
-        if (_remoteData.IsReadOnly)
+        if (RemoteData.IsReadOnly)
         {
             _logger.LogDebug("Skipping commit for read-only session");
             return;
@@ -88,13 +67,11 @@ internal class RemoteSessionState : ISessionState
         using var timeout = new CancellationTokenSource(_options.NetworkTimeout);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, context.RequestAborted, cancellationToken);
 
-        var sessionId = _remoteData.SessionID;
+        var sessionId = RemoteData.SessionID;
 
         try
         {
-            // Note that this is not thread safe and callers should not be writing session state while committing
-            await _remoteSessionService.SetOrReleaseSessionData(sessionId, _remoteData, cts.Token);
-            _remoteData = null;
+            await _remoteSessionService.SetOrReleaseSessionData(sessionId, RemoteData, cts.Token);
             _logger.LogDebug("Set items and released lock for session {SessionId}", sessionId);
         }
         catch (Exception exc)
@@ -104,148 +81,60 @@ internal class RemoteSessionState : ISessionState
         }
         finally
         {
-            _response?.Dispose();
-            _response = null;
+            _remoteDataResponse.Dispose();
         }
     }
 
-    [MemberNotNullWhen(true, nameof(_remoteData))]
-    public bool IsAvailable => _remoteData is not null;
-
-    public string SessionID
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.SessionID;
-        }
-    }
+    public string SessionID => RemoteData.SessionID;
 
     public object? this[string key]
     {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.Values[key];
-        }
-        set
-        {
-            ThrowIfNotAvailable();
-            _remoteData.Values[key] = value;
-        }
+        get => RemoteData.Values[key];
+        set => RemoteData.Values[key] = value;
     }
 
     public int Timeout
     {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.Timeout;
-        }
-        set
-        {
-            ThrowIfNotAvailable();
-            _remoteData.Timeout = value;
-        }
+        get => RemoteData.Timeout;
+        set => RemoteData.Timeout = value;
     }
 
-    public bool IsNewSession
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.IsNewSession;
-        }
-    }
+    public bool IsNewSession => RemoteData.IsNewSession;
 
-    public ICollection<string> Keys
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.Values.Keys.Cast<string>().ToList();
-        }
-    }
+    public ICollection<string> Keys => RemoteData.Values.Keys.Cast<string>().ToList();
 
-    public ICollection<object?> Values
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.Values.KeyValues.Select(kvp => kvp.Value).ToList();
-        }
-    }
+    public ICollection<object?> Values => RemoteData.Values.KeyValues.Select(kvp => kvp.Value).ToList();
 
-    public int Count
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.Values.Count;
-        }
-    }
+    public int Count => RemoteData.Values.Count;
 
-    public bool IsReadOnly
-    {
-        get
-        {
-            ThrowIfNotAvailable();
-            return _remoteData.IsReadOnly;
-        }
-    }
+    public bool IsReadOnly => RemoteData.IsReadOnly;
+    public void Abandon() => RemoteData.Abandon = true;
 
-    public void Abandon()
-    {
-        ThrowIfNotAvailable();
-        _remoteData.Abandon = true;
-    }
-
-    public void Add(string key, object? value)
-    {
-        ThrowIfNotAvailable();
-        _remoteData.Values[key] = value;
-    }
+    public void Add(string key, object? value) => RemoteData.Values[key] = value;
 
     public void Add(KeyValuePair<string, object?> item) => Add(item.Key, item.Value);
 
-    public void Clear()
-    {
-        ThrowIfNotAvailable();
-        _remoteData.Values.Clear();
-    }
-    public bool Contains(KeyValuePair<string, object?> item)
-    {
-        ThrowIfNotAvailable();
-        return _remoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(item.Key, item.Value)).Contains(item);
-    }
+    public void Clear() => RemoteData.Values.Clear();
 
-    public bool ContainsKey(string key)
-    {
-        ThrowIfNotAvailable();
-        return _remoteData.Values.Keys.Cast<string>().Contains(key);
-    }
+    public bool Contains(KeyValuePair<string, object?> item) => RemoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(item.Key, item.Value)).Contains(item);
+
+    public bool ContainsKey(string key) => RemoteData.Values.Keys.Cast<string>().Contains(key);
 
     public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex)
     {
-        ThrowIfNotAvailable();
         foreach (var keyName in this)
         {
             array.SetValue(keyName, arrayIndex++);
         }
     }
 
-    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
-    {
-        ThrowIfNotAvailable();
-        return _remoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(kvp.Key, kvp.Value)).GetEnumerator();
-    }
+    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => RemoteData.Values.KeyValues.Select(kvp => KeyValuePair.Create(kvp.Key, kvp.Value)).GetEnumerator();
 
     public bool Remove(string key)
     {
-        ThrowIfNotAvailable();
         if (ContainsKey(key))
         {
-            _remoteData.Values.Remove(key);
+            RemoteData.Values.Remove(key);
             return true;
         }
 
@@ -254,7 +143,6 @@ internal class RemoteSessionState : ISessionState
 
     public bool Remove(KeyValuePair<string, object?> item)
     {
-        ThrowIfNotAvailable();
         if (Contains(item))
         {
             Remove(item.Key);
@@ -282,15 +170,6 @@ internal class RemoteSessionState : ISessionState
 
     public void Dispose()
     {
-        _response?.Dispose();
-    }
-
-    [MemberNotNull(nameof(_remoteData))]
-    private void ThrowIfNotAvailable()
-    {
-        if (!IsAvailable)
-        {
-            throw new InvalidOperationException("No session state is currently loaded and uncommitted");
-        }
+        _remoteDataResponse?.Dispose();
     }
 }

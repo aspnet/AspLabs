@@ -2,7 +2,7 @@ using System.Net.Http;
 
 namespace System.Web.Adapters.SessionState;
 
-internal class RemoteSessionDataResponse
+internal class RemoteSessionDataResponse: IDisposable
 {
     public RemoteSessionData RemoteSessionData { get; }
     public HttpResponseMessage HttpRespone { get; }
@@ -12,4 +12,6 @@ internal class RemoteSessionDataResponse
         RemoteSessionData = remoteSessionData;
         HttpRespone = httpResponse;
     }
+
+    public void Dispose() => HttpRespone.Dispose();
 }

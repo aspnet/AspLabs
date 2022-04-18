@@ -13,8 +13,6 @@ namespace System.Web.Adapters;
 /// </summary>
 public interface ISessionState : IDictionary<string, object?>, IDisposable
 {
-    bool IsAvailable { get; }
-
     string SessionID { get; }
 
     int Timeout { get; set; }
@@ -22,8 +20,6 @@ public interface ISessionState : IDictionary<string, object?>, IDisposable
     bool IsNewSession { get; }
 
     void Abandon();
-
-    Task LoadAsync(HttpContextCore context, bool readOnly, CancellationToken cancellationToken = default);
 
     Task CommitAsync(HttpContextCore context, CancellationToken cancellationToken = default);
 }
