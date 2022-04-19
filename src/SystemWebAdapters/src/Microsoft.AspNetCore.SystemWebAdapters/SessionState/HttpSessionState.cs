@@ -33,7 +33,7 @@ public class HttpSessionState : ICollection
 
     public object SyncRoot => _container.SyncRoot;
 
-    public void Abandon() => _container.Abandon();
+    public void Abandon() => _container.IsAbandoned = true;
 
     public object? this[string name]
     {
@@ -49,7 +49,13 @@ public class HttpSessionState : ICollection
 
     public void Clear() => _container.Clear();
 
-    public void CopyTo(Array array, int index) => _container.CopyTo(array, index);
+    public void CopyTo(Array array, int index)
+    {
+        foreach (var key in _container.Keys)
+        {
+            array.SetValue(_container[key], index++);
+        }
+    }
 
     public IEnumerator GetEnumerator() => _container.Keys.GetEnumerator();
 }

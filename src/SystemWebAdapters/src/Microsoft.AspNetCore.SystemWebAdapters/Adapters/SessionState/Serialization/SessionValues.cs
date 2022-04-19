@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState;
+namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 
 internal class SessionValues : NameObjectCollectionBase
 {

@@ -47,9 +47,9 @@
     <Compile Remove="**/*" />
     <Compile Include="@(FrameworkFiles)" />
     <Compile Include="Adapters/SessionState/RemoteSession/RemoteAppSessionStateOptions.cs" />
-    <Compile Include="Adapters/SessionState/RemoteSession/RemoteSessionData.cs" />
-    <Compile Include="Adapters/SessionState/SessionValues.cs" />
-    <Compile Include="Adapters/SessionState/SessionSerializer.cs" />
+    <Compile Include="Adapters/SessionState/Serialization/SessionValues.cs" />
+    <Compile Include="Adapters/SessionState/Serialization/SerializedSessionState.cs" />
+    <Compile Include="Adapters/SessionState/Serialization/SessionSerializer.Shared.cs" />
 
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
