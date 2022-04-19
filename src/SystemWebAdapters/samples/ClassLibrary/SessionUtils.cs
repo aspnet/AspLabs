@@ -1,4 +1,4 @@
-using System.Web.Adapters.SessionState;
+using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
 namespace ClassLibrary;
 
@@ -8,5 +8,6 @@ public class SessionUtils
     {
         options.ApiKey = "test-key";
         options.RegisterKey<int>("test-value");
+        options.RegisterKey<SessionDemoModel>("SampleSessionItem");
     }
 }
