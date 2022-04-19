@@ -81,7 +81,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
             var responseTask = new TaskCompletionSource<RemoteSessionData?>();
 
             // Cancel the task if this request is cancelled or timed out
-            cts.Token.Register(() => responseTask.SetCanceled());
+            using var cancellationRegistration = cts.Token.Register(() => responseTask.TrySetCanceled());
 
             // Update the channels dictionary with the new channel
             SessionResponseTasks[context.Session.SessionID] = responseTask;

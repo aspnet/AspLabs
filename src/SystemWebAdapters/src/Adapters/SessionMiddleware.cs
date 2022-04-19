@@ -32,7 +32,7 @@ internal class SessionMiddleware
         var manager = context.RequestServices.GetRequiredService<ISessionManager>();
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        using var state = metadata.Behavior switch
+        await using var state = metadata.Behavior switch
         {
             SessionBehavior.PreLoad => await manager.CreateAsync(context, metadata),
             SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
@@ -45,14 +45,16 @@ internal class SessionMiddleware
         try
         {
             await _next(context);
+
+            // Commit changes to session state and release the lock
+            // If _next throws an exception, the session state's
+            // IDisposeAsync method is expected to release the lock
+            // instead without committing changes.
+            await state.CommitAsync(context.RequestAborted);
         }
         finally
         {
             context.Features.Set<HttpSessionState?>(null);
-
-            // Commit in the finally block so that session doesn't remain locked if
-            // an exception is thrown
-            await state.CommitAsync(context.RequestAborted);
         }
     }
 
@@ -71,11 +73,11 @@ internal class SessionMiddleware
 
         protected override ISessionState State => _state.Value;
 
-        protected override void Dispose(bool disposing)
+        protected override async ValueTask DisposeAsyncCore()
         {
             if (_state.IsValueCreated)
             {
-                base.Dispose(disposing);
+                await base.DisposeAsyncCore();
             }
         }
     }

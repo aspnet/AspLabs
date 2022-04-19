@@ -8,13 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Adapters.SessionState;
 
-internal class RemoteSessionState : ISessionState
+internal sealed class RemoteSessionState : ISessionState
 {
     private readonly RemoteSessionService _remoteSessionService;
     private readonly RemoteAppSessionStateOptions _options;
     private readonly ILogger<RemoteSessionState> _logger;
-
     private readonly RemoteSessionDataResponse _remoteDataResponse;
+
+    private int _committed;
 
     private RemoteSessionData RemoteData => _remoteDataResponse.RemoteSessionData;
 
@@ -56,8 +57,19 @@ internal class RemoteSessionState : ISessionState
         }
     }
 
-    public async ValueTask CommitAsync(CancellationToken cancellationToken = default)
+    public ValueTask CommitAsync(CancellationToken cancellationToken = default)
+        => CommitAsync(RemoteData, cancellationToken);
+
+    // Commits changes to the server. Passing null RemoteSessionData will release the session lock
+    // but not update session data.
+    private async ValueTask CommitAsync(RemoteSessionData? remoteData, CancellationToken cancellationToken = default)
     {
+        if (Interlocked.Exchange(ref _committed, 1) == 1)
+        {
+            // Already committed
+            return;
+        }
+
         if (RemoteData.IsReadOnly)
         {
             _logger.LogDebug("Skipping commit for read-only session");
@@ -71,7 +83,7 @@ internal class RemoteSessionState : ISessionState
 
         try
         {
-            await _remoteSessionService.SetOrReleaseSessionData(sessionId, RemoteData, cts.Token);
+            await _remoteSessionService.SetOrReleaseSessionData(sessionId, remoteData, cts.Token);
             _logger.LogDebug("Set items and released lock for session {SessionId}", sessionId);
         }
         catch (Exception exc)
@@ -121,8 +133,6 @@ internal class RemoteSessionState : ISessionState
 
     public void CopyTo(Array array, int index) => ((ICollection)RemoteData.Values).CopyTo(array, index);
 
-    public void Dispose()
-    {
-        _remoteDataResponse?.Dispose();
-    }
+    public ValueTask DisposeAsync() =>
+        CommitAsync(null, default);
 }

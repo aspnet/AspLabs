@@ -11,7 +11,7 @@ namespace System.Web.Adapters;
 /// <summary>
 /// Represents the state of a session and is used to create a <see cref="HttpSessionState"/>.
 /// </summary>
-public interface ISessionState : IDisposable
+public interface ISessionState : IAsyncDisposable
 {
     string SessionID { get; }
 
