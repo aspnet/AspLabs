@@ -4,7 +4,7 @@
 using System;
 using System.Web;
 
-namespace Microsoft.AspNetCore.SystemWebAdapters.Modules;
+namespace Microsoft.AspNetCore.SystemWebAdapters;
 
 internal class ProxyHeaderModule : IHttpModule
 {
