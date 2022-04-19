@@ -7,9 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Specialized;
-using System.Collections;
-using System.Linq;
 
 #if NETCOREAPP3_1_OR_GREATER
 using System.Web.Adapters;
@@ -22,7 +19,7 @@ using System.Web.SessionState;
 
 namespace System.Web.Adapters.SessionState;
 
-internal class SessionSerializer
+internal partial class SessionSerializer
 {
 #if NETCOREAPP3_1_OR_GREATER
     public SessionSerializer(IOptions<RemoteAppSessionStateOptions> options)
@@ -49,17 +46,20 @@ internal class SessionSerializer
 
     public JsonSerializerOptions Options { get; }
 
-#if NETCOREAPP3_1_OR_GREATER
-    public async ValueTask<ISessionState?> DeserializeAsync(Stream stream)
-        => await JsonSerializer.DeserializeAsync<SessionState>(stream, Options);
+    public RemoteSessionData? Deserialize(string? jsonString)
+        => jsonString?.Length > 0
+        ? JsonSerializer.Deserialize<RemoteSessionData>(jsonString, Options)
+        : null;
 
-    public async ValueTask SerializeAsync(ISessionState sessionState, Stream stream, CancellationToken token)
+    public async ValueTask<RemoteSessionData?> DeserializeAsync(Stream stream)
+        => stream?.Length > 0
+        ? await JsonSerializer.DeserializeAsync<RemoteSessionData>(stream, Options)
+        : null;
+
+    public async ValueTask SerializeAsync(RemoteSessionData remoteSessionState, Stream stream, CancellationToken token)
     {
-        var session = (SessionState)sessionState;
-
-        await JsonSerializer.SerializeAsync(stream, session, Options, token);
+        await JsonSerializer.SerializeAsync(stream, remoteSessionState, Options, token);
     }
-#endif
 
 #if NET472
     public async ValueTask SerializeAsync(HttpSessionState state, Stream stream, CancellationToken token)
@@ -76,7 +76,7 @@ internal class SessionSerializer
             values.Add(key, state[key]);
         }
 
-        var session = new SessionState
+        var session = new RemoteSessionData
         {
             IsNewSession = state.IsNewSession,
             IsReadOnly = state.IsReadOnly,
@@ -121,10 +121,7 @@ internal class SessionSerializer
                     throw new InvalidOperationException();
                 }
 
-                if (JsonSerializer.Deserialize(ref reader, type, options) is { } result)
-                {
-                    state.Add(key, result);
-                }
+                state.Add(key, JsonSerializer.Deserialize(ref reader, type, options));
             }
 
             return state;
@@ -154,89 +151,6 @@ internal class SessionSerializer
             }
 
             writer.WriteEndObject();
-        }
-    }
-
-    private class SessionState
-#if NETCOREAPP3_1_OR_GREATER
-        : ISessionState
-#endif
-    {
-        private SessionValues? _values;
-
-        public object? this[string name]
-        {
-            get => Values[name];
-            set => Values[name] = value;
-        }
-
-        public string SessionID { get; set; } = null!;
-
-        public bool IsReadOnly { get; set; }
-
-        public SessionValues Values
-        {
-            get => _values ??= new();
-            set => _values = value;
-        }
-
-        public int Count => Values.Count;
-
-        public int Timeout { get; set; }
-
-        public bool IsNewSession { get; set; }
-
-        public bool IsAbandoned { get; set; }
-
-        [JsonIgnore]
-        public IEnumerable<string> Keys => _values?.Keys ?? Enumerable.Empty<string>();
-
-        public bool IsSynchronized => ((ICollection)Values).IsSynchronized;
-
-        public object SyncRoot => ((ICollection)Values).SyncRoot;
-
-        public void Abandon() => IsAbandoned = true;
-
-        public void Add(string name, object value) => Values.Add(name, value);
-
-        public void Clear() => _values?.Clear();
-
-        public void Remove(string name) => _values?.Remove(name);
-
-        public ValueTask CommitAsync(CancellationToken token) => default;
-
-        public void Dispose()
-        {
-        }
-
-        public void CopyTo(Array array, int index) => ((ICollection)Values).CopyTo(array, index);
-
-        public IEnumerator GetEnumerator() => Values.GetEnumerator();
-    }
-
-    private class SessionValues : NameObjectCollectionBase
-    {
-        public void Add(string key, object value) => BaseAdd(key, value);
-
-        public void Clear() => BaseClear();
-
-        public void Remove(string key) => BaseRemove(key);
-
-        public new IEnumerable<string> Keys
-        {
-            get
-            {
-                foreach (var key in base.Keys)
-                {
-                    yield return (string)key!;
-                }
-            }
-        }
-
-        public object? this[string key]
-        {
-            get => BaseGet(key);
-            set => BaseSet(key, value);
         }
     }
 }

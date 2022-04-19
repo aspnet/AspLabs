@@ -8,5 +8,5 @@ public sealed class SessionAttribute : Attribute, ISessionMetadata
 {
     public SessionBehavior Behavior { get; set; } = SessionBehavior.PreLoad;
 
-    public bool IsReadOnly { get; set; } = true;
+    public bool IsReadOnly { get; set; } = false;
 }

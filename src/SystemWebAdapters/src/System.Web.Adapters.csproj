@@ -47,6 +47,8 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Compile Remove="**/*" />
     <Compile Include="@(FrameworkFiles)" />
+    <Compile Include="Adapters/SessionState/RemoteSessionData.cs" />
+    <Compile Include="Adapters/SessionState/SessionValues.cs" />
     <Compile Include="Adapters/SessionState/RemoteAppSessionStateOptions.cs" />
     <Compile Include="Adapters/SessionState/SessionSerializer.cs" />
 
@@ -54,6 +56,7 @@
     <Reference Include="System.Configuration" />
 
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="System.Threading.Channels" Version="6.0.0" />
   </ItemGroup>
 
   <Import Condition="$(HasImplementation)" Project="GenerateApis.targets" />

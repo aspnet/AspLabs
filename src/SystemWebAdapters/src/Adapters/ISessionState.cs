@@ -9,9 +9,9 @@ using System.Web.SessionState;
 namespace System.Web.Adapters;
 
 /// <summary>
-/// Represents the state of a session and is used to create a <see cref="HttpSessionState"/> . Disposing the state will handle any writing that may need to be done.
+/// Represents the state of a session and is used to create a <see cref="HttpSessionState"/>.
 /// </summary>
-public interface ISessionState : IDisposable
+public interface ISessionState : IAsyncDisposable
 {
     string SessionID { get; }
 

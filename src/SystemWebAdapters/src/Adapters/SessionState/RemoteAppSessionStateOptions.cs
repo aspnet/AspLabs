@@ -60,4 +60,12 @@ public class RemoteAppSessionStateOptions
     /// <param name="key"></param>
     public void RegisterKey<T>(string key) => KnownKeys.Add(key, typeof(T));
 
+#if NETCOREAPP3_1_OR_GREATER
+    /// <summary>
+    /// The maximum time loading session state from the remote app
+    /// or committing changes to it can take before timing out.
+    /// </summary>
+    [Required]
+    public TimeSpan NetworkTimeout { get; set; } = TimeSpan.FromMinutes(1);
+#endif
 }

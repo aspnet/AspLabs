@@ -1,0 +1,36 @@
+@model ClassLibrary.SessionDemoModel
+
+@{
+    ViewData["Title"] = "ASP.NET Core Session Demo";
+}
+
+<h1>ASP.NET Core Session Demo</h1>
+
+<h4>Current session items</h4>
+<hr />
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Index">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="IntSessionItem" class="control-label"></label>
+                    <input asp-for="IntSessionItem" class="form-control" />
+                    <span asp-validation-for="IntSessionItem" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="StringSessionItem" class="control-label"></label>
+                    <input asp-for="StringSessionItem" class="form-control" />
+                    <span asp-validation-for="StringSessionItem" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update session" class="btn esh-button esh-button-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

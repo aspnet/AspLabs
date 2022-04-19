@@ -20,13 +20,6 @@ namespace System.Web.Adapters
             return new Builder(services);
         }
 
-        public static ISystemWebAdapterBuilder AddSessionManager<TManager>(this ISystemWebAdapterBuilder builder)
-            where TManager : class, ISessionManager
-        {
-            builder.Services.AddSingleton<ISessionManager, TManager>();
-            return builder;
-        }
-
         public static void UseSystemWebAdapters(this IApplicationBuilder app)
         {
             app.UseMiddleware<PreBufferRequestStreamMiddleware>();

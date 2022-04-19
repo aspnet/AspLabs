@@ -41,15 +41,14 @@ public abstract class DelegatingSessionState : ISessionState
 
     public virtual void Clear() => State.Clear();
 
-    public void Dispose() => Dispose(true);
-
-    protected virtual void Dispose(bool disposing)
+    public async ValueTask DisposeAsync()
     {
-        if (disposing)
-        {
-            State.Dispose();
-        }
+        await DisposeAsyncCore();
+
+        GC.SuppressFinalize(this);
     }
+
+    protected virtual ValueTask DisposeAsyncCore() => State.DisposeAsync();
 
     public virtual void Remove(string name) => State.Remove(name);
 
