@@ -57,6 +57,7 @@ internal sealed class RemoteSessionState : ISessionState
         }
     }
 
+    // Commit changes to session state and release the session lock
     public ValueTask CommitAsync(CancellationToken cancellationToken = default)
         => CommitAsync(RemoteData, cancellationToken);
 
@@ -133,6 +134,7 @@ internal sealed class RemoteSessionState : ISessionState
 
     public void CopyTo(Array array, int index) => ((ICollection)RemoteData.Values).CopyTo(array, index);
 
+    // Release the session lock (if necessary) without submitting any session updates
     public ValueTask DisposeAsync() =>
         CommitAsync(null, default);
 }

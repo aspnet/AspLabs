@@ -45,11 +45,6 @@ internal class SessionMiddleware
         try
         {
             await _next(context);
-
-            // Commit changes to session state and release the lock
-            // If _next throws an exception, the session state's
-            // IDisposeAsync method is expected to release the lock
-            // instead without committing changes.
             await state.CommitAsync(context.RequestAborted);
         }
         finally
