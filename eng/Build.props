@@ -12,6 +12,6 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorCustomElements\BlazorCustomElements.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Microsoft.AspNetCore.SystemWebAdapters\Microsoft.AspNetCore.SystemWebAdapters.slnf" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\SystemWebAdapters\Microsoft.AspNetCore.SystemWebAdapters.slnf" />
   </ItemGroup>
 </Project>
