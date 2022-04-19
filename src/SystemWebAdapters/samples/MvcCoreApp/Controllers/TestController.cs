@@ -1,6 +1,6 @@
-using System.Web.Adapters;
 using ClassLibrary;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SystemWebAdapters;
 
 namespace MvcCoreApp.Controllers
 {

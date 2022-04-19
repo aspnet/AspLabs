@@ -199,9 +199,9 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\System.Web.Adapters.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.SystemWebAdapters\Microsoft.AspNetCore.SystemWebAdapters.csproj">
       <Project>{55c1bbe0-b922-46b0-8f2c-8472bc9a5f33}</Project>
-      <Name>System.Web.Adapters</Name>
+      <Name>Microsoft.AspNetCore.SystemWebAdapters</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj">
       <Project>{11dd4d64-7a95-4635-a273-775715e18852}</Project>

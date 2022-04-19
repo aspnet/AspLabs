@@ -7,5 +7,5 @@ public class SessionDemoModel
     public int? IntSessionItem { get; set; }
 
     [Display(Name = "String session item")]
-    public string? StringSessionItem { get; set; }
+    public string StringSessionItem { get; set; }
 }
