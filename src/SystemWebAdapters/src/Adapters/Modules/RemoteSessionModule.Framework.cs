@@ -48,9 +48,6 @@ internal sealed class RemoteSessionModule : IHttpModule
 
                 // Setting session with exclusive access requires NO session because the session
                 // should have already been previously locked by an exclusive get call.
-                // PUT calls should typically be exclusive, but callers might pass !exclusive
-                // if there are no updates being made and the call is only made to release a lock
-                // on read-only session state.
                 else if (httpMethod.Equals("PUT", StringComparison.OrdinalIgnoreCase))
                 {
                     context.SetSessionStateBehavior(SessionStateBehavior.Disabled);

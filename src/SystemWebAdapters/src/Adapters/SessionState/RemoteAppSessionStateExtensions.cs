@@ -15,7 +15,7 @@ public static class RemoteAppSessionStateExtensions
         builder.Services.AddHttpClient<RemoteSessionService>()
             // Disable cookies in the HTTP client because the service will manage the cookie header directly
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false });
-        builder.AddSessionManager<RemoteAppSessionStateManager>();
+        builder.Services.AddTransient<ISessionManager, RemoteAppSessionStateManager>();
         builder.Services.AddOptions<RemoteAppSessionStateOptions>()
             .Configure(configure)
             .ValidateDataAnnotations();
