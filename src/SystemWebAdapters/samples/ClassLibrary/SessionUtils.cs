@@ -1,4 +1,4 @@
-using System.Web.Adapters.SessionState;
+using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
 namespace ClassLibrary;
 

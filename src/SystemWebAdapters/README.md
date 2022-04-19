@@ -1,6 +1,6 @@
-# System.Web.Adapters
+# Microsoft.AspNetCore.SystemWebAdapters
 
-`System.Web.HttpContext` adapters backed by `Microsoft.AspNetCore.Http` types. The goal of this is to enable developers who have taken a dependency on `HttpContext` in class libraries to be able to more quickly move to ASP.NET Core. These adapters will present a subset of the surface area as `System.Web.HttpContext` and what can be accessed on it.
+This project provides a `System.Web.HttpContext` object with a subset of the APIs from `System.Web.dll` backed by `Microsoft.AspNetCore.Http` types. The goal of this is to enable developers who have taken a dependency on `HttpContext` in class libraries to be able to more quickly move to ASP.NET Core.
 
 ## Examples
 
@@ -33,9 +33,9 @@ public class Class2
 
 ### ASP.NET Core
 
-In order to run the above logic in ASP.NET Core, a developer will need to add the `System.Web.Adapters` package, that will enable the projects to work on both platforms.
+In order to run the above logic in ASP.NET Core, a developer will need to add the `Microsoft.AspNetCore.SystemWebAdapters` package, that will enable the projects to work on both platforms.
 
-The libraries would need to be updated to understand the adapters, but it will be as simple as adding the package and recompiling. If these are the only dependencies a system has on `System.Web`, then the libraries will be able to target .NET Standard to facillitate a simpler building process while migrating.
+The libraries would need to be updated to understand the adapters, but it will be as simple as adding the package and recompiling. If these are the only dependencies a system has on `System.Web.dll`, then the libraries will be able to target .NET Standard to facillitate a simpler building process while migrating.
 
 The controller in ASP.NET Core will now look like this:
 
@@ -67,7 +67,7 @@ Below are the steps needed to start using these adapters in your project:
     </packageSources>
   </configuration>
   ```
-2. Install `System.Web.Adapters`
+2. Install `Microsoft.AspNetCore.SystemWebAdapters`
 3. In your framework application:
    - The package installation will add a new handler to your web.config. This is to enable shared session state. If you will not need to use `HttpContext.Session`, feel free to remove this. Please see the section on [session state](#shared-session-state) to configure this
 4. In your class libraries:

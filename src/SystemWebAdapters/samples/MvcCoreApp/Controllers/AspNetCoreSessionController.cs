@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using RemoteContext = System.Web.HttpContext;
 using ClassLibrary;
-using System.Web.Adapters;
+using Microsoft.AspNetCore.SystemWebAdapters;
 
 namespace MvcApp.Controllers;
 
@@ -11,7 +10,7 @@ public class AspNetCoreSessionController : Controller
     // GET: AspNetCoreSession
     public ActionResult Index()
     {
-        var model = RemoteContext.Current?.Session?["SampleSessionItem"] as SessionDemoModel;
+        var model = System.Web.HttpContext.Current?.Session?["SampleSessionItem"] as SessionDemoModel;
 
         return View(model);
     }
@@ -21,9 +20,9 @@ public class AspNetCoreSessionController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Index(SessionDemoModel demoModel)
     {
-        if (RemoteContext.Current?.Session is not null)
+        if (System.Web.HttpContext.Current?.Session is not null)
         {
-            RemoteContext.Current.Session["SampleSessionItem"] = demoModel;
+            System.Web.HttpContext.Current.Session["SampleSessionItem"] = demoModel;
         }
 
         return View(demoModel);
