@@ -28,13 +28,11 @@ public interface ISessionState : IAsyncDisposable
 
     object SyncRoot { get; }
 
-    void Abandon();
+    bool IsAbandoned { get; set; }
 
     object? this[string name] { get; set; }
 
     void Add(string name, object value);
-
-    void CopyTo(Array array, int index);
 
     void Remove(string name);
 

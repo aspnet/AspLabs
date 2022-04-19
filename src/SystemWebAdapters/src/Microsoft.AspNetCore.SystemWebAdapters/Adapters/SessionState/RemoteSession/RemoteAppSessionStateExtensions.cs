@@ -3,8 +3,8 @@
 
 using System;
 using System.Net.Http;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState;
 using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
+using Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters;
@@ -13,11 +13,10 @@ public static class RemoteAppSessionStateExtensions
 {
     public static ISystemWebAdapterBuilder AddRemoteAppSession(this ISystemWebAdapterBuilder builder, Action<RemoteAppSessionStateOptions> configure)
     {
-        builder.Services.AddSingleton<SessionSerializer>();
-        builder.Services.AddHttpClient<RemoteSessionService>()
+        builder.Services.AddSingleton<ISessionSerializer, SessionSerializer>();
+        builder.Services.AddHttpClient<ISessionManager, RemoteAppSessionStateManager>()
             // Disable cookies in the HTTP client because the service will manage the cookie header directly
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false });
-        builder.Services.AddTransient<ISessionManager, RemoteAppSessionStateManager>();
         builder.Services.AddOptions<RemoteAppSessionStateOptions>()
             .Configure(configure)
             .ValidateDataAnnotations();

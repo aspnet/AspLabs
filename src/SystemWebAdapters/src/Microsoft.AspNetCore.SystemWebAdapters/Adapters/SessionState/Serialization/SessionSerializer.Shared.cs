@@ -1,94 +1,32 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
-#if NETCOREAPP3_1_OR_GREATER
-using Microsoft.Extensions.Options;
-#endif
+namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 
-#if NET472
-using System.Web.SessionState;
-#endif
-
-namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState;
-
-internal partial class SessionSerializer
+internal partial class SessionSerializer : ISessionSerializer
 {
-#if NETCOREAPP3_1_OR_GREATER
-    public SessionSerializer(IOptions<RemoteAppSessionStateOptions> options)
-        : this(options.Value.KnownKeys)
-    {
-    }
-#endif
+    private readonly JsonSerializerOptions _options;
 
-    public SessionSerializer(IDictionary<string, Type> map)
+    public SessionSerializer(IDictionary<string, Type> map, bool writeIndented = false)
     {
-        Options = new JsonSerializerOptions
+        _options = new JsonSerializerOptions
         {
 #if !NETCOREAPP3_1
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 #endif
             AllowTrailingCommas = true,
-            IgnoreReadOnlyProperties = true,
+            WriteIndented = writeIndented,
             Converters =
             {
                 new SerializedSessionConverter(map),
             }
         };
     }
-
-    public JsonSerializerOptions Options { get; }
-
-    public RemoteSessionData? Deserialize(string? jsonString)
-        => jsonString?.Length > 0
-        ? JsonSerializer.Deserialize<RemoteSessionData>(jsonString, Options)
-        : null;
-
-    public async ValueTask<RemoteSessionData?> DeserializeAsync(Stream stream)
-        => stream?.Length > 0
-        ? await JsonSerializer.DeserializeAsync<RemoteSessionData>(stream, Options)
-        : null;
-
-    public async ValueTask SerializeAsync(RemoteSessionData remoteSessionState, Stream stream, CancellationToken token)
-    {
-        await JsonSerializer.SerializeAsync(stream, remoteSessionState, Options, token);
-    }
-
-#if NET472
-    public async ValueTask SerializeAsync(HttpSessionState state, Stream stream, CancellationToken token)
-    {
-        if (state is null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
-
-        var values = new SessionValues();
-
-        foreach (string key in state.Keys)
-        {
-            values.Add(key, state[key]);
-        }
-
-        var session = new RemoteSessionData
-        {
-            IsNewSession = state.IsNewSession,
-            IsReadOnly = state.IsReadOnly,
-            SessionID = state.SessionID,
-            Timeout = state.Timeout,
-            Values = values
-        };
-
-        await JsonSerializer.SerializeAsync(stream, session, Options, token);
-    }
-#endif
 
     private class SerializedSessionConverter : JsonConverter<SessionValues>
     {
@@ -103,7 +41,7 @@ internal partial class SessionSerializer
         public override SessionValues? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 #pragma warning restore CS8764 // Nullability of return type doesn't match overridden member (possibly because of nullability attributes).
         {
-            var state = new SessionValues();
+            SessionValues? values = null;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -122,10 +60,18 @@ internal partial class SessionSerializer
                     throw new InvalidOperationException();
                 }
 
-                state.Add(key, JsonSerializer.Deserialize(ref reader, type, options));
+                if (JsonSerializer.Deserialize(ref reader, type, options) is { } result)
+                {
+                    if (values is null)
+                    {
+                        values = new();
+                    }
+
+                    values.Add(key, result);
+                }
             }
 
-            return state;
+            return values;
         }
 
         public override void Write(Utf8JsonWriter writer, SessionValues session, JsonSerializerOptions options)

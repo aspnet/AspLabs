@@ -28,7 +28,11 @@ public abstract class DelegatingSessionState : ISessionState
 
     public virtual bool IsReadOnly => State.IsReadOnly;
 
-    public virtual int Timeout { get => State.Timeout; set => State.Timeout = value; }
+    public virtual int Timeout
+    {
+        get => State.Timeout;
+        set => State.Timeout = value;
+    }
 
     public virtual bool IsNewSession => State.IsNewSession;
 
@@ -36,7 +40,11 @@ public abstract class DelegatingSessionState : ISessionState
 
     public virtual object SyncRoot => State.SyncRoot;
 
-    public virtual void Abandon() => State.Abandon();
+    public virtual bool IsAbandoned
+    {
+        get => State.IsAbandoned;
+        set => State.IsAbandoned = value;
+    }
 
     public virtual void Add(string name, object value) => State.Add(name, value);
 
@@ -54,8 +62,6 @@ public abstract class DelegatingSessionState : ISessionState
     public virtual void Remove(string name) => State.Remove(name);
 
     public virtual ValueTask CommitAsync(CancellationToken token) => State.CommitAsync(token);
-
-    public virtual void CopyTo(Array array, int index) => State.CopyTo(array, index);
 
     public virtual IEnumerable<string> Keys => State.Keys;
 }
