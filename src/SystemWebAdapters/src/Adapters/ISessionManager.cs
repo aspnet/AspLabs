@@ -14,6 +14,6 @@ public interface ISessionManager
     /// Creates an instance of <see cref="ISessionState"/> for a given context.
     /// </summary>
     /// <param name="context">Current <see cref="HttpContextCore"/>.</param>
-    /// <param name = "metadata" > Metadata for the session.</param>
+    /// <param name="metadata"> Metadata for the session.</param>
     Task<ISessionState> CreateAsync(HttpContextCore context, ISessionMetadata metadata);
 }
