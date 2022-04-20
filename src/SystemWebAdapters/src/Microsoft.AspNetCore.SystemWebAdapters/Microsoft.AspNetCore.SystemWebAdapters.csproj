@@ -42,6 +42,7 @@
 
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
+    <Using Include="System.Web.HttpContext" Alias="HttpContextAdapter" />
     <Using Include="Microsoft.AspNetCore.Http.HttpContext" Alias="HttpContextCore" />
     <Using Include="Microsoft.AspNetCore.Http.HttpResponse" Alias="HttpResponseCore" />
     <Using Include="Microsoft.AspNetCore.Http.HttpRequest" Alias="HttpRequestCore" />

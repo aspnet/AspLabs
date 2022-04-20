@@ -1,23 +1,18 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters;
 
 internal class BufferResponseStreamMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<BufferResponseStreamMiddleware> _logger;
 
-    public BufferResponseStreamMiddleware(RequestDelegate next, ILogger<BufferResponseStreamMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    public BufferResponseStreamMiddleware(RequestDelegate next) => _next = next;
 
     public Task InvokeAsync(HttpContextCore context)
         => context.GetEndpoint()?.Metadata.GetMetadata<IBufferResponseStreamMetadata>() is { IsEnabled: true } metadata && context.Features.Get<IHttpResponseBodyFeature>() is { } feature
@@ -26,8 +21,6 @@ internal class BufferResponseStreamMiddleware
 
     private async Task BufferResponseStreamAsync(HttpContextCore context, IHttpResponseBodyFeature feature, IBufferResponseStreamMetadata metadata)
     {
-        _logger.LogTrace("Buffering response stream");
-
         var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
         var originalBufferedResponseFeature = context.Features.Get<IBufferedResponseFeature>();
 
@@ -39,6 +32,14 @@ internal class BufferResponseStreamMiddleware
         try
         {
             await _next(context);
+
+#if NET6_0_OR_GREATER
+            using var activity = HttpContextAdapter.Source.StartActivity("BufferResponseStream");
+
+            activity?.AddTag("BufferLimit", metadata.BufferLimit);
+            activity?.AddTag("MemoryThreshold", metadata.MemoryThreshold);
+#endif
+
             await bufferedFeature.FlushBufferedStreamAsync();
         }
         finally

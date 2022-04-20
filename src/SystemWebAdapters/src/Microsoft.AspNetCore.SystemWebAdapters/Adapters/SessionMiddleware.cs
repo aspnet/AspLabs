@@ -29,30 +29,42 @@ internal class SessionMiddleware
 
     private async Task ManageStateAsync(HttpContextCore context, ISessionMetadata metadata)
     {
-        _logger.LogTrace("Initializing session state");
-
-        var manager = context.RequestServices.GetRequiredService<ISessionManager>();
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        await using var state = metadata.Behavior switch
-        {
-            SessionBehavior.PreLoad => await manager.CreateAsync(context, metadata),
-            SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
-            var behavior => throw new InvalidOperationException($"Unknown session behavior {behavior}"),
-        };
-#pragma warning restore CS0618 // Type or member is obsolete
-
+        await using var state = await CreateSessionStateAsync(context, metadata);
         context.Features.Set(new HttpSessionState(state));
 
         try
         {
             await _next(context);
+
+#if NET6_0_OR_GREATER
+            using var commitActivity = HttpContextAdapter.Source.StartActivity("CommitSession");
+#endif
             await state.CommitAsync(context.RequestAborted);
         }
         finally
         {
             context.Features.Set<HttpSessionState?>(null);
         }
+    }
+
+    private async ValueTask<ISessionState> CreateSessionStateAsync(HttpContextCore context, ISessionMetadata metadata)
+    {
+#if NET6_0_OR_GREATER
+        using var activity = HttpContextAdapter.Source.StartActivity("SessionInitialization");
+        activity?.AddTag("Behavior", metadata.Behavior);
+        activity?.AddTag("IsReadOnly", metadata.IsReadOnly);
+#endif
+
+        var manager = context.RequestServices.GetRequiredService<ISessionManager>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        return metadata.Behavior switch
+        {
+            SessionBehavior.PreLoad => await manager.CreateAsync(context, metadata),
+            SessionBehavior.OnDemand => new LazySessionState(context, _logger, metadata, manager),
+            var behavior => throw new InvalidOperationException($"Unknown session behavior {behavior}"),
+        };
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     private class LazySessionState : DelegatingSessionState
@@ -63,6 +75,10 @@ internal class SessionMiddleware
         {
             _state = new Lazy<ISessionState>(() =>
             {
+#if NET6_0_OR_GREATER
+                using var activity = HttpContextAdapter.Source.StartActivity("OnDemandSession");
+#endif
+
                 logger.LogWarning("Creating session on demand by synchronously waiting on a potential asynchronous connection");
                 return manager.CreateAsync(context, metadata).GetAwaiter().GetResult();
             });
