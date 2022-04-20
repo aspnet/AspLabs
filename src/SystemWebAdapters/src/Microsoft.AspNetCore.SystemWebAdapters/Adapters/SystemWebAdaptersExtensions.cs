@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SystemWebAdapters.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +28,19 @@ namespace Microsoft.AspNetCore.SystemWebAdapters
             app.UseMiddleware<PreBufferRequestStreamMiddleware>();
             app.UseMiddleware<SessionMiddleware>();
             app.UseMiddleware<BufferResponseStreamMiddleware>();
+        }
+
+        /// <summary>
+        /// Add an <see cref="IHttpHandler"/> to run on and endpoint with the supplied <see href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-6.0">pattern</see>.
+        /// </summary>
+        public static IEndpointConventionBuilder UseHttpHandler<T>(this IEndpointRouteBuilder endpoints, string pattern)
+            where T : class, IHttpHandler
+        {
+            var app = endpoints.CreateApplicationBuilder();
+
+            app.UseMiddleware<HttpHandlerMiddleware<T>>();
+
+            return endpoints.Map(pattern, app.Build());
         }
 
         /// <summary>

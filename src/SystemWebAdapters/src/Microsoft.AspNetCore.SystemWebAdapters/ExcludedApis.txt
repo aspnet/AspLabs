@@ -10,11 +10,12 @@ T:Microsoft.AspNetCore.SystemWebAdapters.SessionAttribute
 T:Microsoft.AspNetCore.SystemWebAdapters.ISessionState
 T:Microsoft.AspNetCore.SystemWebAdapters.ISessionMetadata
 T:Microsoft.AspNetCore.SystemWebAdapters.ISessionManager
-T:Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteAppSessionStateExtensions
-T:Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteAppSessionStateOptions
+T:Microsoft.AspNetCore.SystemWebAdapters.RemoteAppSessionStateExtensions
+T:Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession.RemoteAppSessionStateOptions
 T:Microsoft.AspNetCore.SystemWebAdapters.SessionState.DelegatingSessionState
 T:Microsoft.AspNetCore.SystemWebAdapters.SessionBehavior
 M:System.Web.SessionState.HttpSessionState.#ctor(Microsoft.AspNetCore.SystemWebAdapters.ISessionState)
+T:Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization.ISessionSerializer
 
 # Buffering
 T:Microsoft.AspNetCore.SystemWebAdapters.BufferResponseStreamAttribute

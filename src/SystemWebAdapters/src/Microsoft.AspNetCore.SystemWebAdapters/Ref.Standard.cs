@@ -293,6 +293,26 @@ namespace System.Web
         public override void Remove(string name) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
         public override void RemoveAll() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
     }
+    public abstract partial class HttpTaskAsyncHandler : System.Web.IHttpAsyncHandler, System.Web.IHttpHandler
+    {
+        protected HttpTaskAsyncHandler() { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public virtual bool IsReusable { get { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");} }
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
+        public virtual void ProcessRequest(System.Web.HttpContext context) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        public abstract System.Threading.Tasks.Task ProcessRequestAsync(System.Web.HttpContext context);
+        System.IAsyncResult System.Web.IHttpAsyncHandler.BeginProcessRequest(System.Web.HttpContext context, System.AsyncCallback callback, object extraData) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+        void System.Web.IHttpAsyncHandler.EndProcessRequest(System.IAsyncResult result) { throw new System.PlatformNotSupportedException("Only support when running on ASP.NET Core or System.Web");}
+    }
+    public partial interface IHttpAsyncHandler : System.Web.IHttpHandler
+    {
+        System.IAsyncResult BeginProcessRequest(System.Web.HttpContext context, System.AsyncCallback callback, object extraData);
+        void EndProcessRequest(System.IAsyncResult result);
+    }
+    public partial interface IHttpHandler
+    {
+        bool IsReusable { get; }
+        void ProcessRequest(System.Web.HttpContext context);
+    }
     public enum SameSiteMode
     {
         Lax = 1,
