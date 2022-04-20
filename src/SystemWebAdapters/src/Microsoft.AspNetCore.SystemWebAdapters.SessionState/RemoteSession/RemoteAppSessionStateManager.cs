@@ -65,6 +65,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
     private async Task<ISessionState> GetSessionDataAsync(string? sessionId, bool readOnly, HttpContextCore callingContext, CancellationToken cancellationToken = default)
     {
         var req = new HttpRequestMessage { Method = HttpMethod.Get };
+
         AddSessionCookieToHeader(req, sessionId);
         AddReadOnlyHeader(req, readOnly);
 
@@ -72,29 +73,29 @@ internal class RemoteAppSessionStateManager : ISessionManager
         _logger.LogTrace("Received {StatusCode} response getting remote session state for request {RequestUrl}", response.StatusCode, callingContext.Request.GetDisplayUrl());
         response.EnsureSuccessStatusCode();
 
-        // Only read until the first new line since the response is expected to remain open until
-        // RemoteAppSessionStateManager.CommitAsync is called.
-        using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync(), leaveOpen: true);
-        var remoteSessionState = await ReadSessionState(streamReader);
+        var remoteSessionState = await ReadSessionStateAsync(response);
 
         // Propagate headers back to the caller since a new session ID may have been set
         // by the remote app if there was no session active previously or if the previous
         // session expired.
         PropagateHeaders(response, callingContext, HeaderNames.SetCookie);
 
-        if (remoteSessionState is null)
+        if (remoteSessionState.IsReadOnly)
         {
-            throw new InvalidOperationException("Failed to retrieve session state from remote session; confirm session is enabled in remote app");
+            response.Dispose();
+            return remoteSessionState;
         }
 
-        return new RemoteSessionState(remoteSessionState, response, remoteSessionState.IsReadOnly ? null : SetOrReleaseSessionData);
+        return new RemoteSessionState(remoteSessionState, response, SetOrReleaseSessionData);
     }
 
-    private async Task<ISessionState> ReadSessionState(StreamReader streamReader)
+    private async Task<ISessionState> ReadSessionStateAsync(HttpResponseMessage response)
     {
+        // Only read until the first new line since the response is expected to remain open until RemoteSessionState.CommitAsync is called.
+        using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync(), leaveOpen: true);
         var json = await streamReader.ReadLineAsync();
 
-        return _serializer.Deserialize(json) ?? throw new InvalidOperationException("Could not retrieve session state");
+        return _serializer.Deserialize(json) ?? throw new InvalidOperationException("Could not retrieve remote session state");
     }
 
     /// <summary>

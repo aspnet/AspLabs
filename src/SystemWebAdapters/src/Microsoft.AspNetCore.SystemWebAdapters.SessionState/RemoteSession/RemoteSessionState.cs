@@ -13,7 +13,7 @@ internal class RemoteSessionState : DelegatingSessionState
     private HttpResponseMessage? _response;
     private Func<ISessionState?, CancellationToken, Task>? _commitOrRelease;
 
-    public RemoteSessionState(ISessionState other, HttpResponseMessage response, Func<ISessionState?, CancellationToken, Task>? commitOrRelease)
+    public RemoteSessionState(ISessionState other, HttpResponseMessage response, Func<ISessionState?, CancellationToken, Task> commitOrRelease)
     {
         State = other;
         _response = response;
