@@ -1,12 +1,13 @@
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
+using Microsoft.AspNetCore.SystemWebAdapters.SessionState;
 
 namespace ClassLibrary;
 
 public class SessionUtils
 {
-    public static void RegisterSessionKeys(RemoteAppSessionStateOptions options)
+    public static string ApiKey = "test-key";
+
+    public static void RegisterSessionKeys(SessionOptions options)
     {
-        options.ApiKey = "test-key";
         options.RegisterKey<int>("test-value");
         options.RegisterKey<SessionDemoModel>("SampleSessionItem");
     }

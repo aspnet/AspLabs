@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
-using Microsoft.AspNetCore.SystemWebAdapters.Modules;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters;
 
@@ -27,9 +24,6 @@ public static class SystemWebAdaptersExtensions
 
     public static ISystemWebAdapterBuilder AddProxySupport(this ISystemWebAdapterBuilder builder, Action<ProxyOptions> configure)
         => builder.AddModule(configure, static options => new ProxyHeaderModule(options));
-
-    public static ISystemWebAdapterBuilder AddRemoteSession(this ISystemWebAdapterBuilder builder, Action<RemoteAppSessionStateOptions> configure)
-        => builder.AddModule(configure, static options => new RemoteSessionModule(options));
 
     internal static ISystemWebAdapterBuilder? GetSystemWebBuilder(this HttpApplicationState state)
         => state[Key] as ISystemWebAdapterBuilder;

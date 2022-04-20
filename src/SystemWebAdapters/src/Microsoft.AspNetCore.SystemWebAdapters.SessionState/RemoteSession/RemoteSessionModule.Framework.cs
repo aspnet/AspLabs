@@ -4,10 +4,8 @@
 using System;
 using System.Web;
 using System.Web.SessionState;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
-namespace Microsoft.AspNetCore.SystemWebAdapters.Modules;
+namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
 internal sealed class RemoteSessionModule : IHttpModule
 {

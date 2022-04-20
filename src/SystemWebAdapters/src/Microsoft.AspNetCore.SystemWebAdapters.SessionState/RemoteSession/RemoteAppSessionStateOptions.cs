@@ -10,7 +10,7 @@ using System;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
 
-public class RemoteAppSessionStateOptions
+public class RemoteAppSessionStateOptions : SessionOptions
 {
     internal const string ApiKeyHeaderName = "X-SystemWebAdapter-RemoteAppSession-Key";
     internal const string ReadOnlyHeaderName = "X-SystemWebAdapter-RemoteAppSession-ReadOnly";
@@ -48,18 +48,6 @@ public class RemoteAppSessionStateOptions
     [Required]
 #endif
     public string CookieName { get; set; } = "ASP.NET_SessionId";
-
-    /// <summary>
-    /// Gets the mapping of known session keys to types
-    /// </summary>
-    public IDictionary<string, Type> KnownKeys { get; } = new Dictionary<string, Type>();
-
-    /// <summary>
-    /// Registers a session key name to be of type <typeparamref name="T"/>
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
-    public void RegisterKey<T>(string key) => KnownKeys.Add(key, typeof(T));
 
 #if NETCOREAPP3_1_OR_GREATER
     /// <summary>
