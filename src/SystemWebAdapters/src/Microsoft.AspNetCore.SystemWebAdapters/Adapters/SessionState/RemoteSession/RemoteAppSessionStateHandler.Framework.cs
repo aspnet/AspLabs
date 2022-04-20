@@ -18,7 +18,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private readonly SessionSerializer _serializer;
 
     // Track locked sessions awaiting updates or release
-    private static readonly ConcurrentDictionary<string, StateContainer> SessionResponseTasks = new();
+    private static readonly ConcurrentDictionary<string, SessionContainer> SessionResponseTasks = new();
 
     public override bool IsReusable => true;
 
@@ -81,7 +81,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         try
         {
             // Generate a channel to wait for session data updates
-            using var sessionContainer = new StateContainer(context.Session);
+            using var sessionContainer = new SessionContainer(context.Session);
 
             // Cancel the task if this request is cancelled or timed out
             using var cancellationRegistration = token.Register(() => sessionContainer.Complete());
@@ -136,22 +136,30 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         {
             context.Response.StatusCode = 400;
             context.Response.StatusDescription = "No session ID found";
-            context.Response.End();
-            return;
         }
 
         // Get the channel that will be used to write the updated session data
         // to the in-progress request that will update session data
-        if (SessionResponseTasks.TryGetValue(sessionId, out var responseTask))
+        else if (SessionResponseTasks.TryGetValue(sessionId, out var container))
         {
-            if (responseTask.State is { } state)
+            if (container.Session is { } session)
             {
                 using var requestContent = context.Request.GetBufferlessInputStream();
 
-                await _serializer.DeserializeToAsync(requestContent, state, context.Response.ClientDisconnectedToken);
-
-                responseTask.Complete();
-                context.Response.StatusCode = 200;
+                try
+                {
+                    await _serializer.DeserializeToAsync(requestContent, session, context.Response.ClientDisconnectedToken);
+                    context.Response.StatusCode = 200;
+                }
+                catch
+                {
+                    context.Response.StatusDescription = "Failed to deserialize payload";
+                    context.Response.StatusCode = 400;
+                }
+                finally
+                {
+                    container.Complete();
+                }
             }
             else
             {
@@ -171,21 +179,21 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private string? GetSessionId(HttpRequest request)
         => request.Cookies[_options.CookieName]?.Value;
 
-    private sealed class StateContainer : IDisposable
+    private sealed class SessionContainer : IDisposable
     {
         private readonly CancellationTokenSource _done = new();
 
-        public StateContainer(HttpSessionState state)
+        public SessionContainer(HttpSessionState state)
         {
-            State = state;
+            Session = state;
         }
 
-        public HttpSessionState? State { get; private set; }
+        public HttpSessionState? Session { get; private set; }
 
         public void Complete()
         {
             _done.Cancel();
-            State = null;
+            Session = null;
         }
 
         public void Dispose() => _done.Dispose();
