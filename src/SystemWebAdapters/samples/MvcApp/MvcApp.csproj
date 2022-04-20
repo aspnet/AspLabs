@@ -199,6 +199,10 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.SystemWebAdapters.SessionState\Microsoft.AspNetCore.SystemWebAdapters.SessionState.csproj">
+      <Project>{2029d409-07e3-49f8-bb6a-77114de7b337}</Project>
+      <Name>Microsoft.AspNetCore.SystemWebAdapters.SessionState</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.SystemWebAdapters\Microsoft.AspNetCore.SystemWebAdapters.csproj">
       <Project>{55c1bbe0-b922-46b0-8f2c-8472bc9a5f33}</Project>
       <Name>Microsoft.AspNetCore.SystemWebAdapters</Name>

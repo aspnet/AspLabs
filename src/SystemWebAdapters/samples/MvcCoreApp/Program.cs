@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.SystemWebAdapters;
-using Microsoft.AspNetCore.SystemWebAdapters.SessionState;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
@@ -10,6 +9,7 @@ builder.Services.AddSystemWebAdapters()
     .AddRemoteAppSession(options =>
     {
         options.RemoteApp = new(builder.Configuration["ReverseProxy:Clusters:fallbackCluster:Destinations:fallbackApp:Address"]);
+        options.ApiKey = ClassLibrary.SessionUtils.ApiKey;
 
         ClassLibrary.SessionUtils.RegisterSessionKeys(options);
     });
