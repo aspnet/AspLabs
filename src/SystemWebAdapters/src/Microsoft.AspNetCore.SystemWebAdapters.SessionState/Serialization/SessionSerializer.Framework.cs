@@ -2,14 +2,17 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.SessionState;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 
 internal partial class SessionSerializer
 {
-    public byte[] Serialize(HttpSessionState state)
+    public Task SerializeAsync(HttpSessionState state, Stream stream, CancellationToken token)
     {
         if (state is null)
         {
@@ -29,12 +32,12 @@ internal partial class SessionSerializer
             session.Values.Add(key, state[key]);
         }
 
-        return JsonSerializer.SerializeToUtf8Bytes(session, _options);
+        return JsonSerializer.SerializeAsync(stream, session, _options, token);
     }
 
-    public void DeserializeTo(ReadOnlySpan<byte> data, HttpSessionState state)
+    public async Task DeserializeToAsync(Stream stream, HttpSessionState state, CancellationToken token)
     {
-        var result = JsonSerializer.Deserialize<SerializedSessionState>(data, _options);
+        var result = await JsonSerializer.DeserializeAsync<SerializedSessionState>(stream, _options, token);
 
         if (result is null)
         {

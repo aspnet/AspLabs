@@ -34,9 +34,7 @@ public class RemoteAppSessionStateOptions : SessionOptions
     /// </summary>
     [Required]
     public Uri RemoteApp { get; set; } = null!;
-#endif
 
-#if NETCOREAPP3_1_OR_GREATER
     [Required]
 #endif
     public string SessionEndpointPath { get; set; } = "/fallback/adapter/session";

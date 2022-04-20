@@ -30,22 +30,11 @@ internal class RemoteSessionState : DelegatingSessionState
             _response = null;
         }
 
-        if (_commitOrRelease is { } onCommit)
-        {
-            _commitOrRelease = null;
-            await onCommit(null, default);
-        }
-
         await base.DisposeAsyncCore();
     }
 
     public override async ValueTask CommitAsync(CancellationToken token)
     {
-        if (IsReadOnly)
-        {
-            return;
-        }
-
         if (_commitOrRelease is { } onCommit)
         {
             _commitOrRelease = null;
