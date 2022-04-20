@@ -5,11 +5,11 @@
 
   <PropertyGroup>
     <MicrosoftAspNetCoreMvcCorePackageVersion>2.1.0</MicrosoftAspNetCoreMvcCorePackageVersion>
-    <MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>2.1.0</MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>
+    <MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>2.1.3</MicrosoftAspNetCoreMvcDataAnnotationsPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>2.1.0</MicrosoftAspNetCoreMvcFormattersJsonPackageVersion>
     <MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>2.1.0</MicrosoftAspNetCoreMvcFormattersXmlPackageVersion>
     <MicrosoftAspNetCoreMvcTestingPackageVersion>2.1.0</MicrosoftAspNetCoreMvcTestingPackageVersion>
-    <MicrosoftAspNetCorePackageVersion>2.1.2</MicrosoftAspNetCorePackageVersion>
+    <MicrosoftAspNetCorePackageVersion>2.1.22</MicrosoftAspNetCorePackageVersion>
     <MicrosoftAspNetCoreStaticFilesPackageVersion>2.1.0</MicrosoftAspNetCoreStaticFilesPackageVersion>
     <MicrosoftAspNetCoreTestingPackageVersion>2.1.0</MicrosoftAspNetCoreTestingPackageVersion>
     <MicrosoftExtensionsConfigurationPackageVersion>2.1.1</MicrosoftExtensionsConfigurationPackageVersion>
@@ -18,6 +18,7 @@
     <MicrosoftNETTestSdkPackageVersion>15.6.1</MicrosoftNETTestSdkPackageVersion>
     <MoqPackageVersion>4.9.0</MoqPackageVersion>
     <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
+    <SystemSecurityCryptographyX509CertificatesPackageVersion>4.1.2</SystemSecurityCryptographyX509CertificatesPackageVersion>
     <XunitAnalyzersPackageVersion>0.10.0</XunitAnalyzersPackageVersion>
     <XunitPackageVersion>2.4.0</XunitPackageVersion>
     <XunitRunnerVisualStudioPackageVersion>2.4.0</XunitRunnerVisualStudioPackageVersion>
