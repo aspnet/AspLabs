@@ -5,7 +5,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="$(MicrosoftAspNetCorePackageVersion)" />
-    <PackageReference Include="System.IO.Pipelines" Version="4.5.2" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.5.4" />
     <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Slack\Microsoft.AspNetCore.WebHooks.Receivers.Slack.csproj" />
   </ItemGroup>
