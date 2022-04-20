@@ -9,7 +9,7 @@ using KeyDictionary = System.Collections.Generic.Dictionary<string, System.Type>
 
 namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 
-public class SessionStateSerialization
+public class SessionStateSerializationTests
 {
     [Fact]
     public void NewSession()
@@ -50,7 +50,8 @@ public class SessionStateSerialization
 
         // Assert
         Assert.NotNull(result);
-        AssertKey(result!, "Key1", 5);
+        Assert.Equal(1, result!.Count);
+        AssertKey(result, "Key1", 5);
     }
 
     [Fact]

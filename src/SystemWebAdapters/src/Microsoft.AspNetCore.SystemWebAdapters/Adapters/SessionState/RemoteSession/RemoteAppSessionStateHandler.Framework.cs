@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.SessionState;
 using Microsoft.AspNetCore.SystemWebAdapters.SessionState.Serialization;
 
 namespace Microsoft.AspNetCore.SystemWebAdapters.SessionState.RemoteSession;
@@ -17,7 +18,7 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     private readonly SessionSerializer _serializer;
 
     // Track locked sessions awaiting updates or release
-    private static readonly ConcurrentDictionary<string, TaskCompletionSource<byte[]?>> SessionResponseTasks = new();
+    private static readonly ConcurrentDictionary<string, StateContainer> SessionResponseTasks = new();
 
     public override bool IsReusable => true;
 
@@ -59,20 +60,20 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
 
     private async Task GetSessionStateAsync(HttpContext context, bool exclusive)
     {
-        var timeoutCts = new CancellationTokenSource(context.Server.ScriptTimeout * 1000);
-        var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, context.Response.ClientDisconnectedToken);
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(context.Session.Timeout));
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, context.Response.ClientDisconnectedToken);
 
         if (exclusive)
         {
-            await GetExclusiveSessionStateAsync(context, cts);
+            await GetExclusiveSessionStateAsync(context, cts.Token);
         }
         else
         {
-            GetNonExclusiveSessionState(context);
+            await GetNonExclusiveSessionStateAsync(context, cts.Token);
         }
     }
 
-    private async Task GetExclusiveSessionStateAsync(HttpContext context, CancellationTokenSource cts)
+    private async Task GetExclusiveSessionStateAsync(HttpContext context, CancellationToken token)
     {
         // If session data is retrieved exclusively, then it needs sent to the client and
         // this request needs to remain open while waiting for the client to either send updates
@@ -80,31 +81,34 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         try
         {
             // Generate a channel to wait for session data updates
-            var responseTask = new TaskCompletionSource<byte[]?>();
+            using var sessionContainer = new StateContainer(context.Session);
 
             // Cancel the task if this request is cancelled or timed out
-            using var cancellationRegistration = cts.Token.Register(() => responseTask.TrySetCanceled());
+            using var cancellationRegistration = token.Register(() => sessionContainer.Complete());
 
             // Update the channels dictionary with the new channel
-            SessionResponseTasks[context.Session.SessionID] = responseTask;
+            SessionResponseTasks[context.Session.SessionID] = sessionContainer;
 
             // Send the initial snapshot of session data
             context.Response.ContentType = "text/event-stream";
             context.Response.StatusCode = 200;
 
-            WriteSession(context);
+            await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, token);
 
             // Delimit the json body with a new line to mark the end of content
             context.Response.Write('\n');
             await context.Response.FlushAsync();
 
-            // Wait for up to request timeout for updated session state to be provided
-            // (or for null to be passed as updated session state to indicate no updates).
-            var updatedSessionState = await responseTask.Task;
+            // Wait for up to request timeout for updated session state to be written.
+            // We send down heartbeats to ensure the request disconnected token fires correctly
+            using var waitToken = CancellationTokenSource.CreateLinkedTokenSource(sessionContainer.Token, token);
+            var heartbeatDelay = TimeSpan.FromMilliseconds(20);
 
-            if (updatedSessionState is not null)
+            while (!waitToken.IsCancellationRequested)
             {
-                _serializer.DeserializeTo(updatedSessionState, context.Session);
+                await Task.Delay(heartbeatDelay, waitToken.Token);
+                context.Response.Write(' ');
+                await context.Response.FlushAsync();
             }
         }
         finally
@@ -113,30 +117,18 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         }
     }
 
-    private void WriteSession(HttpContext context)
-    {
-        var bytes = _serializer.Serialize(context.Session);
-        context.Response.OutputStream.Write(bytes, 0, bytes.Length);
-    }
-
-    private void GetNonExclusiveSessionState(HttpContext context)
+    private async Task GetNonExclusiveSessionStateAsync(HttpContext context, CancellationToken token)
     {
         // If the session is retrieved non-exclusively, then no updates will be made and the
         // session state can be returned directly, completing this request.
         context.Response.ContentType = "application/json; charset=utf-8";
         context.Response.StatusCode = 200;
 
-        WriteSession(context);
+        await _serializer.SerializeAsync(context.Session, context.Response.OutputStream, token);
     }
 
     private async Task StoreSessionStateAsync(HttpContext context)
     {
-        using var requestContent = context.Request.GetBufferlessInputStream();
-        using var ms = new MemoryStream();
-
-        await requestContent.CopyToAsync(ms);
-        var bytes = ms.ToArray();
-
         var sessionId = GetSessionId(context.Request);
 
         // Check that the request has a session ID
@@ -152,8 +144,13 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
         // to the in-progress request that will update session data
         if (SessionResponseTasks.TryGetValue(sessionId, out var responseTask))
         {
-            if (responseTask.TrySetResult(bytes))
+            if (responseTask.State is { } state)
             {
+                using var requestContent = context.Request.GetBufferlessInputStream();
+
+                await _serializer.DeserializeToAsync(requestContent, state, context.Response.ClientDisconnectedToken);
+
+                responseTask.Complete();
                 context.Response.StatusCode = 200;
             }
             else
@@ -173,4 +170,26 @@ internal sealed class RemoteAppSessionStateHandler : HttpTaskAsyncHandler
     // so read the session ID directly from the cookie instead
     private string? GetSessionId(HttpRequest request)
         => request.Cookies[_options.CookieName]?.Value;
+
+    private sealed class StateContainer : IDisposable
+    {
+        private readonly CancellationTokenSource _done = new();
+
+        public StateContainer(HttpSessionState state)
+        {
+            State = state;
+        }
+
+        public HttpSessionState? State { get; private set; }
+
+        public void Complete()
+        {
+            _done.Cancel();
+            State = null;
+        }
+
+        public void Dispose() => _done.Dispose();
+
+        public CancellationToken Token => _done.Token;
+    }
 }

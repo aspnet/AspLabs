@@ -74,7 +74,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
 
         // Only read until the first new line since the response is expected to remain open until
         // RemoteAppSessionStateManager.CommitAsync is called.
-        using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync());
+        using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync(), leaveOpen: true);
         var remoteSessionState = await ReadSessionState(streamReader);
 
         // Propagate headers back to the caller since a new session ID may have been set
@@ -87,7 +87,7 @@ internal class RemoteAppSessionStateManager : ISessionManager
             throw new InvalidOperationException("Failed to retrieve session state from remote session; confirm session is enabled in remote app");
         }
 
-        return new RemoteSessionState(remoteSessionState, response, SetOrReleaseSessionData);
+        return new RemoteSessionState(remoteSessionState, response, remoteSessionState.IsReadOnly ? null : SetOrReleaseSessionData);
     }
 
     private async Task<ISessionState> ReadSessionState(StreamReader streamReader)
