@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftAspNetCoreMvcTestingPackageVersion)" />
     <PackageReference Include="System.IO.Pipelines" Version="4.5.4" />
     <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.22" />
   </ItemGroup>
 
 </Project>

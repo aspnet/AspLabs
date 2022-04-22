@@ -6,5 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.AspNetCore.WebHooks.Receivers\Microsoft.AspNetCore.WebHooks.Receivers.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="$(MicrosoftAspNetCoreHttpPackageVersion)" />
   </ItemGroup>
 </Project>
