@@ -150,7 +150,7 @@ namespace System.Web
 
         public bool IsClientConnected => !_response.HttpContext.RequestAborted.IsCancellationRequested;
 
-        public void AddHeader(string name, string value) => _response.Headers.Add(name, value);
+        public void AddHeader(string name, string value) => AppendHeader(name, value);
 
         public void AppendHeader(string name, string value)
         {
