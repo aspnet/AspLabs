@@ -134,18 +134,7 @@ app.UseEndpoints(endpoints =>
 });
 ```
 
-This also requires some implementation of a session store. An initial implementation is being included that accesses a running ASP.NET Framework app and grabs session information from it.
-
-### Remote session state
-When the package is installed on a .NET Framework web app, it will add a handler to `web.config` that will grab a session state and make it available on core. At the moment, this is read-only, but there are explorations on how to enable this for writing from .NET Core as well.
-
-In order to support this, you must configure both the .NET Framework and ASP.NET Core app. The shared configuration is available in .NET Standard so it can be registered in a shared library if desired. This configuration includes:
-
-- `ApiKeyHeader` - header name that will contain an API key to secure the endpoint added on .NET Framework
-- `ApiKey` - the shared API key that will be validated in the .NET Framework handler
-- `RegisterKey<T>(string)` - Registers a session key to a known type. This is required in order to serialize/deserialize the session state correctly. If a key is found that there is no registration for, an error will be thrown and session will not be available.
-
-An example of setting this up can be seen in [sample app](samples/MvcCoreApp/Program.cs).
+This also requires some implementation of a session store. An initial implementation is being included that accesses a running ASP.NET Framework app and grabs session information from it. For details see [here](./docs/session-state/remote-session.md) for details.
 
 ## Supported Targets
 - .NET Core App 3.1: This will implement the adapters against ASP.NET Core `HttpContext`. This will provide the following:
