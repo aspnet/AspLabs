@@ -1,0 +1,2 @@
+Placeholder file to make sure the App_Data folder exists (so that
+a SQL mdf file can be created there when running locally).
