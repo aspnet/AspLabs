@@ -1,7 +1,7 @@
 gRPC HTTP API
 =============
 
-gRPC HTTP API is an extension for ASP.NET Core that creates RESTful HTTP APIs for gRPC services. Once configured, gRPC HTTP API allows you call gRPC methods with familiar HTTP concepts:
+gRPC HTTP API is an experimental extension for ASP.NET Core that creates RESTful HTTP JSON APIs for gRPC services. Once configured, gRPC HTTP API allows apps to call gRPC services with familiar HTTP concepts:
 
 * HTTP verbs
 * URL parameter binding
@@ -13,10 +13,10 @@ Of course gRPC can continue to be used as well. RESTful APIs for your gRPC servi
 
 ### Usage
 
-1. Add a package reference to `Microsoft.AspNetCore.Grpc.HttpApi`.
-2. Register services in *Startup.cs* with `AddGrpcHttpApi()`.
-2. Add *google/api/http.proto* and *google/api/annotations.proto* files to your project.
-3. Annotate gRPC methods in your *.proto* files with HTTP bindings and routes:
+1. Add a package reference to [Microsoft.AspNetCore.Grpc.HttpApi](https://www.nuget.org/packages/Microsoft.AspNetCore.Grpc.HttpApi).
+1. Register services in `Startup.cs` with `AddGrpcHttpApi`.
+1. Add [google/api/http.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/http.proto) and [google/api/annotations.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/annotations.proto) files to your project.
+1. Annotate gRPC methods in your `.proto` files with HTTP bindings and routes:
 
 ```protobuf
 syntax = "proto3";
@@ -47,7 +47,7 @@ The `SayHello` gRPC method can now be invoked as gRPC+Protobuf and as an HTTP AP
 * Request: `HTTP/1.1 GET /v1/greeter/world`
 * Response: `{ "message": "Hello world" }`
 
-Server logs:
+Server logs show that the HTTP call is executed by a gRPC service. gRPC HTTP API maps the incoming HTTP request to a gRPC message, and then converts the response message to JSON.
 
 ```
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
@@ -62,13 +62,26 @@ info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
       Request finished in 1.996ms 200 application/json
 ```
 
-This is a simple example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
+This is a basic example. See [HttpRule](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#google.api.HttpRule) for more customization options.
 
 [`Microsoft.AspNetCore.Grpc.HttpApi`](https://www.nuget.org/packages/Microsoft.AspNetCore.Grpc.HttpApi) is available on NuGet.org.
 
 ### gRPC Gateway
 
 [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) maps RESTful HTTP APIs to gRPC using a proxy server. This project adds the same features as grpc-gateway but **without** a proxy.
+
+### Enable Swagger/OpenAPI support
+
+Swagger (OpenAPI) is a language-agnostic specification for describing REST APIs. gRPC HTTP API can integrate with [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) to generate a Swagger endpoint for RESTful gRPC services. The Swagger endpoint can then be used with [Swagger UI](https://swagger.io/swagger-ui/) and other tooling.
+
+To enable Swagger with gRPC HTTP API:
+
+1. Add a package reference to [Microsoft.AspNetCore.Grpc.Swagger](https://www.nuget.org/packages/Microsoft.AspNetCore.Grpc.Swagger).
+2. Configure Swashbuckle in `Startup.cs`. The `AddGrpcSwagger` method configures Swashbuckle to include gRPC HTTP API endpoints.
+
+[!code-csharp[](~/grpc/httpapi/Startup.cs?name=snippet_1&highlight=6-10,15-19)]
+
+To confirm that Swashbuckle is generating Swagger for the RESTful gRPC services, start the app and navigate to the Swagger UI page.
 
 ### Known issues
 
