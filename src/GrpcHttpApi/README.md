@@ -14,9 +14,9 @@ Of course gRPC can continue to be used as well. RESTful APIs for your gRPC servi
 ### Usage
 
 1. Add a package reference to [Microsoft.AspNetCore.Grpc.HttpApi](https://www.nuget.org/packages/Microsoft.AspNetCore.Grpc.HttpApi).
-1. Register services in `Startup.cs` with `AddGrpcHttpApi`.
-1. Add [google/api/http.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/http.proto) and [google/api/annotations.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/annotations.proto) files to your project.
-1. Annotate gRPC methods in your `.proto` files with HTTP bindings and routes:
+2. Register services in `Startup.cs` with `AddGrpcHttpApi`.
+3. Add [google/api/http.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/http.proto) and [google/api/annotations.proto](https://github.com/aspnet/AspLabs/blob/c1e59cacf7b9606650d6ec38e54fa3a82377f360/src/GrpcHttpApi/sample/Proto/google/api/annotations.proto) files to your project.
+4. Annotate gRPC methods in your `.proto` files with HTTP bindings and routes:
 
 ```protobuf
 syntax = "proto3";
