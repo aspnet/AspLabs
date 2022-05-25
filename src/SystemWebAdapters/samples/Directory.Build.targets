@@ -1,3 +1,0 @@
-<!-- Disable any build stuff brought in by arcade for the samples.
-     By default, Arcade will bring in PackageReferences which will break any old-style projects (they will prefer those packages over packages.config) -->
-<Project />
