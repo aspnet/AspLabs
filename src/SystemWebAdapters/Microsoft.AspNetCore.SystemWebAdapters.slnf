@@ -1,9 +1,0 @@
-{
-  "solution": {
-    "path": "Microsoft.AspNetCore.SystemWebAdapters.sln",
-    "projects": [
-      "src\\Microsoft.AspNetCore.SystemWebAdapters\\Microsoft.AspNetCore.SystemWebAdapters.csproj",
-      "test\\Microsoft.AspNetCore.SystemWebAdapters.Tests\\Microsoft.AspNetCore.SystemWebAdapters.Tests.csproj"
-    ]
-  }
-}
