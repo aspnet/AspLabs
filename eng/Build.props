@@ -3,7 +3,6 @@
   <!-- Specify the solutions to build. Add all new solutions/projects here as necessary or the main build won't build them! -->
   <ItemGroup>
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\AspNetCoreWebAPI\AspNetCoreWebAPI.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ComponentsElectron\ComponentsElectron.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\DotNetDiagnostics\dotnet-monitor.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\GrpcHttpApi\GrpcHttpApi.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Proxy\Proxy.sln" />
@@ -13,6 +12,5 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorCustomElements\BlazorCustomElements.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\RateLimiting\RateLimiting.sln" />
   </ItemGroup>
 </Project>

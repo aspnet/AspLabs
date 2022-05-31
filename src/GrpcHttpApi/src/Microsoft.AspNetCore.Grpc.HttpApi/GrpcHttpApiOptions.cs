@@ -1,8 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Google.Protobuf;
-
 namespace Microsoft.AspNetCore.Grpc.HttpApi
 {
     /// <summary>
@@ -10,18 +8,9 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
     /// </summary>
     public class GrpcHttpApiOptions
     {
-        // grpc-gateway V2 writes default values by default
-        // https://github.com/grpc-ecosystem/grpc-gateway/pull/1377
-        private static readonly JsonFormatter DefaultFormatter = new JsonFormatter(new JsonFormatter.Settings(formatDefaultValues: true));
-
         /// <summary>
-        /// Gets or sets the <see cref="Google.Protobuf.JsonFormatter"/> used to serialize outgoing messages.
+        /// Gets or sets the <see cref="HttpApi.JsonSettings"/> used to serialize messages.
         /// </summary>
-        public JsonFormatter JsonFormatter { get; set; } = DefaultFormatter;
-
-        /// <summary>
-        /// Gets or sets the <see cref="Google.Protobuf.JsonParser"/> used to deserialize incoming messages.
-        /// </summary>
-        public JsonParser JsonParser { get; set; } = JsonParser.Default;
+        public JsonSettings JsonSettings { get; set; } = new JsonSettings();
     }
 }

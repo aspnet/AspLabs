@@ -5,5 +5,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.Slack\Microsoft.AspNetCore.WebHooks.Receivers.Slack.csproj" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="$(SystemSecurityCryptographyX509CertificatesPackageVersion)" />
   </ItemGroup>
 </Project>

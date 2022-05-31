@@ -1,17 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Proto\greeter.proto" />
+    <None Remove="Proto\counter.proto" />
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="Proto\counter.proto" GrpcServices="Both" />
+    <Protobuf Include="Proto\xmldoc.proto" GrpcServices="Both" />
     <Protobuf Include="Proto\greeter.proto" GrpcServices="Both" />
-    <Protobuf Include="Proto\httpapi.proto" GrpcServices="Both" />
+    <Protobuf Include="Proto\messages.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>
