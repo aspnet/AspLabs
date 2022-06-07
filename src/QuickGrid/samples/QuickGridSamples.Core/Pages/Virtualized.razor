@@ -1,0 +1,26 @@
+@page "/virtualized"
+@inject IDataService DataService
+
+<div class="grid" tabindex="-1">
+    <QuickGrid ItemsProvider="@itemsProvider" Virtualize="true" ItemSize="30">
+        <TemplateColumn Title="Flag"><img class="flag" src="flags/@(context.Code).svg" /></TemplateColumn>
+        <PropertyColumn Class="country-name" Property="@(c => c.Name)" Sortable="true" IsDefaultSort="SortDirection.Ascending" />
+        <PropertyColumn Property="@(c => c.Medals.Gold)" Sortable="true" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Silver)" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Bronze)" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Total)" Align="Align.Right" />
+    </QuickGrid>
+</div>
+
+@code {
+    GridItemsProvider<Country> itemsProvider;
+
+    protected override void OnInitialized()
+    {
+        itemsProvider = async req =>
+        {
+            var sortBy = req.GetSortByProperties().SingleOrDefault();
+            return await DataService.GetCountriesAsync(req.StartIndex, req.Count, sortBy.PropertyName, sortBy.Direction == SortDirection.Ascending, req.CancellationToken);
+        };
+    }
+}

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWebAssemblyHosting>true</EnableWebAssemblyHosting>
+  </PropertyGroup>
+
+  <!--
+    Due to a VS limitation, each ASP.NET Core server application can only enable hot reload for either
+    Blazor Server or Blazor WebAssembly - not both at the same time. The act of referencing a WebAssembly
+    project determines which one you're choosing. So, in case you want to work on Blazor Server with hot
+    reload, you can set the EnableWebAssemblyHosting flag to 'false' above.
+  -->
+  <ItemGroup Condition="'$(EnableWebAssemblyHosting)' == 'true'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.5" />
+    <ProjectReference Include="..\QuickGridSamples.WebAssembly\QuickGridSamples.WebAssembly.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(EnableWebAssemblyHosting)' == 'true'">
+    <DefineConstants>$(DefineConstants);ENABLE_WASM_HOSTING</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter\Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter.csproj" />
+    <ProjectReference Include="..\QuickGridSamples.Core\QuickGridSamples.Core.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>
