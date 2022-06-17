@@ -27,7 +27,7 @@
     // on every render, so the grid will re-query on every render even if the filter criteria hasn't changed.
     // Once we have @bind:after, it would be possible to use that to update an _items field, meaning that
     // we'd only cause a re-query when the filter actually changes.
-    IQueryable<Country> FilteredItems => DataService.Countries.Where(x => x.Name.Contains(nameFilter));
+    IQueryable<Country> FilteredItems => DataService.Countries.Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
 
     GridSort<Country> rankSort = GridSort<Country>
         .ByDescending(x => x.Medals.Gold)
