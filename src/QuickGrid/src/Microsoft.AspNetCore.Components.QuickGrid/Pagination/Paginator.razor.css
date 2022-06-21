@@ -1,0 +1,41 @@
+.paginator {
+    display: flex;
+    border-top: 1px solid #ccc;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+nav {
+    display: flex;
+    margin-left: auto;
+    gap: 1rem;
+}
+
+nav button {
+    border: 0;
+    background: none;
+}
+
+    nav button:not([disabled]):hover {
+        background-color: #eee;
+    }
+
+    nav button:not([disabled]):active {
+        background-color: #aaa;
+    }
+
+.go-first:after {
+    content: '\21E4'; /* ⇤ */
+}
+
+.go-previous:after {
+    content: '\2190'; /* ← */
+}
+
+.go-next:after {
+    content: '\2192'; /* → */
+}
+
+.go-last:after {
+    content: '\21E5'; /* ⇥ */
+}

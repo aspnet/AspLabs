@@ -1,0 +1,36 @@
+@page "/entityframework"
+@inject IDataService DataService
+
+<div class="grid">
+    <QuickGrid Items="@FilteredItems" ResizableColumns="true" Pagination="@pagination">
+        <TemplateColumn Title="Rank" SortBy="@rankSort" Align="Align.Center" IsDefaultSort="SortDirection.Ascending">
+            <img class="flag" src="flags/@(context.Code).svg" />
+        </TemplateColumn>
+        <PropertyColumn Property="@(c => c.Name)" Sortable="true">
+            <ColumnOptions>
+                <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" />
+            </ColumnOptions>
+        </PropertyColumn>
+        <PropertyColumn Property="@(c => c.Medals.Gold)" Sortable="true" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Silver)" Sortable="true" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Bronze)" Sortable="true" Align="Align.Right" />
+        <PropertyColumn Property="@(c => c.Medals.Total)" Align="Align.Right" />
+    </QuickGrid>
+    <Paginator Value="@pagination" />
+</div>
+
+@code {
+    PaginationState pagination = new PaginationState { ItemsPerPage = 15 };
+    string nameFilter = string.Empty;
+
+    // Note: this pattern is a little dubious because it means we're supplying a different data source
+    // on every render, so the grid will re-query on every render even if the filter criteria hasn't changed.
+    // Once we have @bind:after, it would be possible to use that to update an _items field, meaning that
+    // we'd only cause a re-query when the filter actually changes.
+    IQueryable<Country> FilteredItems => DataService.Countries.Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
+
+    GridSort<Country> rankSort = GridSort<Country>
+        .ByDescending(x => x.Medals.Gold)
+        .ThenDescending(x => x.Medals.Silver)
+        .ThenDescending(x => x.Medals.Bronze);
+}
