@@ -36,13 +36,11 @@ th ::deep .sort-indicator {
 /* Deep to make it easy for people adding a col-options-button element in a custom HeaderTemplate */
 th ::deep .col-options-button {
     border: none;
-    background: none;
     padding: 0; /* So that even if the text on the button is wide, it gets properly centered */
+    width: 1rem;
+    align-self: stretch;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="1.5 0 21 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>') center center / 1rem no-repeat;
 }
-
-    th ::deep .col-options-button:before {
-        content: '\2630';
-    }
 
 .col-options {
     position: absolute;
