@@ -44,7 +44,7 @@ public partial class Paginator : IDisposable
 
     /// <inheritdoc />
     protected override void OnParametersSet()
-        => _totalItemCountChanged.SubscribeOrMove(Value.TotalItemCountChanged);
+        => _totalItemCountChanged.SubscribeOrMove(Value.TotalItemCountChangedSubscribable);
 
     /// <inheritdoc />
     public void Dispose()

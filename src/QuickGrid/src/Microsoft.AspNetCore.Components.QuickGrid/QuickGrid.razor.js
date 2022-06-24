@@ -1,16 +1,16 @@
-export function init(elem) {
-    enableColumnResizing(elem);
+export function init(tableElement) {
+    enableColumnResizing(tableElement);
 
     const bodyClickHandler = event => {
-        const columnOptionsElement = elem.querySelector('thead .col-options');
-        if (columnOptionsElement && event.path.indexOf(columnOptionsElement) < 0) {
-            elem.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
+        const columnOptionsElement = tableElement.tHead.querySelector('.col-options');
+        if (columnOptionsElement && event.composedPath().indexOf(columnOptionsElement) < 0) {
+            tableElement.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
         }
     };
     const keyDownHandler = event => {
-        const columnOptionsElement = elem.querySelector('thead .col-options');
+        const columnOptionsElement = tableElement.tHead.querySelector('.col-options');
         if (columnOptionsElement && event.key === "Escape") {
-            elem.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
+            tableElement.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
         }
     };
 
@@ -27,12 +27,22 @@ export function init(elem) {
     };
 }
 
-export function checkColumnOptionsPosition(elem) {
-    const colOptions = elem.querySelector('.col-options');
+export function checkColumnOptionsPosition(tableElement) {
+    const colOptions = tableElement.tHead && tableElement.tHead.querySelector('.col-options'); // Only match within *our* thead, not nested tables
     if (colOptions) {
-        if (colOptions.offsetLeft < 0) {
-            colOptions.style.transform = `translateX(${-1 * colOptions.offsetLeft}px)`;
+        // We want the options popup to be positioned over the grid, not overflowing on either side, because it's possible that
+        // beyond either side is off-screen or outside the scroll range of an ancestor
+        const gridRect = tableElement.getBoundingClientRect();
+        const optionsRect = colOptions.getBoundingClientRect();
+        const leftOverhang = Math.max(0, gridRect.left - optionsRect.left);
+        const rightOverhang = Math.max(0, optionsRect.right - gridRect.right);
+        if (leftOverhang || rightOverhang) {
+            // In the unlikely event that it overhangs both sides, we'll center it
+            const applyOffset = leftOverhang && rightOverhang ? (leftOverhang - rightOverhang) / 2 : (leftOverhang - rightOverhang);
+            colOptions.style.transform = `translateX(${applyOffset}px)`;
         }
+
+        colOptions.scrollIntoViewIfNeeded();
 
         const autoFocusElem = colOptions.querySelector('[autofocus]');
         if (autoFocusElem) {
@@ -41,21 +51,27 @@ export function checkColumnOptionsPosition(elem) {
     }
 }
 
-function enableColumnResizing(elem) {
-    elem.querySelectorAll('table.quickgrid > thead .col-width-draghandle').forEach(handle => {
-        handle.addEventListener('mousedown', evt => {
+function enableColumnResizing(tableElement) {
+    tableElement.tHead.querySelectorAll('.col-width-draghandle').forEach(handle => {
+        handle.addEventListener('mousedown', handleMouseDown);
+        if ('ontouchstart' in window) {
+            handle.addEventListener('touchstart', handleMouseDown);
+        }
+
+        function handleMouseDown(evt) {
             evt.preventDefault();
             evt.stopPropagation();
+
             const th = handle.parentElement;
-            const startPageX = evt.pageX;
+            const startPageX = evt.touches ? evt.touches[0].pageX : evt.pageX;
             const originalColumnWidth = th.offsetWidth;
             const rtlMultiplier = window.getComputedStyle(th, null).getPropertyValue('direction') === 'rtl' ? -1 : 1;
             let updatedColumnWidth = 0;
 
             function handleMouseMove(evt) {
-                evt.preventDefault();
                 evt.stopPropagation();
-                const nextWidth = originalColumnWidth + (evt.pageX - startPageX) * rtlMultiplier;
+                const newPageX = evt.touches ? evt.touches[0].pageX : evt.pageX;
+                const nextWidth = originalColumnWidth + (newPageX - startPageX) * rtlMultiplier;
                 if (Math.abs(nextWidth - updatedColumnWidth) > 0) {
                     updatedColumnWidth = nextWidth;
                     th.style.width = `${updatedColumnWidth}px`;
@@ -65,10 +81,17 @@ function enableColumnResizing(elem) {
             function handleMouseUp() {
                 document.body.removeEventListener('mousemove', handleMouseMove);
                 document.body.removeEventListener('mouseup', handleMouseUp);
+                document.body.removeEventListener('touchmove', handleMouseMove);
+                document.body.removeEventListener('touchend', handleMouseUp);
             }
 
-            document.body.addEventListener('mousemove', handleMouseMove);
-            document.body.addEventListener('mouseup', handleMouseUp);
-        });
+            if (evt instanceof TouchEvent) {
+                document.body.addEventListener('touchmove', handleMouseMove, { passive: true });
+                document.body.addEventListener('touchend', handleMouseUp, { passive: true });
+            } else {
+                document.body.addEventListener('mousemove', handleMouseMove, { passive: true });
+                document.body.addEventListener('mouseup', handleMouseUp, { passive: true });
+            }
+        }
     });
 }

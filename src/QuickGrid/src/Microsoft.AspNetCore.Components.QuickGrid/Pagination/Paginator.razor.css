@@ -2,19 +2,27 @@
     display: flex;
     border-top: 1px solid #ccc;
     margin-top: 0.5rem;
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
+    align-items: center;
 }
 
 nav {
     display: flex;
     margin-left: auto;
-    gap: 1rem;
+    gap: 0.75rem;
+    align-items: center;
 }
 
-nav button {
-    border: 0;
-    background: none;
-}
+    nav button {
+        border: 0;
+        background: none center center / 1rem no-repeat;
+        width: 2rem;
+        height: 2rem;
+    }
+
+    nav button[disabled] {
+        opacity: 0.4;
+    }
 
     nav button:not([disabled]):hover {
         background-color: #eee;
@@ -24,18 +32,14 @@ nav button {
         background-color: #aaa;
     }
 
-.go-first:after {
-    content: '\21E4'; /* ⇤ */
+.go-first, .go-last {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" transform="rotate(90) scale(0.8)"><path d="m 2,1.5 l 10,17.5 l 10,-17.5 l -10,7.75 l -10,-7.75 z"/><rect height="2" width="20" y="20.5" x="2"/></svg>');
 }
 
-.go-previous:after {
-    content: '\2190'; /* ← */
+.go-previous, .go-next {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" transform="rotate(90)"><path d="M 2 3.25 L 12 20.75 L 22 3.25 L 12 11 z" /></svg>');
 }
 
-.go-next:after {
-    content: '\2192'; /* → */
-}
-
-.go-last:after {
-    content: '\21E5'; /* ⇥ */
+.go-next, .go-last {
+    transform: scaleX(-1);
 }
