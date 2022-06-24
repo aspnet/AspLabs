@@ -1,16 +1,16 @@
-export function init(elem) {
-    enableColumnResizing(elem);
+export function init(tableElement) {
+    enableColumnResizing(tableElement);
 
     const bodyClickHandler = event => {
-        const columnOptionsElement = elem.querySelector('thead .col-options');
-        if (columnOptionsElement && event.path.indexOf(columnOptionsElement) < 0) {
-            elem.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
+        const columnOptionsElement = tableElement.tHead.querySelector('.col-options');
+        if (columnOptionsElement && event.composedPath().indexOf(columnOptionsElement) < 0) {
+            tableElement.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
         }
     };
     const keyDownHandler = event => {
-        const columnOptionsElement = elem.querySelector('thead .col-options');
+        const columnOptionsElement = tableElement.tHead.querySelector('.col-options');
         if (columnOptionsElement && event.key === "Escape") {
-            elem.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
+            tableElement.dispatchEvent(new CustomEvent('closecolumnoptions', { bubbles: true }));
         }
     };
 
@@ -51,8 +51,8 @@ export function checkColumnOptionsPosition(tableElement) {
     }
 }
 
-function enableColumnResizing(elem) {
-    elem.querySelectorAll('table.quickgrid > thead .col-width-draghandle').forEach(handle => {
+function enableColumnResizing(tableElement) {
+    tableElement.tHead.querySelectorAll('.col-width-draghandle').forEach(handle => {
         handle.addEventListener('mousedown', evt => {
             evt.preventDefault();
             evt.stopPropagation();
