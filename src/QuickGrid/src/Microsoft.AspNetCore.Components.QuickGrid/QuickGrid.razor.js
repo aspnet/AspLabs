@@ -27,12 +27,22 @@ export function init(elem) {
     };
 }
 
-export function checkColumnOptionsPosition(elem) {
-    const colOptions = elem.querySelector('.col-options');
+export function checkColumnOptionsPosition(tableElement) {
+    const colOptions = tableElement.tHead && tableElement.tHead.querySelector('.col-options'); // Only match within *our* thead, not nested tables
     if (colOptions) {
-        if (colOptions.offsetLeft < 0) {
-            colOptions.style.transform = `translateX(${-1 * colOptions.offsetLeft}px)`;
+        // We want the options popup to be positioned over the grid, not overflowing on either side, because it's possible that
+        // beyond either side is off-screen or outside the scroll range of an ancestor
+        const gridRect = tableElement.getBoundingClientRect();
+        const optionsRect = colOptions.getBoundingClientRect();
+        const leftOverhang = Math.max(0, gridRect.left - optionsRect.left);
+        const rightOverhang = Math.max(0, optionsRect.right - gridRect.right);
+        if (leftOverhang || rightOverhang) {
+            // In the unlikely event that it overhangs both sides, we'll center it
+            const applyOffset = leftOverhang && rightOverhang ? (leftOverhang - rightOverhang) / 2 : (leftOverhang - rightOverhang);
+            colOptions.style.transform = `translateX(${applyOffset}px)`;
         }
+
+        colOptions.scrollIntoViewIfNeeded();
 
         const autoFocusElem = colOptions.querySelector('[autofocus]');
         if (autoFocusElem) {
