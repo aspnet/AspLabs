@@ -148,6 +148,13 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
         _currentPageItemsChanged = new(EventCallback.Factory.Create<PaginationState>(this, RefreshDataCoreAsync));
         _renderColumnHeaders = RenderColumnHeaders;
         _renderNonVirtualizedRows = RenderNonVirtualizedRows;
+
+        // As a special case, we don't issue the first data load request until we've collected the initial set of columns
+        // This is so we can apply default sort order (or any future per-column options) before loading data
+        // We use EventCallbackSubscriber to safely hook this async operation into the synchronous rendering flow
+        var columnsFirstCollectedSubscriber = new EventCallbackSubscriber<object?>(
+            EventCallback.Factory.Create<object?>(this, RefreshDataCoreAsync));
+        columnsFirstCollectedSubscriber.SubscribeOrMove(_internalGridContext.ColumnsFirstCollected);
     }
 
     /// <inheritdoc />
@@ -173,7 +180,10 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
         var mustRefreshData = dataSourceHasChanged
             || (Pagination?.GetHashCode() != _lastRefreshedPaginationStateHash);
 
-        return mustRefreshData ? RefreshDataCoreAsync() : Task.CompletedTask;
+        // We don't want to trigger the first data load until we've collected the initial set of columns,
+        // because they might perform some action like setting the default sort order, so it would be wasteful
+        // to have to re-query immediately
+        return (_columns.Count > 0 && mustRefreshData) ? RefreshDataCoreAsync() : Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

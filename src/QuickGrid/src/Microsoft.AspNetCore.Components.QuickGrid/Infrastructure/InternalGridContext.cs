@@ -8,6 +8,7 @@ namespace Microsoft.AspNetCore.Components.QuickGrid.Infrastructure;
 internal class InternalGridContext<TGridItem>
 {
     public QuickGrid<TGridItem> Grid { get; }
+    public EventCallbackSubscribable<object?> ColumnsFirstCollected { get; } = new();
 
     public InternalGridContext(QuickGrid<TGridItem> grid)
     {
