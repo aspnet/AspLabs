@@ -16,7 +16,7 @@
         <nav role="navigation">
             <button class="go-first" @onclick="GoFirstAsync" disabled="@(!CanGoBack)" title="Go to first page" aria-title="Go to first page"></button>
             <button class="go-previous" @onclick="GoPreviousAsync" disabled="@(!CanGoBack)" title="Go to previous page" aria-title="Go to previous page"></button>
-            <div>
+            <div class="pagination-text">
                 Page <strong>@(Value.CurrentPageIndex + 1)</strong>
                 of <strong>@(Value.LastPageIndex + 1)</strong>
             </div>
