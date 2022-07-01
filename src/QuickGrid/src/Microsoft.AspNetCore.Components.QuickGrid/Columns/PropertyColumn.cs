@@ -42,15 +42,18 @@ public class PropertyColumn<TGridItem, TProp> : ColumnBase<TGridItem>, ISortBuil
 
             if (!string.IsNullOrEmpty(Format))
             {
-                if (typeof(IFormattable).IsAssignableFrom(typeof(TProp)))
-                {
-                    _cellTextFunc = item => ((IFormattable?)compiledPropertyExpression!(item))?.ToString(Format, null);
+                // TODO: Consider using reflection to avoid having to box every value just to call IFormattable.ToString
+                // For example, define a method "string Format<U>(Func<TGridItem, U> property) where U: IFormattable", and
+                // then construct the closed type here with U=TProp when we know TProp implements IFormattable
 
-                }
-                else
+                // If the type is nullable, we're interested in formatting the underlying type
+                var nullableUnderlyingTypeOrNull = Nullable.GetUnderlyingType(typeof(TProp));
+                if (!typeof(IFormattable).IsAssignableFrom(nullableUnderlyingTypeOrNull ?? typeof(TProp)))
                 {
                     throw new InvalidOperationException($"A '{nameof(Format)}' parameter was supplied, but the type '{typeof(TProp)}' does not implement '{typeof(IFormattable)}'.");
                 }
+
+                _cellTextFunc = item => ((IFormattable?)compiledPropertyExpression!(item))?.ToString(Format, null);
             }
             else
             {
