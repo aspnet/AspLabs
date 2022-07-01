@@ -33,7 +33,6 @@ public class App
             Console.Error.WriteLine(e.Message);
             return;
         }
-
         catch(Exception e)
         {
             Console.WriteLine("Check the file path you entered for errors.");
