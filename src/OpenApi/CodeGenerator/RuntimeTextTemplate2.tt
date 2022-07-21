@@ -1,0 +1,25 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Reflection" #>
+<#@ assembly name="mscorlib" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<# if (shouldCreateWebApp) {
+#>
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+<#
+}
+#>
+
+app.<#=method #>("<#=path #>", () => <#=response #>);
+<#+
+    public string path { get; set; }
+    public string method { get; set; }
+    public string apiResponse { get; set; }
+    public bool shouldCreateWebApp { get; set; }
+    public string response { get; set; }
+#>
