@@ -33,6 +33,9 @@
 </CascadingValue>
 
 @code {
+    [Parameter] public EventCallback<TGridItem> OnRowClick { get; set; }
+    [Parameter] public EventCallback<TGridItem> OnRowDoubleClick { get; set; }
+
     private void RenderNonVirtualizedRows(RenderTreeBuilder __builder)
     {
         var initialRowIndex = 2; // aria-rowindex is 1-based, plus the first row is the header
@@ -56,7 +59,7 @@
 
     private void RenderRow(RenderTreeBuilder __builder, int rowIndex, TGridItem item)
     {
-        <tr @key="@(ItemKey(item))" aria-rowindex="@rowIndex">
+        <tr @key="@(ItemKey(item))" aria-rowindex="@rowIndex" onclick="@(() => RowClick(item))" ondblclick="@(() => RowDoubleClick(item))">
             @foreach (var col in _columns)
             {
                 <td class="@ColumnClass(col)" @key="@col">@{ col.CellContent(__builder, item); }</td>
@@ -92,5 +95,15 @@
                 }
             </th>
         }
+    }
+
+    private async Task RowClick(TGridItem item)
+    {
+        await OnRowClick.InvokeAsync(item);
+    }
+
+    private async Task RowDoubleClick(TGridItem item)
+    {
+        await OnRowDoubleClick.InvokeAsync(item);
     }
 }
