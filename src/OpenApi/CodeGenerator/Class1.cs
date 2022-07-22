@@ -13,72 +13,116 @@ namespace CodeGenerator
 
             RuntimeTextTemplate2 page;
             String pageContent;
+            int count = 0;
+            bool shouldCreateWebApp = true;
 
             foreach (var path in paths)
             {
+                if (count > 0)
+                {
+                    shouldCreateWebApp = false;
+                }
                 var operations = path.Value.Operations;
                 foreach (var operation in operations)
                 {
                     var method = operation.Key.ToString().ToLower();
+                    var response = operation.Value.Responses.FirstOrDefault().Value;
+                    var schema = response.Content.Values.FirstOrDefault()?.Schema;
 
-                    switch(method)
+                    string returnValue;
+                    if (schema?.Type.ToLower() == "array")
                     {
-                        case "get":
-                            page = new RuntimeTextTemplate2
-                            {
-                                apiPath = path.Key.ToString(),
-                                apiMethod = "MapGet"
-                            };
-                            pageContent = page.TransformText();
-                            File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
-                            break;
-
-                        case "post":
-                            page = new RuntimeTextTemplate2
-                            {
-                                apiPath = path.Key.ToString(),
-                                apiMethod = "MapPost"
-                            };
-                            pageContent = page.TransformText();
-                            File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
-                            break;
-
-                        case "put":
-                            page = new RuntimeTextTemplate2
-                            {
-                                apiPath = path.Key.ToString(),
-                                apiMethod = "MapPut"
-                            };
-                            pageContent = page.TransformText();
-                            File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
-                            break;
-
-                        case "delete":
-                            page = new RuntimeTextTemplate2
-                            {
-                                apiPath = path.Key.ToString(),
-                                apiMethod = "MapDelete"
-                            };
-                            pageContent = page.TransformText();
-                            File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
-                            break;
+                        returnValue = new App().GetArraySchema(schema);
+                        returnValue = "new " + returnValue + " {}";
                     }
+                    else
+                    {
+                        returnValue = new App().GetPrimitiveType(schema);
+                    }
+
+                    page = new RuntimeTextTemplate2
+                    {
+                        path = path.Key.ToString(),
+                        method = new App().GetHttpMethod(method),
+                        shouldCreateWebApp = shouldCreateWebApp,
+                        returnValue = returnValue
+                    };
+                    pageContent = page.TransformText();
+                    File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
                 }
+                count++;
             }
 
-            //RuntimeTextTemplate2 page = new RuntimeTextTemplate2
-            //{
-            //    path = "\"/students\""
-            //};
-            //String pageContent = page.TransformText();
-            //System.IO.File.WriteAllText(args[1], pageContent);
-        }
+            //    //RuntimeTextTemplate2 page = new RuntimeTextTemplate2
+            //    //{
+            //    //    path = "\"/students\""
+            //    //};
+            //    //String pageContent = page.TransformText();
+            //    //System.IO.File.WriteAllText(args[1], pageContent);
 
+        }
+        private string GetHttpMethod(string method)
+        {
+            switch (method)
+            {
+                case "get":
+                    return "MapGet";
+
+                case "post":
+                    return "MapPost";
+
+                case "put":
+                    return "MapPut";
+
+                case "delete":
+                    return "MapDelete";
+
+                default:
+                    return "";
+            }
+        }
+        private string GetArraySchema(OpenApiSchema? schema)
+        {
+            var type = schema?.Type;
+
+            switch (type)
+            {
+                case "string":
+                    return "string";
+
+                case "integer":
+                    return "int";
+
+                case "boolean":
+                    return "bool";
+
+                case "array":
+                    return new App().GetArraySchema(schema?.Items) + "[]";
+            }
+            return "";
+        }
+        private string GetPrimitiveType(OpenApiSchema? schema)
+        {
+            var type = schema?.Type;
+
+            switch (type)
+            {
+                case "string":
+                    return "\"\"";
+
+                case "integer":
+                    return "0";
+                    //draft
+
+                case "boolean":
+                    return "false";
+            }
+            return "";
+        }
         private OpenApiDocument ReadJson(string args)
         {
-            string inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
-
-
+            var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
+            //var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
 
             if (!Path.IsPathRooted(inputPath))
             {

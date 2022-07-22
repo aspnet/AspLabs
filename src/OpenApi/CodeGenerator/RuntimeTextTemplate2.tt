@@ -14,12 +14,13 @@ var app = builder.Build();
 <#
 }
 #>
+draft
 
-app.<#=method #>("<#=path #>", () => <#=response #>);
+app.<#=method #>("<#=path #>", () => <#=returnValue #>);
 <#+
     public string path { get; set; }
     public string method { get; set; }
     public string apiResponse { get; set; }
     public bool shouldCreateWebApp { get; set; }
-    public string response { get; set; }
+    public string returnValue { get; set; }
 #>

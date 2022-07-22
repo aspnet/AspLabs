@@ -46,24 +46,24 @@ namespace CodeGenerator
             
             #line default
             #line hidden
-            this.Write("\r\napp.");
+            this.Write("draft\r\n\r\napp.");
             
-            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
+            #line 19 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(method));
             
             #line default
             #line hidden
             this.Write("(\"");
             
-            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
+            #line 19 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(path));
             
             #line default
             #line hidden
             this.Write("\", () => ");
             
-            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(response));
+            #line 19 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(returnValue));
             
             #line default
             #line hidden
@@ -71,13 +71,13 @@ namespace CodeGenerator
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 19 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
+        #line 20 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\RuntimeTextTemplate2.tt"
 
     public string path { get; set; }
     public string method { get; set; }
     public string apiResponse { get; set; }
     public bool shouldCreateWebApp { get; set; }
-    public string response { get; set; }
+    public string returnValue { get; set; }
 
         
         #line default
