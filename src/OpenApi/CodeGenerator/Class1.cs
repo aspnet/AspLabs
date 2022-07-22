@@ -112,7 +112,6 @@ namespace CodeGenerator
 
                 case "integer":
                     return "0";
-                    //draft
 
                 case "boolean":
                     return "false";
