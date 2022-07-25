@@ -13,31 +13,48 @@ namespace CodeGenerator
 
             RuntimeTextTemplate2 page;
             String pageContent;
-            int count = 0;
+            int countPaths = 0;
             bool shouldCreateWebApp = true;
 
             foreach (var path in paths)
             {
-                if (count > 0)
-                {
-                    shouldCreateWebApp = false;
-                }
                 var operations = path.Value.Operations;
                 foreach (var operation in operations)
                 {
+                    if (countPaths > 0)
+                    {
+                        shouldCreateWebApp = false;
+                    }
+
                     var method = operation.Key.ToString().ToLower();
                     var response = operation.Value.Responses.FirstOrDefault().Value;
                     var schema = response.Content.Values.FirstOrDefault()?.Schema;
 
+                    var parameters = operation.Value.Parameters;
+                    string parametersList = "";
+                    int countParam = 1;
+
+                    foreach (var parameter in parameters)
+                    {
+                        parametersList += new App().GetDataTypeKeyword(parameter.Schema) + " " + parameter.Name;
+
+                        if (countParam < parameters.Count)
+                        {
+                            parametersList += ", ";
+                        }
+
+                        countParam++;
+                    }
+
                     string returnValue;
                     if (schema?.Type.ToLower() == "array")
                     {
-                        returnValue = new App().GetArraySchema(schema);
+                        returnValue = new App().GetDataTypeKeyword(schema);
                         returnValue = "new " + returnValue + " {}";
                     }
                     else
                     {
-                        returnValue = new App().GetPrimitiveType(schema);
+                        returnValue = new App().GetPrimitiveValue(schema);
                     }
 
                     page = new RuntimeTextTemplate2
@@ -45,12 +62,14 @@ namespace CodeGenerator
                         path = path.Key.ToString(),
                         method = new App().GetHttpMethod(method),
                         shouldCreateWebApp = shouldCreateWebApp,
-                        returnValue = returnValue
+                        returnValue = returnValue,
+                        parametersList = parametersList
                     };
                     pageContent = page.TransformText();
-                    File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs", pageContent);
+                    File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenApi\\OutputFile\\Program.cs", pageContent);
+
+                    countPaths++;
                 }
-                count++;
             }
 
             //    //RuntimeTextTemplate2 page = new RuntimeTextTemplate2
@@ -81,7 +100,7 @@ namespace CodeGenerator
                     return "";
             }
         }
-        private string GetArraySchema(OpenApiSchema? schema)
+        private string GetDataTypeKeyword(OpenApiSchema? schema)
         {
             var type = schema?.Type;
 
@@ -96,12 +115,18 @@ namespace CodeGenerator
                 case "boolean":
                     return "bool";
 
+                case "float":
+                    return "float";
+
+                case "double":
+                    return "double";
+
                 case "array":
-                    return new App().GetArraySchema(schema?.Items) + "[]";
+                    return new App().GetDataTypeKeyword(schema?.Items) + "[]";
             }
             return "";
         }
-        private string GetPrimitiveType(OpenApiSchema? schema)
+        private string GetPrimitiveValue(OpenApiSchema? schema)
         {
             var type = schema?.Type;
 
@@ -115,13 +140,19 @@ namespace CodeGenerator
 
                 case "boolean":
                     return "false";
+
+                case "float":
+                    return "0.0f";
+
+                case "double":
+                    return "0.0d";
             }
             return "";
         }
         private OpenApiDocument ReadJson(string args)
         {
-            var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
-            //var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
+            //var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
+            var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
 
             if (!Path.IsPathRooted(inputPath))
             {
