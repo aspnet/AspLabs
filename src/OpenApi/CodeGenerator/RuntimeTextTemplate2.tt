@@ -7,7 +7,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Reflection" #>
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
-<# if (shouldCreateWebApp) {
+<# if (ShouldCreateWebApp) {
 #>
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -15,11 +15,11 @@ var app = builder.Build();
 }
 #>
 
-app.<#=method #>("<#=path #>", () => <#=returnValue #>);
+app.<#=Method #>("<#=Path #>", (<#=ParametersList #>) => <#=ReturnValue #>);
 <#+
-    public string path { get; set; }
-    public string method { get; set; }
-    public string apiResponse { get; set; }
-    public bool shouldCreateWebApp { get; set; }
-    public string returnValue { get; set; }
+    public string Path { get; set; }
+    public string Method { get; set; }
+    public bool ShouldCreateWebApp { get; set; }
+    public string ReturnValue { get; set; }
+    public string ParametersList { get; set; }
 #>
