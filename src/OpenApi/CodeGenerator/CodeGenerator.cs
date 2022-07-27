@@ -7,12 +7,17 @@ public class App
 {
     public static void Main(string[] args)
     {
-        var document = ReadJson("");
+        if (args.Length == 0)
+        {
+            Console.WriteLine("No file path was found!");
+            return;
+        }
+        var document = ReadJson(args[0]);
         var paths = document.Paths;
 
         if (paths is null || paths.Count == 0)
         {
-            Console.WriteLine("No path was found!");
+            Console.WriteLine("No path was found in the schema!");
             return;
         }
 
@@ -28,7 +33,7 @@ public class App
             if (operations is null || operations.Count == 0)
             {
                 Console.WriteLine("No path was found!");
-                return;
+                Environment.Exit(0);
             }
             foreach (var operation in operations)
             {
@@ -38,6 +43,14 @@ public class App
                 }
 
                 var method = operation.Key.ToString().ToLower();
+                method = GetHttpMethod(method);
+
+                if (method == String.Empty)
+                {
+                    Console.WriteLine("Invalid operation found!");
+                    Environment.Exit(0);
+                }
+
                 var response = operation.Value.Responses.FirstOrDefault().Value;
                 var schema = response.Content.Values.FirstOrDefault()?.Schema;
 
@@ -69,13 +82,13 @@ public class App
                 page = new RuntimeTextTemplate2
                 {
                     Path = path.Key.ToString(),
-                    Method = GetHttpMethod(method),
+                    Method = method,
                     ShouldCreateWebApp = shouldCreateWebApp,
                     ReturnValue = returnValue,
                     ParametersList = parametersList
                 };
                 pageContent = page.TransformText();
-                File.AppendAllText("C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenApi\\OutputFile\\Program.cs", pageContent);
+                File.AppendAllText(args[1], pageContent);
 
                 countPaths++;
             }
@@ -96,7 +109,7 @@ public class App
         "float" => "float",
         "boolean" => "bool",
         "double" => "double",
-        _ => ""
+        _ => String.Empty
     };
     private static string GetArrayKeyword(OpenApiSchema? schema)
     {
@@ -122,15 +135,15 @@ public class App
         "double" => "0.0d",
         _ => String.Empty,
     };
-    private static OpenApiDocument ReadJson(string args)
+    private static OpenApiDocument? ReadJson(string args)
     {
-        var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
-        //var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
+        //var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
+        var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
 
-        if (!Path.IsPathRooted(inputPath))
+        if (!Path.IsPathRooted(args))
         {
             Console.WriteLine("The file path you entered does not have a root");
-            return new OpenApiDocument();
+            return null;
         }
 
         OpenApiStreamReader reader = new OpenApiStreamReader();
@@ -138,7 +151,7 @@ public class App
 
         try
         {
-            string path = Path.GetFullPath(inputPath);
+            string path = Path.GetFullPath(args);
             Stream stream = File.OpenRead(path);
             OpenApiDocument newDocument = reader.Read(stream, out diagnostic);
             return newDocument;
@@ -147,13 +160,15 @@ public class App
         {
             Console.WriteLine("Check to make sure you entered a correct file path because the file was not found.");
             Console.Error.WriteLine(e.Message);
-            return new OpenApiDocument();
+            Environment.Exit(0);
+            return null;
         }
         catch (Exception e)
         {
             Console.WriteLine("Check the file path you entered for errors.");
             Console.Error.WriteLine(e.Message);
-            return new OpenApiDocument();
+            Environment.Exit(0);
+            return null;
         }
         finally
         {
@@ -165,8 +180,9 @@ public class App
             {
                 foreach (OpenApiError error in diagnostic.Errors)
                 {
-                    Console.WriteLine($"There was an error reading in the file at {error.Pointer}");
+                    Console.WriteLine($"There was an error reading in the file: {error.Pointer}");
                     Console.Error.WriteLine(error.Message);
+                    Environment.Exit(0);
                 }
             }
         }
