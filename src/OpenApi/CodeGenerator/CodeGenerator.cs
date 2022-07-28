@@ -11,7 +11,7 @@ public class App
         if (args.Length != 2)
         {
             Console.Error.WriteLine("Please enter two arguments: an input file path and an output file path.");
-            Environment.Exit(1);
+            Environment.Exit(1); // Code 1 is for problems with passed in file paths
         }
 
         var document = ReadJson(args[0]);
@@ -20,7 +20,7 @@ public class App
         if (paths is null || paths.Count == 0)
         {
             Console.Error.WriteLine("No path was found in the schema.");
-            Environment.Exit(3);
+            Environment.Exit(2); // Code 2 is for problems with paths in schema
         }
 
         var fileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();  
@@ -31,7 +31,7 @@ public class App
             if (operations is null || operations.Count == 0)
             {
                 Console.Error.WriteLine("No operation was found in path.");
-                Environment.Exit(4);
+                Environment.Exit(3); // Code 3 is for problems with operations
             }
             var pathString = path.Key.ToString();
             fileProperties.Add(pathString, new Dictionary<string, Dictionary<string, string>> { });
@@ -44,7 +44,7 @@ public class App
                 if (method == String.Empty)
                 {
                     Console.Error.WriteLine($"Unsupported HTTP method found: '{operation.Key}'");
-                    Environment.Exit(4);
+                    Environment.Exit(3);
                 }
 
                 fileProperties[pathString].Add(method, new Dictionary<string, string> { });
@@ -165,14 +165,14 @@ public class App
         {
             Console.WriteLine("Check to make sure you entered a correct file path because the file was not found.");
             Console.Error.WriteLine(e.Message);
-            Environment.Exit(2);
+            Environment.Exit(1);
             return null;
         }
         catch (Exception e)
         {
             Console.WriteLine("Check the file path you entered for errors.");
             Console.Error.WriteLine(e.Message);
-            Environment.Exit(2);
+            Environment.Exit(1);
             return null;
         }
         finally
@@ -187,7 +187,7 @@ public class App
                 {
                     Console.WriteLine($"There was an error reading in the file: {error.Pointer}");
                     Console.Error.WriteLine(error.Message);
-                    Environment.Exit(2);
+                    Environment.Exit(1);
                 }
             }
         }
