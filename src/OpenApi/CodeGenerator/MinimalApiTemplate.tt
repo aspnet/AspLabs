@@ -1,0 +1,44 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Reflection" #>
+<#@ assembly name="mscorlib" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+<#
+    foreach (var path in FileProperties) {
+        Path = path.Key;
+        foreach (var operation in FileProperties[Path]) {
+            Method = operation.Key;
+
+            // currently, the code doesn't handle multiple status code
+            // so it will return the response for code "200" if there is
+            // if not, it will return the first response in the list
+            // this will be changed after we figure out how to handle different status code
+            if (operation.Value.ContainsKey("200")) {
+                ReturnValue = operation.Value["200"];
+            }
+            else {
+                ReturnValue = operation.Value.ElementAt(1).Value;
+            }
+            ParametersList = operation.Value["parameters"];
+#>
+app.<#=Method #>("<#=Path #>", (<#=ParametersList #>) => <#=ReturnValue #>);
+
+<#
+        }
+    }
+#>
+
+<#+
+    public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties { get; set; }
+    public string Path { get; set; }
+    public string Method { get; set; }
+    public string ReturnValue { get; set; }
+    public string ParametersList { get; set; }
+#>

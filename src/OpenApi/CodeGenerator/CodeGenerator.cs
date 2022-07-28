@@ -7,52 +7,47 @@ public class App
 {
     public static void Main(string[] args)
     {
-        if (args.Length == 0)
+
+        if (args.Length != 2)
         {
-            Console.WriteLine("No file path was found!");
-            return;
+            Console.Error.WriteLine("Please enter two arguments: an input file path and an output file path.");
+            Environment.Exit(1);
         }
+
         var document = ReadJson(args[0]);
-        var paths = document.Paths;
+        var paths = document?.Paths;
 
         if (paths is null || paths.Count == 0)
         {
-            Console.WriteLine("No path was found in the schema!");
-            return;
+            Console.Error.WriteLine("No path was found in the schema.");
+            Environment.Exit(3);
         }
 
-        RuntimeTextTemplate2 page;
-        String pageContent;
-
-        int countPaths = 0;
-        bool shouldCreateWebApp = true;
+        var fileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();  
 
         foreach (var path in paths)
         {
             var operations = path.Value.Operations;
             if (operations is null || operations.Count == 0)
             {
-                Console.WriteLine("No path was found!");
-                Environment.Exit(0);
+                Console.Error.WriteLine("No operation was found in path.");
+                Environment.Exit(4);
             }
+            var pathString = path.Key.ToString();
+            fileProperties.Add(pathString, new Dictionary<string, Dictionary<string, string>> { });
+
             foreach (var operation in operations)
             {
-                if (countPaths > 0)
-                {
-                    shouldCreateWebApp = false;
-                }
-
                 var method = operation.Key.ToString().ToLower();
                 method = GetHttpMethod(method);
 
                 if (method == String.Empty)
                 {
-                    Console.WriteLine("Invalid operation found!");
-                    Environment.Exit(0);
+                    Console.Error.WriteLine($"Unsupported HTTP method found: '{operation.Key}'");
+                    Environment.Exit(4);
                 }
 
-                var response = operation.Value.Responses.FirstOrDefault().Value;
-                var schema = response.Content.Values.FirstOrDefault()?.Schema;
+                fileProperties[pathString].Add(method, new Dictionary<string, string> { });
 
                 var parameters = operation.Value.Parameters;
                 string parametersList = "";
@@ -68,31 +63,44 @@ public class App
                     }
                 }
 
-                string returnValue;
+                fileProperties[pathString][method].Add("parameters", parametersList);
 
-                if (schema?.Type.ToLower() == "array")
+                var responses = operation.Value.Responses;
+
+                foreach (var response in responses)
                 {
-                    returnValue = GetArrayKeyword(schema);
+                    string returnValue;
+
+                    // for responses that doesn't have "content" property
+                    // but a description is always required so we will return that
+                    if (response.Value.Content == null || response.Value.Content.Count == 0)
+                    {
+                        returnValue = $"\"{response.Value.Description}\"";
+                        fileProperties[pathString][method].Add(response.Key, returnValue);
+                        continue;
+                    }
+                    var schema = response.Value.Content.First().Value.Schema;
+
+                    if (schema?.Type.ToLower() == "array")
+                    {
+                        returnValue = GetArrayKeyword(schema);
+                    }
+                    else
+                    {
+                        returnValue = GetPrimitiveValue(schema);
+                    }
+
+                    fileProperties[pathString][method].Add(response.Key, returnValue);
                 }
-                else
-                {
-                    returnValue = GetPrimitiveValue(schema);
-                }
-
-                page = new RuntimeTextTemplate2
-                {
-                    Path = path.Key.ToString(),
-                    Method = method,
-                    ShouldCreateWebApp = shouldCreateWebApp,
-                    ReturnValue = returnValue,
-                    ParametersList = parametersList
-                };
-                pageContent = page.TransformText();
-                File.AppendAllText(args[1], pageContent);
-
-                countPaths++;
             }
         }
+
+        var page = new MinimalApiTemplate
+        {
+            FileProperties = fileProperties
+        };
+        var pageContent = page.TransformText();
+        File.AppendAllText(args[1], pageContent);
     }
     private static string GetHttpMethod(string method) => method switch
     {
@@ -137,12 +145,9 @@ public class App
     };
     private static OpenApiDocument? ReadJson(string args)
     {
-        //var inputPath = "C:\\Users\\AnhThiDao\\openapi.json";
-        var inputPath = "C:\\Users\\Anh Thi Dao\\Downloads\\petstore.json";
-
         if (!Path.IsPathRooted(args))
         {
-            Console.WriteLine("The file path you entered does not have a root");
+            Console.Error.WriteLine("The file path you entered does not have a root");
             return null;
         }
 
@@ -160,14 +165,14 @@ public class App
         {
             Console.WriteLine("Check to make sure you entered a correct file path because the file was not found.");
             Console.Error.WriteLine(e.Message);
-            Environment.Exit(0);
+            Environment.Exit(2);
             return null;
         }
         catch (Exception e)
         {
             Console.WriteLine("Check the file path you entered for errors.");
             Console.Error.WriteLine(e.Message);
-            Environment.Exit(0);
+            Environment.Exit(2);
             return null;
         }
         finally
@@ -182,7 +187,7 @@ public class App
                 {
                     Console.WriteLine($"There was an error reading in the file: {error.Pointer}");
                     Console.Error.WriteLine(error.Message);
-                    Environment.Exit(0);
+                    Environment.Exit(2);
                 }
             }
         }
