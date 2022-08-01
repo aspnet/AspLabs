@@ -16,22 +16,104 @@ var app = builder.Build();
         foreach (var operation in FileProperties[Path]) {
             Method = operation.Key;
 
-            // currently, the code doesn't handle multiple status code
-            // so it will return the response for code "200" if there is
-            // if not, it will return the first response in the list
-            // this will be changed after we figure out how to handle different status code
-            if (operation.Value.ContainsKey("200")) {
-                ReturnValue = operation.Value["200"];
-            }
-            else {
-                ReturnValue = operation.Value.ElementAt(1).Value;
-            }
             ParametersList = operation.Value["parameters"];
+
+            if (ParametersList != String.Empty) {
+                ParametersList = ", " + ParametersList;
+            }
 #>
-app.<#=Method #>("<#=Path #>", (<#=ParametersList #>) => <#=ReturnValue #>);
+app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
+{
+<#
+            foreach (var response in operation.Value) {
+
+                if (response.Key != "parameters") {
+                    StatusCode = response.Key;
+                    if (response.Value == "Default") {
+                        var statusMethod = StatusCode switch {
+                        "202" => "Accepted()",
+                        "400" => "BadRequest()",
+                        "409" => "Conflict()",
+                        "204" => "NoContent()",
+                        "404" => "NotFound()",
+                        "200" => "Ok()",
+                        "401" => "Unauthorized()",
+                        "422" => "UnprocessableEntity()",
+                        _ => $"StatusCode({response.Key})"
+                        };
+                        ReturnValue = $"Results.{statusMethod}";
+                    }
+                    else {
+                        var statusMethod = StatusCode switch {
+                        "202" => $"Accepted(_, {response.Value})",
+                        "400" => $"BadRequest({response.Value})",
+                        "409" => $"Conflict({response.Value})",
+                        "204" => "NoContent()",
+                        "404" => $"NotFound({response.Value})",
+                        "200" => $"Ok({response.Value})",
+                        "401" => "Unauthorized()",
+                        "422" => $"UnprocessableEntity({response.Value})",
+                        _ => $"StatusCode({response.Key})"
+                        };
+                        ReturnValue = $"Results.{statusMethod}";
+                    }
+                    
+                }
+
+                else {
+                    continue;
+                }
+#>
+    if (context.Request.Headers["AcceptStatusCode"] == "<#=StatusCode #>")
+    {
+        return <#=ReturnValue #>;
+    }
+
+<#
+            }
+#>
+    return null;
+});
 
 <#
         }
+    }
+#>
+
+<#
+    foreach (var schema in Schemas) {
+        UserObject = schema.Key;
+#>
+public class <#=UserObject #> {
+<#
+        string constructorParameters = string.Empty;
+        string constructorBody = string.Empty;
+        foreach (var property in schema.Value) {
+            PropertyName = property.Key;
+            PropertyType = property.Value;
+            constructorParameters += PropertyType + "? " + PropertyName + ", ";
+            constructorBody += $"this.{PropertyName} = {PropertyName}\n";
+#>
+    public <#=PropertyType #>? <#=PropertyName #> { get; set; }
+<#
+        }
+        ConstructorParameters = constructorParameters.Substring(0, constructorParameters.Length - 2);
+        constructorBody = constructorBody.Substring(0, constructorBody.Length - 1);
+#>
+    public <#=UserObject #>(<#=ConstructorParameters #>) {
+<#
+    var statements = constructorBody.Split("\n");
+    foreach (var statement in statements) {
+        ConstructorBody = statement;
+#>
+       <#=ConstructorBody #>;
+<#
+    }
+#>
+    }
+    public <#=UserObject #>() {}
+}
+<#
     }
 #>
 
@@ -41,4 +123,11 @@ app.<#=Method #>("<#=Path #>", (<#=ParametersList #>) => <#=ReturnValue #>);
     public string Method { get; set; }
     public string ReturnValue { get; set; }
     public string ParametersList { get; set; }
+    public string StatusCode { get; set; }
+    public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }
+    public string UserObject { get; set; }
+    public string PropertyName { get; set; }
+    public string PropertyType { get; set; }
+    public string ConstructorParameters { get; set; }
+    public string ConstructorBody { get; set; }
 #>

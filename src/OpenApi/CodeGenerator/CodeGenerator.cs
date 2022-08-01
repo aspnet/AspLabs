@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
@@ -7,7 +8,10 @@ public class App
 {
     public static void Main(string[] args)
     {
-
+        args = new string[] { "C:\\Users\\AnhThiDao\\AspLabs\\mockFiles\\petstore.json", "C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs" };
+        //C:\\Users\\Anh Thi Dao\\Downloads\\openapi (1).json
+        //C:\\Users\\Anh Thi Dao\\Downloads\\Movies.json
+        //C:\\Users\\AnhThiDao\\AspLabs\\mockFiles\\petstore.json
         if (args.Length != 2)
         {
             Console.Error.WriteLine("Please enter two arguments: an input file path and an output file path.");
@@ -19,7 +23,7 @@ public class App
 
         if (paths is null || paths.Count == 0)
         {
-            Console.Error.WriteLine("No path was found in the schema.");
+            Console.Error.WriteLine("No path were found in the schema.");
             Environment.Exit(2); // Code 2 is for problems with paths in schema
         }
 
@@ -50,12 +54,23 @@ public class App
                 fileProperties[pathString].Add(method, new Dictionary<string, string> { });
 
                 var parameters = operation.Value.Parameters;
-                string parametersList = "";
+                string parametersList = String.Empty;
 
                 for (int i = 0; i < parameters.Count; i++)
                 {
                     var parameter = parameters[i];
-                    parametersList += GetDataTypeKeyword(parameter.Schema) + " " + parameter.Name;
+                    if (parameter.Schema.Type.ToLower() == "array")
+                    {
+                        parametersList += GetArrayKeyword(parameter.Schema) + " " + parameter.Name;
+                    }
+                    else if (parameter.Schema.Type.ToLower() == "object")
+                    {
+                        parametersList += parameter.Schema.Reference?.Id + $" user{parameter.Schema.Reference?.Id}";
+                    }
+                    else
+                    {
+                        parametersList += GetDataTypeKeyword(parameter.Schema) + " " + parameter.Name;
+                    }
 
                     if (i < parameters.Count - 1)
                     {
@@ -71,23 +86,41 @@ public class App
                 {
                     string returnValue;
 
-                    // for responses that doesn't have "content" property
-                    // but a description is always required so we will return that
+                    // some responses doesn't have "content" property
+                    // so these would later return a default value
                     if (response.Value.Content == null || response.Value.Content.Count == 0)
                     {
-                        returnValue = $"\"{response.Value.Description}\"";
+                        returnValue = "Default";
                         fileProperties[pathString][method].Add(response.Key, returnValue);
                         continue;
                     }
-                    var schema = response.Value.Content.First().Value.Schema;
+                    var content = response.Value.Content.First().Value;
+                    var schema = content.Schema;
 
                     if (schema?.Type.ToLower() == "array")
                     {
-                        returnValue = GetArrayKeyword(schema);
+                        returnValue = "new " + GetArrayKeyword(schema) + " {}";
+                    }
+                    else if (schema?.Type.ToLower() == "object")
+                    {
+                        returnValue = "new " + schema?.Reference?.Id + "()";
                     }
                     else
                     {
                         returnValue = GetPrimitiveValue(schema);
+                    }
+
+                    // this code below is for parsing sample values
+                    // this is used for demoing the project
+                    if (content.Example != null)
+                    {
+       
+                        returnValue = GetSampleValue(content.Example, schema);
+                    }
+                    
+                    if (content.Examples != null && content.Examples.Count > 0)
+                    {
+                        returnValue = GetSampleValue(content.Examples.First().Value.Value, schema);
                     }
 
                     fileProperties[pathString][method].Add(response.Key, returnValue);
@@ -95,13 +128,68 @@ public class App
             }
         }
 
+        var schemas = document?.Components?.Schemas;
+
+        Dictionary<string, Dictionary<string, string>> schemaDict = new Dictionary<string, Dictionary<string, string>> ();
+        if (schemas != null && schemas.Count > 0)
+        {
+            foreach (var schema in schemas)
+            {
+                schemaDict.Add(schema.Key, new Dictionary<string, string>());
+                foreach (var property in schema.Value.Properties)
+                {
+                    string propertyType;
+                    if (property.Value.Type.ToLower() == "array")
+                    {
+                        propertyType = GetArrayKeyword(property.Value);
+                    }
+                    else if (property.Value.Reference?.Id != null)
+                    {
+                        propertyType = property.Value.Reference.Id;
+                    }
+                    else
+                    {
+                        propertyType = GetDataTypeKeyword(property.Value);
+                    }
+                    schemaDict[schema.Key].Add(property.Key, propertyType);
+                }
+            }
+        }
+
         var page = new MinimalApiTemplate
         {
-            FileProperties = fileProperties
+            FileProperties = fileProperties,
+            Schemas = schemaDict
         };
         var pageContent = page.TransformText();
         File.AppendAllText(args[1], pageContent);
     }
+    private static string GetSampleValue(IOpenApiAny example, OpenApiSchema? schema) => example switch
+    {
+        OpenApiString castedExample => $"\"{castedExample.Value}\"",
+        OpenApiInteger castedExample => castedExample.Value.ToString(),
+        OpenApiBoolean castedExample => castedExample.Value.ToString(),
+        OpenApiFloat castedExample => castedExample.Value.ToString(),
+        OpenApiDouble castedExample => castedExample.Value.ToString(),
+        OpenApiArray castedExample => "new " + GetDataTypeKeyword(schema) + $"[] {{{GetArrayValues(castedExample)}}}",
+        _ => string.Empty
+    };
+    private static string GetArrayValues(OpenApiArray example)
+    {
+        int count = example.Count;
+        string returnValue = string.Empty;
+        foreach (var value in example)
+        {
+            returnValue += GetSampleValue(value,null);
+            if (count > 1)
+            {
+                returnValue += ", ";
+            }
+            count--;
+        }
+        return returnValue;
+    }
+
     private static string GetHttpMethod(string method) => method switch
     {
         "get" => "MapGet",
@@ -131,9 +219,16 @@ public class App
             returnValue += ",";
             schema = schema.Items;
         }
-        returnValue = "new " + GetDataTypeKeyword(schema.Items) + returnValue + "] {}";
+        if (schema.Items.Type.ToLower() == "object")
+        {
+            returnValue = schema?.Items.Reference?.Id + returnValue + "]";
+        }
+        else
+        {
+            returnValue = GetDataTypeKeyword(schema?.Items) + returnValue + "]";
+        }
         return returnValue;
-    } 
+    }
     private static string GetPrimitiveValue(OpenApiSchema? schema) => schema?.Type switch
     {
         "string" => "\"\"",
@@ -183,13 +278,14 @@ public class App
             }
             else
             {
-                foreach (OpenApiError error in diagnostic.Errors)
+                foreach (var error in diagnostic.Errors)
                 {
                     Console.WriteLine($"There was an error reading in the file: {error.Pointer}");
                     Console.Error.WriteLine(error.Message);
                     Environment.Exit(1);
                 }
             }
+      
         }
     }
 }
