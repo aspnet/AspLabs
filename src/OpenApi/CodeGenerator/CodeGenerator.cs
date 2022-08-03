@@ -8,10 +8,6 @@ public class App
 {
     public static void Main(string[] args)
     {
-        args = new string[] { "C:\\Users\\AnhThiDao\\AspLabs\\mockFiles\\petstore.json", "C:\\Users\\AnhThiDao\\AspLabs\\src\\OpenAPI\\OutputFile\\Program.cs" };
-        //C:\\Users\\Anh Thi Dao\\Downloads\\openapi (1).json
-        //C:\\Users\\Anh Thi Dao\\Downloads\\Movies.json
-        //C:\\Users\\AnhThiDao\\AspLabs\\mockFiles\\petstore.json
         if (args.Length != 2)
         {
             Console.Error.WriteLine("Please enter two arguments: an input file path and an output file path.");
@@ -114,7 +110,6 @@ public class App
                     // this is used for demoing the project
                     if (content.Example != null)
                     {
-       
                         returnValue = GetSampleValue(content.Example, schema);
                     }
                     
@@ -161,8 +156,9 @@ public class App
             FileProperties = fileProperties,
             Schemas = schemaDict
         };
+
         var pageContent = page.TransformText();
-        File.AppendAllText(args[1], pageContent);
+        File.WriteAllText(args[1], pageContent);
     }
     private static string GetSampleValue(IOpenApiAny example, OpenApiSchema? schema) => example switch
     {
@@ -172,6 +168,8 @@ public class App
         OpenApiFloat castedExample => castedExample.Value.ToString(),
         OpenApiDouble castedExample => castedExample.Value.ToString(),
         OpenApiArray castedExample => "new " + GetDataTypeKeyword(schema) + $"[] {{{GetArrayValues(castedExample)}}}",
+        OpenApiObject castedExample => GetObjectArguments(castedExample, schema),
+        OpenApiNull castedExample => "null",
         _ => string.Empty
     };
     private static string GetArrayValues(OpenApiArray example)
@@ -188,6 +186,22 @@ public class App
             count--;
         }
         return returnValue;
+    }
+    private static string GetObjectArguments(OpenApiObject example, OpenApiSchema? schema)
+    {
+        string arguments = $"new {schema?.Reference?.Id}(";
+        for (int i = 0; i < example.Values.Count; i++)
+        {
+            if (schema?.Properties?.Values.Count > i)
+            {
+                arguments += $"{GetSampleValue(example.Values.ElementAt(i), schema?.Properties?.Values?.ElementAt(i))}, ";
+            }
+            else
+            {
+                arguments += $"{GetSampleValue(example.Values.ElementAt(i), null)}, ";
+            }
+        }
+        return arguments.Substring(0, arguments.Length - 2) + ")";
     }
 
     private static string GetHttpMethod(string method) => method switch
