@@ -3,6 +3,8 @@
   <Import Project="js\WebpackBuild.targets" />
 
   <PropertyGroup>
+    <NpmFolder>js\</NpmFolder>
+    <NpmCommand>npm run build:$(Configuration)</NpmCommand>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
