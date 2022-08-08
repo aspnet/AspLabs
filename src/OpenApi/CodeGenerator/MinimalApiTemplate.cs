@@ -78,7 +78,7 @@ namespace CodeGenerator
 
                 if (response.Key != "parameters") {
                     StatusCode = response.Key;
-                    if (response.Value == "Default") {
+                    if (response.Value == null) {
                         var statusMethod = StatusCode switch {
                         "202" => "Accepted()",
                         "400" => "BadRequest()",
@@ -153,7 +153,7 @@ namespace CodeGenerator
             #line 82 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     foreach (var schema in Schemas) {
-        UserObject = schema.Key;
+        CustomObject = schema.Key;
 
             
             #line default
@@ -161,7 +161,7 @@ namespace CodeGenerator
             this.Write("public class ");
             
             #line 86 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(UserObject));
+            this.Write(this.ToStringHelper.ToStringWithCulture(CustomObject));
             
             #line default
             #line hidden
@@ -208,7 +208,7 @@ namespace CodeGenerator
             this.Write("    public ");
             
             #line 102 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(UserObject));
+            this.Write(this.ToStringHelper.ToStringWithCulture(CustomObject));
             
             #line default
             #line hidden
@@ -249,7 +249,7 @@ namespace CodeGenerator
             this.Write("    }\r\n    public ");
             
             #line 113 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(UserObject));
+            this.Write(this.ToStringHelper.ToStringWithCulture(CustomObject));
             
             #line default
             #line hidden
@@ -269,17 +269,17 @@ namespace CodeGenerator
         #line 119 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties { get; set; }
-    public string Path { get; set; }
-    public string Method { get; set; }
-    public string ReturnValue { get; set; }
-    public string ParametersList { get; set; }
-    public string StatusCode { get; set; }
+    private string Path { get; set; }
+    private string Method { get; set; }
+    private string ReturnValue { get; set; }
+    private string ParametersList { get; set; }
+    private string StatusCode { get; set; }
     public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }
-    public string UserObject { get; set; }
-    public string PropertyName { get; set; }
-    public string PropertyType { get; set; }
-    public string ConstructorParameters { get; set; }
-    public string ConstructorBody { get; set; }
+    private string CustomObject { get; set; }
+    private string PropertyName { get; set; }
+    private string PropertyType { get; set; }
+    private string ConstructorParameters { get; set; }
+    private string ConstructorBody { get; set; }
 
         
         #line default

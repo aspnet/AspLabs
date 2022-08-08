@@ -41,7 +41,7 @@ public class App
                 var method = operation.Key.ToString().ToLower();
                 method = GetHttpMethod(method);
 
-                if (method == String.Empty)
+                if (method == string.Empty)
                 {
                     Console.Error.WriteLine($"Unsupported HTTP method found: '{operation.Key}'");
                     Environment.Exit(3);
@@ -50,7 +50,7 @@ public class App
                 fileProperties[pathString].Add(method, new Dictionary<string, string> { });
 
                 var parameters = operation.Value.Parameters;
-                string parametersList = String.Empty;
+                string parametersList = string.Empty;
 
                 for (int i = 0; i < parameters.Count; i++)
                 {
@@ -86,18 +86,23 @@ public class App
                     // so these would later return a default value
                     if (response.Value.Content == null || response.Value.Content.Count == 0)
                     {
-                        returnValue = "Default";
-                        fileProperties[pathString][method].Add(response.Key, returnValue);
+                        fileProperties[pathString][method].Add(response.Key, null);
                         continue;
                     }
                     var content = response.Value.Content.First().Value;
                     var schema = content.Schema;
 
-                    if (schema?.Type.ToLower() == "array")
+                    if (schema == null)
+                    {
+                        Console.Error.WriteLine("No schema was found for the response.");
+                        Environment.Exit(3); 
+                    }
+
+                    if (schema.Type.ToLower() == "array")
                     {
                         returnValue = "new " + GetArrayKeyword(schema) + " {}";
                     }
-                    else if (schema?.Type.ToLower() == "object")
+                    else if (schema.Type.ToLower() == "object")
                     {
                         returnValue = "new " + schema?.Reference?.Id + "()";
                     }
@@ -160,6 +165,7 @@ public class App
         var pageContent = page.TransformText();
         File.WriteAllText(args[1], pageContent);
     }
+
     private static string GetSampleValue(IOpenApiAny example, OpenApiSchema? schema) => example switch
     {
         OpenApiString castedExample => $"\"{castedExample.Value}\"",
@@ -172,6 +178,7 @@ public class App
         OpenApiNull castedExample => "null",
         _ => string.Empty
     };
+
     private static string GetArrayValues(OpenApiArray example)
     {
         int count = example.Count;
@@ -187,6 +194,7 @@ public class App
         }
         return returnValue;
     }
+
     private static string GetObjectArguments(OpenApiObject example, OpenApiSchema? schema)
     {
         string arguments = $"new {schema?.Reference?.Id}(";
@@ -210,8 +218,9 @@ public class App
         "post" => "MapPost",
         "put" => "MapPut",
         "delete" => "MapDelete",
-        _ => String.Empty
+        _ => string.Empty
     };
+
     private static string GetDataTypeKeyword(OpenApiSchema? schema) => schema?.Type switch
     {
         "string" => "string",
@@ -219,13 +228,14 @@ public class App
         "float" => "float",
         "boolean" => "bool",
         "double" => "double",
-        _ => String.Empty
+        _ => string.Empty
     };
+
     private static string GetArrayKeyword(OpenApiSchema? schema)
     {
         if (schema == null)
         {
-            return String.Empty;
+            return string.Empty;
         }
         string returnValue = "[";
         while (schema.Items.Type == "array")
@@ -239,10 +249,11 @@ public class App
         }
         else
         {
-            returnValue = GetDataTypeKeyword(schema?.Items) + returnValue + "]";
+            returnValue = GetDataTypeKeyword(schema.Items) + returnValue + "]";
         }
         return returnValue;
     }
+
     private static string GetPrimitiveValue(OpenApiSchema? schema) => schema?.Type switch
     {
         "string" => "\"\"",
@@ -250,8 +261,9 @@ public class App
         "boolean" => "false",
         "float" => "0.0f",
         "double" => "0.0d",
-        _ => String.Empty,
+        _ => string.Empty,
     };
+
     private static OpenApiDocument? ReadJson(string args)
     {
         if (!Path.IsPathRooted(args))
