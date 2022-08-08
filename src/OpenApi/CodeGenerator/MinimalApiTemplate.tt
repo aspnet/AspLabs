@@ -10,6 +10,7 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+
 <#
     foreach (var path in FileProperties) {
         Path = path.Key;
