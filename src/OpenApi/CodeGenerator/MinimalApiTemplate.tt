@@ -12,25 +12,26 @@ var app = builder.Build();
 
 <#
     foreach (var path in FileProperties) {
-        Path = path.Key;
-        foreach (var operation in FileProperties[Path]) {
-            Method = operation.Key;
+        var pathValue = path.Key;
+        foreach (var operation in FileProperties[pathValue]) {
+            var method = operation.Key;
 
-            ParametersList = operation.Value["parameters"];
+            var parameterList = operation.Value["parameters"];
 
-            if (ParametersList != String.Empty) {
-                ParametersList = ", " + ParametersList;
+            if (parameterList != String.Empty) {
+                parameterList = ", " + parameterList;
             }
 #>
-app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
+app.<#=method #>("<#=pathValue #>", (HttpContext context<#=parameterList #>) =>
 {
 <#
             foreach (var response in operation.Value) {
 
                 if (response.Key != "parameters") {
-                    StatusCode = response.Key;
+                    var statusCode = response.Key;
+                    string returnValue;
                     if (response.Value == null) {
-                        var statusMethod = StatusCode switch {
+                        var statusMethod = statusCode switch {
                         "202" => "Accepted()",
                         "400" => "BadRequest()",
                         "409" => "Conflict()",
@@ -41,10 +42,10 @@ app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
                         "422" => "UnprocessableEntity()",
                         _ => $"StatusCode({response.Key})"
                         };
-                        ReturnValue = $"Results.{statusMethod}";
+                        returnValue = $"Results.{statusMethod}";
                     }
                     else {
-                        var statusMethod = StatusCode switch {
+                        var statusMethod = statusCode switch {
                         "202" => $"Accepted(_, {response.Value})",
                         "400" => $"BadRequest({response.Value})",
                         "409" => $"Conflict({response.Value})",
@@ -55,7 +56,7 @@ app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
                         "422" => $"UnprocessableEntity({response.Value})",
                         _ => $"StatusCode({response.Key})"
                         };
-                        ReturnValue = $"Results.{statusMethod}";
+                        returnValue = $"Results.{statusMethod}";
                     }
                     
                 }
@@ -63,9 +64,9 @@ app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
                     continue;
                 }
 #>
-    if (context.Request.Headers["AcceptStatusCode"] == "<#=StatusCode #>")
+    if (context.Request.Headers["AcceptStatusCode"] == "<#=statusCode #>")
     {
-        return <#=ReturnValue #>;
+        return <#=returnValue #>;
     }
 
 <#
@@ -81,36 +82,35 @@ app.<#=Method #>("<#=Path #>", (HttpContext context<#=ParametersList #>) =>
 
 <#
     foreach (var schema in Schemas) {
-        CustomObject = schema.Key;
+        var customObject = schema.Key;
 #>
-public class <#=CustomObject #> {
+public class <#=customObject #> {
 <#
         string constructorParameters = string.Empty;
         string constructorBody = string.Empty;
         foreach (var property in schema.Value) {
-            PropertyName = property.Key;
-            PropertyType = property.Value;
-            constructorParameters += PropertyType + "? " + PropertyName + ", ";
-            constructorBody += $"this.{PropertyName} = {PropertyName}\n";
+            var propertyName = property.Key;
+            var propertyType = property.Value;
+            constructorParameters += propertyType + "? " + propertyName + ", ";
+            constructorBody += $"this.{propertyName} = {propertyName}\n";
 #>
-    public <#=PropertyType #>? <#=PropertyName #> { get; set; }
+    public <#=propertyType #>? <#=propertyName #> { get; set; }
 <#
         }
-        ConstructorParameters = constructorParameters.Substring(0, constructorParameters.Length - 2);
+        constructorParameters = constructorParameters.Substring(0, constructorParameters.Length - 2);
         constructorBody = constructorBody.Substring(0, constructorBody.Length - 1);
 #>
-    public <#=CustomObject #>(<#=ConstructorParameters #>) {
+    public <#=customObject #>(<#=constructorParameters #>) {
 <#
     var statements = constructorBody.Split("\n");
     foreach (var statement in statements) {
-        ConstructorBody = statement;
 #>
-       <#=ConstructorBody #>;
+       <#=statement #>;
 <#
     }
 #>
     }
-    public <#=CustomObject #>() {}
+    public <#=customObject #>() {}
 }
 <#
     }
@@ -118,15 +118,5 @@ public class <#=CustomObject #> {
 
 <#+
     public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties { get; set; }
-    private string Path { get; set; }
-    private string Method { get; set; }
-    private string ReturnValue { get; set; }
-    private string ParametersList { get; set; }
-    private string StatusCode { get; set; }
     public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }
-    private string CustomObject { get; set; }
-    private string PropertyName { get; set; }
-    private string PropertyType { get; set; }
-    private string ConstructorParameters { get; set; }
-    private string ConstructorBody { get; set; }
 #>
