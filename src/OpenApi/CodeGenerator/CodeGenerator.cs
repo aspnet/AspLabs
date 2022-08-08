@@ -160,7 +160,6 @@ public class App
         var pageContent = page.TransformText();
         File.WriteAllText(args[1], pageContent);
     }
-
     private static string GetSampleValue(IOpenApiAny example, OpenApiSchema? schema) => example switch
     {
         OpenApiString castedExample => $"\"{castedExample.Value}\"",
