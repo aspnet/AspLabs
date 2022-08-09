@@ -9,11 +9,6 @@
 // ------------------------------------------------------------------------------
 namespace CodeGenerator
 {
-    using System.Linq;
-    using System.Text;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using Microsoft.VisualStudio.TextTemplating;
     using System;
     
     /// <summary>
@@ -33,7 +28,7 @@ namespace CodeGenerator
             this.Write("var builder = WebApplication.CreateBuilder(args);\r\nvar app = builder.Build();\r\n\r\n" +
                     "");
             
-            #line 13 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 6 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     foreach (var path in FileProperties) {
         var pathValue = path.Key;
@@ -51,32 +46,32 @@ namespace CodeGenerator
             #line hidden
             this.Write("app.");
             
-            #line 25 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(method));
             
             #line default
             #line hidden
             this.Write("(\"");
             
-            #line 25 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(pathValue));
             
             #line default
             #line hidden
             this.Write("\", (HttpContext context");
             
-            #line 25 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 18 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameterList));
             
             #line default
             #line hidden
             this.Write(") =>\r\n{\r\n");
             
-            #line 27 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 20 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
             foreach (var response in operation.Value) {
-                string returnValue;
                 string statusCode;
+                string returnValue;
                 if (response.Key != "parameters") {
                     statusCode = response.Key;
                     if (response.Value == null) {
@@ -118,21 +113,21 @@ namespace CodeGenerator
             #line hidden
             this.Write("    if (context.Request.Headers[\"AcceptStatusCode\"] == \"");
             
-            #line 67 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 60 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(statusCode));
             
             #line default
             #line hidden
             this.Write("\")\r\n    {\r\n        return ");
             
-            #line 69 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 62 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(returnValue));
             
             #line default
             #line hidden
             this.Write(";\r\n    }\r\n\r\n");
             
-            #line 72 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 65 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
             }
 
@@ -141,7 +136,7 @@ namespace CodeGenerator
             #line hidden
             this.Write("    return null;\r\n});\r\n\r\n");
             
-            #line 78 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 71 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
         }
     }
@@ -151,7 +146,7 @@ namespace CodeGenerator
             #line hidden
             this.Write("\r\n");
             
-            #line 83 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 76 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     foreach (var schema in Schemas) {
         var customObject = schema.Key;
@@ -161,14 +156,14 @@ namespace CodeGenerator
             #line hidden
             this.Write("public class ");
             
-            #line 87 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 80 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(customObject));
             
             #line default
             #line hidden
             this.Write(" {\r\n");
             
-            #line 88 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 81 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
         string constructorParameters = string.Empty;
         string constructorBody = string.Empty;
@@ -183,21 +178,21 @@ namespace CodeGenerator
             #line hidden
             this.Write("    public ");
             
-            #line 97 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 90 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(propertyType));
             
             #line default
             #line hidden
             this.Write("? ");
             
-            #line 97 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 90 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(propertyName));
             
             #line default
             #line hidden
             this.Write(" { get; set; }\r\n");
             
-            #line 98 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 91 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
         }
         constructorParameters = constructorParameters.Substring(0, constructorParameters.Length - 2);
@@ -208,21 +203,21 @@ namespace CodeGenerator
             #line hidden
             this.Write("    public ");
             
-            #line 103 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 96 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(customObject));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 103 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 96 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(constructorParameters));
             
             #line default
             #line hidden
             this.Write(") {\r\n");
             
-            #line 104 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 97 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     var statements = constructorBody.Split("\n");
     foreach (var statement in statements) {
@@ -232,14 +227,14 @@ namespace CodeGenerator
             #line hidden
             this.Write("       ");
             
-            #line 108 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 101 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(statement));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 109 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 102 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     }
 
@@ -248,14 +243,14 @@ namespace CodeGenerator
             #line hidden
             this.Write("    }\r\n    public ");
             
-            #line 113 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 106 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(customObject));
             
             #line default
             #line hidden
             this.Write("() {}\r\n}\r\n");
             
-            #line 115 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+            #line 108 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     }
 
@@ -266,7 +261,7 @@ namespace CodeGenerator
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 119 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
+        #line 112 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
     public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties { get; set; }
     public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }

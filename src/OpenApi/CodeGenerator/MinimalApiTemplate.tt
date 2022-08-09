@@ -1,12 +1,5 @@
 <#@ template language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ assembly name="System.Reflection" #>
 <#@ assembly name="mscorlib" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.Reflection" #>
-<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -26,10 +19,10 @@ app.<#=method #>("<#=pathValue #>", (HttpContext context<#=parameterList #>) =>
 {
 <#
             foreach (var response in operation.Value) {
-
+                string statusCode;
+                string returnValue;
                 if (response.Key != "parameters") {
-                    var statusCode = response.Key;
-                    string returnValue;
+                    statusCode = response.Key;
                     if (response.Value == null) {
                         var statusMethod = statusCode switch {
                         "202" => "Accepted()",
