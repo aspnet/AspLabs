@@ -263,7 +263,9 @@ namespace CodeGenerator
         
         #line 112 "C:\Users\AnhThiDao\AspLabs\src\OpenAPI\CodeGenerator\MinimalApiTemplate.tt"
 
-    public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties { get; set; }
+#nullable enable
+    public Dictionary<string, Dictionary<string, Dictionary<string, string?>>>? FileProperties { get; set; }
+#nullable disable
     public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }
 
         

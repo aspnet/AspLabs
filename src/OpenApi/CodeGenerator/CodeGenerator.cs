@@ -23,7 +23,7 @@ public class App
             Environment.Exit(2); // Code 2 is for problems with paths in schema
         }
 
-        var fileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();  
+        var fileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string?>>>();  
 
         foreach (var path in paths)
         {
@@ -34,8 +34,9 @@ public class App
                 Environment.Exit(3); // Code 3 is for problems with operations
             }
             var pathString = path.Key.ToString();
-            fileProperties.Add(pathString, new Dictionary<string, Dictionary<string, string>> { });
+            fileProperties.Add(pathString, new Dictionary<string, Dictionary<string, string?>> ());
 
+            var dict = new Dictionary<string, Dictionary<string, string>> ();
             foreach (var operation in operations)
             {
                 var method = operation.Key.ToString().ToLower();
@@ -47,7 +48,7 @@ public class App
                     Environment.Exit(3);
                 }
 
-                fileProperties[pathString].Add(method, new Dictionary<string, string> { });
+                fileProperties[pathString].Add(method, new Dictionary<string, string?> ());
 
                 var parameters = operation.Value.Parameters;
                 string parametersList = string.Empty;
