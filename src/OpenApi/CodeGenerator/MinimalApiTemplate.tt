@@ -1,0 +1,117 @@
+<#@ template language="C#" #>
+<#@ assembly name="mscorlib" #>
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+<#
+    foreach (var path in FileProperties) {
+        var pathValue = path.Key;
+        foreach (var operation in FileProperties[pathValue]) {
+            var method = operation.Key;
+
+            var parameterList = operation.Value["parameters"];
+
+            if (parameterList != String.Empty) {
+                parameterList = ", " + parameterList;
+            }
+#>
+app.<#=method #>("<#=pathValue #>", (HttpContext context<#=parameterList #>) =>
+{
+<#
+            foreach (var response in operation.Value) {
+                string statusCode;
+                string returnValue;
+                if (response.Key != "parameters") {
+                    statusCode = response.Key;
+                    if (response.Value == null) {
+                        var statusMethod = statusCode switch {
+                        "202" => "Accepted()",
+                        "400" => "BadRequest()",
+                        "409" => "Conflict()",
+                        "204" => "NoContent()",
+                        "404" => "NotFound()",
+                        "200" => "Ok()",
+                        "401" => "Unauthorized()",
+                        "422" => "UnprocessableEntity()",
+                        _ => $"StatusCode({response.Key})"
+                        };
+                        returnValue = $"Results.{statusMethod}";
+                    }
+                    else {
+                        var statusMethod = statusCode switch {
+                        "202" => $"Accepted(_, {response.Value})",
+                        "400" => $"BadRequest({response.Value})",
+                        "409" => $"Conflict({response.Value})",
+                        "204" => "NoContent()",
+                        "404" => $"NotFound({response.Value})",
+                        "200" => $"Ok({response.Value})",
+                        "401" => "Unauthorized()",
+                        "422" => $"UnprocessableEntity({response.Value})",
+                        _ => $"StatusCode({response.Key})"
+                        };
+                        returnValue = $"Results.{statusMethod}";
+                    }
+                    
+                }
+                else {
+                    continue;
+                }
+#>
+    if (context.Request.Headers["AcceptStatusCode"] == "<#=statusCode #>")
+    {
+        return <#=returnValue #>;
+    }
+
+<#
+            }
+#>
+    return null;
+});
+
+<#
+        }
+    }
+#>
+
+<#
+    foreach (var schema in Schemas) {
+        var customObject = schema.Key;
+#>
+public class <#=customObject #> {
+<#
+        string constructorParameters = string.Empty;
+        string constructorBody = string.Empty;
+        foreach (var property in schema.Value) {
+            var propertyName = property.Key;
+            var propertyType = property.Value;
+            constructorParameters += propertyType + "? " + propertyName + ", ";
+            constructorBody += $"this.{propertyName} = {propertyName}\n";
+#>
+    public <#=propertyType #>? <#=propertyName #> { get; set; }
+<#
+        }
+        constructorParameters = constructorParameters.Substring(0, constructorParameters.Length - 2);
+        constructorBody = constructorBody.Substring(0, constructorBody.Length - 1);
+#>
+    public <#=customObject #>(<#=constructorParameters #>) {
+<#
+    var statements = constructorBody.Split("\n");
+    foreach (var statement in statements) {
+#>
+       <#=statement #>;
+<#
+    }
+#>
+    }
+    public <#=customObject #>() {}
+}
+<#
+    }
+#>
+
+<#+
+#nullable enable
+    public Dictionary<string, Dictionary<string, Dictionary<string, string?>>>? FileProperties { get; set; }
+#nullable disable
+    public Dictionary<string, Dictionary<string, string>> Schemas { get; set; }
+#>
