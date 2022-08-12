@@ -85,7 +85,7 @@ stages:
           clean: true
         - task: NodeTool@0
           inputs:
-            versionSpec: '10.x'
+            versionSpec: '16.x'
         - task: NuGetCommand@2
           displayName: 'Clear NuGet caches'
           condition: succeeded()
@@ -127,7 +127,7 @@ stages:
 
       - job: macOS
         pool:
-          vmImage: macOS-10.15
+          vmImage: macOS-11
         strategy:
           matrix:
             debug:
@@ -142,7 +142,7 @@ stages:
           clean: true
         - task: NodeTool@0
           inputs:
-            versionSpec: '10.x'
+            versionSpec: '16.x'
         - script: eng/common/cibuild.sh
             --configuration $(_BuildConfig)
             --prepareMachine
