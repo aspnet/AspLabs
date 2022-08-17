@@ -14,8 +14,8 @@
   <Target Name="NpmInstall"
           Inputs="$(MSBuildThisFileDirectory)package-lock.json"
           Outputs="$(BaseIntermediateOutputPath)package-lock.json">
-    <Message Importance="high" Text="Running npm install..." />
-    <Exec Command="npm install" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+    <Message Importance="high" Text="Running npm clean install..." />
+    <Exec Command="npm ci" WorkingDirectory="$(MSBuildThisFileDirectory)" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)package-lock.json"
           DestinationFolder="$(BaseIntermediateOutputPath)" />
   </Target>
