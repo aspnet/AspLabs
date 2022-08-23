@@ -128,6 +128,19 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
                     ParameterDescriptor = parameterDescriptor!
                 });
             }
+            
+            foreach (var queryDescription in ServiceDescriptorHelpers.ResolveQueryParameterDescriptors(
+                         routeParameters, methodDescriptor, bodyDescriptor?.Descriptor, bodyDescriptor?.FieldDescriptors))
+            {
+                apiDescription.ParameterDescriptions.Add(new ApiParameterDescription
+                {
+                    Name = queryDescription.Name,
+                    ModelMetadata = new GrpcModelMetadata(
+                        ModelMetadataIdentity.ForType(MessageDescriptorHelpers.ResolveFieldType(queryDescription.Field))),
+                    Source = BindingSource.Query,
+                    DefaultValue = string.Empty
+                });
+            }
 
             return apiDescription;
         }
