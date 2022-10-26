@@ -86,6 +86,8 @@ stages:
         variables:
         - name: _HelixBuildConfig
           value: $(_BuildConfig)
+        # Rely on task Arcade injects, not auto-injected build step.
+        - skipComponentGovernanceDetection: true
         - ${{ if eq(variables.runCodeQL3000, 'true') }}:
           - Codeql.SourceRoot: src
           - _AdditionalBuildArgs: /p:Test=false /p:Sign=false /p:Pack=false /p:Publish=false /p:UseSharedCompilation=false
