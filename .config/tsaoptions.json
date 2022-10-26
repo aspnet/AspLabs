@@ -1,0 +1,12 @@
+{
+  "areaPath": "DevDiv\\ASP.NET Core",
+  "codebaseName": "AspLabs",
+  "instanceUrl": "https://devdiv.visualstudio.com/",
+  "iterationPath": "DevDiv",
+  "notificationAliases": [
+    "aspnetcore-build@microsoft.com"
+  ],
+  "projectName": "DEVDIV",
+  "repositoryName": "AspLabs",
+  "template": "TFSDEVDIV"
+}
