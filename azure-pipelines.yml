@@ -68,7 +68,7 @@ stages:
       # Align w/ Maestro++ default channel when generating software bills of materials (SBOMs).
       PackageVersion: 6.0.0
       # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
-      ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')), ne(variables.runCodeQL3000, 'true') }}:
+      ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), ne(variables.runCodeQL3000, 'true')) }}:
         enableMicrobuild: true
       jobs:
       - job: Windows
@@ -253,7 +253,7 @@ stages:
               pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
               publishLocation: Container
 
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')), ne(variables.runCodeQL3000, 'true') }}:
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), ne(variables.runCodeQL3000, 'true')) }}:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       publishingInfraVersion: 3
