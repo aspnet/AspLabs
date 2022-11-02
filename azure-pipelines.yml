@@ -134,6 +134,7 @@ stages:
         - ${{ if eq(variables.runCodeQL3000, 'true') }}:
           - script: "echo ##vso[build.addbuildtag]CodeQL3000"
             displayName: 'Set CI CodeQL3000 tag'
+            condition: ne(variables.CODEQL_DIST,'')
           - task: CodeQL3000Init@0
             displayName: CodeQL Initialize
         - script: eng\common\cibuild.cmd
