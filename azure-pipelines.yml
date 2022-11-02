@@ -167,15 +167,15 @@ stages:
               parallel: true
               pathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)'
               publishLocation: Container
-          - task: PublishBuildArtifacts@1
-            displayName: Publish Logs
-            condition: always()
-            continueOnError: true
-            inputs:
-              artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
-              parallel: true
-              pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
-              publishLocation: Container
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
 
       - ${{ if ne(variables.runCodeQL3000, 'true') }}:
         - job: macOS
