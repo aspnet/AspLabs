@@ -42,12 +42,6 @@ variables:
   - name: runCodeQL3000
     value: ${{ and(ne(variables['System.TeamProject'], 'public'), or(eq(variables['Build.Reason'], 'Schedule'), and(eq(variables['Build.Reason'], 'Manual'), eq(parameters.runCodeQL3000, 'true')))) }}
 
-resources:
-  containers:
-  - container: LinuxContainer
-    image: mcr.microsoft.com/dotnet-buildtools-prereqs:ubuntu-18.04-c103199-20180628134610
-    options: --init # This ensures all the stray defunct processes are reaped.
-
 trigger:
 - main
 
@@ -222,7 +216,6 @@ stages:
         - job: Linux
           pool:
             vmImage: ubuntu-18.04
-            container: LinuxContainer
           strategy:
             matrix:
               debug:
