@@ -42,12 +42,6 @@ variables:
   - name: runCodeQL3000
     value: ${{ and(ne(variables['System.TeamProject'], 'public'), or(eq(variables['Build.Reason'], 'Schedule'), and(eq(variables['Build.Reason'], 'Manual'), eq(parameters.runCodeQL3000, 'true')))) }}
 
-resources:
-  containers:
-  - container: LinuxContainer
-    image: mcr.microsoft.com/dotnet-buildtools-prereqs:ubuntu-18.04-c103199-20180628134610
-    options: --init # This ensures all the stray defunct processes are reaped.
-
 trigger:
 - main
 
@@ -75,10 +69,10 @@ stages:
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: NetCore-Public
-            demands: ImageOverride -equals Build.Server.Amd64.VS2017.Open
+            demands: ImageOverride -equals windows.vs2017.amd64.open
           ${{ if ne(variables['System.TeamProject'], 'public') }}:
             name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals Build.Server.Amd64.VS2017
+            demands: ImageOverride -equals windows.vs2017.amd64
         ${{ if eq(variables.runCodeQL3000, 'true') }}:
           # Component governance and SBOM creation are not needed here. Disable what Arcade would inject.
           disableComponentGovernance: true
@@ -222,7 +216,6 @@ stages:
         - job: Linux
           pool:
             vmImage: ubuntu-18.04
-            container: LinuxContainer
           strategy:
             matrix:
               debug:
