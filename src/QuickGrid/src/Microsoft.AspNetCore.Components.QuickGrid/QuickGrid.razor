@@ -7,7 +7,7 @@
         @{ FinishCollectingColumns(); }
         <ColumnsCollectedNotifier TGridItem="TGridItem" />
 
-        <table class="@GridClass()" theme="@Theme" aria-rowcount="@(_ariaBodyRowCount + 1)" @ref="_tableReference" @onclosecolumnoptions="CloseColumnOptions">
+        <table id="@Id" class="@GridClass()" style="@Style" theme="@Theme" aria-rowcount="@(_ariaBodyRowCount + 1)" @ref="_tableReference" @onclosecolumnoptions="CloseColumnOptions">
             <thead>
                 <tr>
                     @_renderColumnHeaders

@@ -38,6 +38,16 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     [Parameter] public string? Class { get; set; }
 
     /// <summary>
+    /// An optional CSS id. If given, this will be included in the id attribute of the rendered table.
+    /// </summary>
+    [Parameter] public string? Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// An optional CSS style. If given, this will be included in the style attribute of the rendered table.
+    /// </summary>
+    [Parameter] public string? Style { get; set; } = string.Empty;
+
+    /// <summary>
     /// A theme name, with default value "default". This affects which styling rules match the table.
     /// </summary>
     [Parameter] public string? Theme { get; set; } = "default";
