@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Components.QuickGrid.Infrastructure;
 
 namespace Microsoft.AspNetCore.Components.QuickGrid;
@@ -21,6 +22,11 @@ public partial class Paginator : IDisposable
     /// Optionally supplies a template for rendering the page count summary.
     /// </summary>
     [Parameter] public RenderFragment? SummaryTemplate { get; set; }
+
+    [Parameter] public string GoToFirstPageLabel { get; set; } = "Go to first page";
+    [Parameter] public string GoToPreviousPageLabel { get; set; } = "Go to previous page";
+    [Parameter] public string GoToNextPageLabel { get; set; } = "Go to next page";
+    [Parameter] public string GoToLastPageLabel { get; set; } = "Go to last page";
 
     /// <summary>
     /// Constructs an instance of <see cref="Paginator" />.
