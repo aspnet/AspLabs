@@ -1,3 +1,7 @@
+# The below content is now obsolete. Please refer to Blazor documentation if you'd like to use Custom Elements
+## The previously experimental Microsoft.AspNetCore.Components.CustomElements package for building standards based custom elements with Blazor is no longer experimental and is now part of [.NET 7 release](https://devblogs.microsoft.com/dotnet/asp-net-core-updates-in-dotnet-7-preview-6/#blazor-custom-elements-no-longer-experimental). You can learn more about how to use Custom Elements in Blazor from our [documentation](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-7.0#blazor-custom-elements)
+
+
 # Blazor Custom Elements
 
 This package provides a simple mechanism for using Blazor components as custom elements. This means you can easily render Blazor components dynamically from other SPA frameworks, such as Angular or React.
