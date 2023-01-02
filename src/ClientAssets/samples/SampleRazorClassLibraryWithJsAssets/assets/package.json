@@ -7,9 +7,9 @@
     "watch": "webpack --watch --mode development --env.configuration=Debug"
   },
   "devDependencies": {
-    "ts-loader": "^6.2.1",
+    "ts-loader": "^9.4.2",
     "typescript": "^3.7.5",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
