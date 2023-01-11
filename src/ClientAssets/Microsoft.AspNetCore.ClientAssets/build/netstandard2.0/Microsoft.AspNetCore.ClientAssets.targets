@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)**" Exclude="$(DefaultItemExcludes)" />
+    <ProjectCapability Include="ClientAssetsAlpha"/>
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
