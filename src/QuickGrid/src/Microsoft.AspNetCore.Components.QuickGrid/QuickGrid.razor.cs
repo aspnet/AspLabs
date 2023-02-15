@@ -38,16 +38,6 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     [Parameter] public string? Class { get; set; }
 
     /// <summary>
-    /// An optional CSS id. If given, this will be included in the id attribute of the rendered table.
-    /// </summary>
-    [Parameter] public string? Id { get; set; } = string.Empty;
-
-    /// <summary>
-    /// An optional CSS style. If given, this will be included in the style attribute of the rendered table.
-    /// </summary>
-    [Parameter] public string? Style { get; set; } = string.Empty;
-
-    /// <summary>
     /// A theme name, with default value "default". This affects which styling rules match the table.
     /// </summary>
     [Parameter] public string? Theme { get; set; } = "default";
@@ -104,6 +94,12 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     /// that displays and updates the supplied <see cref="PaginationState"/> instance.
     /// </summary>
     [Parameter] public PaginationState? Pagination { get; set; }
+
+    /// <summary>
+    /// Allows to accept arbitrary additional attributes and pass them to the underlying
+    /// table component.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> UserAttributes { get; set; }
 
     [Inject] private IServiceProvider Services { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
