@@ -100,17 +100,9 @@ public class GridSort<TGridItem>
     }
 
     internal IReadOnlyCollection<(string PropertyName, SortDirection Direction)> ToPropertyList(bool ascending)
-    {
-        if (ascending)
-        {
-            _cachedPropertyListAscending ??= BuildPropertyList(ascending: true);
-            return _cachedPropertyListAscending;
-        }
-        else
-        {
-            _cachedPropertyListDescending ??= BuildPropertyList(ascending: false);
-            return _cachedPropertyListDescending;
-        }
+    {        
+        _cachedPropertyListAscending ??= BuildPropertyList(ascending: ascending);
+        return _cachedPropertyListAscending;
     }
 
     private IReadOnlyCollection<(string PropertyName, SortDirection Direction)> BuildPropertyList(bool ascending)
