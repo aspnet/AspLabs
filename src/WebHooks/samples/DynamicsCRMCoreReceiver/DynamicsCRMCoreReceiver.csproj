@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="$(MicrosoftAspNetCorePackageVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="$(MicrosoftAspNetCoreHttpPackageVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" Version="$(MicrosoftAspNetCoreServerKestrelCorePackageVersion)" />
     <PackageReference Include="System.IO.Pipelines" Version="4.5.4" />
     <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.WebHooks.Receivers.DynamicsCRM\Microsoft.AspNetCore.WebHooks.Receivers.DynamicsCRM.csproj" />
