@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27110.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{929F44D0-A040-4DC3-A22F-4C5829C05D44}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHubCoreReceiver", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert\Microsoft.AspNetCore.WebHooks.Receivers.AzureAlert.csproj", "{FAE4E7F8-7786-4388-802D-69C5C40DD5ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry.csproj", "{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry\Microsoft.AspNetCore.WebHooks.Receivers.AzureContainerRegistry.csproj", "{B4297872-1ED3-4A5D-95A8-0C1A11FDF781}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.BitBucket", "src\Microsoft.AspNetCore.WebHooks.Receivers.BitBucket\Microsoft.AspNetCore.WebHooks.Receivers.BitBucket.csproj", "{06B0D9D1-1368-423E-B2F7-5F408423A187}"
 EndProject
@@ -98,6 +98,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrelloCoreReceiver", "samples\TrelloCoreReceiver\TrelloCoreReceiver.csproj", "{E9E37253-3FE1-44A4-A9E7-A2B6C54EECFE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.FunctionalTest", "test\Microsoft.AspNetCore.WebHooks.FunctionalTest\Microsoft.AspNetCore.WebHooks.FunctionalTest.csproj", "{F42E56B7-60D4-481A-8585-04015B2B501E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps", "src\Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps\Microsoft.AspNetCore.WebHooks.Receivers.AzureDevOps.csproj", "{820D031D-237E-4892-A0BD-EF341421066A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsCoreReceiver", "samples\AzureDevOpsCoreReceiver\AzureDevOpsCoreReceiver.csproj", "{DAE01DE1-421B-420C-87DE-74ED9279A034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -249,6 +253,14 @@ Global
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F42E56B7-60D4-481A-8585-04015B2B501E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{820D031D-237E-4892-A0BD-EF341421066A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{820D031D-237E-4892-A0BD-EF341421066A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{820D031D-237E-4892-A0BD-EF341421066A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{820D031D-237E-4892-A0BD-EF341421066A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAE01DE1-421B-420C-87DE-74ED9279A034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAE01DE1-421B-420C-87DE-74ED9279A034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAE01DE1-421B-420C-87DE-74ED9279A034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAE01DE1-421B-420C-87DE-74ED9279A034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -290,6 +302,8 @@ Global
 		{91E02D64-BA6E-473C-A250-D1051A50DDAB} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
 		{E9E37253-3FE1-44A4-A9E7-A2B6C54EECFE} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 		{F42E56B7-60D4-481A-8585-04015B2B501E} = {9575CB90-BC4B-43BB-8AEA-82C53FDA4187}
+		{820D031D-237E-4892-A0BD-EF341421066A} = {929F44D0-A040-4DC3-A22F-4C5829C05D44}
+		{DAE01DE1-421B-420C-87DE-74ED9279A034} = {E957C8D9-B4A0-488B-838F-BAB4DE080A76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {12CE6238-F847-4984-8622-1ED46072150A}
