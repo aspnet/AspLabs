@@ -1,7 +1,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Microsoft.AspNetCore.Components.QuickGrid;
@@ -65,7 +68,10 @@ public class PropertyColumn<TGridItem, TProp> : ColumnBase<TGridItem>, ISortBuil
 
         if (Title is null && Property.Body is MemberExpression memberExpression)
         {
-            Title = memberExpression.Member.Name;
+            var memberInfo = memberExpression.Member;
+            var displayName = memberInfo?.GetCustomAttribute(typeof(DisplayNameAttribute)) as DisplayNameAttribute;
+            var display = memberInfo?.GetCustomAttribute(typeof(DisplayAttribute)) as DisplayAttribute;
+            Title = displayName?.DisplayName ?? display?.Name ?? memberInfo?.Name ?? "";            
         }
     }
 
