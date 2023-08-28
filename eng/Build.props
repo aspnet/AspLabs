@@ -5,8 +5,6 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\AspNetCoreWebAPI\AspNetCoreWebAPI.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\DotNetDiagnostics\dotnet-monitor.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\GrpcHttpApi\GrpcHttpApi.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Proxy\Proxy.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\WebHooks\WebHooks.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Components.Web.Extensions\Microsoft.AspNetCore.Components.Web.Extensions.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ApiTemplate\ApiTemplatePackage.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
