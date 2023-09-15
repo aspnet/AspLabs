@@ -11,4 +11,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Bump NETStandard.Library to a version that doesn't transitively reference a System.Net.Http that causes CG alerts -->
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+  </ItemGroup>
+
 </Project>
