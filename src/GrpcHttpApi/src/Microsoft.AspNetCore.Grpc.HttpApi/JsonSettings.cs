@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi
         /// </summary>
         public bool FormatDefaultValues { get; set; } = true;
 
-        public bool FormatEnumsAsIntegers { get; set; }
+        public bool FormatEnumsAsIntegers { get; set; } = true;
 
         public TypeRegistry TypeRegistry { get; set; } = TypeRegistry.Empty;
 
