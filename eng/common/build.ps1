@@ -19,8 +19,6 @@ Param(
   [switch] $pack,
   [switch] $publish,
   [switch] $clean,
-  [switch] $verticalBuild,
-  [switch][Alias('pb')]$productBuild,
   [switch][Alias('bl')]$binaryLog,
   [switch][Alias('nobl')]$excludeCIBinarylog,
   [switch] $ci,
@@ -60,8 +58,6 @@ function Print-Usage() {
   Write-Host "  -sign                   Sign build outputs"
   Write-Host "  -publish                Publish artifacts (e.g. symbols)"
   Write-Host "  -clean                  Clean the solution"
-  Write-Host "  -verticalBuild          Run in 'vertical build' infra mode."
-  Write-Host "  -productBuild           Build the solution in the way it will be built in the full .NET product (VMR) build (short: -pb)"
   Write-Host ""
 
   Write-Host "Advanced settings:"
@@ -71,8 +67,8 @@ function Print-Usage() {
   Write-Host "  -prepareMachine         Prepare machine for CI run, clean up processes after build"
   Write-Host "  -warnAsError <value>    Sets warnaserror msbuild parameter ('true' or 'false')"
   Write-Host "  -msbuildEngine <value>  Msbuild engine to use to run build ('dotnet', 'vs', or unspecified)."
-  Write-Host "  -excludePrereleaseVS    Set to exclude build engines in prerelease versions of Visual Studio"
   Write-Host "  -nativeToolsOnMachine   Sets the native tools on machine environment variable (indicating that the script should use native tools on machine)"
+  Write-Host "  -excludePrereleaseVS    Set to exclude build engines in prerelease versions of Visual Studio"
   Write-Host ""
 
   Write-Host "Command line arguments not listed above are passed thru to msbuild."
@@ -124,8 +120,6 @@ function Build {
     /p:Deploy=$deploy `
     /p:Test=$test `
     /p:Pack=$pack `
-    /p:DotNetBuildRepo=$($productBuild -or $verticalBuild) `
-    /p:ArcadeBuildVertical=$verticalBuild `
     /p:IntegrationTest=$integrationTest `
     /p:PerformanceTest=$performanceTest `
     /p:Sign=$sign `
