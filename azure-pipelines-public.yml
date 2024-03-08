@@ -29,4 +29,182 @@ pr:
 stages:
 - stage: build
   displayName: Build
-  - template: /eng/templates/default-build.yml
+  jobs:
+  - template: /eng/common/templates/jobs/jobs.yml
+    parameters:
+      enablePublishBuildArtifacts: true
+      enablePublishTestResults: true
+      enablePublishBuildAssets: true
+      enablePublishUsingPipelines: true
+      helixRepo: aspnet/AspLabs
+      # Align w/ Maestro++ default channel when generating software bills of materials (SBOMs).
+      PackageVersion: 6.0.0
+      # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
+      ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+        enableMicrobuild: true
+      jobs:
+      - job: Windows
+        pool:
+          ${{ if eq(variables['System.TeamProject'], 'public') }}:
+            name: NetCore-Public
+            demands: ImageOverride -equals windows.vs2019.amd64.open
+          ${{ if ne(variables['System.TeamProject'], 'public') }}:
+            name: NetCore1ESPool-Internal
+            demands: ImageOverride -equals windows.vs2019.amd64
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        strategy:
+          matrix:
+            ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+              Debug:
+                _BuildConfig: Debug
+                _SignType: test
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+            Release:
+              _BuildConfig: Release
+              # PRs and external builds are not signed.
+              ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+                _SignType: test
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+                _SignType: real
+                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
+                  /p:DotNetPublishUsingPipelines=true
+                  /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
+                  /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
+                  /p:DotNetPublishToBlobFeed=true
+        steps:
+        - checkout: self
+          clean: true
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '16.x'
+        - task: NuGetCommand@2
+          displayName: 'Clear NuGet caches'
+          condition: succeeded()
+          inputs:
+            command: custom
+            arguments: 'locals all -clear'
+        - script: eng\common\cibuild.cmd
+            -configuration $(_BuildConfig)
+            -prepareMachine
+            $(_BuildArgs)
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Packages
+          condition: and(eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
+          continueOnError: true
+          inputs:
+            artifactName: Packages_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)'
+            publishLocation: Container
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
+
+      - job: macOS
+        pool:
+          vmImage: macOS-11
+        strategy:
+          matrix:
+            debug:
+              _BuildConfig: Debug
+            release:
+              _BuildConfig: Release
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        steps:
+        - checkout: self
+          clean: true
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '16.x'
+        - script: eng/common/cibuild.sh
+            --configuration $(_BuildConfig)
+            --prepareMachine
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
+
+      - job: Linux
+        pool:
+          vmImage: ubuntu-20.04
+        strategy:
+          matrix:
+            debug:
+              _BuildConfig: Debug
+            release:
+              _BuildConfig: Release
+        variables:
+        - name: _HelixBuildConfig
+          value: $(_BuildConfig)
+        steps:
+        - checkout: self
+          clean: true
+        - script: eng/common/cibuild.sh
+            --configuration $(_BuildConfig)
+            --prepareMachine
+          name: Build
+          displayName: Build
+          condition: succeeded()
+        - task: PublishTestResults@2
+          displayName: Publish xUnit Test Results
+          condition: always()
+          continueOnError: true
+          inputs:
+            testRunner: xunit
+            testResultsFiles: 'artifacts/TestResults/$(_BuildConfig)/*.xml'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Logs
+          condition: always()
+          continueOnError: true
+          inputs:
+            artifactName: Logs_$(Agent.Os)_$(Agent.JobName)
+            parallel: true
+            pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
+            publishLocation: Container
+
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+  - template: eng\common\templates\post-build\post-build.yml
+    parameters:
+      publishingInfraVersion: 3
+      # Symbol validation isn't being very reliable lately. This should be enabled back
+      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+      enableSymbolValidation: false
+      # This is to enable SDL runs part of Post-Build Validation Stage
+      SDLValidationParameters:
+        enable: false
