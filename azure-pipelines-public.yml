@@ -15,11 +15,6 @@ variables:
     - name: _HelixSource
       value: pr/aspnet/AspLabs/$(Build.SourceBranch)
 
-  # Variables for internal Official builds
-  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - name: _HelixSource
-      value: official/aspnet/AspLabs/$(Build.SourceBranch)
-
 trigger:
 - main
 
@@ -39,18 +34,11 @@ stages:
       helixRepo: aspnet/AspLabs
       # Align w/ Maestro++ default channel when generating software bills of materials (SBOMs).
       PackageVersion: 6.0.0
-      # enableMicrobuild can't be read from a user-defined variable (Azure DevOps limitation)
-      ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-        enableMicrobuild: true
       jobs:
       - job: Windows
         pool:
-          ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            name: NetCore-Public
-            demands: ImageOverride -equals windows.vs2019.amd64.open
-          ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals windows.vs2019.amd64
+          name: NetCore-Public
+          demands: ImageOverride -equals windows.vs2019.amd64.open
         variables:
         - name: _HelixBuildConfig
           value: $(_BuildConfig)
@@ -67,13 +55,6 @@ stages:
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
                 _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-                _SignType: real
-                _BuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:OfficialBuildId=$(Build.BuildNumber)
-                  /p:DotNetPublishUsingPipelines=true
-                  /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
-                  /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
-                  /p:DotNetPublishToBlobFeed=true
         steps:
         - checkout: self
           clean: true
@@ -197,14 +178,3 @@ stages:
             parallel: true
             pathtoPublish: '$(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)'
             publishLocation: Container
-
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-  - template: eng\common\templates\post-build\post-build.yml
-    parameters:
-      publishingInfraVersion: 3
-      # Symbol validation isn't being very reliable lately. This should be enabled back
-      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
-      enableSymbolValidation: false
-      # This is to enable SDL runs part of Post-Build Validation Stage
-      SDLValidationParameters:
-        enable: false
