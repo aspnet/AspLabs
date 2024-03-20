@@ -95,6 +95,12 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     /// </summary>
     [Parameter] public PaginationState? Pagination { get; set; }
 
+    /// <summary>
+    /// An optional delegate that gets called when the grid needs to refresh.
+    /// A typical use case may be to update items provider with updated sort orders.
+    /// </summary>
+    [Parameter] public Action? OnRefresh { get; set; }
+
     [Inject] private IServiceProvider Services { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
@@ -134,6 +140,7 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     private int? _lastRefreshedPaginationStateHash;
     private object? _lastAssignedItemsOrProvider;
     private CancellationTokenSource? _pendingDataLoadCancellationTokenSource;
+    private SemaphoreSlim _pendingDataLoadSemaphore = new SemaphoreSlim(1);
 
     // If the PaginationState mutates, it raises this event. We use it to trigger a re-render.
     private readonly EventCallbackSubscriber<PaginationState> _currentPageItemsChanged;
@@ -276,6 +283,8 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     // because in that case there's going to be a re-render anyway.
     private async Task RefreshDataCoreAsync()
     {
+        OnRefresh?.Invoke();
+
         // Move into a "loading" state, cancelling any earlier-but-still-pending load
         _pendingDataLoadCancellationTokenSource?.Cancel();
         var thisLoadCts = _pendingDataLoadCancellationTokenSource = new CancellationTokenSource();
@@ -306,15 +315,28 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
         }
     }
 
+    [Parameter] public int MaxDebounceMs { get; set; } = 100;
+    private DateTime lastBounced; // Default value is BOC
+    private async Task SmartConfigurableDebounce()
+    {
+        var now = DateTime.UtcNow;
+        var delay = lastBounced.AddMilliseconds(MaxDebounceMs) - now;
+        lastBounced = now;
+        if (delay > TimeSpan.Zero)
+        {
+            // Task.Delay() does not support negative delays!
+            await Task.Delay(delay);
+        }
+    }
+
     // Gets called both by RefreshDataCoreAsync and directly by the Virtualize child component during scrolling
     private async ValueTask<ItemsProviderResult<(int, TGridItem)>> ProvideVirtualizedItems(ItemsProviderRequest request)
     {
         _lastRefreshedPaginationStateHash = Pagination?.GetHashCode();
 
         // Debounce the requests. This eliminates a lot of redundant queries at the cost of slight lag after interactions.
-        // TODO: Consider making this configurable, or smarter (e.g., doesn't delay on first call in a batch, then the amount
-        // of delay increases if you rapidly issue repeated requests, such as when scrolling a long way)
-        await Task.Delay(100);
+        await SmartConfigurableDebounce();
+
         if (request.CancellationToken.IsCancellationRequested)
         {
             return default;
@@ -364,14 +386,25 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
         }
         else if (Items is not null)
         {
-            var totalItemCount = _asyncQueryExecutor is null ? Items.Count() : await _asyncQueryExecutor.CountAsync(Items);
-            var result = request.ApplySorting(Items).Skip(request.StartIndex);
-            if (request.Count.HasValue)
+            // EF Core does not support Multiple Concurrent Data Readers.
+            // This may happen with virtualized grids of larger datasets.
+            // Let's wait if that happens.
+            await _pendingDataLoadSemaphore.WaitAsync().ConfigureAwait(false);
+            try
             {
-                result = result.Take(request.Count.Value);
+                var totalItemCount = _asyncQueryExecutor is null ? Items.Count() : await _asyncQueryExecutor.CountAsync(Items);
+                var result = request.ApplySorting(Items).Skip(request.StartIndex);
+                if (request.Count.HasValue)
+                {
+                    result = result.Take(request.Count.Value);
+                }
+                var resultArray = _asyncQueryExecutor is null ? result.ToArray() : await _asyncQueryExecutor.ToArrayAsync(result);
+                return GridItemsProviderResult.From(resultArray, totalItemCount);
             }
-            var resultArray = _asyncQueryExecutor is null ? result.ToArray() : await _asyncQueryExecutor.ToArrayAsync(result);
-            return GridItemsProviderResult.From(resultArray, totalItemCount);
+            finally
+            {
+                _pendingDataLoadSemaphore.Release();
+            }
         }
         else
         {
