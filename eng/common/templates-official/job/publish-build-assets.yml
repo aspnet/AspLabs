@@ -48,8 +48,8 @@ jobs:
     - group: AzureDevOps-Artifact-Feeds-Pats
     - name: runCodesignValidationInjection
       value: false
-    # unconditional - needed for logs publishing (redactor tool version)
-    - template: /eng/common/templates-official/post-build/common-variables.yml
+    - ${{ if eq(parameters.publishAssetsImmediately, 'true') }}:
+      - template: /eng/common/templates-official/post-build/common-variables.yml
 
   pool:
     # We don't use the collection uri here because it might vary (.visualstudio.com vs. dev.azure.com)
@@ -61,14 +61,11 @@ jobs:
     # If it's not devdiv, it's dnceng
     ${{ if ne(variables['System.TeamProject'], 'DevDiv') }}:
       name: $(DncEngInternalBuildPool)
-      image: 1es-windows-2022-pt
+      image: 1es-windows-2022
       os: windows
+
   steps:
   - ${{ if and(eq(parameters.runAsPublic, 'false'), ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - checkout: self
-      fetchDepth: 3
-      clean: true
-      
     - task: DownloadBuildArtifacts@0
       displayName: Download artifact
       inputs:
@@ -79,6 +76,12 @@ jobs:
       continueOnError: ${{ parameters.continueOnError }}
     
     - task: NuGetAuthenticate@1
+
+    - task: PowerShell@2 
+      displayName: Enable cross-org NuGet feed authentication 
+      inputs: 
+        filePath: $(Build.SourcesDirectory)/eng/common/enable-cross-org-publishing.ps1 
+        arguments: -token $(dn-bot-all-orgs-artifact-feeds-rw) 
 
     - task: PowerShell@2
       displayName: Publish Build Assets
@@ -98,14 +101,16 @@ jobs:
       inputs:
         targetType: inline
         script: |
-          Add-Content -Path "$(Build.StagingDirectory)/ReleaseConfigs.txt" -Value $(BARBuildId)
-          Add-Content -Path "$(Build.StagingDirectory)/ReleaseConfigs.txt" -Value "$(DefaultChannels)"
-          Add-Content -Path "$(Build.StagingDirectory)/ReleaseConfigs.txt" -Value $(IsStableBuild)
+          New-Item -Path "$(Build.StagingDirectory)/ReleaseConfigs" -ItemType Directory -Force
+          $filePath = "$(Build.StagingDirectory)/ReleaseConfigs/ReleaseConfigs.txt"
+          Add-Content -Path $filePath -Value $(BARBuildId)
+          Add-Content -Path $filePath -Value "$(DefaultChannels)"
+          Add-Content -Path $filePath -Value $(IsStableBuild)
     
     - task: 1ES.PublishBuildArtifacts@1
       displayName: Publish ReleaseConfigs Artifact
       inputs:
-        PathtoPublish: '$(Build.StagingDirectory)/ReleaseConfigs.txt'
+        PathtoPublish: '$(Build.StagingDirectory)/ReleaseConfigs'
         PublishLocation: Container
         ArtifactName: ReleaseConfigs
 
@@ -154,4 +159,4 @@ jobs:
     - ${{ if eq(parameters.enablePublishBuildArtifacts, 'true') }}:
       - template: /eng/common/templates-official/steps/publish-logs.yml
         parameters:
-          JobLabel: 'Publish_Artifacts_Logs'     
+          JobLabel: 'Publish_Artifacts_Logs'
