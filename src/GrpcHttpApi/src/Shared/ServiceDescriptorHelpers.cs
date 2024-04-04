@@ -317,6 +317,65 @@ namespace Grpc.Shared.HttpApi
 
             return null;
         }
+        
+    public static IEnumerable<(string Name, FieldDescriptor Field)> ResolveQueryParameterDescriptors(
+        Dictionary<string, List<FieldDescriptor>> routeParameters,
+        MethodDescriptor methodDescriptor,
+        MessageDescriptor? bodyDescriptor,
+        List<FieldDescriptor>? bodyFieldDescriptors
+    )
+    {
+        if (methodDescriptor.InputType.Fields.InDeclarationOrder().Count <= routeParameters.Count)
+        {
+            yield break;
+        }
+
+        var allParameters = methodDescriptor.InputType.Fields.InDeclarationOrder().ToList();
+
+        var allParametersName = methodDescriptor.InputType.Fields
+            .InDeclarationOrder()
+            .Select(x => x.Name)
+            .ToList();
+
+        foreach (var pathParameter in routeParameters)
+        {
+            allParametersName.Remove(pathParameter.Key);
+        }
+
+        if (bodyDescriptor != null)
+        {
+            if (bodyFieldDescriptors != null)
+            {
+                // body with field name
+                foreach (var bodyFieldDescriptor in bodyFieldDescriptors)
+                {
+                    allParametersName.Remove(bodyFieldDescriptor.Name);
+                }
+            }
+            else
+            {
+                // body with wildcard
+                foreach (var bodyFieldDescriptor in bodyDescriptor.Fields.InDeclarationOrder())
+                {
+                    allParametersName.Remove(bodyFieldDescriptor.Name);
+                }
+            }
+        }
+
+        foreach (var parameterName in allParametersName)
+        {
+            var field = allParameters
+                .Where(x => x.Name == parameterName)
+                .Select(x => x)
+                .First();
+
+            allParameters.Remove(field);
+
+            (string Name, FieldDescriptor Field) queryDescription = (Name: parameterName, Field: field);
+
+            yield return queryDescription;
+        }
+    }
 
         public record BodyDescriptorInfo(
             MessageDescriptor Descriptor,
