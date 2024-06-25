@@ -41,10 +41,13 @@ namespace Server
             app.UseStaticFiles();
 
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            if (env.IsDevelopment())
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "gRPC HTTP API Example V1");
-            });
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "gRPC HTTP API Example V1");
+                });
+            }
 
             app.UseRouting();
 
