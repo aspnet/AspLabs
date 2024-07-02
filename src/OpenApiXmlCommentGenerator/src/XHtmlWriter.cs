@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
+namespace DocFx.XmlComments;
 
 internal sealed class XHtmlWriter : XmlWriter
 {

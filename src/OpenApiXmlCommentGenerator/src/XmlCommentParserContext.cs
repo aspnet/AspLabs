@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
+namespace DocFx.XmlComments;
 
 public sealed class XmlCommentParserContext
 {

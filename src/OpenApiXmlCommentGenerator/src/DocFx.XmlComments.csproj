@@ -1,16 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <IsPackable>false</IsPackable>
-    <IsAnalyzersProject>true</IsAnalyzersProject>
-    <AddPublicApiAnalyzers>false</AddPublicApiAnalyzers>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <WarnOnNullable>true</WarnOnNullable>
-    <NoWarn>RSEXPERIMENTAL002</NoWarn>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../gen/Helpers/IsExternalInit.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" IsImplicitlyDefined="true" Version="4.11.0-2.final" />
@@ -18,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
+    <EmbeddedResource Include="Resources\**" />
   </ItemGroup>
 
 </Project>

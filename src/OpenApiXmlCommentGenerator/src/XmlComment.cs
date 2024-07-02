@@ -12,7 +12,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
+namespace DocFx.XmlComments;
 
 public sealed class XmlComment
 {

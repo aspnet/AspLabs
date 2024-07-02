@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
-namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
+namespace DocFx.XmlComments;
 
 enum SymbolUrlKind
 {

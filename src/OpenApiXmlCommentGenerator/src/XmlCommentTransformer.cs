@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
-namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
+namespace DocFx.XmlComments;
 
 internal static class XmlCommentTransformer
 {
