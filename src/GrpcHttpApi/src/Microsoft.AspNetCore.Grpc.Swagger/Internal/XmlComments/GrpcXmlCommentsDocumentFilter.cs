@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal.XmlComments
     {
         private const string MemberXPath = "/doc/members/member[@name='{0}']";
         private const string SummaryTag = "summary";
+        private const string ValueTag = "value";
 
         private readonly XPathNavigator _xmlNavigator;
 
@@ -56,10 +57,11 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal.XmlComments
             var memberName = XmlCommentsNodeNameHelper.GetMemberNameForType(type);
             var typeNode = _xmlNavigator.SelectSingleNode(string.Format(MemberXPath, memberName));
 
-            if (typeNode != null)
+            if (typeNode is not null)
             {
-                var summaryNode = typeNode.SelectSingleNode(SummaryTag);
-                if (summaryNode != null)
+                var valueNode = typeNode.SelectSingleNode(ValueTag)
+                    ?? typeNode.SelectSingleNode(SummaryTag);
+                if (valueNode != null)
                 {
                     if (swaggerDoc.Tags == null)
                         swaggerDoc.Tags = new List<OpenApiTag>();
@@ -67,7 +69,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal.XmlComments
                     swaggerDoc.Tags.Add(new OpenApiTag
                     {
                         Name = nameAndType.Key,
-                        Description = XmlCommentsTextHelper.Humanize(summaryNode.InnerXml)
+                        Description = XmlCommentsTextHelper.Humanize(valueNode.InnerXml)
                     });
                 }
                 return true;
