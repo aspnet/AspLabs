@@ -10,10 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0-preview.7.24329.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0-preview.rc.1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0-2.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0-2.final" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-preview.7.24352.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-preview.rc.1.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.6.15" />
     <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.15" />
@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\gen\Microsoft.AspNetCore.OpenApi.SourceGenerators.csproj" />
+    <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,7 +14,6 @@ namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
 
 public sealed partial class XmlCommentGenerator
 {
-    private static readonly SymbolDisplayFormat _propertyDisplayFormat = new(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining, SymbolDisplayTypeQualificationStyle.NameOnly, SymbolDisplayGenericsOptions.IncludeTypeParameters, SymbolDisplayMemberOptions.None, SymbolDisplayDelegateStyle.NameAndSignature, SymbolDisplayExtensionMethodStyle.StaticMethod, SymbolDisplayParameterOptions.IncludeType, SymbolDisplayPropertyStyle.NameOnly, SymbolDisplayLocalOptions.None, SymbolDisplayKindOptions.None, SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
     internal static IEnumerable<(string, string?, XmlComment?)> ParseComments(Compilation compilation, CancellationToken cancellationToken)
     {
         var visitor = new AssemblyTypeSymbolsVisitor(cancellationToken);
@@ -47,7 +46,7 @@ public sealed partial class XmlCommentGenerator
             if (!string.IsNullOrEmpty(comment) && !string.Equals("<doc />", comment, StringComparison.Ordinal))
             {
                 var typeInfo = property.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                var propertyInfo = property.ToDisplayString(_propertyDisplayFormat);
+                var propertyInfo = property.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 comments.Add((typeInfo, propertyInfo, XmlComment.Parse(comment, new())));
             }
         }
@@ -62,6 +61,11 @@ public sealed partial class XmlCommentGenerator
                 cancellationToken: cancellationToken);
             if (!string.IsNullOrEmpty(comment) && !string.Equals("<doc />", comment, StringComparison.Ordinal))
             {
+                // If the method is a constructor for a record, skip it because we will have already processed the type.
+                if (method.MethodKind == MethodKind.Constructor)
+                {
+                    continue;
+                }
                 var typeInfo = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var methodInfo = method.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 comments.Add((typeInfo, methodInfo, XmlComment.Parse(comment, new())));

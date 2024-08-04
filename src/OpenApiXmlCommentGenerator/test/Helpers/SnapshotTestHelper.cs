@@ -32,6 +32,7 @@ public static class SnapshotTestHelper
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Builder.IApplicationBuilder).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiDescriptionProvider).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Text.Json.Nodes.JsonArray).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(DocFx.XmlComments.XmlComment).Assembly.Location),
                 ]);
         var inputCompilation = CSharpCompilation.Create("OpenApiXmlCommentGeneratorSample",
             [CSharpSyntaxTree.ParseText(source, options: ParseOptions, path: "Program.cs")],
@@ -41,7 +42,7 @@ public static class SnapshotTestHelper
         return Verifier
             .Verify(driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out compilation, out _))
             .AutoVerify()
-            .UseDirectory("snapshots");
+            .UseDirectory("../snapshots");
     }
 
     public static async Task VerifyOpenApi(Compilation compilation, Action<OpenApiDocument> verifyFunc)

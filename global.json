@@ -1,9 +1,9 @@
 {
   "sdk": {
-    "version": "9.0.100-preview.7.24351.1"
+    "version": "9.0.100-rc.1.24403.1"
   },
   "tools": {
-    "dotnet": "9.0.100-preview.7.24351.1"
+    "dotnet": "9.0.100-rc.1.24403.1"
   },
   "msbuild-sdks": {
     "Yarn.MSBuild": "1.22.10",

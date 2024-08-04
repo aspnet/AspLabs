@@ -1,12 +1,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using DocFx.XmlComments;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using DocFx.XmlComments;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -42,6 +42,7 @@ namespace System.Runtime.CompilerServices
 
 namespace Microsoft.AspNetCore.OpenApi.Generated
 {
+    using DocFx.XmlComments;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -127,48 +128,32 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         }
     }
 
-    file class XmlCommentTransformer : IOpenApiDocumentTransformer
+    file class XmlCommentSchemaTransformer : IOpenApiSchemaTransformer
     {
         internal static readonly Dictionary<(Type, string?), XmlComment> Cache = new()
         {
 {{GenerateCacheEntries(cacheEntries)}}
         };
 
-        public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
+        public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
-        }
-
-        public static Task XmlCommentOperationTransformer(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
-        {
-            var methodInfo = context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().FirstOrDefault();
-            if (Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var comment))
+            if (context.JsonPropertyInfo is { AttributeProvider: PropertyInfo propertyInfo })
             {
-                operation.Summary = comment.Summary;
-            }
-            return Task.CompletedTask;
-        }
-
-        public static Task XmlCommentSchemaTransformer(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
-        {
-            System.Diagnostics.Debugger.Break();
-            if (Cache.TryGetValue((context.Type, null), out var typeComment))
-            {
-                schema.Description = typeComment.Summary;
-                if (typeComment.Example is not null)
+                if (Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyComment))
                 {
-                    schema.Example = typeComment.Example.ToOpenApiAny();
-                }
-            }
-            foreach (var property in schema.Properties)
-            {
-                if (Cache.TryGetValue((context.Type, property.Key), out var propertyComment))
-                {
-                    property.Value.Description = propertyComment.Summary;
+                    schema.Description = propertyComment.Summary;
                     if (propertyComment.Example is not null)
                     {
-                        property.Value.Example = propertyComment.Example.ToOpenApiAny();
+                        schema.Example = propertyComment.Example.ToOpenApiAny();
                     }
+                }
+            }
+            if (Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeComment))
+            {
+                schema.Description = typeComment.Summary;
+                if (schema.Example is not null)
+                {
+                    schema.Example = typeComment.Example.ToOpenApiAny();
                 }
             }
             return Task.CompletedTask;
@@ -189,8 +174,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     return services.AddOpenApi("v1", options =>
                     {
-                        options.UseTransformer(new XmlCommentTransformer());
-                        options.UseSchemaTransformer(XmlCommentTransformer.XmlCommentSchemaTransformer);
+                        options.AddSchemaTransformer(new XmlCommentSchemaTransformer());
                     });
                 }
         """,
@@ -199,8 +183,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     return services.AddOpenApi(documentName, options =>
                     {
-                        options.UseTransformer(new XmlCommentTransformer());
-                        options.UseSchemaTransformer(XmlCommentTransformer.XmlCommentSchemaTransformer);
+                        options.AddSchemaTransformer(new XmlCommentSchemaTransformer());
                     });
                 }
         """,
@@ -211,8 +194,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                     return OpenApiServiceCollectionExtensions.AddOpenApi(services, documentName, options =>
                     {
                         configureOptions(options);
-                        options.UseTransformer(new XmlCommentTransformer());
-                        options.UseSchemaTransformer(XmlCommentTransformer.XmlCommentSchemaTransformer);
+                        options.AddSchemaTransformer(new XmlCommentTransformer());
                     });
                 }
         """,
@@ -246,7 +228,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             if (comment is not null)
             {
                 var typeKey = $"(typeof({type})";
-                var memberKey = member is not null ? $"System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName({SymbolDisplay.FormatLiteral(member, true)})" : "null";
+                var memberKey = member is not null ? $"nameof({type}.{member})" : "null";
                 codeWriter.WriteLine($"{{ {typeKey}, {memberKey}), new XmlComment({(comment.Summary is not null ? SymbolDisplay.FormatLiteral(comment.Summary, true) : "null")}, {(comment.Examples.FirstOrDefault() is { } example ? SymbolDisplay.FormatLiteral(example, true) : "null")}) }},");
             }
         }
