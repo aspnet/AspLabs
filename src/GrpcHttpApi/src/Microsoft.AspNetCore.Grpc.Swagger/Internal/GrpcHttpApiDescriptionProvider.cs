@@ -72,10 +72,40 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Internal
             };
             apiDescription.RelativePath = pattern.TrimStart('/');
             apiDescription.SupportedRequestFormats.Add(new ApiRequestFormat { MediaType = "application/json" });
+
+            var modelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(methodDescriptor.OutputType.ClrType));
+            var responseBody = httpRule.ResponseBody;
+
+            if (!string.IsNullOrEmpty(responseBody))
+            {
+                var responseBodyDescriptor = ServiceDescriptorHelpers.ResolveResponseBodyDescriptor(responseBody, methodDescriptor);
+                if (responseBodyDescriptor.IsRepeated)
+                {
+                    if (responseBodyDescriptor.IsMap)
+                    {
+                        var key = responseBodyDescriptor.MessageType.FindFieldByName("key");
+                        var value = responseBodyDescriptor.MessageType.FindFieldByName("value");
+
+                        var keyType = MessageDescriptorHelpers.ResolveFieldType(key);
+                        var valueType = MessageDescriptorHelpers.ResolveFieldType(value);
+
+                        modelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(typeof(Dictionary<,>).MakeGenericType(keyType, valueType)));
+                    }
+                    else
+                    {
+                        modelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(typeof(List<>).MakeGenericType(MessageDescriptorHelpers.ResolveFieldType(responseBodyDescriptor))));
+                    }
+                }
+                else
+                {
+                    modelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(MessageDescriptorHelpers.ResolveFieldType(responseBodyDescriptor)));
+                }
+            }
+
             apiDescription.SupportedResponseTypes.Add(new ApiResponseType
             {
                 ApiResponseFormats = { new ApiResponseFormat { MediaType = "application/json" } },
-                ModelMetadata = new GrpcModelMetadata(ModelMetadataIdentity.ForType(methodDescriptor.OutputType.ClrType)),
+                ModelMetadata = modelMetadata,
                 StatusCode = 200
             });
             var explorerSettings = routeEndpoint.Metadata.GetMetadata<ApiExplorerSettingsAttribute>();
