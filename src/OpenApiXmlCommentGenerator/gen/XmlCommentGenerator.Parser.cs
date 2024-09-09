@@ -31,7 +31,8 @@ public sealed partial class XmlCommentGenerator
             if (!string.IsNullOrEmpty(comment) && !string.Equals("<doc />", comment, StringComparison.Ordinal))
             {
                 var typeInfo = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                comments.Add((typeInfo, null, XmlComment.Parse(comment, new())));
+                var typeComment = XmlComment.Parse(comment, new());
+                comments.Add((typeInfo, null, typeComment));
             }
         }
         var properties = visitor.GetPublicProperties();
@@ -47,7 +48,9 @@ public sealed partial class XmlCommentGenerator
             {
                 var typeInfo = property.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var propertyInfo = property.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                comments.Add((typeInfo, propertyInfo, XmlComment.Parse(comment, new())));
+                var propertyComment = XmlComment.Parse(comment, new());
+                propertyComment.Type = property.Type;
+                comments.Add((typeInfo, propertyInfo, propertyComment));
             }
         }
         var methods = visitor.GetPublicMethods();

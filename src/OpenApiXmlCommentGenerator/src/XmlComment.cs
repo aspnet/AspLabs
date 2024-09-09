@@ -11,6 +11,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.CodeAnalysis;
 
 namespace DocFx.XmlComments;
 
@@ -25,7 +26,11 @@ public sealed class XmlComment
 
     private readonly XmlCommentParserContext _context;
 
+    public ITypeSymbol? Type { get; set; }
+
     public string? Summary { get; private set; }
+
+    public string? Description { get; private set; }
 
     public string? Remarks { get; private set; }
 
@@ -81,6 +86,7 @@ public sealed class XmlComment
 
         var nav = doc.CreateNavigator();
         Summary = GetSingleNodeValue(nav, "/member/summary");
+        Description = GetSingleNodeValue(nav, "/member/description");
         Remarks = GetSingleNodeValue(nav, "/member/remarks");
         Returns = GetSingleNodeValue(nav, "/member/returns");
 

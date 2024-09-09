@@ -31,6 +31,9 @@ public static class SnapshotTestHelper
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Builder.EndpointRouteBuilderExtensions).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Builder.IApplicationBuilder).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiDescriptionProvider).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Mvc.ControllerBase).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Microsoft.Extensions.DependencyInjection.MvcServiceCollectionExtensions).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Microsoft.Extensions.DependencyInjection.MvcCoreMvcBuilderExtensions).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Text.Json.Nodes.JsonArray).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(DocFx.XmlComments.XmlComment).Assembly.Location),
                 ]);
