@@ -275,10 +275,6 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     return $"new OpenApiDateTime(System.DateTimeOffset.Parse({SymbolDisplay.FormatLiteral(example, true)}))";
                 }
-                else
-                {
-                    return $"new OpenApiObject({SymbolDisplay.FormatLiteral(example, false)})";
-                }
             }
             return "new OpenApiNull()";
         }

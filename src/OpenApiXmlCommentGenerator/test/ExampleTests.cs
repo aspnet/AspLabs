@@ -41,8 +41,6 @@ public class TypeWithExamples
     public DateTime DateTimeType { get; set; }
     /// <example>2022-01-01T00:00:00Z</example>
     public DateTimeOffset DateTimeOffsetType { get; set; }
-    /// <example>2022-01-01T00:00:00Z</example>
-    public TimeSpan TimeSpanType { get; set; }
     /// <example>SGVsbG8gV29ybGQ=</example>
     public byte[] ByteArrayType { get; set; }
     /// <example>{ "a" : 1, "b": 3.14, "c": "hello" }</example>

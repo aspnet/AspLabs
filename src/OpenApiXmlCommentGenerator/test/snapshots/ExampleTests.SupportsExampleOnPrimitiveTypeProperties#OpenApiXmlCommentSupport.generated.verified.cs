@@ -86,13 +86,10 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             xmlComment.Example = new OpenApiDateTime(System.DateTimeOffset.Parse("2022-01-01T00:00:00Z"));
             _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.DateTimeOffsetType)), xmlComment);
             xmlComment = new XmlComment();
-            xmlComment.Example = new OpenApiObject(2022-01-01T00:00:00Z);
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.TimeSpanType)), xmlComment);
-            xmlComment = new XmlComment();
             xmlComment.Example = new OpenApiNull();
             _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.ByteArrayType)), xmlComment);
             xmlComment = new XmlComment();
-            xmlComment.Example = new OpenApiObject({ "a" : 1, "b": 3.14, "c": "hello" });
+            xmlComment.Example = new OpenApiNull();
             _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.ObjectType)), xmlComment);
             return _cache;
 
@@ -155,7 +152,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
 
     file static class GeneratedServiceCollectionExtensions
     {
-        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "eJzRaTG3vikAwy56pPYxCqMAAABQcm9ncmFtLmNz")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "kZghOOomq7zTtz4oLsvObKMAAABQcm9ncmFtLmNz")]
         public static IServiceCollection AddOpenApi(this IServiceCollection services)
         {
             return services.AddOpenApi("v1", options =>
