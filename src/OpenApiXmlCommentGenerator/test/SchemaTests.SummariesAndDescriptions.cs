@@ -2,7 +2,7 @@
 
 namespace Microsoft.AspNetCore.OpenApi.SourceGenerators.Tests;
 
-public partial class DescriptionTests
+public partial class SchemaTests
 {
     [Fact]
     public async Task SupportsDescriptionOnClasses()

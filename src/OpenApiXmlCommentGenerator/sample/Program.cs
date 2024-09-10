@@ -11,12 +11,22 @@ if (app.Environment.IsDevelopment())
 
 var todos = app.MapGroup("/todos");
 
-todos.MapPost("/", (Todo todo) =>
-{
-    return Results.Created("/todos/1", todo);
-});
+todos.MapPost("/", RouteHandlerExtensionMethods.PostTodo);
 
 app.Run();
+
+public static class RouteHandlerExtensionMethods
+{
+    /// <summary>
+    /// Create a new Todo item.
+    /// </summary>
+    /// <param name="todo">The todo item to create.</param>
+    /// <response code="201">The created Todo item.</response>
+    public static IResult PostTodo(Todo todo)
+    {
+        return TypedResults.Created("/todo/1", todo);
+    }
+}
 
 /// <summary>
 /// Represents a todo item that can be created, read, updated, and deleted.

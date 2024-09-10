@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Models;
 
 namespace Microsoft.AspNetCore.OpenApi.SourceGenerators.Tests;
 
-public class ExampleTests
+public partial class SchemaTests
 {
     [Fact]
     public async Task SupportsExampleOnPrimitiveTypeProperties()
