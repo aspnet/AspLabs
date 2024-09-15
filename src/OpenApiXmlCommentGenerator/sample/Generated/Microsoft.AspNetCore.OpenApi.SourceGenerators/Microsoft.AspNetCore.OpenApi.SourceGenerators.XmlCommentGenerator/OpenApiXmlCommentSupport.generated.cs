@@ -42,6 +42,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         public string? Description { get; set; }
         public string? Returns { get; set; }
         public IOpenApiAny? Example { get; set; }
+        public Dictionary<string, string>? Parameters { get; set; }
     }
 
     file static class XmlCommentCache
@@ -65,15 +66,20 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             XmlComment xmlComment;
             xmlComment = new XmlComment();
             xmlComment.Summary = "Represents a todo item that can be created, read, updated, and deleted.";
+            xmlComment.Parameters = new Dictionary<string, string>();
             _cache.Add((typeof(global::Todo), null), xmlComment);
             xmlComment = new XmlComment();
             xmlComment.Summary = "The main title of the todo.";
+            xmlComment.Parameters = new Dictionary<string, string>();
             _cache.Add((typeof(global::Todo), nameof(global::Todo.Title)), xmlComment);
             xmlComment = new XmlComment();
             xmlComment.Summary = "Whether or not the todo has been completed.";
+            xmlComment.Parameters = new Dictionary<string, string>();
             _cache.Add((typeof(global::Todo), nameof(global::Todo.Completed)), xmlComment);
             xmlComment = new XmlComment();
             xmlComment.Summary = "Create a new Todo item.";
+            xmlComment.Parameters = new Dictionary<string, string>();
+            xmlComment.Parameters.Add("todo", "The todo item to create.");
             _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.PostTodo)), xmlComment);
             return _cache;
 
@@ -84,13 +90,22 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     {
         public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debugger.Break();
             if (context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
             {
                 if (XmlCommentCache.Cache.TryGetValue((controllerActionDescriptor.MethodInfo.DeclaringType, controllerActionDescriptor.MethodInfo.Name), out var methodComment))
                 {
                     operation.Summary = methodComment.Summary;
                     operation.Description = methodComment.Description;
+                    if (methodComment.Parameters.Count > 0)
+                    {
+                        foreach (var parameter in operation.Parameters)
+                        {
+                            if (methodComment.Parameters.TryGetValue(parameter.Name, out var parameterComment))
+                            {
+                                parameter.Description = parameterComment;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -101,6 +116,16 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     operation.Summary = methodComment.Summary;
                     operation.Description = methodComment.Description;
+                    if (methodComment.Parameters.Count > 0)
+                    {
+                        foreach (var parameter in operation.Parameters)
+                        {
+                            if (methodComment.Parameters.TryGetValue(parameter.Name, out var parameterComment))
+                            {
+                                parameter.Description = parameterComment;
+                            }
+                        }
+                    }
                 }
             }
             return Task.CompletedTask;

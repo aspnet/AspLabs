@@ -11,10 +11,13 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis;
 
 namespace DocFx.XmlComments;
 
+[JsonConverter(typeof(XmlCommentJsonConverter))]
 public sealed class XmlComment
 {
     private const string IdSelector = @"((?![0-9])[\w_])+[\w\(\)\.\{\}\[\]\|\*\^~#@!`,_<>:]*";
@@ -28,23 +31,27 @@ public sealed class XmlComment
 
     public ITypeSymbol? Type { get; set; }
 
-    public string? Summary { get; private set; }
+    public string? Summary { get; internal set; }
 
-    public string? Description { get; private set; }
+    public string? Description { get; internal set; }
 
-    public string? Remarks { get; private set; }
+    public string? Remarks { get; internal set; }
 
-    public string? Returns { get; private set; }
+    public string? Returns { get; internal set; }
 
-    public List<ExceptionInfo>? Exceptions { get; private set; }
+    public List<ExceptionInfo>? Exceptions { get; internal set; }
 
-    public List<LinkInfo>? SeeAlsos { get; private set; }
+    public List<LinkInfo>? SeeAlsos { get; internal set; }
 
-    public List<string?>? Examples { get; private set; }
+    public List<string?>? Examples { get; internal set; }
 
-    public Dictionary<string, string?>? Parameters { get; private set; }
+    public List<XmlParameterComment> Parameters { get; internal set; }
 
-    public Dictionary<string, string?>? TypeParameters { get; private set; }
+    public Dictionary<string, string?>? TypeParameters { get; internal set; }
+
+    public List<XmlResponseComment> Responses { get; internal set; }
+
+    internal XmlComment() { }
 
     private XmlComment(string xml, XmlCommentParserContext context)
     {
@@ -93,7 +100,8 @@ public sealed class XmlComment
         Exceptions = ToListNullOnEmpty(GetMultipleCrefInfo(nav, "/member/exception"));
         SeeAlsos = ToListNullOnEmpty(GetMultipleLinkInfo(nav, "/member/seealso"));
         Examples = GetMultipleExampleNodes(nav, "/member/example").ToList();
-        Parameters = GetListContent(nav, "/member/param");
+        Parameters = XmlParameterComment.GetXmlParameterListComment(nav, "/member/param", _context);
+        Responses = XmlResponseComment.GetXmlResponseCommentList(nav, "/member/response", _context);
         TypeParameters = GetListContent(nav, "/member/typeparam");
 
         // Nulls and empty list are treated differently in overwrite files:
@@ -132,11 +140,6 @@ public sealed class XmlComment
         }
     }
 
-    public string? GetParameter(string name)
-    {
-        return Parameters?.TryGetValue(name, out var value) == true ? value : null;
-    }
-
     public string? GetTypeParameter(string name)
     {
         return TypeParameters?.TryGetValue(name, out var value) == true ? value : null;
@@ -154,7 +157,7 @@ public sealed class XmlComment
 
             var indent = new string(' ', ((IXmlLineInfo)node).LinePosition - 2);
             var (lang, value) = ResolveCodeSource(node, context);
-            value = TrimEachLine(value ?? node.Value, indent);
+            value = (value ?? node.Value).TrimEachLine(indent);
             var code = new XElement("code", value);
 
             if (node.Attribute("language") is { } languageAttribute)
@@ -210,7 +213,7 @@ public sealed class XmlComment
         var builder = new StringBuilder();
         var regionCount = 0;
 
-        foreach (var line in ReadLines(code))
+        foreach (var line in code.ReadLines())
         {
             if (!string.IsNullOrEmpty(region))
             {
@@ -251,16 +254,6 @@ public sealed class XmlComment
         return (lang, builder.ToString());
     }
 
-    private static IEnumerable<string> ReadLines(string text)
-    {
-        string line;
-        using var sr = new StringReader(text);
-        while ((line = sr.ReadLine()) != null)
-        {
-            yield return line;
-        }
-    }
-
     private Dictionary<string, string?>? GetListContent(XPathNavigator navigator, string xpath)
     {
         var iterator = navigator.Select(xpath);
@@ -272,7 +265,8 @@ public sealed class XmlComment
         foreach (XPathNavigator nav in iterator)
         {
             var name = nav.GetAttribute("name", string.Empty);
-            var description = GetXmlValue(nav);
+            var code = nav.GetAttribute("code", string.Empty);
+            var description = nav.GetXmlValue(_context);
             if (!string.IsNullOrEmpty(name))
             {
                 if (result.ContainsKey(name))
@@ -284,6 +278,10 @@ public sealed class XmlComment
                 {
                     result.Add(name, description);
                 }
+            }
+            else if (!string.IsNullOrEmpty(code))
+            {
+                result.Add(code, description);
             }
         }
 
@@ -420,7 +418,7 @@ public sealed class XmlComment
         }
         foreach (XPathNavigator nav in iterator)
         {
-            yield return GetXmlValue(nav);
+            yield return nav.GetXmlValue(_context);
         }
     }
 
@@ -433,7 +431,7 @@ public sealed class XmlComment
         }
         foreach (XPathNavigator nav in iterator)
         {
-            var description = GetXmlValue(nav);
+            var description = nav.GetXmlValue(_context);
             var commentId = nav.GetAttribute("cref", string.Empty);
             var refId = nav.GetAttribute("refId", string.Empty);
             if (!string.IsNullOrEmpty(refId))
@@ -514,79 +512,7 @@ public sealed class XmlComment
 
     private string? GetSingleNodeValue(XPathNavigator nav, string selector)
     {
-        return GetXmlValue(nav.Clone().SelectSingleNode(selector));
-    }
-
-    private string? GetXmlValue(XPathNavigator node)
-    {
-        if (node is null)
-        {
-            return null;
-        }
-
-        if (_context.SkipMarkup != false)
-        {
-            return TrimEachLine(node.InnerXml);
-        }
-
-        return null;
-    }
-
-    private static string TrimEachLine(string text, string indent = "")
-    {
-        var minLeadingWhitespace = int.MaxValue;
-        var lines = ReadLines(text).ToList();
-        foreach (var line in lines)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-
-            var leadingWhitespace = 0;
-            while (leadingWhitespace < line.Length && char.IsWhiteSpace(line[leadingWhitespace]))
-            {
-                leadingWhitespace++;
-            }
-
-            minLeadingWhitespace = Math.Min(minLeadingWhitespace, leadingWhitespace);
-        }
-
-        var builder = new StringBuilder();
-
-        // Trim leading empty lines
-        var trimStart = true;
-
-        // Apply indentation to all lines except the first,
-        // since the first new line in <pre></code> is significant
-        var firstLine = true;
-
-        foreach (var line in lines)
-        {
-            if (trimStart && string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-
-            if (firstLine)
-            {
-                firstLine = false;
-            }
-            else
-            {
-                builder.Append(indent);
-            }
-
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                builder.AppendLine();
-                continue;
-            }
-
-            trimStart = false;
-            builder.AppendLine(line.Substring(minLeadingWhitespace));
-        }
-
-        return builder.ToString().TrimEnd();
+        var node = nav.Clone().SelectSingleNode(selector);
+        return node.GetXmlValue(_context);
     }
 }

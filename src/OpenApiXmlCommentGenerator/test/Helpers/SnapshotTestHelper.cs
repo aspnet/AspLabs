@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -36,6 +37,7 @@ public static class SnapshotTestHelper
                     MetadataReference.CreateFromFile(typeof(Microsoft.Extensions.DependencyInjection.MvcCoreMvcBuilderExtensions).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Http.TypedResults).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Text.Json.Nodes.JsonArray).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(System.Console).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(DocFx.XmlComments.XmlComment).Assembly.Location),
                 ]);
         var inputCompilation = CSharpCompilation.Create("OpenApiXmlCommentGeneratorSample",
@@ -136,21 +138,11 @@ public static class SnapshotTestHelper
                 return;
             }
 
-            var service = services.GetService(serviceType);
-
-            if (service == null)
-            {
-                return;
-            }
-
+            var service = services.GetService(serviceType) ?? throw new InvalidOperationException("Could not resolve IDocumntProvider service.");
             using var stream = new MemoryStream();
             var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
             using var writer = new StreamWriter(stream, encoding, bufferSize: 1024, leaveOpen: true);
-            var targetMethod = serviceType.GetMethod("GenerateAsync", [typeof(string), typeof(TextWriter)]);
-            if (targetMethod == null)
-            {
-                return;
-            }
+            var targetMethod = serviceType.GetMethod("GenerateAsync", [typeof(string), typeof(TextWriter)]) ?? throw new InvalidOperationException("Could not resolve GenerateAsync method.");
             targetMethod.Invoke(service, ["v1", writer]);
             stream.Position = 0;
             var openApiReadResult = await new OpenApiStreamReader().ReadAsync(stream);

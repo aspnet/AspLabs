@@ -68,6 +68,7 @@ var builder = WebApplication.CreateBuilder();
 builder.Services
     .AddControllers()
     .AddApplicationPart(typeof(TestController).Assembly);
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 

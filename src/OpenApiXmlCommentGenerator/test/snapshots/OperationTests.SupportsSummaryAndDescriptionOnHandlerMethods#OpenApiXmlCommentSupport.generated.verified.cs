@@ -37,18 +37,10 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     using Microsoft.OpenApi.Models;
     using Microsoft.OpenApi.Any;
 
-    file class XmlComment
-    {
-        public string? Summary { get; set; }
-        public string? Description { get; set; }
-        public string? Returns { get; set; }
-        public IOpenApiAny? Example { get; set; }
-    }
-
     file static class XmlCommentCache
     {
-        private static Dictionary<(Type?, string?), XmlComment>? _cache;
-        public static Dictionary<(Type?, string?), XmlComment> Cache
+        private static Dictionary<(Type?, string?), string>? _cache;
+        public static Dictionary<(Type?, string?), string> Cache
         {
             get
             {
@@ -60,13 +52,10 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             }
         }
 
-        private static Dictionary<(Type?, string?), XmlComment> GenerateCacheEntries()
+        private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
-            var _cache = new Dictionary<(Type?, string?), XmlComment>();
-            XmlComment xmlComment;
-            xmlComment = new XmlComment();
-            xmlComment.Summary = "A summary of the action.";
-            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.Get)), xmlComment);
+            var _cache = new Dictionary<(Type?, string?), string>();
+            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.Get)), "{\"Summary\":\"A summary of the action.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
             return _cache;
 
         }
@@ -76,25 +65,40 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     {
         public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debugger.Break();
-            if (context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            var methodInfo = context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+                ? controllerActionDescriptor.MethodInfo
+                : context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
+
+            if (methodInfo is null)
             {
-                if (XmlCommentCache.Cache.TryGetValue((controllerActionDescriptor.MethodInfo.DeclaringType, controllerActionDescriptor.MethodInfo.Name), out var methodComment))
+                return Task.CompletedTask;
+            }
+
+            if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodCommentString))
+            {
+                var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
+                operation.Summary = methodComment.Summary;
+                operation.Description = methodComment.Description;
+                if (methodComment.Parameters is { Count: > 0 })
                 {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
+                    foreach (var parameter in operation.Parameters)
+                    {
+                        var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
+                        parameter.Description = parameterComment.Description;
+                    }
+                }
+                if (methodComment.Responses is { Count: > 0})
+                {
+                    foreach (var response in operation.Responses)
+                    {
+                        if (methodComment.Responses.TryGetValue(response.Key, out var responseComment))
+                        {
+                            response.Value.Description = responseComment.Description;
+                        }
+                    }
                 }
             }
 
-            var methodInfo = context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
-            if (methodInfo is not null)
-            {
-                if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodComment))
-                {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
-                }
-            }
             return Task.CompletedTask;
         }
     }
@@ -105,21 +109,23 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         {
             if (context.JsonPropertyInfo is { AttributeProvider: PropertyInfo propertyInfo })
             {
-                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyComment))
+                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyCommentString))
                 {
+                    var propertyComment = JsonSerializer.Deserialize<XmlComment>(propertyCommentString);
                     schema.Description = propertyComment.Returns ?? propertyComment.Summary;
-                    if (propertyComment.Example is not null)
+                    if (propertyComment.Examples is { Count: > 0 })
                     {
-                        schema.Example = propertyComment.Example;
+                        // schema.Example = propertyComment.Examples.FirstOrDefault();
                     }
                 }
             }
-            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeComment))
+            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeCommentString))
             {
+                var typeComment = JsonSerializer.Deserialize<XmlComment>(typeCommentString);
                 schema.Description = typeComment.Summary;
-                if (schema.Example is not null)
+                if (typeComment.Examples is { Count: > 0 })
                 {
-                    schema.Example = typeComment.Example;
+                    // schema.Example = typeComment.Examples.FirstOrDefault();
                 }
             }
             return Task.CompletedTask;

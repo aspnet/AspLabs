@@ -33,10 +33,10 @@ public class TypeWithExamples
     public long LongType { get; set; }
     /// <example>3.14</example>
     public double DoubleType { get; set; }
-    /// <example>3.14f</example>
+    /// <example>3.14</example>
     public float FloatType { get; set; }
     /// <example>3.14</example>
-    // public decimal DecimalType { get; set; }
+    public decimal DecimalType { get; set; }
     /// <example>2022-01-01T00:00:00Z</example>
     public DateTime DateTimeType { get; set; }
     /// <example>2022-01-01T00:00:00Z</example>

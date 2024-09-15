@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Text.Json;
 
 namespace Microsoft.AspNetCore.OpenApi.SourceGenerators;
 
@@ -56,18 +57,10 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     using Microsoft.OpenApi.Models;
     using Microsoft.OpenApi.Any;
 
-    file class XmlComment
-    {
-        public string? Summary { get; set; }
-        public string? Description { get; set; }
-        public string? Returns { get; set; }
-        public IOpenApiAny? Example { get; set; }
-    }
-
     file static class XmlCommentCache
     {
-        private static Dictionary<(Type?, string?), XmlComment>? _cache;
-        public static Dictionary<(Type?, string?), XmlComment> Cache
+        private static Dictionary<(Type?, string?), string>? _cache;
+        public static Dictionary<(Type?, string?), string> Cache
         {
             get
             {
@@ -79,7 +72,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             }
         }
 
-        private static Dictionary<(Type?, string?), XmlComment> GenerateCacheEntries()
+        private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
 {{GenerateCacheEntries(cacheEntries)}}
         }
@@ -89,25 +82,40 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     {
         public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debugger.Break();
-            if (context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            var methodInfo = context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+                ? controllerActionDescriptor.MethodInfo
+                : context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
+
+            if (methodInfo is null)
             {
-                if (XmlCommentCache.Cache.TryGetValue((controllerActionDescriptor.MethodInfo.DeclaringType, controllerActionDescriptor.MethodInfo.Name), out var methodComment))
+                return Task.CompletedTask;
+            }
+            System.Diagnostics.Debugger.Break();
+            if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodCommentString))
+            {
+                var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
+                operation.Summary = methodComment.Summary;
+                operation.Description = methodComment.Description;
+                if (methodComment.Parameters is { Count: > 0 })
                 {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
+                    foreach (var parameter in operation.Parameters)
+                    {
+                        var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameter.Name);
+                        var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
+                        parameter.Description = parameterComment.Description;
+                        parameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
+                    }
+                }
+                if (methodComment.Responses is { Count: > 0})
+                {
+                    foreach (var response in operation.Responses)
+                    {
+                        var responseComment = methodComment.Responses.SingleOrDefault(xmlResponse => xmlResponse.Code == response.Key);
+                        response.Value.Description = responseComment.Description;
+                    }
                 }
             }
 
-            var methodInfo = context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
-            if (methodInfo is not null)
-            {
-                if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodComment))
-                {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
-                }
-            }
             return Task.CompletedTask;
         }
     }
@@ -118,24 +126,44 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         {
             if (context.JsonPropertyInfo is { AttributeProvider: PropertyInfo propertyInfo })
             {
-                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyComment))
+                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyCommentString))
                 {
+                    var propertyComment = JsonSerializer.Deserialize<XmlComment>(propertyCommentString);
                     schema.Description = propertyComment.Returns ?? propertyComment.Summary;
-                    if (propertyComment.Example is not null)
+                    if (propertyComment.Examples is { Count: > 0 })
                     {
-                        schema.Example = propertyComment.Example;
+                        schema.Example = OpenApiExamplesHelper.ToOpenApiAny(propertyComment.Examples.FirstOrDefault(), propertyInfo.PropertyType);
                     }
                 }
             }
-            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeComment))
+            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeCommentString))
             {
+                var typeComment = JsonSerializer.Deserialize<XmlComment>(typeCommentString);
                 schema.Description = typeComment.Summary;
-                if (schema.Example is not null)
+                if (typeComment.Examples is { Count: > 0 })
                 {
-                    schema.Example = typeComment.Example;
+                    schema.Example = OpenApiExamplesHelper.ToOpenApiAny(typeComment.Examples.FirstOrDefault(), context.JsonTypeInfo.Type);
                 }
             }
             return Task.CompletedTask;
+        }
+    }
+
+    file static class OpenApiExamplesHelper
+    {
+        public static IOpenApiAny ToOpenApiAny(string? example, Type type)
+        {
+            return Type.GetTypeCode(type) switch
+            {
+                TypeCode.String => new OpenApiString(example),
+                TypeCode.Boolean => new OpenApiBoolean(bool.Parse(example)),
+                TypeCode.Int32 => new OpenApiInteger(int.Parse(example)),
+                TypeCode.Int64 => new OpenApiLong(long.Parse(example)),
+                TypeCode.Double => new OpenApiDouble(double.Parse(example)),
+                TypeCode.Single => new OpenApiFloat(float.Parse(example)),
+                TypeCode.DateTime => new OpenApiDateTime(DateTime.Parse(example)),
+                _ => new OpenApiNull()
+            };
         }
     }
 
@@ -205,79 +233,18 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     {
         var writer = new StringWriter();
         var codeWriter = new CodeWriter(writer, baseIndent: 3);
-        codeWriter.WriteLine("var _cache = new Dictionary<(Type?, string?), XmlComment>();");
-        codeWriter.WriteLine("XmlComment xmlComment;");
+        codeWriter.WriteLine("var _cache = new Dictionary<(Type?, string?), string>();");
         foreach (var (type, member, comment) in cacheEntries)
         {
             if (comment is not null)
             {
                 var typeKey = $"(typeof({type})";
                 var memberKey = member is not null ? $"nameof({type}.{member})" : "null";
-                codeWriter.WriteLine("xmlComment = new XmlComment();");
-                if (comment.Summary is not null)
-                {
-                    codeWriter.WriteLine($"xmlComment.Summary = {SymbolDisplay.FormatLiteral(comment.Summary, true)};");
-                }
-                if (comment.Description is not null)
-                {
-                    codeWriter.WriteLine($"xmlComment.Description = {SymbolDisplay.FormatLiteral(comment.Description, true)};");
-                }
-                if (comment.Returns is not null)
-                {
-                    codeWriter.WriteLine($"xmlComment.Returns = {SymbolDisplay.FormatLiteral(comment.Returns, true)};");
-                }
-                if (comment.Examples.FirstOrDefault() is { } example)
-                {
-                    codeWriter.WriteLine($"xmlComment.Example = {GenerateExampleValue(example, comment.Type)};");
-                }
-                codeWriter.WriteLine($"_cache.Add({typeKey}, {memberKey}), xmlComment);");
+                codeWriter.WriteLine($"_cache.Add({typeKey}, {memberKey}), {SymbolDisplay.FormatLiteral(JsonSerializer.Serialize(comment), true)});");
             }
         }
         codeWriter.WriteLine("return _cache;");
         return writer.ToString();
-    }
-
-    private static string GenerateExampleValue(string? example, ITypeSymbol type)
-    {
-        if (example == null)
-        {
-            return "new OpenApiNull()";
-        }
-        return type.SpecialType switch
-        {
-            SpecialType.System_String => $"new OpenApiString({SymbolDisplay.FormatLiteral(example, false)})",
-            SpecialType.System_DateTime => $"new OpenApiDateTime(System.DateTime.Parse({SymbolDisplay.FormatLiteral(example, true)}))",
-            SpecialType.System_Boolean => $"new OpenApiBoolean({SymbolDisplay.FormatLiteral(example, false)})",
-            SpecialType.System_Int32 => $"new OpenApiInteger({SymbolDisplay.FormatLiteral(example, false)})",
-            SpecialType.System_Int64 => $"new OpenApiLong({SymbolDisplay.FormatLiteral(example, false)})",
-            SpecialType.System_Double => $"new OpenApiDouble({SymbolDisplay.FormatLiteral(example, false)})",
-            SpecialType.System_Single => $"new OpenApiFloat({SymbolDisplay.FormatLiteral(example, false)})",
-            _ => HandleExampleWithoutSpecialType(example, type)
-        };
-
-        static string HandleExampleWithoutSpecialType(string? example, ITypeSymbol type)
-        {
-            if (type is INamedTypeSymbol namedType)
-            {
-                if (namedType.IsGenericType && namedType.TypeArguments.Length == 1)
-                {
-                    var typeArgument = namedType.TypeArguments[0];
-                    if (namedType.Name == "IEnumerable" || namedType.Name == "ICollection" || namedType.Name == "IList")
-                    {
-                        return $"new OpenApiArray({GenerateExampleValue(example, typeArgument)})";
-                    }
-                    if (namedType.Name == "IDictionary")
-                    {
-                        return $"new OpenApiObject(new Dictionary<string, IOpenApiAny> {{ {{ \"key\", {GenerateExampleValue(example, typeArgument)} }} }})";
-                    }
-                }
-                else if (namedType.Name == "DateTimeOffset")
-                {
-                    return $"new OpenApiDateTime(System.DateTimeOffset.Parse({SymbolDisplay.FormatLiteral(example, true)}))";
-                }
-            }
-            return "new OpenApiNull()";
-        }
     }
 
     internal static void EmitXmlCommentCache(SourceProductionContext context, IEnumerable<(string, string?, XmlComment?)> comments, ImmutableArray<(AddOpenApiInvocation Source, int Index, ImmutableArray<InterceptableLocation?> Elements)> groupedAddOpenApiInvocations)

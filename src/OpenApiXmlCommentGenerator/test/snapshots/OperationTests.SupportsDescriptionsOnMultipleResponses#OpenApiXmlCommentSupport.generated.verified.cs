@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
             var _cache = new Dictionary<(Type?, string?), string>();
-            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.Get)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"name\",\"Description\":\"The name of the person.\"}],\"Responses\":[{\"Code\":\"200\",\"Description\":\"Returns the greeting.\"}]}");
+            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.Get)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Responses\":[{\"Code\":\"200\",\"Description\":\"Indicates that the value is even.\"},{\"Code\":\"201\",\"Description\":\"Indicates that the value is less than 50.\"},{\"Code\":\"404\",\"Description\":\"Indicates that the value was not found.\"}]}");
             return _cache;
 
         }
@@ -132,7 +132,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
 
     file static class GeneratedServiceCollectionExtensions
     {
-        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "LNYY15ViYqeTRJvwVo09aJUAAABQcm9ncmFtLmNz")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "yigFM5Ppzy7lCZPwIrW+xPEAAABQcm9ncmFtLmNz")]
         public static IServiceCollection AddOpenApi(this IServiceCollection services)
         {
             return services.AddOpenApi("v1", options =>
