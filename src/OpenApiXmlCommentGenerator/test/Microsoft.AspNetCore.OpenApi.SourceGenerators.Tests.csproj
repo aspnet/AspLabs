@@ -4,7 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
     <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 

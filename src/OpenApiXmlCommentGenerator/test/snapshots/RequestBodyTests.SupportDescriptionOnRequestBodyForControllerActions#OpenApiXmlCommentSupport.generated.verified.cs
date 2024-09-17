@@ -55,9 +55,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
             var _cache = new Dictionary<(Type?, string?), string>();
-            _cache.Add((typeof(global::Todo), nameof(global::Todo.Id)), "{\"Summary\":\"The identifier of the todo.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
-            _cache.Add((typeof(global::Todo), nameof(global::Todo.Name)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":\"The name of the todo.\"}");
-            _cache.Add((typeof(global::Todo), nameof(global::Todo.Description)), "{\"Summary\":\"A description of the the todo.\",\"Description\":null,\"Remarks\":null,\"Returns\":\"Another description of the todo.\"}");
+            _cache.Add((typeof(global::TestController), nameof(global::TestController.Post)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"todo\",\"Description\":\"The todo to insert into the database.\",\"Example\":\"\"}]}");
             return _cache;
 
         }
@@ -81,17 +79,21 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
                 operation.Summary = methodComment.Summary;
                 operation.Description = methodComment.Description;
-                if (methodComment.Parameters is { Count: > 0 })
+                if (methodComment.Parameters is { Count: > 0 } && operation.Parameters is { Count: > 0 })
                 {
                     foreach (var parameter in operation.Parameters)
                     {
                         var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameter.Name);
                         var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
+                        if (parameterComment is null)
+                        {
+                            continue;
+                        }
                         parameter.Description = parameterComment.Description;
                         parameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
                     }
                 }
-                if (methodComment.Responses is { Count: > 0})
+                if (methodComment.Responses is { Count: > 0} && operation.Responses is { Count: > 0 })
                 {
                     foreach (var response in operation.Responses)
                     {
@@ -154,7 +156,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
 
     file static class GeneratedServiceCollectionExtensions
     {
-        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "sQCkUyv2/x0hS9bTXSMloJUAAABQcm9ncmFtLmNz")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "jblmsQZXA/Lmc0G5TgMjJhYBAABQcm9ncmFtLmNz")]
         public static IServiceCollection AddOpenApi(this IServiceCollection services)
         {
             return services.AddOpenApi("v1", options =>

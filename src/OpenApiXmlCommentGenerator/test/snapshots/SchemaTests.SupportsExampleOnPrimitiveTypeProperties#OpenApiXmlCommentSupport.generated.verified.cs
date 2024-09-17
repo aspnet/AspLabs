@@ -92,8 +92,10 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     foreach (var parameter in operation.Parameters)
                     {
+                        var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameter.Name);
                         var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
                         parameter.Description = parameterComment.Description;
+                        parameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
                     }
                 }
                 if (methodComment.Responses is { Count: > 0})

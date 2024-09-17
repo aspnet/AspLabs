@@ -69,8 +69,8 @@ public class TypeWithExamples
             var floatTypeExample = Assert.IsType<OpenApiFloat>(typeWithExamples.Properties["floatType"].Example);
             Assert.Equal(3.14f, floatTypeExample.Value);
 
-            // var decimalTypeExample = Assert.IsType<OpenApi>(typeWithExamples.Properties["decimalType"].Example);
-            // Assert.Equal(3.14m, decimalTypeExample.Value);
+            var decimalTypeExample = Assert.IsType<OpenApi>(typeWithExamples.Properties["decimalType"].Example);
+            Assert.Equal(3.14m, decimalTypeExample.Value);
 
             var dateTimeTypeExample = Assert.IsType<OpenApiDateTime>(typeWithExamples.Properties["dateTimeType"].Example);
             Assert.Equal(DateTime.Parse("2022-01-01T00:00:00Z"), dateTimeTypeExample.Value);

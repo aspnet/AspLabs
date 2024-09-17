@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
             var _cache = new Dictionary<(Type?, string?), string>();
-            _cache.Add((typeof(global::Project), null), "{\"Summary\":\"The project that contains Todo items.\",\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"Name\",\"Description\":\"The name of the project.\"},{\"Name\":\"Description\",\"Description\":\"The description of the project.\"}]}");
+            _cache.Add((typeof(global::Project), null), "{\"Summary\":\"The project that contains Todo items.\",\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"Name\",\"Description\":\"The name of the project.\",\"Example\":\"\"},{\"Name\":\"Description\",\"Description\":\"The description of the project.\",\"Example\":\"\"}]}");
             _cache.Add((typeof(global::Project), nameof(global::Project.Name)), "{\"Summary\":\"The name of the project.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
             _cache.Add((typeof(global::Project), nameof(global::Project.Description)), "{\"Summary\":\"The description of the project.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
             return _cache;
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             {
                 return Task.CompletedTask;
             }
-
+            System.Diagnostics.Debugger.Break();
             if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodCommentString))
             {
                 var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
@@ -85,18 +85,18 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     foreach (var parameter in operation.Parameters)
                     {
+                        var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameter.Name);
                         var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
                         parameter.Description = parameterComment.Description;
+                        parameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
                     }
                 }
                 if (methodComment.Responses is { Count: > 0})
                 {
                     foreach (var response in operation.Responses)
                     {
-                        if (methodComment.Responses.TryGetValue(response.Key, out var responseComment))
-                        {
-                            response.Value.Description = responseComment.Description;
-                        }
+                        var responseComment = methodComment.Responses.SingleOrDefault(xmlResponse => xmlResponse.Code == response.Key);
+                        response.Value.Description = responseComment.Description;
                     }
                 }
             }
@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                     schema.Description = propertyComment.Returns ?? propertyComment.Summary;
                     if (propertyComment.Examples is { Count: > 0 })
                     {
-                        // schema.Example = propertyComment.Examples.FirstOrDefault();
+                        schema.Example = OpenApiExamplesHelper.ToOpenApiAny(propertyComment.Examples.FirstOrDefault(), propertyInfo.PropertyType);
                     }
                 }
             }
@@ -127,10 +127,28 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 schema.Description = typeComment.Summary;
                 if (typeComment.Examples is { Count: > 0 })
                 {
-                    // schema.Example = typeComment.Examples.FirstOrDefault();
+                    schema.Example = OpenApiExamplesHelper.ToOpenApiAny(typeComment.Examples.FirstOrDefault(), context.JsonTypeInfo.Type);
                 }
             }
             return Task.CompletedTask;
+        }
+    }
+
+    file static class OpenApiExamplesHelper
+    {
+        public static IOpenApiAny ToOpenApiAny(string? example, Type type)
+        {
+            return Type.GetTypeCode(type) switch
+            {
+                TypeCode.String => new OpenApiString(example),
+                TypeCode.Boolean => new OpenApiBoolean(bool.Parse(example)),
+                TypeCode.Int32 => new OpenApiInteger(int.Parse(example)),
+                TypeCode.Int64 => new OpenApiLong(long.Parse(example)),
+                TypeCode.Double => new OpenApiDouble(double.Parse(example)),
+                TypeCode.Single => new OpenApiFloat(float.Parse(example)),
+                TypeCode.DateTime => new OpenApiDateTime(DateTime.Parse(example)),
+                _ => new OpenApiNull()
+            };
         }
     }
 
