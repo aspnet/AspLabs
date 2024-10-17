@@ -44,8 +44,8 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests.XmlComments
 
             Subject().Apply(document, filterContext);
 
-            Assert.Equal(1, document.Tags.Count);
-            Assert.Equal(expectedDescription, document.Tags[0].Description);
+            var tag = Assert.Single(document.Tags);
+            Assert.Equal(expectedDescription, tag.Description);
 
             static ApiDescription CreateApiDescription(Type serviceType)
             {

@@ -34,9 +34,9 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             // Assert
             schema = repository.Schemas[schema.Reference.Id];
             Assert.Equal("object", schema.Type);
-            Assert.Equal(1, schema.Properties.Count);
+            var enumValue = Assert.Single(schema.Properties);
 
-            var enumSchema = repository.Schemas[schema.Properties["enumValue"].Reference.Id];
+            var enumSchema = repository.Schemas[enumValue.Value.Reference.Id];
             Assert.Equal("string", enumSchema.Type);
             Assert.Equal(5, enumSchema.Enum.Count);
             Assert.Equal("NESTED_ENUM_UNSPECIFIED", ((OpenApiString)enumSchema.Enum[0]).Value);
@@ -72,8 +72,8 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             // Assert
             schema = repository.Schemas[schema.Reference.Id];
             Assert.Equal("object", schema.Type);
-            Assert.Equal(1, schema.Properties.Count);
-            Assert.Equal("RecursiveMessage", schema.Properties["child"].Reference.Id);
+            var child = Assert.Single(schema.Properties);
+            Assert.Equal("RecursiveMessage", child.Value.Reference.Id);
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             var resolvedSchema = repository.Schemas[schema.Reference.Id];
 
             Assert.Equal("object", resolvedSchema.Type);
-            Assert.Equal(0, resolvedSchema.Properties.Count);
+            Assert.Empty(resolvedSchema.Properties);
             Assert.NotNull(resolvedSchema.AdditionalProperties);
             Assert.Null(resolvedSchema.AdditionalProperties.Type);
         }
@@ -132,8 +132,8 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             Assert.Equal("object", schema.Type);
             Assert.NotNull(schema.AdditionalProperties);
             Assert.Null(schema.AdditionalProperties.Type);
-            Assert.Equal(1, schema.Properties.Count);
-            Assert.Equal("string", schema.Properties["@type"].Type);
+            var typeSchema = Assert.Single(schema.Properties);
+            Assert.Equal("string", typeSchema.Value.Type);
         }
 
         [Fact]
@@ -162,10 +162,10 @@ namespace Microsoft.AspNetCore.Grpc.Swagger.Tests
             // Assert
             schema = repository.Schemas[schema.Reference.Id];
             Assert.Equal("object", schema.Type);
-            Assert.Equal(1, schema.Properties.Count);
-            Assert.Equal("object", schema.Properties["mapValue"].Type);
-            Assert.Equal("number", schema.Properties["mapValue"].AdditionalProperties.Type);
-            Assert.Equal("double", schema.Properties["mapValue"].AdditionalProperties.Format);
+            var mapSchema = Assert.Single(schema.Properties);
+            Assert.Equal("object", mapSchema.Value.Type);
+            Assert.Equal("number", mapSchema.Value.AdditionalProperties.Type);
+            Assert.Equal("double", mapSchema.Value.AdditionalProperties.Format);
         }
     }
 }

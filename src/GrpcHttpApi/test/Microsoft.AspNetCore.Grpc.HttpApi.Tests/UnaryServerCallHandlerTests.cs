@@ -456,7 +456,7 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("text/html")]
-        public async Task HandleCallAsync_BadContentType_BadRequestReturned(string contentType)
+        public async Task HandleCallAsync_BadContentType_BadRequestReturned(string? contentType)
         {
             // Arrange
             UnaryServerMethod<HttpApiGreeterService, HelloRequest, HelloReply> invoker = (s, r, c) =>

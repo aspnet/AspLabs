@@ -32,8 +32,8 @@ namespace Microsoft.AspNetCore.Grpc.HttpApi.Tests
 
             Assert.Equal("GET", endpoint.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Single());
             Assert.Equal("/v1/greeter/{name}", endpoint.RoutePattern.RawText);
-            Assert.Equal(1, endpoint.RoutePattern.Parameters.Count);
-            Assert.Equal("name", endpoint.RoutePattern.Parameters[0].Name);
+            var routeParameter = Assert.Single(endpoint.RoutePattern.Parameters);
+            Assert.Equal("name", routeParameter.Name);
         }
 
         [Fact]
