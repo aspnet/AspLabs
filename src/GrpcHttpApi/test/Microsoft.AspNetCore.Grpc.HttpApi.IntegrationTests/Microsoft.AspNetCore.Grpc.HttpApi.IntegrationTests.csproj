@@ -16,7 +16,8 @@
 
     <ProjectReference Include="..\testassets\IntegrationTestsWebsite\IntegrationTestsWebsite.csproj" />
 
-    <PackageReference Include="Microsoft.Extensions.Logging.Testing" Version="$(MicrosoftExtensionsLoggingTestingPackageVersion)" />
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
 
