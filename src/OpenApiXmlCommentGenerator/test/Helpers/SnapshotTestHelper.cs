@@ -160,7 +160,7 @@ public static class SnapshotTestHelper
     {
         public IFeatureCollection Features { get; } = new FeatureCollection();
         public void Dispose() { }
-        public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken) where TContext: notnull => Task.CompletedTask;
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
