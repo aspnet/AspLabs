@@ -101,7 +101,7 @@ public static class SnapshotTestHelper
         }
 
         var waitForStartTcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-        void OnEntryPointExit(Exception exception)
+        void OnEntryPointExit(Exception? exception)
         {
             // If the entry point exited, we'll try to complete the wait
             if (exception != null)
@@ -110,7 +110,7 @@ public static class SnapshotTestHelper
             }
             else
             {
-                waitForStartTcs.TrySetResult(null);
+                waitForStartTcs.TrySetResult(0);
             }
         }
 
@@ -127,7 +127,7 @@ public static class SnapshotTestHelper
         var services = ((IHost)factory([$"--{HostDefaults.ApplicationKey}={assemblyName}"])).Services;
 
         var applicationLifetime = services.GetRequiredService<IHostApplicationLifetime>();
-        using (var registration = applicationLifetime.ApplicationStarted.Register(() => waitForStartTcs.TrySetResult(null)))
+        using (var registration = applicationLifetime.ApplicationStarted.Register(() => waitForStartTcs.TrySetResult(0)))
         {
             waitForStartTcs.Task.Wait();
             var targetAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.GetName().Name == "Microsoft.AspNetCore.OpenApi");

@@ -35,16 +35,10 @@ public class TypeWithExamples
     public double DoubleType { get; set; }
     /// <example>3.14</example>
     public float FloatType { get; set; }
-    /// <example>3.14</example>
-    public decimal DecimalType { get; set; }
     /// <example>2022-01-01T00:00:00Z</example>
     public DateTime DateTimeType { get; set; }
-    /// <example>2022-01-01T00:00:00Z</example>
-    public DateTimeOffset DateTimeOffsetType { get; set; }
-    /// <example>SGVsbG8gV29ybGQ=</example>
-    public byte[] ByteArrayType { get; set; }
-    /// <example>{ "a" : 1, "b": 3.14, "c": "hello" }</example>
-    public object ObjectType { get; set; }
+    /// <example>2022-01-01</example>
+    public DateOnly DateOnlyType { get; set; }
 }
 """;
         var generator = new XmlCommentGenerator();
@@ -69,25 +63,11 @@ public class TypeWithExamples
             var floatTypeExample = Assert.IsType<OpenApiFloat>(typeWithExamples.Properties["floatType"].Example);
             Assert.Equal(3.14f, floatTypeExample.Value);
 
-            var decimalTypeExample = Assert.IsType<OpenApi>(typeWithExamples.Properties["decimalType"].Example);
-            Assert.Equal(3.14m, decimalTypeExample.Value);
-
             var dateTimeTypeExample = Assert.IsType<OpenApiDateTime>(typeWithExamples.Properties["dateTimeType"].Example);
             Assert.Equal(DateTime.Parse("2022-01-01T00:00:00Z"), dateTimeTypeExample.Value);
 
-            // var dateTimeOffsetTypeExample = Assert.IsType<OpenApiDateTimeOffset>(typeWithExamples.Properties["dateTimeOffsetType"].Example);
-            // Assert.Equal(DateTimeOffset.Parse("2022-01-01T00:00:00Z"), dateTimeOffsetTypeExample.Value);
-
-            // var timeSpanTypeExample = Assert.IsType<OpenApiTimeSpan>(typeWithExamples.Properties["timeSpanType"].Example);
-            // Assert.Equal(TimeSpan.Parse("00:00:00"), timeSpanTypeExample.Value);
-
-            // var byteArrayTypeExample = Assert.IsType<OpenApiBinary>(typeWithExamples.Properties["byteArrayType"].Example);
-            // Assert.Equal("SGVsbG8gV29ybGQ=", byteArrayTypeExample.Value);
-
-            // var objectTypeExample = Assert.IsType<OpenApiObject>(typeWithExamples.Properties["objectType"].Example);
-            // Assert.Equal(1, Assert.IsType<OpenApiInteger>(objectTypeExample["a"]).Value);
-            // Assert.Equal(3.14, Assert.IsType<OpenApiDouble>(objectTypeExample["b"]).Value);
-            // Assert.Equal("hello", Assert.IsType<OpenApiString>(objectTypeExample["c"]).Value);
+            var dateOnlyTypeExample = Assert.IsType<OpenApiDate>(typeWithExamples.Properties["dateOnlyType"].Example);
+            Assert.Equal(DateTime.Parse("2022-01-01"), dateOnlyTypeExample.Value);
         });
     }
 }

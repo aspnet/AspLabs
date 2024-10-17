@@ -1,9 +1,23 @@
 {
   "sdk": {
-    "version": "9.0.100-rc.1.24403.1"
+    "version": "9.0.100-rc.2.24474.11"
   },
   "tools": {
-    "dotnet": "9.0.100-rc.1.24403.1"
+    "dotnet": "9.0.100-rc.2.24474.11",
+    "runtimes": {
+      "dotnet": [
+        "9.0.0-rc.2.24473.5"
+      ],
+      "aspnetcore": [
+        "9.0.0-rc.2.24474.3"
+      ],
+      "aspnetcore/x64": [
+        "3.1.23"
+      ],
+      "aspnetcore/x86": [
+        "3.1.23"
+      ]
+    }
   },
   "msbuild-sdks": {
     "Yarn.MSBuild": "1.22.10",
