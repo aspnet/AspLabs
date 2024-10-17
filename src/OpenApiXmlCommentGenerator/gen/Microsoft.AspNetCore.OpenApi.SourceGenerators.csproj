@@ -4,6 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
+    <MajorVersion>1</MajorVersion>
+    <MinorVersion>0</MinorVersion>
+    <PreReleaseVersionLabel>preview1</PreReleaseVersionLabel>
     <IsAnalyzersProject>true</IsAnalyzersProject>
     <AddPublicApiAnalyzers>false</AddPublicApiAnalyzers>
     <Nullable>enable</Nullable>
