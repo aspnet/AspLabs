@@ -10,6 +10,7 @@
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsPreviewNamespaces>
+    <WarningsNotAsErrors>nullable;CS8604</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

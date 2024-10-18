@@ -6,7 +6,7 @@ namespace DocFx.XmlComments;
 
 public class XmlResponseComment
 {
-    public string Code { get; set; }
+    public string Code { get; set; } = string.Empty;
     public string? Description { get; set; }
 
     public string? Example { get; set; }

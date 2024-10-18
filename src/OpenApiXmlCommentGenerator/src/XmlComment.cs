@@ -27,7 +27,7 @@ public sealed class XmlComment
     private static readonly Regex EndRegionRegex = new(@"^\s*#endregion\s*.*$");
     private static readonly Regex XmlEndRegionRegex = new(@"^\s*<!--\s*</(.*)>\s*-->$");
 
-    private readonly XmlCommentParserContext _context;
+    private readonly XmlCommentParserContext _context = new XmlCommentParserContext();
 
     public ITypeSymbol? Type { get; set; }
 
@@ -45,11 +45,11 @@ public sealed class XmlComment
 
     public List<string?>? Examples { get; internal set; }
 
-    public List<XmlParameterComment> Parameters { get; internal set; }
+    public List<XmlParameterComment> Parameters { get; internal set; } = new();
 
     public Dictionary<string, string?>? TypeParameters { get; internal set; }
 
-    public List<XmlResponseComment> Responses { get; internal set; }
+    public List<XmlResponseComment> Responses { get; internal set; } = new();
 
     internal XmlComment() { }
 

@@ -38,6 +38,7 @@ public static class SnapshotTestHelper
                     MetadataReference.CreateFromFile(typeof(Microsoft.AspNetCore.Http.TypedResults).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Text.Json.Nodes.JsonArray).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Console).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(System.Uri).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(DocFx.XmlComments.XmlComment).Assembly.Location),
                 ]);
         var inputCompilation = CSharpCompilation.Create("OpenApiXmlCommentGeneratorSample",

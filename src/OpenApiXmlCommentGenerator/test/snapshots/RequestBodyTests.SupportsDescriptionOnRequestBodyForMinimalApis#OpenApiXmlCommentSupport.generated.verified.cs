@@ -56,13 +56,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
             var _cache = new Dictionary<(Type?, string?), string>();
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.BooleanType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"true\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.IntegerType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"42\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.LongType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"1234567890123456789\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.DoubleType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"3.14\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.FloatType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"3.14\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.DateTimeType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"2022-01-01T00:00:00Z\"]}");
-            _cache.Add((typeof(global::TypeWithExamples), nameof(global::TypeWithExamples.DateOnlyType)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Examples\":[\"2022-01-01\"]}");
+            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.Post)), "{\"Summary\":null,\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"todo\",\"Description\":\"The todo to insert into the database.\",\"Example\":\"\"}]}");
             return _cache;
 
         }
@@ -192,7 +186,8 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class GeneratedServiceCollectionExtensions
     {
-        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "sry865mxoIk8J4aBKBcsx6MAAABQcm9ncmFtLmNz")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "c+6uGogGWM1OYiZhcfkK6pUAAABQcm9ncmFtLmNz")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "c+6uGogGWM1OYiZhcfkK6rUAAABQcm9ncmFtLmNz")]
         public static IServiceCollection AddOpenApi(this IServiceCollection services)
         {
             return services.AddOpenApi("v1", options =>

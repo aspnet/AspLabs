@@ -49,8 +49,11 @@ public sealed partial class XmlCommentGenerator
                 var typeInfo = property.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var propertyInfo = property.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var propertyComment = XmlComment.Parse(comment, new());
-                propertyComment.Type = property.Type;
-                comments.Add((typeInfo, propertyInfo, propertyComment));
+                if (propertyComment is not null)
+                {
+                    propertyComment.Type = property.Type;
+                    comments.Add((typeInfo, propertyInfo, propertyComment));
+                }
             }
         }
         var methods = visitor.GetPublicMethods();

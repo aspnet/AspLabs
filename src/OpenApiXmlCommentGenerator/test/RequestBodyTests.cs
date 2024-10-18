@@ -21,7 +21,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.MapPost("/", RouteHandlerExtensionMethods.Get);
+app.MapPost("/", RouteHandlerExtensionMethods.Post);
 
 app.Run();
 
@@ -34,7 +34,7 @@ public static class RouteHandlerExtensionMethods
     }
 }
 
-record Todo(int Id, string Title, bool Completed);
+public record Todo(int Id, string Title, bool Completed);
 """;
         var generator = new XmlCommentGenerator();
         await SnapshotTestHelper.Verify(source, generator, out var compilation);

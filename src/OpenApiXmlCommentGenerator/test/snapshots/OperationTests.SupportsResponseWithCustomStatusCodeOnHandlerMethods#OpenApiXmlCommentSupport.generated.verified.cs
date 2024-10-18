@@ -37,6 +37,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     using Microsoft.OpenApi.Models;
     using Microsoft.OpenApi.Any;
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class XmlCommentCache
     {
         private static Dictionary<(Type?, string?), string>? _cache;
@@ -61,6 +62,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file class XmlCommentOperationTransformer : IOpenApiOperationTransformer
     {
         public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
@@ -73,28 +75,47 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             {
                 return Task.CompletedTask;
             }
-            System.Diagnostics.Debugger.Break();
             if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodCommentString))
             {
+                System.Diagnostics.Debugger.Break();
                 var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
+                if (methodComment is null)
+                {
+                    return Task.CompletedTask;
+                }
                 operation.Summary = methodComment.Summary;
                 operation.Description = methodComment.Description;
-                if (methodComment.Parameters is { Count: > 0 })
+                foreach (var parameterComment in methodComment.Parameters)
                 {
-                    foreach (var parameter in operation.Parameters)
+                    var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameterComment.Name);
+                    var operationParameter = operation.Parameters?.SingleOrDefault(parameter => parameter.Name == parameterComment.Name);
+                    if (operationParameter is not null)
                     {
-                        var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameter.Name);
-                        var parameterComment = methodComment.Parameters.SingleOrDefault(xmlParameter => xmlParameter.Name == parameter.Name);
-                        parameter.Description = parameterComment.Description;
-                        parameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
+                        operationParameter.Description = parameterComment.Description;
+                        if (parameterInfo is not null)
+                        {
+                            operationParameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
+                        }
+                    }
+                    else
+                    {
+                        var requestBody = operation.RequestBody;
+                        if (requestBody is not null)
+                        {
+                            requestBody.Description = parameterComment.Description;
+                        }
                     }
                 }
-                if (methodComment.Responses is { Count: > 0})
+                if (methodComment.Responses is { Count: > 0} && operation.Responses is { Count: > 0 })
                 {
                     foreach (var response in operation.Responses)
                     {
                         var responseComment = methodComment.Responses.SingleOrDefault(xmlResponse => xmlResponse.Code == response.Key);
-                        response.Value.Description = responseComment.Description;
+                        if (responseComment is not null)
+                        {
+                            response.Value.Description = responseComment.Description;
+                        }
+
                     }
                 }
             }
@@ -103,6 +124,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file class XmlCommentSchemaTransformer : IOpenApiSchemaTransformer
     {
         public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
@@ -112,30 +134,41 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyCommentString))
                 {
                     var propertyComment = JsonSerializer.Deserialize<XmlComment>(propertyCommentString);
-                    schema.Description = propertyComment.Returns ?? propertyComment.Summary;
-                    if (propertyComment.Examples is { Count: > 0 })
+                    if (propertyComment is not null)
                     {
-                        schema.Example = OpenApiExamplesHelper.ToOpenApiAny(propertyComment.Examples.FirstOrDefault(), propertyInfo.PropertyType);
+                        schema.Description = propertyComment.Returns ?? propertyComment.Summary;
+                        if (propertyComment.Examples is { Count: > 0 })
+                        {
+                            schema.Example = OpenApiExamplesHelper.ToOpenApiAny(propertyComment.Examples.FirstOrDefault(), propertyInfo.PropertyType);
+                        }
                     }
                 }
             }
             if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeCommentString))
             {
                 var typeComment = JsonSerializer.Deserialize<XmlComment>(typeCommentString);
-                schema.Description = typeComment.Summary;
-                if (typeComment.Examples is { Count: > 0 })
+                if (typeComment is not null)
                 {
-                    schema.Example = OpenApiExamplesHelper.ToOpenApiAny(typeComment.Examples.FirstOrDefault(), context.JsonTypeInfo.Type);
+                    schema.Description = typeComment.Summary;
+                    if (typeComment.Examples is { Count: > 0 })
+                    {
+                        schema.Example = OpenApiExamplesHelper.ToOpenApiAny(typeComment.Examples.FirstOrDefault(), context.JsonTypeInfo.Type);
+                    }
                 }
             }
             return Task.CompletedTask;
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class OpenApiExamplesHelper
     {
         public static IOpenApiAny ToOpenApiAny(string? example, Type type)
         {
+            if (example is null || type is null)
+            {
+                return new OpenApiNull();
+            }
             return Type.GetTypeCode(type) switch
             {
                 TypeCode.String => new OpenApiString(example),
@@ -150,6 +183,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class GeneratedServiceCollectionExtensions
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "D49AV73nitYJEt/D26s0E+MAAABQcm9ncmFtLmNz")]

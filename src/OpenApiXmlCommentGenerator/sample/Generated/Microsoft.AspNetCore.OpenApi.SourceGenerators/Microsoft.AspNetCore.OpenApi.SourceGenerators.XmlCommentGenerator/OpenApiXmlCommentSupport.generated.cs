@@ -36,19 +36,11 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     using Microsoft.OpenApi.Models;
     using Microsoft.OpenApi.Any;
 
-    file class XmlComment
-    {
-        public string? Summary { get; set; }
-        public string? Description { get; set; }
-        public string? Returns { get; set; }
-        public IOpenApiAny? Example { get; set; }
-        public Dictionary<string, string>? Parameters { get; set; }
-    }
-
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class XmlCommentCache
     {
-        private static Dictionary<(Type?, string?), XmlComment>? _cache;
-        public static Dictionary<(Type?, string?), XmlComment> Cache
+        private static Dictionary<(Type?, string?), string>? _cache;
+        public static Dictionary<(Type?, string?), string> Cache
         {
             get
             {
@@ -60,105 +52,140 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
             }
         }
 
-        private static Dictionary<(Type?, string?), XmlComment> GenerateCacheEntries()
+        private static Dictionary<(Type?, string?), string> GenerateCacheEntries()
         {
-            var _cache = new Dictionary<(Type?, string?), XmlComment>();
-            XmlComment xmlComment;
-            xmlComment = new XmlComment();
-            xmlComment.Summary = "Represents a todo item that can be created, read, updated, and deleted.";
-            xmlComment.Parameters = new Dictionary<string, string>();
-            _cache.Add((typeof(global::Todo), null), xmlComment);
-            xmlComment = new XmlComment();
-            xmlComment.Summary = "The main title of the todo.";
-            xmlComment.Parameters = new Dictionary<string, string>();
-            _cache.Add((typeof(global::Todo), nameof(global::Todo.Title)), xmlComment);
-            xmlComment = new XmlComment();
-            xmlComment.Summary = "Whether or not the todo has been completed.";
-            xmlComment.Parameters = new Dictionary<string, string>();
-            _cache.Add((typeof(global::Todo), nameof(global::Todo.Completed)), xmlComment);
-            xmlComment = new XmlComment();
-            xmlComment.Summary = "Create a new Todo item.";
-            xmlComment.Parameters = new Dictionary<string, string>();
-            xmlComment.Parameters.Add("todo", "The todo item to create.");
-            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.PostTodo)), xmlComment);
+            var _cache = new Dictionary<(Type?, string?), string>();
+            _cache.Add((typeof(global::Todo), null), "{\"Summary\":\"Represents a todo item that can be created, read, updated, and deleted.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
+            _cache.Add((typeof(global::Todo), nameof(global::Todo.Title)), "{\"Summary\":\"The main title of the todo.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
+            _cache.Add((typeof(global::Todo), nameof(global::Todo.Completed)), "{\"Summary\":\"Whether or not the todo has been completed.\",\"Description\":null,\"Remarks\":null,\"Returns\":null}");
+            _cache.Add((typeof(global::RouteHandlerExtensionMethods), nameof(global::RouteHandlerExtensionMethods.PostTodo)), "{\"Summary\":\"Create a new Todo item.\",\"Description\":null,\"Remarks\":null,\"Returns\":null,\"Parameters\":[{\"Name\":\"todo\",\"Description\":\"The todo item to create.\",\"Example\":\"\"}],\"Responses\":[{\"Code\":\"201\",\"Description\":\"The created Todo item.\"}]}");
             return _cache;
 
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file class XmlCommentOperationTransformer : IOpenApiOperationTransformer
     {
         public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
         {
-            if (context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            var methodInfo = context.Description.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+                ? controllerActionDescriptor.MethodInfo
+                : context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
+
+            if (methodInfo is null)
             {
-                if (XmlCommentCache.Cache.TryGetValue((controllerActionDescriptor.MethodInfo.DeclaringType, controllerActionDescriptor.MethodInfo.Name), out var methodComment))
+                return Task.CompletedTask;
+            }
+            if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodCommentString))
+            {
+                System.Diagnostics.Debugger.Break();
+                var methodComment = JsonSerializer.Deserialize<XmlComment>(methodCommentString);
+                if (methodComment is null)
                 {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
-                    if (methodComment.Parameters.Count > 0)
+                    return Task.CompletedTask;
+                }
+                operation.Summary = methodComment.Summary;
+                operation.Description = methodComment.Description;
+                foreach (var parameterComment in methodComment.Parameters)
+                {
+                    var parameterInfo = methodInfo.GetParameters().SingleOrDefault(info => info.Name == parameterComment.Name);
+                    var operationParameter = operation.Parameters?.SingleOrDefault(parameter => parameter.Name == parameterComment.Name);
+                    if (operationParameter is not null)
                     {
-                        foreach (var parameter in operation.Parameters)
+                        operationParameter.Description = parameterComment.Description;
+                        if (parameterInfo is not null)
                         {
-                            if (methodComment.Parameters.TryGetValue(parameter.Name, out var parameterComment))
-                            {
-                                parameter.Description = parameterComment;
-                            }
+                            operationParameter.Example = OpenApiExamplesHelper.ToOpenApiAny(parameterComment.Example, parameterInfo.ParameterType);
                         }
+                    }
+                    else
+                    {
+                        var requestBody = operation.RequestBody;
+                        if (requestBody is not null)
+                        {
+                            requestBody.Description = parameterComment.Description;
+                        }
+                    }
+                }
+                if (methodComment.Responses is { Count: > 0} && operation.Responses is { Count: > 0 })
+                {
+                    foreach (var response in operation.Responses)
+                    {
+                        var responseComment = methodComment.Responses.SingleOrDefault(xmlResponse => xmlResponse.Code == response.Key);
+                        if (responseComment is not null)
+                        {
+                            response.Value.Description = responseComment.Description;
+                        }
+
                     }
                 }
             }
 
-            var methodInfo = context.Description.ActionDescriptor.EndpointMetadata.OfType<MethodInfo>().SingleOrDefault();
-            if (methodInfo is not null)
-            {
-                if (XmlCommentCache.Cache.TryGetValue((methodInfo.DeclaringType, methodInfo.Name), out var methodComment))
-                {
-                    operation.Summary = methodComment.Summary;
-                    operation.Description = methodComment.Description;
-                    if (methodComment.Parameters.Count > 0)
-                    {
-                        foreach (var parameter in operation.Parameters)
-                        {
-                            if (methodComment.Parameters.TryGetValue(parameter.Name, out var parameterComment))
-                            {
-                                parameter.Description = parameterComment;
-                            }
-                        }
-                    }
-                }
-            }
             return Task.CompletedTask;
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file class XmlCommentSchemaTransformer : IOpenApiSchemaTransformer
     {
         public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
         {
             if (context.JsonPropertyInfo is { AttributeProvider: PropertyInfo propertyInfo })
             {
-                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyComment))
+                if (XmlCommentCache.Cache.TryGetValue((propertyInfo.DeclaringType, propertyInfo.Name), out var propertyCommentString))
                 {
-                    schema.Description = propertyComment.Returns ?? propertyComment.Summary;
-                    if (propertyComment.Example is not null)
+                    var propertyComment = JsonSerializer.Deserialize<XmlComment>(propertyCommentString);
+                    if (propertyComment is not null)
                     {
-                        schema.Example = propertyComment.Example;
+                        schema.Description = propertyComment.Returns ?? propertyComment.Summary;
+                        if (propertyComment.Examples is { Count: > 0 })
+                        {
+                            schema.Example = OpenApiExamplesHelper.ToOpenApiAny(propertyComment.Examples.FirstOrDefault(), propertyInfo.PropertyType);
+                        }
                     }
                 }
             }
-            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeComment))
+            if (XmlCommentCache.Cache.TryGetValue((context.JsonTypeInfo.Type, null), out var typeCommentString))
             {
-                schema.Description = typeComment.Summary;
-                if (schema.Example is not null)
+                var typeComment = JsonSerializer.Deserialize<XmlComment>(typeCommentString);
+                if (typeComment is not null)
                 {
-                    schema.Example = typeComment.Example;
+                    schema.Description = typeComment.Summary;
+                    if (typeComment.Examples is { Count: > 0 })
+                    {
+                        schema.Example = OpenApiExamplesHelper.ToOpenApiAny(typeComment.Examples.FirstOrDefault(), context.JsonTypeInfo.Type);
+                    }
                 }
             }
             return Task.CompletedTask;
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
+    file static class OpenApiExamplesHelper
+    {
+        public static IOpenApiAny ToOpenApiAny(string? example, Type type)
+        {
+            if (example is null || type is null)
+            {
+                return new OpenApiNull();
+            }
+            return Type.GetTypeCode(type) switch
+            {
+                TypeCode.String => new OpenApiString(example),
+                TypeCode.Boolean => new OpenApiBoolean(bool.Parse(example)),
+                TypeCode.Int32 => new OpenApiInteger(int.Parse(example)),
+                TypeCode.Int64 => new OpenApiLong(long.Parse(example)),
+                TypeCode.Double => new OpenApiDouble(double.Parse(example)),
+                TypeCode.Single => new OpenApiFloat(float.Parse(example)),
+                TypeCode.DateTime => new OpenApiDateTime(DateTime.Parse(example)),
+                _ => new OpenApiNull()
+            };
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.AspNetCore.OpenApi.SourceGenerators, Version=42.42.42.42, Culture=neutral, PublicKeyToken=adb9793829ddae60", "42.42.42.42")]
     file static class GeneratedServiceCollectionExtensions
     {
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(1, "d2c6L52Mb6gH4vQfy8D9hkQAAABQcm9ncmFtLmNz")]
