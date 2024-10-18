@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsPackable>true</IsPackable>
+    <IsShipping>true</IsShipping>
+    <MajorVersion>1</MajorVersion>
+    <MinorVersion>0</MinorVersion>
+    <PreReleaseVersionLabel>preview1</PreReleaseVersionLabel>
+    <IsAnalyzersProject>true</IsAnalyzersProject>
+    <AddPublicApiAnalyzers>false</AddPublicApiAnalyzers>
+    <Nullable>enable</Nullable>
+    <WarnOnNullable>true</WarnOnNullable>
+    <NoWarn>RSEXPERIMENTAL002</NoWarn>
+    <LangVersion>preview</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" IsImplicitlyDefined="true" Version="4.11.0-2.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" PrivateAssets="All" IsImplicitlyDefined="true" Version="4.11.0-2.final" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+</Project>

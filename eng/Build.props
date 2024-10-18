@@ -10,5 +10,6 @@
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\QuickGrid\QuickGrid.sln" />
+    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\OpenApiXmlCommentGenerator\gen\Microsoft.AspNetCore.OpenApi.SourceGenerators.csproj" />
   </ItemGroup>
 </Project>
