@@ -14,6 +14,7 @@
     <WarnOnNullable>true</WarnOnNullable>
     <NoWarn>RSEXPERIMENTAL002</NoWarn>
     <LangVersion>preview</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
