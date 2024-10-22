@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project>
+  <PropertyGroup>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+    <InterceptorsPreviewNamespaces>
+      $(InterceptorsPreviewNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsPreviewNamespaces>
+  </PropertyGroup>
+</Project>

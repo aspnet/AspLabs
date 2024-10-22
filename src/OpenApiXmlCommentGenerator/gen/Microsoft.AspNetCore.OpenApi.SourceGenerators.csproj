@@ -15,19 +15,24 @@
     <NoWarn>RSEXPERIMENTAL002</NoWarn>
     <LangVersion>preview</LangVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>source generator, openapi, xml</PackageTags>
+    <Description>Source generator to provide XML doc support for Microsoft.AspNetCore.OpenApi</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" IsImplicitlyDefined="true" Version="4.11.0-2.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" PrivateAssets="All" IsImplicitlyDefined="true" Version="4.11.0-2.final" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include=".\README.md" Pack="true" PackagePath="\"/>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include=".\build\Microsoft.AspNetCore.OpenApi.SourceGenerators.targets" Pack="true" PackagePath="build" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DocFx.XmlComments\Resources\**" />
   </ItemGroup>
 
 </Project>
