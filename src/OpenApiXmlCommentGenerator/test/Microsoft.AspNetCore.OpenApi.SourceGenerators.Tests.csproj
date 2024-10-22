@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\gen\Microsoft.AspNetCore.OpenApi.SourceGenerators.csproj" />
-    <ProjectReference Include="..\src\DocFx.XmlComments.csproj" />
   </ItemGroup>
 
   <ItemGroup>

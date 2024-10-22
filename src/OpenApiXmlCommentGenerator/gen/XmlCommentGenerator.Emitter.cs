@@ -182,7 +182,7 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
     {
         public static IOpenApiAny ToOpenApiAny(string? example, Type type)
         {
-            if (example is null || type is null)
+            if (string.IsNullOrEmpty(example) || type is null)
             {
                 return new OpenApiNull();
             }
@@ -225,6 +225,17 @@ namespace Microsoft.AspNetCore.OpenApi.Generated
                 {
                     return services.AddOpenApi(documentName, options =>
                     {
+                        options.AddSchemaTransformer(new XmlCommentSchemaTransformer());
+                        options.AddOperationTransformer(new XmlCommentOperationTransformer());
+                    });
+                }
+        """,
+        AddOpenApiOverloadVariant.AddOpenApiConfigureOptions => """
+        public static IServiceCollection AddOpenApi(this IServiceCollection services, Action<OpenApiOptions> configureOptions)
+                {
+                    return services.AddOpenApi("v1", options =>
+                    {
+                        configureOptions(options);
                         options.AddSchemaTransformer(new XmlCommentSchemaTransformer());
                         options.AddOperationTransformer(new XmlCommentOperationTransformer());
                     });

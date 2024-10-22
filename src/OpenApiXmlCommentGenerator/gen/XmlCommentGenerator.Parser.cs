@@ -87,12 +87,28 @@ public sealed partial class XmlCommentGenerator
     {
         var invocationExpression = (InvocationExpressionSyntax)context.Node;
         var interceptableLocation = context.SemanticModel.GetInterceptableLocation(invocationExpression, cancellationToken);
-        return new(invocationExpression.ArgumentList.Arguments.Count switch
+        var argumentsCount = invocationExpression.ArgumentList.Arguments.Count;
+        if (argumentsCount == 0)
         {
-            0 => AddOpenApiOverloadVariant.AddOpenApi,
-            1 => AddOpenApiOverloadVariant.AddOpenApiDocumentName,
-            2 => AddOpenApiOverloadVariant.AddOpenApiDocumentNameConfigureOptions,
-            _ => throw new InvalidOperationException("Invalid number of arguments for supported `AddOpenApi` overload."),
-        }, invocationExpression, interceptableLocation);
+            return new(AddOpenApiOverloadVariant.AddOpenApi, invocationExpression, interceptableLocation);
+        }
+        else if (argumentsCount == 2)
+        {
+            return new(AddOpenApiOverloadVariant.AddOpenApiDocumentNameConfigureOptions, invocationExpression, interceptableLocation);
+        }
+        else
+        {
+            // We need to disambiguate between the two overloads that take a string and a delegate
+            // AddOpenApi("v1") vs. AddOpenApi(options => { })
+            var argument = invocationExpression.ArgumentList.Arguments[0];
+            if (argument.Expression is LiteralExpressionSyntax)
+            {
+                return new(AddOpenApiOverloadVariant.AddOpenApiDocumentName, invocationExpression, interceptableLocation);
+            }
+            else
+            {
+                return new(AddOpenApiOverloadVariant.AddOpenApiConfigureOptions, invocationExpression, interceptableLocation);
+            }
+        }
     }
 }
