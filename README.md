@@ -5,7 +5,7 @@ AspLabs
 
 Repo for ASP.NET experiments that are not ready for a production release.
 
-Use https://github.com/aspnet/AspNetCore/issues for issues with this project.
+Use https://github.com/dotnet/AspNetCore/issues for issues with this project.
 
 ## Building
 
