@@ -102,7 +102,7 @@ stages:
 
       - job: macOS
         pool:
-          vmImage: macOS-12
+          vmImage: macOS-15
         strategy:
           matrix:
             debug:
