@@ -1,2 +1,0 @@
-# ASP.NET Core "api" templates
-This repo contains the source for the experimental ASP.NET Core 'api' templates. The project template utilizes the new minimal APIs for hosting and routing endpoints in .NET 6 along with a pre-configured, opinionated wire-up of OpenAPI via the [Swashbuckle library](https://github.com/domaindrivendev/Swashbuckle.AspNetCore).
