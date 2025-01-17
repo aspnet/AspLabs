@@ -1,0 +1,8 @@
+<Project>
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory)..\, Directory.Build.props))\Directory.Build.props" />
+
+  <PropertyGroup>
+    <!-- Suppress warning about using a netfx package in net3.1 projects -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+</Project>
