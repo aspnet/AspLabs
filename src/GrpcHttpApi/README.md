@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> gRPC HTTP API is now part of ASP.NET Core. For more information, see [gRPC JSON transcoding](https://learn.microsoft.com/aspnet/core/grpc/json-transcoding).
+> 
+> Source code has been removed but it is accessible from [the repo history](https://github.com/aspnet/AspLabs/tree/776c606e7817468a2ad7383ea587f0151998d8a4/src/GrpcHttpApi).
+
 gRPC HTTP API
 =============
 
@@ -8,8 +13,6 @@ gRPC HTTP API is an experimental extension for ASP.NET Core that creates RESTful
 * JSON requests/responses
 
 Of course gRPC can continue to be used as well. RESTful APIs for your gRPC services. No duplication!
-
-![gRPC loves REST](grpc-rest-logo.png "gRPC loves REST")
 
 ### Usage
 
