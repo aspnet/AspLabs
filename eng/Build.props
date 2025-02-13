@@ -3,9 +3,7 @@
   <!-- Specify the solutions to build. Add all new solutions/projects here as necessary or the main build won't build them! -->
   <ItemGroup>
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\AspNetCoreWebAPI\AspNetCoreWebAPI.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\Components.Web.Extensions\Microsoft.AspNetCore.Components.Web.Extensions.csproj" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\ClientAssets\ClientAssets.sln" />
-    <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\BlazorWebAssemblyCustomInitialization\BlazorWebAssemblyCustomInitialization.sln" />
     <ProjectToBuild Include="$(MSBuildThisFileDirectory)..\src\OpenApiXmlCommentGenerator\gen\Microsoft.AspNetCore.OpenApi.SourceGenerators.csproj" />
   </ItemGroup>
 </Project>
