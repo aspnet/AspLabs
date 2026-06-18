@@ -30,7 +30,7 @@ public sealed partial class XmlCommentGenerator
                 cancellationToken: cancellationToken);
             if (!string.IsNullOrEmpty(comment) && !string.Equals("<doc />", comment, StringComparison.Ordinal))
             {
-                var typeInfo = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                var typeInfo = type.ToNormalizedDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var typeComment = XmlComment.Parse(comment, new());
                 comments.Add((typeInfo, null, typeComment));
             }
@@ -46,7 +46,7 @@ public sealed partial class XmlCommentGenerator
                 cancellationToken: cancellationToken);
             if (!string.IsNullOrEmpty(comment) && !string.Equals("<doc />", comment, StringComparison.Ordinal))
             {
-                var typeInfo = property.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                var typeInfo = property.ContainingType.ToNormalizedDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var propertyInfo = property.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var propertyComment = XmlComment.Parse(comment, new());
                 if (propertyComment is not null)
@@ -72,7 +72,7 @@ public sealed partial class XmlCommentGenerator
                 {
                     continue;
                 }
-                var typeInfo = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                var typeInfo = method.ContainingType.ToNormalizedDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var methodInfo = method.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 comments.Add((typeInfo, methodInfo, XmlComment.Parse(comment, new())));
             }
