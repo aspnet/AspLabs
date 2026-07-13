@@ -8,8 +8,14 @@ updates:
     directory: "/"
     registries:
       - dotnet-public
-    open-pull-requests-limit: 5
     schedule:
       interval: "monthly"
     labels:
       - "area-infrastructure"
+    groups:
+      nuget:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
