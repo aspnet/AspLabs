@@ -19,3 +19,5 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Managed via eng/Version.Details.xml (arcade dependency flow), not Dependabot.
+      - dependency-name: "Microsoft.DotNet.Arcade.Sdk"
