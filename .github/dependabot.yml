@@ -9,7 +9,7 @@ updates:
     registries:
       - dotnet-public
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     labels:
       - "area-infrastructure"
     groups:
