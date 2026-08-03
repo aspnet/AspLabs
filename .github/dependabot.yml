@@ -9,7 +9,7 @@ updates:
     registries:
       - dotnet-public
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     labels:
       - "area-infrastructure"
     groups:
@@ -19,3 +19,5 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Managed via eng/Version.Details.xml (arcade dependency flow), not Dependabot.
+      - dependency-name: "Microsoft.DotNet.Arcade.Sdk"
